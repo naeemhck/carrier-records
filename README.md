@@ -4,7 +4,7 @@ Internal records, trip billing, expenses and monthly reporting for a car-carrier
 
 ## Project status
 
-The six planning documents are complete. T01 has a Windows/Android Flutter scaffold and local Supabase tooling. Analysis and the application harness test pass; native builds and backend deployment are not complete. Windows is the first release; Android follows the Windows pilot. See [tooling setup](docs/tooling.md) and [executed evidence](docs/tooling-evidence.md).
+T00–T04 are complete: local Windows/Android tooling, exact domain/schema contracts, managed staff accounts and authorization, and company/master records. Analysis, unit/widget and local backend checks, Windows integration checks and both debug builds pass. Production deployment, release distribution and T05 onward remain pending. See [current tasks](tasks.md) and [T04 evidence](docs/masters-evidence.md).
 
 ## Planning documents
 
@@ -19,8 +19,8 @@ The six planning documents are complete. T01 has a Windows/Android Flutter scaff
 
 ## Continue in VS Code
 
-Open this repository folder in VS Code and use the Codex extension. Read memory.md, PRD.md and rules.md first, then continue from T01 in tasks.md. Verify the existing Flutter SDK with flutter --version and flutter doctor before creating the Windows/Android application.
+Open this repository folder in VS Code and use the Codex extension. Read memory.md, PRD.md and rules.md first, then continue from T05 in tasks.md. Use the existing Flutter SDK and local Supabase setup documented in [tooling setup](docs/tooling.md).
 
-Flutter/Dart is the client stack; Supabase will provide the shared online backend. Core package versions and the application lockfile are pinned. Use local Git; do not publish to GitHub. Keep secrets, signing material, live customer records and backup archives outside version control.
+Flutter/Dart is the client stack; Supabase provides the local backend during implementation. Core package versions and the application lockfile are pinned. Use local Git and the user-authorized [private source backup](https://github.com/naeemhck/carrier-records). Keep secrets, signing material, live customer records and backup archives outside version control. Public publication is not authorized. See [source backup review](docs/source-backup.md).
 
 Update the affected planning documents and memory.md when requirements or implementation status change. Record actual test and build results; defined tests are not passed tests.

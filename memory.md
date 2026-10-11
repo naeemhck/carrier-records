@@ -7,7 +7,7 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 ## 1. Current state
 
 - Six planning documents and AGENTS.md have been read. The business scope and financial invariants remain unchanged.
-- Workspace: D:\portfolio\transport_project. Local Git on main only; no remote or GitHub publication is authorized.
+- Workspace: D:\portfolio\transport_project. Local Git history is preserved. On 2026-10-11 the user superseded the earlier no-GitHub instruction for a private source backup: origin is https://github.com/naeemhck/carrier-records.git, created under the verified naeemhck account with private visibility. Public publication and inclusion of credentials/operational data remain unauthorized. See docs/source-backup.md for the pre-push review; remote commit equality is verified after pushing.
 - T00-T04 are DONE; T05-T20 remain TODO. Next task is T05 trips/consignments/stops/car records. T04 company/master forms, administrator commands, exact route defaults, multiple party roles and used-record archiving are implemented. AT-10/11 historical snapshots and relevant direct authorization attacks pass. Later financial/lifecycle/output/release/restore acceptance is NOT RUN.
 - Existing VS Code SDK verified: Flutter 3.47.4 stable (9584c6713b), Dart 3.13.3. tools/flutter.ps1 resolves the configured SDK. T01 developer mode, standard v143 ATL, Visual Studio/Android/JDK/SDK prerequisites and licenses passed; exact installation failures/remedies remain in docs/tooling-evidence.md. No installer duplicates were started during T03.
 - App keeps Riverpod composition/go_router navigation with an Auth adapter, staff username sign-in, mandatory password change, administrator account creation/edit/status/offices/reset and logout. Protected FlutterSecureStorage replaces session SharedPreferences. Explicit persistence errors fail sign-in; pending writes/deletions serialize; stale refreshes cannot restore a signed-out profile. Windows native protected storage and real local username sign-in/logout UI tests passed. Android backup is disabled; Android protected-store device execution remains T20 verification.
@@ -149,7 +149,7 @@ Not verified in this phase: Flutter application analysis/tests, SQL migrations/R
 ## 9. Resume instructions
 
 1. Read the six documents, starting with this file and PRD.md/rules.md.
-2. Use local Git; do not publish to GitHub under the latest instruction.
+2. Preserve local Git history. The user authorized a private GitHub source backup at origin https://github.com/naeemhck/carrier-records.git. Verify private visibility before a backup push; never force-push or publish private operational files. Public publication remains unauthorized.
 3. Resume T05 trips/consignments/stops/car records, then follow task dependencies. T01-T04 completion checks passed; see docs/tooling-evidence.md, docs/domain-evidence.md, docs/accounts-evidence.md and docs/masters-evidence.md. First real administrator/company/office setup still needs actual user inputs; use docs/accounts-setup.md and docs/masters-setup.md.
 4. Create required source/tooling in the project and keep production secrets out of it.
 5. Do not reinvent the money model, broaden recipient visibility, silently add taxes or enable paid hosting.
