@@ -1,0 +1,16 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path=public,extensions;
+select no_plan();
+select ok(not has_function_privilege('authenticated','private.report_facts(jsonb,boolean)','EXECUTE'),'No raw unredacted facts endpoint');
+select ok(not has_function_privilege('anon','public.get_scoped_report(text,jsonb,integer)','EXECUTE'),'Anonymous report denied');
+select ok(not has_table_privilege('authenticated','public.financial_events','SELECT'),'Reports do not open event metadata');
+select ok(not has_table_privilege('carrier_security','public.journal_lines','INSERT,UPDATE,DELETE'),'Report owner has no financial writes');
+select ok(not pg_has_role('postgres','carrier_security','SET'),'Migration access revoked');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid='public.get_scoped_report(text,jsonb,integer)'::regprocedure),'Report definer search path pinned');
+select set_config('request.jwt.claims','{}',true);
+set local role authenticated;
+select throws_ok($$select public.get_scoped_report('MONTHLY_VEHICLE','{"from":"2026-01-01","to":"2026-01-31"}',0)$$,'42501','FORBIDDEN','Reports require current live staff');
+reset role;
+select * from finish();
+rollback;

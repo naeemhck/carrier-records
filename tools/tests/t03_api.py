@@ -200,6 +200,9 @@ try:
     if '--corrections' in sys.argv:
         from t10_corrections import verify
         verify(globals())
+    if '--reports' in sys.argv:
+        from t11_reports import verify
+        verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify
         verify(globals())

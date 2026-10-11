@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../features/finance/financial_repository.dart';
 import '../features/finance/correction_repository.dart';
+import '../features/reports/report_repository.dart';
+import '../features/reports/report_workspace.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -278,6 +280,60 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
+                  for (final dashboard in [true, false])
+                    FilledButton.icon(
+                      icon: Icon(
+                        dashboard ? Icons.dashboard : Icons.assessment,
+                      ),
+                      label: Text(dashboard ? 'Dashboard' : 'Reports'),
+                      onPressed: () async {
+                        final scope = tripScope(p);
+                        Widget guard(Widget child) => ListenableBuilder(
+                          listenable: widget.session,
+                          builder: (_, _) =>
+                              tripScope(widget.session.profile) == scope &&
+                                  widget
+                                          .session
+                                          .profile?['must_change_password'] ==
+                                      false
+                              ? child
+                              : const Scaffold(
+                                  body: Center(
+                                    child: Text(
+                                      'Current office access required.',
+                                    ),
+                                  ),
+                                ),
+                        );
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => guard(
+                              ReportWorkspace(
+                                reports: ReportRepository(
+                                  widget.session.client,
+                                ),
+                                trips: SupabaseTripRepository(
+                                  widget.session.client,
+                                ),
+                                masters: SupabaseMasterRepository(
+                                  widget.session.client,
+                                ),
+                                offices: (p['offices'] as List)
+                                    .map(
+                                      (o) =>
+                                          Map<String, dynamic>.from(o as Map),
+                                    )
+                                    .toList(),
+                                dashboard: dashboard,
+                                guard: guard,
+                              ),
+                            ),
+                          ),
+                        );
+                        await widget.session.refresh();
+                      },
+                    ),
                   FilledButton.icon(
                     icon: const Icon(Icons.local_shipping),
                     label: const Text(TripStrings.trips),

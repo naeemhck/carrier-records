@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T10 DONE. Next: T11 reports and dashboard. T11-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T11 DONE. Next: T12 field catalogue, customization and presets. T12-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -173,11 +173,15 @@ Executed 2026-10-11: audited final source and reachable history, verified intend
 
 ### T11 — Reports and dashboard
 
-Status: TODO | Dependencies: T10
+Status: DONE | Dependencies: T10
 
 Implement server-side aggregation for monthly vehicle/owner earnings, commission, expenses, receipts, credits, custody and claims plus lifetime trip profit. Date bases follow rules.md. Build dashboard/list navigation with 50-row pagination and scoped completeness labels.
 
 Evidence: AT-07/19/22 pass, including expenses on earlier trips and scoped staff totals. Performance fixture is prepared without mixing test and production records.
+
+Executed: final clean thirteen-migration reset; 170 SQL assertions and error-level lint PASS; analyzer no issues; 54 Flutter tests PASS. Final full backend regression/functional-report command exits 0 with 1,143 PASS checks and successful fixture cleanup. Real Windows scoped report UI PASS (55.1s build/7s test); ordinary Windows/Android debug builds PASS (47.0s/45.2s). Privileged-value audit PASS across 735 source/package entries; source/history audit no findings. Health HTTP 200/PG ready; synthetic public/private/Auth/Storage records zero, triggers enabled, temporary role grants/native config absent. Actual failures, fixes and hashes: docs/reports-evidence.md; guide: docs/reports-setup.md.
+
+AT-07/19/22 report checks PASS: independent date bases, cross-month earning/receipt/expense replacements, prior-trip and standalone monthly costs, lifetime exclusions, historical owner assignment, exact profit separate from claims/custody/settlement, 50-row disjoint pages with constant whole-filter totals, explicit scope labels and denied direct/revoked-office requests. Annual isolated fixture: 12,000 trips, 20 vehicles, five distinct concurrent staff sessions, 50 HTTP samples each. Summary p95 4.2047s (≤5s) and trip-screen p95 0.4207s (≤2s), Windows 10/i5-6200U/four logical processors/local loopback active Docker; not hosted-network measurements. First benchmark failed before measurement; optimized indexes and one-time office checks produced the passing run. Premature reset interrupted its cleanup; final full functional/backend run completed and cleaned successfully. T11 gate passes. Commit locally before T12; no push. Document issuance and file exports remain T13/T14, backup status and hosted quota checks remain later tasks.
 
 ### T12 — Field catalogue, customization and presets
 
