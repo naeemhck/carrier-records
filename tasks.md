@@ -169,6 +169,8 @@ git -C "D:\portfolio\transport_project" push -u origin main
 
 Verify remote main matches the backed-up local commit and report the repository URL and commit. If authentication is unavailable, request sign-in through GitHub or the CLI; never request passwords/tokens in chat. Resolve divergence without overwriting remote history. This checkpoint backs up committed project files; operational database and receipt backups remain separate. No push is requested before T10 by this checkpoint.
 
+Executed 2026-10-11: audited final source and reachable history, verified intended origin/private visibility with authenticated GitHub API, committed T10 as 18428a0829275f3aaa49f5bbc4f3bec4b873f2ba and pushed main without force. Remote main matched that local commit; PRIVATE visibility was reverified. This actual-result documentation is included in a follow-up commit/push and final remote comparison. No other branches/tags or intended unpushed work; ignored credentials, operational records/receipts and artifacts remain local. Repository: https://github.com/naeemhck/carrier-records. See docs/corrections-evidence.md.
+
 ### T11 — Reports and dashboard
 
 Status: TODO | Dependencies: T10
