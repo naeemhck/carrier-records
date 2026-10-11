@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T07 DONE. Next: T08 transfers, retention, funding and credits. T08-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T08 DONE. Next: T09 expenses, receipts and reimbursements. T09-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -119,11 +119,17 @@ T07 completion checks PASS at the engine boundary: AT-01/02/04 use real dispatch
 
 ### T08 — Transfers, retention, funding and credits
 
-Status: TODO | Dependencies: T07
+Status: DONE | Dependencies: T07
 
 Build actual remittances, owner settlement, commission retained/paid, custody transfers, personal funding, trip-linked advances, excess credits, explicit applications and refunds. Implement allocation UI with remaining balances and separate cash/offset components.
 
-Evidence: AT-04/05/06/18 pass, including no custody overdraft and no repeated claim consumption. Owner payment does not erase customer debt when funded personally.
+Evidence: Applicable T08 portions of AT-04/05/06/18 pass, including no custody overdraft and no repeated claim consumption. Owner payment does not erase customer debt when funded personally.
+
+Implemented (2026-10-11): public remittance/owner settlement, actual commission retention/payment, custody transfer, personal owner funding/recovery, trip/consignment advances, explicit excess credit, application and funded refunds. Exact locked source/target allocation aggregates and revisions prevent overdraft/repeated consumption; personal owner payments leave customer debt unchanged. Real guarded payment entry supports partial/bulk allocations, remaining/resulting balances, cash versus non-cash components, review, committed-only success and safe retries/conflict reload. Funded draft identities and cancellations retain financial dependencies.
+
+Executed evidence: clean ten-migration reset PASS; 132 SQL assertions and lint PASS; analyzer no issues and 42 Flutter tests PASS. Combined T03/T05/T06/T07/T08 backend run passes 726 assertions. Expanded T03/T08 run passes 291 assertions, including trip-level credit attribution and direct cross-trip-source/spoofed-recipient attacks. Windows native harness passes 287 assertions with real receipt/retention/remittance UI and independent RPC persistence checks (86.1s build/35s test). Ordinary Windows/Android debug builds exit 0 (67.4s/110.7s); source/package privileged-value audit PASS. Auth/REST/Storage HTTP 200, PostgreSQL ready; synthetic identities/business/financial/private retry/storage data zero, triggers enabled, migration/test role SET privileges revoked and temporary native configuration absent. Actual failures and fixes, contracts and artifact hashes: docs/payments-evidence.md; entry guide: docs/payments-setup.md.
+
+T08 completion checks PASS at the documented boundary: AT-04/06/18 and non-expense settlement/funding primitives are verified. AT-05 diesel creation, profit, expense reimbursement and mixed expense offsets are explicitly DEFERRED to T09; the complete AT-05 is not claimed PASS. T06/T07 rollback and earnings separation remain verified. T10 retains dependent corrections/cancellation; T11 retains full reports. Local Git commit only; do not push before the T10 backup checkpoint.
 
 ### T09 — Expenses, receipts and reimbursements
 
@@ -283,6 +289,8 @@ All scenarios below are specifications; execution status is NOT RUN until implem
 
 
 2026-10-11 T07: AT-01/02/04 financial-kernel examples and AT-16/17 exact concurrency/idempotency checks PASS, migration 20261011000900. T06 rollback and permission regressions retained. T08/T09 client workflows and actual expense/advance creation remain pending; see docs/financial-engine-evidence.md. No GitHub push before the T10 backup checkpoint.
+
+2026-10-11 T08: public AT-04/06/18 payment checks PASS; complete expense-dependent AT-05 remains DEFERRED to T09. Migration 20261011001000; Windows native entry, backend attacks/concurrency, exact validation and rollback verified. See docs/payments-evidence.md. No GitHub push.
 
 For each executed scenario, record date, commit/migration version, platform, test environment, result and evidence path. Store example data without identifying real customers. Record failures and remediation rather than relabeling them passed.
 

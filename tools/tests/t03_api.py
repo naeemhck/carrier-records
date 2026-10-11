@@ -191,6 +191,9 @@ try:
     if '--finance' in sys.argv:
         from t07_finance import verify
         verify(globals())
+    if '--payments' in sys.argv:
+        from t08_payments import verify
+        verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify
         verify(globals())

@@ -1,0 +1,927 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../core/domain/business_date.dart';
+import '../../core/domain/money.dart';
+import '../../core/domain/record_context.dart';
+import '../masters/master_repository.dart';
+import '../trips/trip_repository.dart';
+import 'financial_repository.dart';
+import 'payment_model.dart';
+
+Widget unguardedPayments(Widget child) => child;
+
+class PaymentRow {
+  PaymentRow(this.trip, this.number, this.claims, this.consignments);
+  final String trip, number;
+  final List<Map<String, dynamic>> claims, consignments;
+  final amount = TextEditingController();
+  String? target, source, consignment;
+  bool credit = false;
+  Map<String, dynamic>? find(String? id) =>
+      claims.where((c) => c['line_id'] == id).firstOrNull;
+}
+
+/// Explicit allocations across individually authorized trips; no silent netting.
+class PaymentWorkspace extends StatefulWidget {
+  const PaymentWorkspace({
+    super.key,
+    required this.finance,
+    required this.trips,
+    required this.masters,
+    required this.offices,
+    required this.initialTrip,
+    this.guard = unguardedPayments,
+  });
+  final FinancialCommands finance;
+  final TripRepository trips;
+  final MasterRepository masters;
+  final List<Map<String, dynamic>> offices;
+  final String initialTrip;
+  final Widget Function(Widget) guard;
+  @override
+  State<PaymentWorkspace> createState() => _PaymentWorkspaceState();
+}
+
+class _PaymentWorkspaceState extends State<PaymentWorkspace> {
+  PaymentAction action = PaymentAction.receipt;
+  final date = TextEditingController(),
+      amount = TextEditingController(),
+      reason = TextEditingController();
+  final rows = <PaymentRow>[];
+  final balances = <String, Map<String, dynamic>>{};
+  final names = <String, String>{};
+  String? payer, payee, payerName, payeeName, office, error;
+  bool busy = true, conflict = false;
+  String? pendingSignature, pendingRequest;
+  Map<String, dynamic>? reviewed;
+  @override
+  void initState() {
+    super.initState();
+    date.text = DateTime.now().toIso8601String().substring(0, 10);
+    office = widget.offices.firstOrNull?['id'] as String?;
+    load(widget.initialTrip);
+  }
+
+  @override
+  void dispose() {
+    for (final c in [date, amount, reason, ...rows.map((r) => r.amount)]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> load(String trip) async {
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      final detail = await widget.trips.detail(trip);
+      final ledger = await widget.finance.trip(RecordId(trip));
+      if (!mounted) return;
+      setState(() {
+        final owner = detail['owner_snapshot'] as Map?;
+        if (detail['owner_id'] is String && owner?['display_name'] is String) {
+          names[detail['owner_id'] as String] =
+              owner!['display_name'] as String;
+        }
+        rows.add(
+          PaymentRow(
+            trip,
+            detail['trip_number'] as String,
+            (ledger['claims'] as List)
+                .map((c) => Map<String, dynamic>.from(c as Map))
+                .toList(),
+            (detail['consignments'] as List)
+                .map((c) => Map<String, dynamic>.from(c as Map))
+                .toList(),
+          ),
+        );
+        balances[trip] = ledger;
+        reviewed = null;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          error = message(e);
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          busy = false;
+        });
+      }
+    }
+  }
+
+  String message(Object e) => e is FormatException
+      ? e.message
+      : e is PostgrestException
+      ? (e.code == 'PT409'
+            ? 'Balances or permissions changed. Reload and review before confirming.'
+            : const {
+                    'ALLOCATION_MISMATCH':
+                        'Total must equal allocations and credit remainder.',
+                    'INSUFFICIENT_SOURCE': 'Held funds are insufficient. Choose available funds or declare personal funding.',
+                    'INSUFFICIENT_SOURCE_OR_CLAIM':
+                        'Available source or claim is insufficient.',
+                    'FORBIDDEN': 'Your current office permissions do not allow this payment.',
+                    'CLAIM_EXHAUSTED': 'The claim has already been consumed.',
+                    'INVALID_SOURCE': 'Select eligible funds from this trip and the actual payer.',
+                    'INVALID_CLAIM':
+                        'Select a claim belonging to the identified party.',
+                    'CUSTOMER_TRIP_REQUIRED':
+                        'Select this customer’s trip or consignment.',
+                    'PAYMENT_PRECEDES_CLAIM': 'Payment predates earnings. Record a customer advance instead.',
+                    'PAYMENT_PRECEDES_SOURCE':
+                        'Payment predates its funding source.',
+                    'ACTIVE_RECIPIENT_OR_OFFICE_REQUIRED':
+                        'Select an active recipient and recording office.',
+                  }[e.message] ??
+                  'Payment was not confirmed. Input is retained; check the selections or retry.')
+      : 'Payment was not confirmed. Input is retained. Retry the same reviewed request.';
+
+  Future<void> chooseParty(bool isPayer) async {
+    final result = await showDialog<MasterRecord>(
+      context: context,
+      builder: (_) => widget.guard(_PartyPicker(widget.masters)),
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      if (isPayer) {
+        payer = result.id;
+        payerName = result.label;
+      } else {
+        payee = result.id;
+        payeeName = result.label;
+      }
+      reviewed = null;
+      for (final r in rows) {
+        r.target = null;
+        r.source = null;
+        r.consignment = null;
+      }
+    });
+  }
+
+  Future<void> addTrip() async {
+    final trip = await showDialog<String>(
+      context: context,
+      builder: (_) => widget.guard(_TripPicker(widget.trips)),
+    );
+    if (mounted && trip != null) await load(trip);
+  }
+
+  List<Map<String, dynamic>> eligible(PaymentRow row, bool source) {
+    final purpose = source ? action.source : action.target;
+    final party =
+        source ||
+            action == PaymentAction.receipt ||
+            action == PaymentAction.application
+        ? payer
+        : payee;
+    return row.claims
+        .where((c) => c['account_purpose'] == purpose && c['party_id'] == party)
+        .toList();
+  }
+
+  Map<String, dynamic> payload() {
+    if (payer == null || payee == null || office == null) {
+      throw const FormatException(
+        'Choose payer, recipient and recording office.',
+      );
+    }
+    final businessDate = BusinessDate.parse(date.text.trim());
+    if (reason.text.trim().isEmpty || reason.text.trim().length > 500) {
+      throw const FormatException('Enter a reason up to 500 characters.');
+    }
+    final allocations = <Map<String, dynamic>>[],
+        credits = <Map<String, dynamic>>[];
+    final cash = <String>[], offsets = <String>[], creditValues = <String>[];
+    final used = <String, BigInt>{};
+    for (final row in rows) {
+      if (row.amount.text.trim().isEmpty) continue;
+      final value = Money.parse(row.amount.text.trim());
+      if (value.paisa <= 0) {
+        throw const FormatException('Allocation must be positive.');
+      }
+      final item = <String, dynamic>{'amount': value.toString()};
+      final credit = action == PaymentAction.receipt && row.credit;
+      if (action == PaymentAction.advance || credit) {
+        if (!row.consignments.any(
+          (c) =>
+              c['customer_id'] == payer &&
+              (row.consignment == null || c['id'] == row.consignment),
+        )) {
+          throw const FormatException(
+            'Credit must belong to this customer and trip.',
+          );
+        }
+        item.addAll({'trip_id': row.trip, 'consignment_id': row.consignment});
+      } else if (action.target != null) {
+        final target = row.find(row.target);
+        if (target == null || !eligible(row, false).contains(target)) {
+          throw const FormatException('Select an eligible target claim.');
+        }
+        item.addAll({
+          'target_line_id': target['line_id'],
+          'target_version': target['version'],
+        });
+      }
+      if (action.source != null) {
+        final source = row.find(row.source);
+        if (source == null || !eligible(row, true).contains(source)) {
+          throw const FormatException('Select an eligible funding source.');
+        }
+        item.addAll({
+          'source_line_id': source['line_id'],
+          'source_version': source['version'],
+        });
+        if (action == PaymentAction.application &&
+            source['consignment_id'] != null &&
+            source['consignment_id'] !=
+                row.find(row.target)?['consignment_id']) {
+          throw const FormatException(
+            'This credit is restricted to its original consignment.',
+          );
+        }
+      }
+      for (final id in [
+        item['target_line_id'],
+        item['source_line_id'],
+      ].whereType<String>()) {
+        used[id] = (used[id] ?? BigInt.zero) + BigInt.from(value.paisa);
+        if (used[id]! >
+            BigInt.from(Money.fromJson(row.find(id)!['remaining']).paisa)) {
+          throw const FormatException(
+            'Allocated amount exceeds the remaining claim or source.',
+          );
+        }
+      }
+      if (credit) {
+        credits.add(item);
+        creditValues.add(value.toString());
+      } else {
+        allocations.add(item);
+        (action.offset ? offsets : cash).add(value.toString());
+      }
+    }
+    AllocationTotals(
+      cash,
+      offsets,
+      creditValues,
+    ).validate(amount.text.trim(), action.offset);
+    if (allocations.length + credits.length > 100) {
+      throw const FormatException('At most 100 allocations per payment.');
+    }
+    return {
+      'payer_id': payer,
+      'payee_id': payee,
+      'office_id': office,
+      'effective_date': businessDate.toString(),
+      'amount': Money.parse(amount.text.trim()).toString(),
+      'reason': reason.text.trim(),
+      'allocations': allocations,
+      if (credits.isNotEmpty) 'credits': credits,
+    };
+  }
+
+  void review() {
+    try {
+      final p = payload();
+      setState(() {
+        reviewed = p;
+        error = null;
+      });
+    } catch (e) {
+      setState(() {
+        error = message(e);
+        reviewed = null;
+      });
+    }
+  }
+
+  Future<void> confirm() async {
+    final p = reviewed!;
+    final signature = jsonEncode({'kind': action.key, 'payload': p});
+    if (pendingSignature != null && pendingSignature != signature) {
+      setState(() {
+        error = 'An earlier request may have committed. Retry that request or reload balances before changing it.';
+      });
+      return;
+    }
+    pendingSignature = signature;
+    pendingRequest ??= newRecordId();
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await widget.finance.post(action.key, pendingRequest!, p);
+      if (!mounted) return;
+      pendingSignature = null;
+      pendingRequest = null;
+      amount.clear();
+      reason.clear();
+      for (final r in rows) {
+        r.amount.clear();
+        r.target = null;
+        r.source = null;
+      }
+      final reloaded = await refresh();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            reloaded ? 'Payment confirmed. Balances reloaded.' : 'Payment confirmed. Balance reload failed; reload before another payment.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          error = message(e);
+          conflict = e is PostgrestException && e.code == 'PT409';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          busy = false;
+        });
+      }
+    }
+  }
+
+  Future<bool> refresh() async {
+    setState(() {
+      busy = true;
+      reviewed = null;
+    });
+    try {
+      final loaded = <String, Map<String, dynamic>>{};
+      for (final id in rows.map((r) => r.trip).toSet()) {
+        loaded[id] = await widget.finance.trip(RecordId(id));
+      }
+      if (!mounted) return false;
+      setState(() {
+        for (final row in rows) {
+          row.claims
+            ..clear()
+            ..addAll(
+              (loaded[row.trip]!['claims'] as List).map(
+                (c) => Map<String, dynamic>.from(c as Map),
+              ),
+            );
+          row.target = null;
+          row.source = null;
+        }
+        balances
+          ..clear()
+          ..addAll(loaded);
+        pendingSignature = null;
+        pendingRequest = null;
+        conflict = false;
+        error = null;
+      });
+      return true;
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          error = message(e);
+          conflict = true;
+        });
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() {
+          busy = false;
+        });
+      }
+    }
+  }
+
+  String totals() {
+    try {
+      final values = rows
+          .where((r) => r.amount.text.trim().isNotEmpty)
+          .toList();
+      final t = AllocationTotals(
+        values
+            .where((r) => !r.credit && !action.offset)
+            .map((r) => r.amount.text)
+            .toList(),
+        values.where((r) => action.offset).map((r) => r.amount.text).toList(),
+        values.where((r) => r.credit).map((r) => r.amount.text).toList(),
+      );
+      return 'Cash allocated: PKR ${AllocationTotals.decimal(t.cash)} · Non-cash credit offset: PKR ${AllocationTotals.decimal(t.offsets)} · Credit remainder: PKR ${AllocationTotals.decimal(t.credits)}';
+    } catch (_) {
+      return 'Enter positive amounts with at most two decimal places.';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => PopScope(
+    canPop: !busy,
+    child: Scaffold(
+      appBar: AppBar(
+        title: const Text('Payments and allocations'),
+        actions: [
+          IconButton(
+            onPressed: busy ? null : refresh,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reload balances',
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            'Permitted trips only — not a complete party or business balance.',
+          ),
+          const Text(
+            'Collections, held funds, owner settlement and earnings are separate. Expense offsets and reimbursements are entered with expenses.',
+          ),
+          if (busy) const LinearProgressIndicator(),
+          DropdownButtonFormField<PaymentAction>(
+            initialValue: action,
+            decoration: const InputDecoration(labelText: 'Action'),
+            items: PaymentAction.values
+                .map((a) => DropdownMenuItem(value: a, child: Text(a.label)))
+                .toList(),
+            onChanged: busy || pendingRequest != null
+                ? null
+                : (v) => setState(() {
+                    action = v!;
+                    reviewed = null;
+                    for (final r in rows) {
+                      r.target = null;
+                      r.source = null;
+                      r.credit = false;
+                    }
+                  }),
+          ),
+          Wrap(
+            spacing: 16,
+            children: [
+              TextButton(
+                onPressed: busy || pendingRequest != null
+                    ? null
+                    : () => chooseParty(true),
+                child: Text('Payer: ${payerName ?? 'Choose'}'),
+              ),
+              TextButton(
+                onPressed: busy || pendingRequest != null
+                    ? null
+                    : () => chooseParty(false),
+                child: Text('Recipient: ${payeeName ?? 'Choose'}'),
+              ),
+            ],
+          ),
+          DropdownButtonFormField<String>(
+            initialValue: office,
+            decoration: const InputDecoration(labelText: 'Recording office'),
+            items: widget.offices
+                .map(
+                  (o) => DropdownMenuItem(
+                    value: o['id'] as String,
+                    child: Text(o['name'] as String),
+                  ),
+                )
+                .toList(),
+            onChanged: busy || pendingRequest != null
+                ? null
+                : (v) => setState(() {
+                    office = v;
+                    reviewed = null;
+                  }),
+          ),
+          for (final field in [
+            (date, 'Payment date (YYYY-MM-DD)'),
+            (amount, 'Total amount (PKR)'),
+            (reason, 'Reason / reference'),
+          ])
+            TextField(
+              controller: field.$1,
+              enabled: !busy && pendingRequest == null,
+              decoration: InputDecoration(labelText: field.$2),
+              onChanged: (_) => setState(() {
+                reviewed = null;
+              }),
+            ),
+          Text(totals()),
+          for (final entry in balances.entries) ...[
+            Text(
+              rows.firstWhere((r) => r.trip == entry.key).number,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            for (final b in entry.value['balances'] as List)
+              Text(
+                '${accountLabel(b['account_purpose'] as String)} · ${partyLabel(b['party_id'] as String)}: PKR ${displayBalance(b['account_purpose'] as String, b['balance'] as String)}',
+              ),
+          ],
+          for (final row in rows)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Allocation · ${row.number}'),
+                    if (action == PaymentAction.receipt)
+                      CheckboxListTile(
+                        title: const Text('Identified excess credit'),
+                        value: row.credit,
+                        onChanged: busy || pendingRequest != null
+                            ? null
+                            : (v) => setState(() {
+                                row.credit = v!;
+                                row.target = null;
+                                reviewed = null;
+                              }),
+                      ),
+                    if (action == PaymentAction.advance || row.credit)
+                      DropdownButtonFormField<String>(
+                        key: ValueKey(
+                          '${rows.indexOf(row)}-consignment-$payer',
+                        ),
+                        initialValue: row.consignment,
+                        decoration: const InputDecoration(
+                          labelText: 'Credit belongs to',
+                        ),
+                        items: [
+                          const DropdownMenuItem(
+                            value: null,
+                            child: Text('This customer’s trip'),
+                          ),
+                          for (final c in row.consignments.where(
+                            (c) => c['customer_id'] == payer,
+                          ))
+                            DropdownMenuItem(
+                              value: c['id'] as String,
+                              child: Text(
+                                '${c['customer_name']} · ${c['car_count']} cars',
+                              ),
+                            ),
+                        ],
+                        onChanged: busy || pendingRequest != null
+                            ? null
+                            : (v) => setState(() {
+                                row.consignment = v;
+                                reviewed = null;
+                              }),
+                      ),
+                    if (action.target != null && !row.credit)
+                      claimPicker(row, false),
+                    if (action.source != null) claimPicker(row, true),
+                    TextField(
+                      controller: row.amount,
+                      enabled: !busy && pendingRequest == null,
+                      decoration: InputDecoration(
+                        labelText: action.offset
+                            ? 'Non-cash offset (PKR)'
+                            : 'Allocated amount (PKR)',
+                      ),
+                      onChanged: (_) => setState(() {
+                        reviewed = null;
+                      }),
+                    ),
+                    for (final id in [
+                      row.target,
+                      row.source,
+                    ].whereType<String>())
+                      Text(
+                        'Remaining: PKR ${row.find(id)?['remaining']} · After allocation: PKR ${remaining(row, id)}',
+                      ),
+                    TextButton(
+                      onPressed: busy || pendingRequest != null
+                          ? null
+                          : () => setState(() {
+                              rows.remove(row);
+                              row.amount.dispose();
+                              reviewed = null;
+                            }),
+                      child: const Text('Remove allocation'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          Wrap(
+            children: [
+              TextButton(
+                onPressed: busy || pendingRequest != null ? null : addTrip,
+                child: const Text('Add trip allocation'),
+              ),
+              for (final id in rows.map((r) => r.trip).toSet())
+                TextButton(
+                  onPressed: busy || pendingRequest != null
+                      ? null
+                      : () => load(id),
+                  child: Text(
+                    'Add another allocation · ${rows.firstWhere((r) => r.trip == id).number}',
+                  ),
+                ),
+            ],
+          ),
+          if (error != null)
+            Text(
+              error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          if (reviewed == null)
+            FilledButton(
+              onPressed: busy || conflict ? null : review,
+              child: const Text('Review payment'),
+            ),
+          if (reviewed != null) ...[
+            Text(
+              'Review: ${action.label} · ${date.text} · $payerName → $payeeName · PKR ${reviewed!['amount']}',
+            ),
+            const Text(
+              'Confirm the allocations and resulting balances above. Arrival and earnings are unchanged.',
+            ),
+            FilledButton(
+              onPressed: busy || conflict ? null : confirm,
+              child: const Text('Confirm payment'),
+            ),
+            if (pendingRequest == null)
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () => setState(() {
+                        reviewed = null;
+                      }),
+                child: const Text('Change selections'),
+              ),
+          ],
+        ],
+      ),
+    ),
+  );
+  String partyLabel(String id) {
+    if (id == payer) return payerName ?? 'Payer';
+    if (id == payee) return payeeName ?? 'Recipient';
+    if (names[id] != null) return names[id]!;
+    for (final row in rows) {
+      for (final c in row.consignments) {
+        if (c['customer_id'] == id) return c['customer_name'] as String;
+        if (c['broker_id'] == id) return c['broker_name'] as String;
+      }
+    }
+    return 'Related party';
+  }
+
+  String remaining(PaymentRow row, String id) {
+    try {
+      final original = Money.fromJson(row.find(id)!['remaining']);
+      final consumed = rows
+          .where((r) => r.target == id || r.source == id)
+          .fold(
+            BigInt.zero,
+            (n, r) =>
+                n +
+                BigInt.from(
+                  r.amount.text.isEmpty ? 0 : Money.parse(r.amount.text).paisa,
+                ),
+          );
+      return AllocationTotals.decimal(BigInt.from(original.paisa) - consumed);
+    } catch (_) {
+      return 'Check amount';
+    }
+  }
+
+  Widget claimPicker(
+    PaymentRow row,
+    bool source,
+  ) => DropdownButtonFormField<String>(
+    key: ValueKey(
+      '${rows.indexOf(row)}-$source-${action.key}-$payer-$payee-${row.credit}-${row.claims.hashCode}-${source ? row.source : row.target}',
+    ),
+    initialValue: source ? row.source : row.target,
+    isExpanded: true,
+    decoration: InputDecoration(
+      labelText: source ? 'Available source' : 'Outstanding claim',
+    ),
+    items: eligible(row, source)
+        .map(
+          (c) => DropdownMenuItem(
+            value: c['line_id'] as String,
+            child: Text(
+              '${accountLabel(c['account_purpose'] as String)} · ${c['effective_date']} · PKR ${c['remaining']}',
+            ),
+          ),
+        )
+        .toList(),
+    onChanged: busy || pendingRequest != null
+        ? null
+        : (v) => setState(() {
+            if (source) {
+              row.source = v;
+            } else {
+              row.target = v;
+            }
+            reviewed = null;
+          }),
+  );
+}
+
+String accountLabel(String key) =>
+    const {
+      'CUSTOMER_RECEIVABLE': 'Customer outstanding',
+      'CUSTODY_RECEIVABLE': 'Money held',
+      'OWNER_PAYABLE': 'Owner settlement due',
+      'BROKER_COMMISSION_PAYABLE': 'Commission due',
+      'TRIP_FUNDING_PAYABLE': 'Personal funding due',
+      'CUSTOMER_ADVANCE_CREDIT': 'Customer credit',
+      'EXPENSE_REIMBURSEMENT_PAYABLE': 'Expense reimbursement due',
+      'PARTY_COST_RECOVERY': 'Cost recovery',
+    }[key] ??
+    key;
+
+String displayBalance(String purpose, String value) {
+  final amount = LedgerAmount.fromJson(value).paisa;
+  const credits = {
+    'OWNER_PAYABLE',
+    'BROKER_COMMISSION_PAYABLE',
+    'TRIP_FUNDING_PAYABLE',
+    'CUSTOMER_ADVANCE_CREDIT',
+    'EXPENSE_REIMBURSEMENT_PAYABLE',
+  };
+  return AllocationTotals.decimal(credits.contains(purpose) ? -amount : amount);
+}
+
+class _PartyPicker extends StatefulWidget {
+  const _PartyPicker(this.repository);
+  final MasterRepository repository;
+  @override
+  State<_PartyPicker> createState() => _PartyPickerState();
+}
+
+class _PartyPickerState extends State<_PartyPicker> {
+  String search = '';
+  int offset = 0;
+  late Future<List<MasterRecord>> page;
+  @override
+  void initState() {
+    super.initState();
+    reload();
+  }
+
+  void reload() {
+    page = widget.repository.list(
+      MasterKind.party,
+      search: search,
+      offset: offset,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Choose party'),
+    content: SizedBox(
+      width: 500,
+      height: 400,
+      child: Column(
+        children: [
+          TextField(
+            decoration: const InputDecoration(labelText: 'Search parties'),
+            onSubmitted: (v) => setState(() {
+              search = v;
+              offset = 0;
+              reload();
+            }),
+          ),
+          Expanded(
+            child: FutureBuilder<List<MasterRecord>>(
+              future: page,
+              builder: (context, s) => s.hasError
+                  ? const Text('Party choices unavailable.')
+                  : !s.hasData
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      children: [
+                        for (final p in s.data!)
+                          ListTile(
+                            title: Text(p.label),
+                            onTap: () => Navigator.pop(context, p),
+                          ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => setState(() {
+          offset = offset >= 50 ? offset - 50 : 0;
+          reload();
+        }),
+        child: const Text('Previous'),
+      ),
+      TextButton(
+        onPressed: () => setState(() {
+          offset += 50;
+          reload();
+        }),
+        child: const Text('Next'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Close'),
+      ),
+    ],
+  );
+}
+
+class _TripPicker extends StatefulWidget {
+  const _TripPicker(this.repository);
+  final TripRepository repository;
+  @override
+  State<_TripPicker> createState() => _TripPickerState();
+}
+
+class _TripPickerState extends State<_TripPicker> {
+  String search = '';
+  int offset = 0;
+  late Future<TripPage> page;
+  @override
+  void initState() {
+    super.initState();
+    reload();
+  }
+
+  void reload() {
+    page = widget.repository.list(search: search, offset: offset);
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Choose permitted trip'),
+    content: SizedBox(
+      width: 500,
+      height: 400,
+      child: Column(
+        children: [
+          TextField(
+            decoration: const InputDecoration(labelText: 'Search trips'),
+            onSubmitted: (v) => setState(() {
+              search = v;
+              offset = 0;
+              reload();
+            }),
+          ),
+          Expanded(
+            child: FutureBuilder<TripPage>(
+              future: page,
+              builder: (context, s) => s.hasError
+                  ? const Text('Trip choices unavailable.')
+                  : !s.hasData
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      children: [
+                        Text(s.data!.scope),
+                        for (final t in s.data!.rows)
+                          ListTile(
+                            title: Text(
+                              '${t['trip_number']} · ${t['registration']}',
+                            ),
+                            onTap: () => Navigator.pop(context, t['id']),
+                          ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => setState(() {
+          offset = offset >= 50 ? offset - 50 : 0;
+          reload();
+        }),
+        child: const Text('Previous'),
+      ),
+      TextButton(
+        onPressed: () => setState(() {
+          offset += 50;
+          reload();
+        }),
+        child: const Text('Next'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Close'),
+      ),
+    ],
+  );
+}

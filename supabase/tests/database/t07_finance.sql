@@ -14,7 +14,7 @@ select set_config('request.jwt.claims','{}',true);
 set local role authenticated;
 select throws_ok($$select public.post_financial_event('CUSTOMER_RECEIPT',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','No live identity cannot post receipt');
 select throws_ok($$select public.get_trip_financials(gen_random_uuid())$$,'42501','FORBIDDEN','No live identity cannot view claims');
-select throws_ok($$select public.post_financial_event('OWNER_SETTLEMENT',gen_random_uuid(),0,'{}')$$,'22023','WORKFLOW_NOT_AVAILABLE','Client cannot bypass later settlement workflow');
+select throws_ok($$select public.post_financial_event('OWNER_SETTLEMENT',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','Owner settlement requires a live identity');
 reset role;
 select * from finish();
 rollback;

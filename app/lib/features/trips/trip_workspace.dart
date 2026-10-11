@@ -8,6 +8,8 @@ import 'trip_draft.dart';
 import 'trip_repository.dart';
 import 'trip_lifecycle.dart';
 import 'trip_operation_dialog.dart';
+import '../finance/financial_repository.dart';
+import '../finance/payment_workspace.dart';
 
 Widget unguardedTrip(Widget child) => child;
 
@@ -26,11 +28,13 @@ class TripWorkspace extends StatefulWidget {
     required this.masters,
     required this.offices,
     this.guard = unguardedTrip,
+    this.finance,
   });
   final TripRepository repository;
   final MasterRepository masters;
   final List<Map<String, dynamic>> offices;
   final Widget Function(Widget) guard;
+  final FinancialCommands? finance;
   @override
   State<TripWorkspace> createState() => _TripWorkspaceState();
 }
@@ -103,6 +107,23 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             canReturn: (o) => widget.offices.any((a) => a['id'] == o),
             onEdit: edit,
             guard: widget.guard,
+            onPayments: widget.finance == null
+                ? null
+                : () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => widget.guard(
+                        PaymentWorkspace(
+                          guard: widget.guard,
+                          finance: widget.finance!,
+                          trips: widget.repository,
+                          masters: widget.masters,
+                          offices: widget.offices,
+                          initialTrip: id,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ),
       ),
@@ -1025,8 +1046,10 @@ class TripDetail extends StatefulWidget {
     required this.onEdit,
     this.saved = false,
     this.guard = unguardedTrip,
+    this.onPayments,
   });
   final TripRepository repository;
+  final Future<void> Function()? onPayments;
   final Widget Function(Widget) guard;
   final String id;
   final bool saved;
@@ -1165,6 +1188,11 @@ class _TripDetailState extends State<TripDetail> {
                   onPressed: history,
                   child: const Text(LifecycleStrings.history),
                 ),
+                if (widget.onPayments != null)
+                  TextButton(
+                    onPressed: widget.onPayments,
+                    child: const Text('Payments and allocations'),
+                  ),
                 if (r['can_edit'] == true)
                   TextButton(
                     onPressed: () async {

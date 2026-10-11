@@ -113,15 +113,40 @@ final class CustomerReceipt {
   };
 }
 
-/// T07 contracts only. Transfer/expense entry screens are added in T08/T09.
-class FinancialRepository {
+abstract interface class FinancialCommands {
+  Future<Map<String, dynamic>> trip(RecordId id);
+  Future<Map<String, dynamic>> post(
+    String kind,
+    String request,
+    Map<String, dynamic> payload,
+  );
+}
+
+class FinancialRepository implements FinancialCommands {
   FinancialRepository(this.client);
   final SupabaseClient client;
+  @override
   Future<Map<String, dynamic>> trip(RecordId id) async =>
       Map<String, dynamic>.from(
         await client.rpc('get_trip_financials', params: {'trip_id': id.value})
             as Map,
       );
+  @override
+  Future<Map<String, dynamic>> post(
+    String kind,
+    String request,
+    Map<String, dynamic> payload,
+  ) async => Map<String, dynamic>.from(
+    await client.rpc(
+      'post_financial_event',
+      params: {
+        'event_kind': kind,
+        'request_id': request,
+        'expected_version': 0,
+        'payload': payload,
+      },
+    ) as Map,
+  );
   Future<Map<String, dynamic>> receipt(
     RecordId request,
     CustomerReceipt receipt,

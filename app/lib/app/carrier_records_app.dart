@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../features/finance/financial_repository.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/staff_session.dart';
@@ -298,6 +301,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                         MaterialPageRoute<void>(
                           builder: (_) => guard(
                             TripWorkspace(
+                              finance: FinancialRepository(
+                                widget.session.client,
+                              ),
                               guard: guard,
                               repository: SupabaseTripRepository(
                                 widget.session.client,
