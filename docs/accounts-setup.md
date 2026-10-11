@@ -1,0 +1,18 @@
+# T03 account setup and recovery
+
+Local development only; no hosted deployment is configured. Ordinary installations contain only APP_ENV, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and APP_BUSINESS_ID. A server/service key must never be copied into those values or a client build.
+
+1. Start the existing local stack with `./tools/supabase.ps1 start -x 'logflare,vector'`. Wait until it completes before starting another backend command.
+2. Apply migrations with `./tools/supabase.ps1 migration up --local`.
+3. Serve the account endpoint with `./tools/supabase.ps1 functions serve staff-accounts --no-verify-jwt`. The endpoint verifies the bearer token through Auth and checks the live staff session in PostgreSQL. The CLI provides server credentials to this runtime only.
+4. On an empty local business, run `python tools/manage_accounts.py bootstrap`. Supply the actual company and administrator names and a temporary password at the hidden prompt. This writes public configuration to ignored `config/local.json`; it never saves the password or privileged key. No administrator elevation is required.
+5. From `app/`, run `../tools/flutter.ps1 run -d windows --dart-define-from-file=../config/local.json`. Sign in with the supplied username and temporary password, change the password, then sign in again. Office/company maintenance follows in T04; no real office assignments have been invented.
+6. Administrators use Create staff account / Manage to select role, offices and active status, or reset a password. Staff without an active office assignment cannot sign in. Changing assignments, role or status revokes the target's existing sessions. Self-disable/self-demotion is denied.
+
+A password change spans Auth and a database transaction. Before Auth is changed, the account is locked and its sessions revoked. A failed external update/finalization reports incomplete work and leaves the account locked. Do not repeatedly retry an uncertain password operation. On the trusted local administrator machine, run `python tools/manage_accounts.py recover`, enter the locked username and an active administrator username for the audit, then supply a new temporary password. The tool changes Auth first, performs the version-checked database recovery, revokes sessions and requires a fresh password change. A failure reports no success; the account remains gated. Service-only recovery is unavailable to ordinary administrator JWTs.
+
+Passwords are never retained in database operations or audit JSON. Internal Auth email identifiers are derived from the username and business UUID and are non-deliverable. Public signup, anonymous sign-in and public recovery UI are unavailable. A hosted setup must configure the same token hook/signup settings before any pilot; this task has not deployed it.
+
+Receipts use a private bucket. Only authenticated downloads of authorized receipt records are allowed. Staff-generated persistent signed URLs are denied so office removal/account disabling also blocks later retrieval. Upload/evidence workflows remain T09.
+
+Verification on an empty local test database: `python tools/tests/t03_api.py --native`. This creates randomized synthetic identities and fixture records, executes direct HTTP attacks and a Windows sign-in/logout UI test, and removes its fixtures. It refuses to run if any business or Auth users already exist. Its temporary configuration/logs live under ignored tools/.local. Do not run it against business data. Separate adapter test: from app, `../tools/flutter.ps1 test integration_test/secure_storage_test.dart -d windows --no-pub`.

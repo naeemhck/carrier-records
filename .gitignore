@@ -53,3 +53,6 @@ exports/
 *.msixbundle
 
 # Keep dependency lockfiles tracked.
+# Python bytecode
+__pycache__/
+*.pyc

@@ -1,5 +1,6 @@
 {
   "APP_ENV": "local",
   "SUPABASE_URL": "http://127.0.0.1:54321",
-  "SUPABASE_PUBLISHABLE_KEY": ""
+  "SUPABASE_PUBLISHABLE_KEY": "",
+  "APP_BUSINESS_ID": ""
 }

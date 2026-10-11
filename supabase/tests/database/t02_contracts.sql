@@ -101,7 +101,7 @@ select throws_ok($$update public.trips set load_kind = 'EMPTY', version = 2
   where id = '00000000-0000-0000-0000-000000000041'$$,'22023',
   'VALIDATION_ERROR: loaded trip cannot become empty','Empty return cannot retain loads');
 select ok(not has_table_privilege('anon','public.trips','SELECT'),'Anonymous has no trip grant');
-select ok(not has_table_privilege('authenticated','public.trips','SELECT'),'Staff access waits for T03 policy');
+select ok(has_table_privilege('authenticated','public.trips','SELECT'),'T03 grants trip reads subject to RLS');
 select ok(not has_table_privilege('authenticated','public.financial_events','INSERT'),'Direct financial writes revoked');
 select ok(not has_function_privilege('authenticated','public.calculate_quote(text,text,text,text,boolean)','EXECUTE'),
   'RPC grants remain closed until T03');

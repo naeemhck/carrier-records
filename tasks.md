@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T01 tooling and application scaffold in progress. T02–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T03 accounts, permissions and secure sessions DONE. T04–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -57,11 +57,16 @@ Actual completion (2026-10-11): Four migrations applied to a clean local databas
 
 ### T03 — Accounts, permissions and secure sessions
 
-Status: TODO | Dependencies: T02
+Status: DONE | Dependencies: T02
 
 Implement admin-managed username/password accounts, disable signup, office assignments, disabled-user checks, temporary-password changes, secure session storage and admin-only account functions. Implement RLS and restricted function privileges; deny direct financial writes.
 
 Evidence: Staff can sign in only when active and assigned; direct backend permission tests AT-12/13/14 pass. A client package contains no privileged keys.
+
+Actual completion (2026-10-11): Implemented administrator-managed username/password accounts, role/status/office changes, forced temporary-password changes, resets, protected session persistence and logout. Signup remains globally disabled. Edge Functions keep Auth admin credentials server-side; public client configuration rejects privileged keys. Backend authorization checks live sessions, active assignments and credential revisions; RLS scopes trip/expense/receipt/journal reads and all ordinary direct financial writes remain revoked. Trusted local first-admin setup and interrupted-password recovery are documented in docs/accounts-setup.md. No actual business/staff identities were invented.
+
+Executed checks: Final clean local reset applies five migrations; database lint reports no issues; 69 SQL assertions pass. Final HTTP suite passes 156 assertions, including AT-12 operation/office gates, AT-13 direct filtered financial writes (401/403 with PostgreSQL 42501), forged JWTs, privilege/status/assignment/password-flag bypasses, signup/private receipts and revocation; AT-14 denies complete/global or null staff scope and verifies explicitly labelled exact scoped versus admin totals. Pending-password recovery is fail-closed and tested. Ten Dart/widget tests and analyzer pass. Two Windows native integration tests pass (protected store and actual username sign-in/logout UI). Final Windows/Android debug builds exit 0 in 39.1s/42.2s. The final package/source audit scans 658 entries/files and finds no actual local service/secret/signing/S3 keys. Auth/REST/Storage return HTTP 200; PostgreSQL ready; synthetic Auth/business/password-operation/receipt-object counts return zero. Evidence/failures/remedies and artifact hashes: docs/accounts-evidence.md. T03 completion checks pass. AT-12 is verified at the authorization contract; T06 state transitions, T07 financial commands, T09 upload workflow, T11 full report UI, Android device execution and release/restore checks remain NOT RUN. Local Git only; no GitHub publication.
+
 
 ### T04 — Company and master records
 
@@ -242,6 +247,9 @@ All scenarios below are specifications; execution status is NOT RUN until implem
 | AT-35 | Windows/Android release | Actual install/launch/login/export succeeds; secret-free configuration and protected release signing. |
 
 ## 5. Release evidence record
+
+2026-10-11 T03: AT-12/13/14 authorization-layer checks PASS on the disposable local Windows/Supabase backend, migration 20261011000500. Direct requests and native Windows session checks executed; see docs/accounts-evidence.md. This does not mark later lifecycle, financial posting, Android device or release acceptance complete.
+
 
 For each executed scenario, record date, commit/migration version, platform, test environment, result and evidence path. Store example data without identifying real customers. Record failures and remediation rather than relabeling them passed.
 

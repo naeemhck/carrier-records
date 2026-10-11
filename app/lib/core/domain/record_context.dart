@@ -23,8 +23,9 @@ final class RecordContext {
     required this.businessId,
     required this.version,
   }) {
-    if (version < 1 || version > 2147483647)
+    if (version < 1 || version > 2147483647) {
       throw RangeError('Invalid record version');
+    }
   }
 }
 

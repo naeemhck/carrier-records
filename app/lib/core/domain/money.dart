@@ -30,8 +30,9 @@ final class Money implements Comparable<Money> {
   }
 
   factory Money.fromJson(Object? value) {
-    if (value is! String)
+    if (value is! String) {
       throw FormatException('Money must be a decimal string');
+    }
     return Money.parse(value);
   }
 

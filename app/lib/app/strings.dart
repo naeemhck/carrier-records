@@ -2,5 +2,5 @@
 abstract final class AppStrings {
   static const title = 'Carrier Records';
   static const setupPending =
-      'Application setup is in progress. Staff sign-in is not yet available.';
+      'Ask your administrator to configure this installation for staff sign-in.';
 }
