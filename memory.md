@@ -6,6 +6,8 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 
 ## 1. Current state
 
+- User requested a private GitHub source-backup push after T10 is DONE. Follow the checkpoint under T10 in tasks.md: verify a private destination, audit intended source files, commit, push main without force, then verify the remote commit. This documentation update does not trigger an immediate push.
+
 - Six planning documents and AGENTS.md have been read. The business scope and financial invariants remain unchanged.
 - Workspace: D:\portfolio\transport_project. Local Git history is preserved. User-authorized private source backup origin is https://github.com/naeemhck/carrier-records.git; the prior backup verified private visibility and remote/local main at d260f08d400dce5e84a3995ea70ce14872f17a9c. This T05 instruction requests a local commit only; T05 is not pushed. Public publication, credentials and private operational data remain unauthorized. See docs/source-backup.md.
 - T00-T05 are DONE; next task is T06 dispatch/arrival/audit history. T06-T20 remain TODO. Draft figures remain potential fare; dispatch/arrival and financial posting are later tasks.
@@ -140,6 +142,7 @@ Backups must be recoverable after losing the original PC. Keeping an encryption 
 | 2026-10-11 | Free Supabase pilot and daily PC backups | Zero-cost constraint and selected hosting/recovery approach |
 | 2026-10-11 | Attribute selection/order/presets in output workflow | User requested easy output customization; preserve recipient restrictions |
 | 2026-10-11 | Document generation prioritized | User explicitly asked to start with the six documents before application work |
+| 2026-10-11 | Add private GitHub source-backup checkpoint after T10 | User requested the push command after T10; defer this checkpoint until verified completion |
 | 2026-10-11 | Continue in VS Code with Codex using the existing D:\portfolio\transport_project folder; private GitHub versioning requested | User selected the development workflow; local Git prepared, remote publication pending authentication |
 | 2026-10-11 | Continue T01 with existing Flutter SDK and local Git; do not publish to GitHub | Latest instruction supersedes the earlier remote-publication request |
 

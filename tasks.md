@@ -133,6 +133,18 @@ Implement creator/admin correction workflows, reasons, operational history and a
 
 Evidence: AT-07/15/21 pass. A journal cannot be reversed twice; cancellation cannot quietly delete money or evidence.
 
+#### Source backup checkpoint after T10
+
+After T10 is verified DONE, update the task/evidence records and commit the intended source changes locally. Review tracked and untracked files for secrets, signing material, database dumps, receipts and private operational data; exclude them without deleting local copies. Verify that origin points to the intended GitHub repository and that the repository is private using the GitHub connector or authenticated CLI. Do not push if the destination or private visibility cannot be verified.
+
+Push the completed work without force-pushing:
+
+```powershell
+git -C "D:\portfolio\transport_project" push -u origin main
+```
+
+Verify remote main matches the backed-up local commit and report the repository URL and commit. If authentication is unavailable, request sign-in through GitHub or the CLI; never request passwords/tokens in chat. Resolve divergence without overwriting remote history. This checkpoint backs up committed project files; operational database and receipt backups remain separate. No push is requested before T10 by this checkpoint.
+
 ### T11 — Reports and dashboard
 
 Status: TODO | Dependencies: T10
