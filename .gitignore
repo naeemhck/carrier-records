@@ -1,0 +1,52 @@
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+**/Flutter/ephemeral/
+**/flutter/ephemeral/
+android/local.properties
+android/.gradle/
+android/captures/
+
+# Local editor and operating system files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+**/key.properties
+service-account*.json
+credentials*.json
+
+# Backend tooling and temporary dependencies
+supabase/.temp/
+supabase/.branches/
+node_modules/
+
+# Private operational data and generated artifacts
+backups/
+receipts/
+exports/
+*.dump
+*.sql.gz
+*.apk
+*.aab
+*.msix
+*.msixbundle
+
+# Keep dependency lockfiles tracked.
