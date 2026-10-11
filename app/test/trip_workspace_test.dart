@@ -40,6 +40,19 @@ class FakeTrips implements TripRepository {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> history(
+    String id, {
+    int offset = 0,
+  }) async => [];
+  @override
+  Future<Map<String, dynamic>> operate(
+    String action,
+    String id,
+    String request,
+    int version,
+    Map<String, dynamic> payload,
+  ) async => {};
+  @override
   Future<TripPage> list({
     String search = '',
     int offset = 0,

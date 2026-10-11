@@ -19,6 +19,14 @@ abstract interface class TripRepository {
     String? to,
   });
   Future<Map<String, dynamic>> detail(String id);
+  Future<List<Map<String, dynamic>>> history(String id, {int offset = 0});
+  Future<Map<String, dynamic>> operate(
+    String action,
+    String id,
+    String request,
+    int version,
+    Map<String, dynamic> payload,
+  );
   Future<Map<String, dynamic>> overlap(TripDraft draft);
   Future<Map<String, dynamic>> defaults(TripDraft draft);
   Future<Map<String, dynamic>> save(
@@ -67,6 +75,41 @@ class SupabaseTripRepository implements TripRepository {
   @override
   Future<Map<String, dynamic>> detail(String id) =>
       call('get_trip_detail', {'trip_id': id});
+  @override
+  Future<List<Map<String, dynamic>>> history(
+    String id, {
+    int offset = 0,
+  }) async {
+    final result = await call('get_trip_history', {
+      'trip_id': id,
+      'page_offset': offset,
+    });
+    return (result['rows'] as List)
+        .map((r) => Map<String, dynamic>.from(r as Map))
+        .toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> operate(
+    String action,
+    String id,
+    String request,
+    int version,
+    Map<String, dynamic> payload,
+  ) => call(
+    action == 'DISPATCH'
+        ? 'dispatch_trip'
+        : action == 'ARRIVE'
+        ? 'arrive_trip'
+        : 'correct_trip_operation',
+    {
+      'target_id': id,
+      'request_id': request,
+      'expected_version': version,
+      'payload': payload,
+      if (action != 'DISPATCH' && action != 'ARRIVE') 'action': action,
+    },
+  );
   @override
   Future<Map<String, dynamic>> defaults(TripDraft d) =>
       call('get_trip_defaults', {

@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T05 draft trips DONE. T06–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T06 DONE. Next: T07 immutable financial engine. T07-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -95,11 +95,15 @@ Executed checks: clean seven-migration reset; 95 SQL assertions and database lin
 
 ### T06 — Dispatch, arrival and audit history
 
-Status: TODO | Dependencies: T05
+Status: DONE | Dependencies: T05
 
 Implement lifecycle transitions with origin/destination permissions, actual dates, arrival-driven delivery, independent settlement state, audited edits, creator permissions and optimistic conflicts. Couple dispatch to the earnings-posting interface; block fake success until the transaction commits.
 
 Evidence: AT-07/08/12/15 pass; arrival does not post receipts or settle owner debt. Cross-office fare edits are denied.
+
+Executed checks (2026-10-11): final clean local reset applies eight migrations; database lint reports no issues; 110 SQL assertions PASS. Final combined T03/T05/T06 HTTP suite passes 465 assertions, including actual dispatch earnings, destination-only arrival, every active consignment delivered/cancelled evidence retained, denied cross-office fare edits, operation-creator/live-permission checks, immutable effective-date reversal/replacement, retries, concurrent updates and a deferred commit failure that rolls back state/journal/audit/retry data. Thirty-two Flutter tests and analyzer PASS. Windows native dispatch to destination arrival and history test PASS (57.7s build, 8s test); persisted delivery/cancellation checked through real RPC. Ordinary Windows/Android debug builds exit 0 (42.7s/44.2s). Auth/REST/Storage HTTP 200, PostgreSQL ready; all synthetic Auth/business/private retry/recognition/storage records zero, no disabled triggers or temporary native credentials. Package/source audit passes 686 entries/files with no actual privileged values. T06 scoped completion checks pass; local Git only, no push. See docs/lifecycle-evidence.md.
+
+Acceptance boundaries: AT-08 pending arrival/delivery/cancelled checks now PASS; AT-12 lifecycle/direct backend permission checks PASS; AT-15 operational creators/concurrency/immutable date repost and dependency blocking PASS. AT-07 January dispatch/February arrival and corrected monthly earnings basis PASS. A March zero-amount receipt metadata fixture verifies dependency blocking/date independence only: full receipt posting, February expenses, lifetime profit and report UI remain NOT RUN until T07-T11. T07 must extend the narrow real dispatch-earnings interface with general financial commands, locked claims/allocations, receipts/custody and reviewed advances; advance application fields are rejected now. T10 retains full dependent correction/financial cancellation/refund plans. Arrival creates no receipt or owner settlement.
 
 ### T07 — Immutable financial engine
 
@@ -270,6 +274,8 @@ All scenarios below are specifications; execution status is NOT RUN until implem
 ## 5. Release evidence record
 
 2026-10-11 T03: AT-12/13/14 authorization-layer checks PASS on the disposable local Windows/Supabase backend, migration 20261011000500. Direct requests and native Windows session checks executed; see docs/accounts-evidence.md. This does not mark later lifecycle, financial posting, Android device or release acceptance complete.
+
+2026-10-11 T06: AT-08 arrival/delivery/cancelled propagation and AT-12 lifecycle permissions PASS; AT-07 effective earnings-date and AT-15 creator/concurrency/linked date corrections PASS within the documented boundary. Full expense/payment/profit reports and dependent financial unwind remain later tasks; see docs/lifecycle-evidence.md. Local commit only.
 
 
 For each executed scenario, record date, commit/migration version, platform, test environment, result and evidence path. Store example data without identifying real customers. Record failures and remediation rather than relabeling them passed.

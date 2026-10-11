@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../masters/master_repository.dart';
 import 'trip_draft.dart';
 import 'trip_repository.dart';
+import 'trip_lifecycle.dart';
+import 'trip_operation_dialog.dart';
 
 Widget unguardedTrip(Widget child) => child;
 
@@ -213,11 +215,9 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                   Card(
                     child: ListTile(
                       key: ValueKey('trip:${r['id']}'),
-                      title: Text(
-                        '${r['trip_number']} Â· ${r['registration']}',
-                      ),
+                      title: Text('${r['trip_number']} · ${r['registration']}'),
                       subtitle: Text(
-                        '${r['origin_name']} â†’ ${r['destination_name']}\n${r['state']} Â· ${r['load_kind']} Â· ${r['dispatch_date'] ?? r['planned_dispatch_date'] ?? ''}',
+                        '${r['origin_name']} → ${r['destination_name']}\n${r['state']} · ${r['load_kind']} · ${r['dispatch_date'] ?? r['planned_dispatch_date'] ?? ''}',
                       ),
                       onTap: () => detail(r['id'] as String),
                     ),
@@ -977,7 +977,7 @@ class _DraftReviewState extends State<_DraftReview> {
             if (needed) ...[
               const Text(TripStrings.overlap),
               for (final t in widget.warning['visible_trips'] as List)
-                Text('${t['trip_number']} Â· ${t['dispatch_date']}'),
+                Text('${t['trip_number']} · ${t['dispatch_date']}'),
               if (widget.warning['restricted_conflict'] == true)
                 const Text(TripStrings.restricted),
               CheckboxListTile(
@@ -1050,6 +1050,40 @@ class _TripDetailState extends State<TripDetail> {
     });
   }
 
+  Future<void> operate(
+    TripAction action,
+    Map<String, dynamic> trip, {
+    String? consignment,
+  }) async {
+    final committed = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => widget.guard(
+        TripOperationDialog(
+          repository: widget.repository,
+          trip: trip,
+          action: action,
+          consignment: consignment,
+        ),
+      ),
+    );
+    if (committed != null && mounted) {
+      reload();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(LifecycleStrings.success)));
+    }
+  }
+
+  Future<void> history() => Navigator.push<void>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => widget.guard(
+        TripHistory(repository: widget.repository, id: widget.id),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -1085,11 +1119,11 @@ class _TripDetailState extends State<TripDetail> {
           children: [
             if (widget.saved) const Text(TripStrings.saved),
             Text(
-              '${r['trip_number']} Â· ${r['registration']}',
+              '${r['trip_number']} · ${r['registration']}',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Text('${r['origin_name']} â†’ ${r['destination_name']}'),
-            Text('${r['state']} Â· ${r['load_kind']}'),
+            Text('${r['origin_name']} → ${r['destination_name']}'),
+            Text('${r['state']} · ${r['load_kind']}'),
             Text(
               'Recorded owner: ${(r['owner_snapshot'] as Map)['display_name']}',
             ),
@@ -1101,9 +1135,12 @@ class _TripDetailState extends State<TripDetail> {
               'Planned date: ${r['planned_dispatch_date'] ?? TripStrings.none}',
             ),
             Text(
-              'Dispatch: ${r['dispatch_date'] ?? TripStrings.none} Â· Arrival: ${r['arrival_date'] ?? TripStrings.none}',
+              'Dispatch: ${r['dispatch_date'] ?? TripStrings.none} · Arrival: ${r['arrival_date'] ?? TripStrings.none}',
             ),
             if (r['state'] == 'DRAFT') const Text(TripStrings.potential),
+            if (r['earnings_recognized'] == true)
+              const Text(LifecycleStrings.recognition),
+            const Text(LifecycleStrings.independent),
             for (final k in [
               'customer_charge',
               'commission',
@@ -1116,6 +1153,18 @@ class _TripDetailState extends State<TripDetail> {
               Text('Overlap reviewed: ${r['overlap_reason']}'),
             Wrap(
               children: [
+                for (final action in TripAction.values.where(
+                  (a) => a != TripAction.cancelConsignment,
+                ))
+                  if (r[action.permission] == true)
+                    TextButton(
+                      onPressed: () => operate(action, r),
+                      child: Text(action.label),
+                    ),
+                TextButton(
+                  onPressed: history,
+                  child: const Text(LifecycleStrings.history),
+                ),
                 if (r['can_edit'] == true)
                   TextButton(
                     onPressed: () async {
@@ -1140,7 +1189,7 @@ class _TripDetailState extends State<TripDetail> {
             for (final t in r['linked_returns'] as List)
               TextButton(
                 onPressed: () => openLinked(t['id'] as String),
-                child: Text('Return ${t['trip_number']} Â· ${t['load_kind']}'),
+                child: Text('Return ${t['trip_number']} · ${t['load_kind']}'),
               ),
             const Text(TripStrings.stops),
             for (final s in stops)
@@ -1153,11 +1202,21 @@ class _TripDetailState extends State<TripDetail> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${c['customer_name']} Â· ${c['state']} Â· ${c['car_count']} cars',
+                        '${c['customer_name']} · ${c['state']} · ${c['car_count']} cars',
                       ),
+                      if (r['can_cancel_consignment'] == true &&
+                          c['state'] == 'ACTIVE')
+                        TextButton(
+                          onPressed: () => operate(
+                            TripAction.cancelConsignment,
+                            r,
+                            consignment: c['id'] as String,
+                          ),
+                          child: Text(TripAction.cancelConsignment.label),
+                        ),
                       Text('Broker: ${c['broker_name'] ?? TripStrings.none}'),
                       Text(
-                        'Quoted: PKR ${c['quoted_amount']} Â· ${c['quote_mode']} Â· ${c['commission_method']} ${c['commission_value']}',
+                        'Quoted: PKR ${c['quoted_amount']} · ${c['quote_mode']} · ${c['commission_method']} ${c['commission_value']}',
                       ),
                       for (final k in [
                         'customer_charge',
@@ -1171,7 +1230,7 @@ class _TripDetailState extends State<TripDetail> {
                       Text('${c['notes']}'),
                       for (final a in c['cars'] as List)
                         Text(
-                          '${a['identifier']} Â· Pickup: ${stopLabel(a['pickup_stop_id'])} Â· Drop: ${stopLabel(a['drop_stop_id'])}',
+                          '${a['identifier']} · Pickup: ${stopLabel(a['pickup_stop_id'])} · Drop: ${stopLabel(a['drop_stop_id'])}',
                         ),
                     ],
                   ),

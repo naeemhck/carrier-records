@@ -4,7 +4,7 @@ Internal records, trip billing, expenses and monthly reporting for a car-carrier
 
 ## Project status
 
-T00-T05 are complete: local Windows/Android tooling, exact domain/schema contracts, managed staff accounts and authorization, company/master records, and office-scoped trip drafts with multiple customers, stops, reviewed returns and server-calculated quotes. Analysis, 26 unit/widget tests, 95 SQL assertions, 344 HTTP/native assertions and both debug builds pass. Production deployment, release distribution and T06 onward remain pending. See [current tasks](tasks.md) and [T05 evidence](docs/trips-evidence.md).
+T00-T06 are complete: local Windows/Android tooling, exact schema/domain contracts, managed staff accounts, company/master records, scoped multi-customer trip drafts, and atomic dispatch/arrival with audited creator corrections. Dispatch recognizes agreed earnings; arrival delivers active consignments without settling money. Analysis, 32 unit/widget tests, 110 SQL assertions, 465 HTTP assertions, the Windows lifecycle test and both debug builds pass. General financial commands, production deployment and release distribution remain pending. See [current tasks](tasks.md) and [T06 evidence](docs/lifecycle-evidence.md).
 
 ## Planning documents
 
@@ -19,8 +19,8 @@ T00-T05 are complete: local Windows/Android tooling, exact domain/schema contrac
 
 ## Continue in VS Code
 
-Open this repository folder in VS Code and use the Codex extension. Read memory.md, PRD.md and rules.md first, then continue from T06 in tasks.md. Use the existing Flutter SDK and local Supabase setup documented in [tooling setup](docs/tooling.md).
+Open this repository folder in VS Code and use the Codex extension. Read memory.md, PRD.md and rules.md first, then continue from T07 in tasks.md. Use the existing Flutter SDK and local Supabase setup documented in [tooling setup](docs/tooling.md).
 
-Flutter/Dart is the client stack; Supabase provides the local backend during implementation. Core package versions and the application lockfile are pinned. Use local Git; this T05 commit is not pushed. An earlier user-authorized [private source backup](https://github.com/naeemhck/carrier-records) is configured. Keep secrets, signing material, live customer records and backup archives outside version control. Public publication is not authorized. See [source backup review](docs/source-backup.md).
+Flutter/Dart is the client stack; Supabase provides the local backend during implementation. Core package versions and the application lockfile are pinned. Use local Git; the T05 and T06 commits are not pushed. An earlier user-authorized [private source backup](https://github.com/naeemhck/carrier-records) is configured. Keep secrets, signing material, live customer records and backup archives outside version control. Public publication is not authorized. See [source backup review](docs/source-backup.md).
 
 Update the affected planning documents and memory.md when requirements or implementation status change. Record actual test and build results; defined tests are not passed tests.
