@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: Planning documents. Application tasks remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T01 tooling and application scaffold in progress. T02–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -33,11 +33,15 @@ Deliver PRD.md, architecture.md, rules.md, design.md, tasks.md and memory.md. Ve
 
 ### T01 — Establish Flutter and backend tooling
 
-Status: TODO | Dependencies: T00
+Status: IN PROGRESS | Dependencies: T00
 
 Use the existing VS Code Flutter SDK after checking its configured path/version. Inspect flutter doctor; install missing Windows C++ and Android/JDK prerequisites only as needed. Create the Flutter Windows/Android project and local Supabase tooling. Configure local/test environments separately from production. Pin compatible packages and commit lockfiles.
 
 Evidence: Flutter analyzer/test harness works; generated runner files exist; dependency versions and build prerequisites documented. No credentials are committed.
+
+Actual progress (2026-10-11): Read AGENTS.md and all six planning documents. Verified the existing VS Code SDK using `flutter --version` and `flutter doctor -v`: Flutter 3.47.4 stable / Dart 3.13.3. Generated `app/` Windows and Android runners. Added Riverpod/router composition, centralized English strings and a setup-only screen; no business feature or backend success is simulated. Pinned direct core packages and tracked `app/pubspec.lock`. Added SDK/CLI wrappers, ignored local tooling/configuration, and separate local/test public-config examples. Supabase CLI 2.120.0 downloaded from its official release, SHA-256 verified as `0db5224fc5d92ae5f15e675ed65dad376967326921122ab8d9a78e790874c92e`; `--version` and `init` succeeded. Local configuration disables signup and automatic Data API exposure, disables seed loading until T02, and sets a 5 MB storage limit. Docker Desktop 4.90.0 / engine 29.7.2 responds.
+
+Executed checks: Dart formatter completed; `flutter analyze --no-pub` returned no issues; `flutter test --no-pub` passed the one application-route harness test. `flutter pub add` resolved/downloaded packages but returned exit 1 at Windows plugin symlink setup. `flutter build windows --debug --no-pub` failed on missing symlink support. `flutter build apk --debug --no-pub` failed because no Android SDK was found. Developer Mode registry change was denied for this non-administrator session. No AT-01–AT-35 scenario, native release, hosted deployment or restoration has passed. Further prerequisite/startup results are recorded in `docs/tooling-evidence.md`; T01 stays IN PROGRESS until remaining tooling checks are resolved.
 
 ### T02 — Migrations and domain types
 

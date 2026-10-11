@@ -9,11 +9,14 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 - The grilling interview and final specification confirmation are complete.
 - The user requested customizable output attributes after the initial template decision; the revised plan includes them in both PDF and Excel.
 - The user asked to implement the revised plan, then directed work to begin with document generation.
-- Six planning Markdown files have been generated. No application source, hosted backend, production staff accounts, installer or APK is delivered by this phase.
+- Six planning Markdown files have been read; T01 now has a Flutter source scaffold and local Supabase configuration. No hosted backend, production staff accounts, installer or APK is delivered.
 - The working project folder is D:\portfolio\transport_project. The user will continue in VS Code with the Codex extension.
-- Local Git is initialized on main with the six planning documents, README.md, AGENTS.md and .gitignore. GitHub publication is pending authentication; no remote repository is confirmed yet.
-- T00 covers documentation. T01–T20 remain TODO; application acceptance scenarios remain NOT RUN.
-- A VS Code Flutter SDK path exists on the user's computer. Full SDK/build verification was interrupted when work was redirected to documents. Do not claim native build readiness from that discovery.
+- Local Git on main is the versioning workflow. The latest user instruction explicitly forbids GitHub publication; no push or repository publication is authorized.
+- T00 is DONE; T01 is IN PROGRESS; T02–T20 remain TODO. Business acceptance scenarios remain NOT RUN.
+- Existing VS Code SDK actually verified: Flutter 3.47.4 stable (9584c6713b), Dart 3.13.3. Flutter/Dart are not on PATH; `tools/flutter.ps1` resolves the configured SDK without committing the machine path.
+- `app/` contains generated Windows/Android runners, Riverpod/router composition and a setup-only screen. Analyzer found no issues and one route harness test passed. Core dependency versions and the transitive lockfile are committed with the scaffold; see docs/tooling.md.
+- Supabase CLI 2.120.0 was downloaded with verified release SHA-256; version and init succeeded. Docker Desktop responds. Local/test config examples contain no keys; local Auth signup is disabled. Backend initialization/session persistence remains T03 work.
+- Native debug attempts failed: Windows plugin symlinks require Developer Mode; Android SDK was absent. Registry access to enable Developer Mode was denied. Prerequisite installers and local startup evidence are tracked in docs/tooling-evidence.md; do not infer native build readiness from installation attempts.
 
 ## 2. Confirmed business decisions
 
@@ -127,6 +130,7 @@ Backups must be recoverable after losing the original PC. Keeping an encryption 
 | 2026-10-11 | Attribute selection/order/presets in output workflow | User requested easy output customization; preserve recipient restrictions |
 | 2026-10-11 | Document generation prioritized | User explicitly asked to start with the six documents before application work |
 | 2026-10-11 | Continue in VS Code with Codex using the existing D:\portfolio\transport_project folder; private GitHub versioning requested | User selected the development workflow; local Git prepared, remote publication pending authentication |
+| 2026-10-11 | Continue T01 with existing Flutter SDK and local Git; do not publish to GitHub | Latest instruction supersedes the earlier remote-publication request |
 
 Dates above record this specification baseline, not an inferred timestamp for every earlier interview answer.
 
@@ -139,8 +143,8 @@ Not verified in this phase: Flutter application analysis/tests, SQL migrations/R
 ## 9. Resume instructions
 
 1. Read the six documents, starting with this file and PRD.md/rules.md.
-2. Respect the latest user instruction about phase ordering; planning documents are the current completed deliverable.
-3. Continue from T01 when application implementation resumes; confirm existing SDK readiness through actual commands.
+2. Use local Git; do not publish to GitHub under the latest instruction.
+3. Resume remaining T01 prerequisite checks from docs/tooling-evidence.md, then follow the task dependencies. Existing SDK/analyzer/test checks passed; native builds did not.
 4. Create required source/tooling in the project and keep production secrets out of it.
 5. Do not reinvent the money model, broaden recipient visibility, silently add taxes or enable paid hosting.
 6. Record real test/build/recovery evidence and update tasks.md and this current-state section when work progresses.

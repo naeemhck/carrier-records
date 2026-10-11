@@ -37,6 +37,9 @@ credentials*.json
 supabase/.temp/
 supabase/.branches/
 node_modules/
+tools/.local/
+config/*.json
+!config/*.example.json
 
 # Private operational data and generated artifacts
 backups/
