@@ -12,13 +12,15 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 - Six planning Markdown files have been read; T01 now has a Flutter source scaffold and local Supabase configuration. No hosted backend, production staff accounts, installer or APK is delivered.
 - The working project folder is D:\portfolio\transport_project. The user will continue in VS Code with the Codex extension.
 - Local Git on main is the versioning workflow. The latest user instruction explicitly forbids GitHub publication; no push or repository publication is authorized.
-- T00 and T01 are DONE; T02 is IN PROGRESS; T03?T20 remain TODO. Business acceptance scenarios remain NOT RUN until T02 checks are implemented/executed.
+- T00, T01 and T02 are DONE; T03?T20 remain TODO. T02 quote/precision portions verified; full business workflows remain NOT RUN.
 - Existing VS Code SDK verified: Flutter 3.47.4 stable (9584c6713b), Dart 3.13.3. Its bin directory was added to user PATH; restart VS Code to inherit it. `tools/flutter.ps1` also resolves the configured SDK without committing the machine path.
 - `app/` contains generated Windows/Android runners, Riverpod/router composition and a setup-only screen. Analyzer found no issues and one route harness test passed. Core dependency versions/lockfile are committed. No backend session or business feature is simulated.
 - Prerequisites completed: Visual Studio Build Tools/standard x86/x64 ATL, Android Studio JBR, API 36 and plugin-required API 35, build-tools 36, platform-tools, NDK 28.2.13676358, CMake 3.22.1; SDK licences accepted. User enabled Developer Mode (registry value 1 verified). Doctor exits 0 with no issues.
 - Windows debug build exits 0 after 126.2s; Android debug build exits 0 after 345.3s. Artifacts are ignored under app/build. Kotlin incremental compilation disabled to address C: Pub cache versus D: project path failure. Gradle official archive size/SHA-256 verified; retries sequential with certificate verification intact. Detailed failed attempts/remedies and hashes in docs/tooling-evidence.md. No installer, release signing, device launch or production distribution claimed.
 - Supabase CLI 2.120.0 checksum/version/init verified. Local stack passes Auth/REST/Storage HTTP 200 and PostgreSQL readiness. Optional local analytics disabled to avoid Vector's Docker TCP dependency; no insecure TCP listener enabled. No hosted project linked. Signup and automatic new-table API exposure disabled. Local/test examples contain no keys; backend session work remains T03.
-- T01 changes are versioned locally; do not publish to GitHub. Proceed with T02 schema, exact domain values and isolated tests.
+- T02 completed: four local migrations, 27 application tables, business-scoped/party-role foreign keys, versions, owner/quote snapshots, append-only financial/document/audit history and query indexes. Default-deny RLS and revoked client grants remain until T03 scoped authorization. No operational or financial RPC command is yet implemented.
+- Exact Dart Money/Percentage/BusinessDate/Quote and UUID/context/command types implemented; decimal-string server quote function rejects extra input precision and recomputes canonical amounts. Integer paisa/BigInt intermediate rounding avoids floating point. Six Dart/widget tests and 43 SQL assertions pass; analyzer and database lint have no issues; formatting check passes. SQL fixtures roll back; local business/Auth counts are zero and migration count four. Post-reset backend health passes. See docs/domain-evidence.md for actual failed attempts/fixes and the limited AT coverage.
+- T01/T02 changes use local Git only; do not publish to GitHub. Next task is T03 accounts, scoped permissions and secure sessions.
 
 ## 2. Confirmed business decisions
 
@@ -147,7 +149,7 @@ Not verified in this phase: Flutter application analysis/tests, SQL migrations/R
 
 1. Read the six documents, starting with this file and PRD.md/rules.md.
 2. Use local Git; do not publish to GitHub under the latest instruction.
-3. Continue T02 migrations/domain types, then follow the task dependencies. T01 doctor, analyzer/test harness, both debug builds and local backend health passed; see docs/tooling-evidence.md.
+3. Resume T03 accounts/permissions/sessions, then follow the task dependencies. T01 native/tooling checks and T02 migration/domain checks passed; see docs/tooling-evidence.md and docs/domain-evidence.md. No login/business workflow is implemented yet.
 4. Create required source/tooling in the project and keep production secrets out of it.
 5. Do not reinvent the money model, broaden recipient visibility, silently add taxes or enable paid hosting.
 6. Record real test/build/recovery evidence and update tasks.md and this current-state section when work progresses.

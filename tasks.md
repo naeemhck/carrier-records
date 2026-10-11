@@ -47,11 +47,13 @@ Completion (2026-10-11): Existing Visual Studio/Android Studio installers finish
 
 ### T02 — Migrations and domain types
 
-Status: IN PROGRESS | Dependencies: T01
+Status: DONE | Dependencies: T01
 
 Implement architecture.md records, keys, constraints and indexes. Implement exact Money/rate/date/quote types and server pricing functions. Add seeded test fixtures only to isolated test environments. Include business/office context, party roles, owner snapshots and optimistic versions.
 
 Evidence: Migrations apply to a clean database; quote tests AT-01/02/03 and precision AT-17 pass.
+
+Actual completion (2026-10-11): Four migrations applied to a clean local database (reset first three, then pending role-link migration on the empty database). Added 27 application tables, business-scoped keys, party roles, owner/quote snapshots, versions, history guards, indexes and default-deny RLS/client grants. Added decimal-string server pricing and exact Dart Money/Percentage/BusinessDate/Quote plus UUID/context/command types. `flutter analyze --no-pub` passes; six Dart/widget tests pass; formatting check reports no changes. `supabase test db` passes 43 assertions and database lint reports no issues. Fixtures rolled back: business/Auth counts both zero; four migration records present. Post-reset Auth/REST/Storage health returns HTTP 200 and PostgreSQL accepts connections. Tests verify T02 quote/precision portions of AT-01/02/03/17; full dispatch, allocation, permission and financial-command scenarios remain NOT RUN until their tasks. First reset failure, fixture typo and lint corrections are recorded in docs/domain-evidence.md. No credentials or test identities persist; local Git only.
 
 ### T03 — Accounts, permissions and secure sessions
 
