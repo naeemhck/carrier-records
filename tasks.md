@@ -33,7 +33,7 @@ Deliver PRD.md, architecture.md, rules.md, design.md, tasks.md and memory.md. Ve
 
 ### T01 — Establish Flutter and backend tooling
 
-Status: IN PROGRESS | Dependencies: T00
+Status: DONE | Dependencies: T00
 
 Use the existing VS Code Flutter SDK after checking its configured path/version. Inspect flutter doctor; install missing Windows C++ and Android/JDK prerequisites only as needed. Create the Flutter Windows/Android project and local Supabase tooling. Configure local/test environments separately from production. Pin compatible packages and commit lockfiles.
 
@@ -43,13 +43,11 @@ Actual progress (2026-10-11): Read AGENTS.md and all six planning documents. Ver
 
 Executed checks: Dart formatter completed; `flutter analyze --no-pub` returned no issues; `flutter test --no-pub` passed the one application-route harness test. `flutter pub add` resolved/downloaded packages but returned exit 1 at Windows plugin symlink setup. `flutter build windows --debug --no-pub` failed on missing symlink support. `flutter build apk --debug --no-pub` failed because no Android SDK was found. Developer Mode registry change was denied for this non-administrator session. No AT-01–AT-35 scenario, native release, hosted deployment or restoration has passed. Further prerequisite/startup results are recorded in `docs/tooling-evidence.md`; T01 stays IN PROGRESS until remaining tooling checks are resolved.
 
-T01 continuation (2026-10-11): Existing installers were monitored without duplicates. C++ Build Tools and Android Studio installation completed successfully. User enabled Developer Mode and registry value 1 was verified; `pub get` passed. Android command-line tools were installed with verified official checksum. Local Supabase startup and a controlled restart pass; Auth/REST/Storage return HTTP 200 and PostgreSQL is ready. Optional local analytics was disabled to resolve Vector's Docker TCP connection failure. See docs/tooling-evidence.md. T01 is not yet DONE.
-
-Latest T01 checks (2026-10-11): Required Android packages are installed and recognized: API 36 revision 2, build-tools 36.0.0, platform-tools 37.0.1, NDK 28.2.13676358 and CMake 3.22.1. Official archive sizes/checksums were verified. All SDK licences are accepted. `flutter doctor -v` exits 0 with no issues found. The verified Flutter bin was added to user PATH; existing VS Code sessions need restarting to inherit it. Windows initially failed with missing ATL header, then missing standard `atls.lib`. After the user installed standard latest v143 x86/x64 ATL, the final Windows debug retry exits 0 after 126.2 seconds and produces `app/build/windows/x64/runner/Debug/carrier_records.exe`. Android debug attempt exits 1 after 141.9 seconds because the Gradle distribution download times out; its process ended before one official archive retry. Gradle 9.3.1 archive size and official SHA-256 verified, then copied into the inactive wrapper cache. The Android retry has started Gradle and is downloading build dependencies; final result pending. Windows debug build has passed; Android debug build has not yet passed. Do not mark T01 DONE or start T02 until the native/tooling completion gate passes.
+Completion (2026-10-11): Existing Visual Studio/Android Studio installers finished without duplicates. Developer Mode enabled by user and verified. Standard latest v143 x86/x64 ATL installed; Windows debug build exits 0 after 126.2 seconds and produces `app/build/windows/x64/runner/Debug/carrier_records.exe`. Android SDK/API 36 and plugin-required API 35, build-tools 36, platform-tools, NDK and CMake installed; licences accepted. `flutter doctor -v` exits 0 with no issues. Android debug build exits 0 after 345.3 seconds and produces `app/build/app/outputs/flutter-apk/app-debug.apk` after verified Gradle download, IPv4 retry and disabling cross-drive Kotlin incremental caches. Supabase Auth/REST/Storage HTTP 200 and PostgreSQL readiness pass after disabling optional local analytics. Analyzer and one widget harness test passed. Exact failures, remedies and debug artifact hashes are in docs/tooling-evidence.md. No packaged installer, device launch, release APK, business acceptance scenario, hosted deployment or restoration is claimed. T01 completion checks pass; local Git only.
 
 ### T02 — Migrations and domain types
 
-Status: TODO | Dependencies: T01
+Status: IN PROGRESS | Dependencies: T01
 
 Implement architecture.md records, keys, constraints and indexes. Implement exact Money/rate/date/quote types and server pricing functions. Add seeded test fixtures only to isolated test environments. Include business/office context, party roles, owner snapshots and optimistic versions.
 

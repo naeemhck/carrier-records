@@ -12,14 +12,16 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 - Six planning Markdown files have been read; T01 now has a Flutter source scaffold and local Supabase configuration. No hosted backend, production staff accounts, installer or APK is delivered.
 - The working project folder is D:\portfolio\transport_project. The user will continue in VS Code with the Codex extension.
 - Local Git on main is the versioning workflow. The latest user instruction explicitly forbids GitHub publication; no push or repository publication is authorized.
-- T00 is DONE; T01 is IN PROGRESS; T02–T20 remain TODO. Business acceptance scenarios remain NOT RUN.
-- Existing VS Code SDK actually verified: Flutter 3.47.4 stable (9584c6713b), Dart 3.13.3. Its bin directory was added to user PATH; restart VS Code to inherit it. `tools/flutter.ps1` also resolves the configured SDK without committing the machine path.
-- `app/` contains generated Windows/Android runners, Riverpod/router composition and a setup-only screen. Analyzer found no issues and one route harness test passed. Core dependency versions and the transitive lockfile are committed with the scaffold; see docs/tooling.md.
-- Supabase CLI 2.120.0 was downloaded with verified release SHA-256; version and init succeeded. Docker Desktop responds. Local/test config examples contain no keys; local Auth signup is disabled. Backend initialization/session persistence remains T03 work.
-- Initial native failures (Developer Mode and absent Android SDK) were resolved. Monitored existing installers without duplicates: Visual Studio Build Tools and Android Studio completed successfully. User enabled Developer Mode (registry value 1 verified). Supabase completed startup and one controlled restart; Auth/REST/Storage HTTP 200 and PostgreSQL readiness verified. Optional local analytics disabled because Vector could not reach Docker's TCP logging endpoint. Detailed historical evidence is in docs/tooling-evidence.md.
-- Latest native/tooling state: Android API 36 revision 2, build-tools 36.0.0, platform-tools 37.0.1, NDK 28.2.13676358 and CMake 3.22.1 installed; official archive checksums verified and licences accepted. Doctor exits 0 with no issues. User installed the standard latest v143 x86/x64 ATL component after missing-header/library failures. Final Windows debug retry exits 0 after 126.2 seconds and produces the executable; no installer or launch test claimed. Android debug attempt exits 1 on a Gradle distribution read timeout after 141.9 seconds; the old process ended before a single official download retry. Gradle 9.3.1 archive size/SHA-256 verified; Android retry has started Gradle and is downloading dependencies, final result pending. T01 stays IN PROGRESS; T02 has not begun.
+- T00 and T01 are DONE; T02 is IN PROGRESS; T03?T20 remain TODO. Business acceptance scenarios remain NOT RUN until T02 checks are implemented/executed.
+- Existing VS Code SDK verified: Flutter 3.47.4 stable (9584c6713b), Dart 3.13.3. Its bin directory was added to user PATH; restart VS Code to inherit it. `tools/flutter.ps1` also resolves the configured SDK without committing the machine path.
+- `app/` contains generated Windows/Android runners, Riverpod/router composition and a setup-only screen. Analyzer found no issues and one route harness test passed. Core dependency versions/lockfile are committed. No backend session or business feature is simulated.
+- Prerequisites completed: Visual Studio Build Tools/standard x86/x64 ATL, Android Studio JBR, API 36 and plugin-required API 35, build-tools 36, platform-tools, NDK 28.2.13676358, CMake 3.22.1; SDK licences accepted. User enabled Developer Mode (registry value 1 verified). Doctor exits 0 with no issues.
+- Windows debug build exits 0 after 126.2s; Android debug build exits 0 after 345.3s. Artifacts are ignored under app/build. Kotlin incremental compilation disabled to address C: Pub cache versus D: project path failure. Gradle official archive size/SHA-256 verified; retries sequential with certificate verification intact. Detailed failed attempts/remedies and hashes in docs/tooling-evidence.md. No installer, release signing, device launch or production distribution claimed.
+- Supabase CLI 2.120.0 checksum/version/init verified. Local stack passes Auth/REST/Storage HTTP 200 and PostgreSQL readiness. Optional local analytics disabled to avoid Vector's Docker TCP dependency; no insecure TCP listener enabled. No hosted project linked. Signup and automatic new-table API exposure disabled. Local/test examples contain no keys; backend session work remains T03.
+- T01 changes are versioned locally; do not publish to GitHub. Proceed with T02 schema, exact domain values and isolated tests.
 
 ## 2. Confirmed business decisions
+
 
 | Decision | Agreed position |
 |---|---|
@@ -145,7 +147,7 @@ Not verified in this phase: Flutter application analysis/tests, SQL migrations/R
 
 1. Read the six documents, starting with this file and PRD.md/rules.md.
 2. Use local Git; do not publish to GitHub under the latest instruction.
-3. Resume remaining T01 prerequisite checks from docs/tooling-evidence.md, then follow the task dependencies. Existing SDK/analyzer/test checks passed; native builds did not.
+3. Continue T02 migrations/domain types, then follow the task dependencies. T01 doctor, analyzer/test harness, both debug builds and local backend health passed; see docs/tooling-evidence.md.
 4. Create required source/tooling in the project and keep production secrets out of it.
 5. Do not reinvent the money model, broaden recipient visibility, silently add taxes or enable paid hosting.
 6. Record real test/build/recovery evidence and update tasks.md and this current-state section when work progresses.

@@ -16,6 +16,8 @@ Windows requires Developer Mode for plugin symlinks, Visual Studio's C++ workloa
 
 Android requires an Android SDK, command-line tools, accepted SDK licences, and a compatible JDK (Android Studio provides one). This Flutter SDK requests Android API 36 and NDK 28.2.13676358. `flutter doctor -v` reports readiness. See [Flutter Windows setup](https://docs.flutter.dev/platform-integration/windows/setup), [Android setup](https://docs.flutter.dev/platform-integration/android/setup), and [Microsoft ATL component IDs](https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022).
 
+Android plugins also requested API 35, which Gradle installed with its accepted licence. Kotlin incremental compilation is disabled in `app/android/gradle.properties`: plugin sources in the user Pub cache on C: and this project on D: caused relative-path cache failures. This permits full compilation without moving the user's SDK/cache. See [Kotlin compilation and caches](https://kotlinlang.org/docs/gradle-compilation-and-caches.html). For this workstation's transient download failures, build retries used `JAVA_TOOL_OPTIONS` with TLS 1.2, IPv4 preference and bounded HTTP timeouts; certificate verification remained enabled and dependency versions were retained.
+
 ## Local backend
 
 `tools/install-supabase.ps1` downloads CLI 2.120.0 from the official release and checks its SHA-256 against the release checksums. Downloaded binaries are ignored under `tools/.local/`. Docker Desktop must be running in Linux-container mode. See [Supabase local development](https://supabase.com/docs/guides/local-development).
