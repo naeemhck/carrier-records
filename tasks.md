@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T03 accounts, permissions and secure sessions DONE. T04–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T04 company and master records DONE. T05–T20 remain TODO. Next: T05 trips, consignments, stops and car records. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -70,11 +70,15 @@ Executed checks: Final clean local reset applies five migrations; database lint 
 
 ### T04 — Company and master records
 
-Status: TODO | Dependencies: T03
+Status: DONE | Dependencies: T03
 
 Build company identity, offices, vehicle/owner/driver/customer/broker records, multiple party roles, route defaults and expense categories. Archive used records. Implement required setup before bill issuance. Use editable suggested office labels Karachi and Islamabad; collect real identities instead of invented production records.
 
 Evidence: New/archived record flows work; historical owner and route snapshot checks AT-10/11 pass.
+
+Actual verification (2026-10-11): All six migrations apply on a clean local reset. `python tools/tests/t03_api.py --masters` passes 302 assertions, including AT-10/11 owner/fare history, multi-role parties, used-record archiving, exact fares, same-body create/update retries, null/stale/concurrent versions, foreign-business and origin-office restrictions, archived/disabled-office access and direct POST/PATCH/DELETE permission attacks against all master tables. Existing T03 account/financial/storage/balance authorization checks also pass. Prior trip, agreed quote and issued snapshot remain byte-equivalent after ownership/route/contact changes; existing expense survives category/party archive. No master edit posts financial events.
+
+`flutter analyze --no-pub`: no issues; `flutter test --no-pub`: 15 tests pass. `supabase test db`: 83 assertions pass; `supabase db lint --local`: no issues. Real Windows integration test passes administrator create/edit/archive/retrieval. Ordinary Windows/Android debug builds pass (150.5s/151.1s); package/source audit passes 667 entries/files with no actual privileged credentials. Auth/REST/Storage health HTTP 200; PostgreSQL ready. Auth users, businesses, password operations, master retries and storage objects return to zero; temporary test configuration is removed. Company setup gate is implemented; actual trip entry and document issuance remain T05/T13, with historical fixtures clearly identified as test-only. See docs/masters-evidence.md and docs/masters-setup.md. No production identities, elevated administrator action, hosted deployment or GitHub publication.
 
 ### T05 — Trips, consignments, stops and car records
 

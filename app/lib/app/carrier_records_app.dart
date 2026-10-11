@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/staff_session.dart';
+import '../features/masters/master_repository.dart';
+import '../features/masters/master_workspace.dart';
 import 'strings.dart';
 
 class CarrierRecordsApp extends StatefulWidget {
@@ -222,6 +224,39 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                         : 'Assigned offices: ${(p['offices'] as List).map((o) => o['name']).join(', ')}',
                   ),
                   const SizedBox(height: 16),
+                  if (p['role'] == 'ADMIN')
+                    FilledButton.icon(
+                      icon: const Icon(Icons.settings),
+                      label: const Text(MasterStrings.title),
+                      onPressed: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => ListenableBuilder(
+                              listenable: widget.session,
+                              builder: (context, _) =>
+                                  widget.session.profile?['role'] == 'ADMIN' &&
+                                      widget
+                                              .session
+                                              .profile?['must_change_password'] ==
+                                          false
+                                  ? MasterWorkspace(
+                                      repository: SupabaseMasterRepository(
+                                        widget.session.client,
+                                      ),
+                                    )
+                                  : const Scaffold(
+                                      body: Center(
+                                        child: Text(
+                                          MasterStrings.accessRequired,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        );
+                        await widget.session.refresh();
+                      },
+                    ),
                   if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
                   if (p['role'] != 'ADMIN')

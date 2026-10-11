@@ -5,7 +5,7 @@ import json, subprocess, urllib.request, urllib.error, uuid, secrets, hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 def sql(query):
-    r=subprocess.run(['docker','exec','-i','supabase_db_transport_project','psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,text=True,capture_output=True)
+    r=subprocess.run(['docker','exec','-i','supabase_db_transport_project','psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,text=True,encoding='utf-8',capture_output=True)
     if r.returncode: raise RuntimeError('SQL fixture failed: '+r.stderr)
     return r.stdout.strip()
 status=subprocess.run(['powershell','-NoProfile','-File',str(ROOT/'tools/supabase.ps1'),'status','-o','json'],capture_output=True,text=True,check=True)
@@ -182,17 +182,20 @@ try:
                 built=subprocess.run(['powershell','-NoProfile','-File',str(ROOT/'tools/flutter.ps1'),'test','integration_test/staff_sign_in_test.dart','-d','windows','--no-pub','--dart-define-from-file='+str(config_path)],cwd=ROOT/'app',stdout=log,stderr=subprocess.STDOUT)
             ok('native Windows username sign-in and secure logout UI',built.returncode==0)
         finally:config_path.unlink(missing_ok=True)
+    if '--masters' in sys.argv:
+        from t04_masters import verify
+        verify(globals())
     ok('global logout succeeds',request('/auth/v1/logout?scope=global',token=at)[0]==204)
     ok('logged-out JWT fails live authorization',rpc('get_session_profile',token=at)[0]==403)
     print('T03 API acceptance checks PASS',flush=True)
 finally:
     # Local test fixtures only; preserve production immutability by never using this against hosted data.
     request('/storage/v1/object/receipts',{'prefixes':[b+'/synthetic.png']},priv=True,method='DELETE')
-    sql(f"""begin;delete from private.password_operations where target_id in(select id from public.staff_profiles where business_id='{b}');
+    sql(f"""begin;delete from private.master_requests where business_id='{b}';delete from private.password_operations where target_id in(select id from public.staff_profiles where business_id='{b}');
     alter table public.audit_events disable trigger user;alter table public.journal_lines disable trigger user;alter table public.financial_events disable trigger user;
     delete from public.audit_events where business_id='{b}';delete from public.journal_lines where business_id='{b}';delete from public.financial_events where business_id='{b}';
-    delete from public.receipt_files where business_id='{b}';delete from public.trips where business_id='{b}';delete from public.vehicles where business_id='{b}';delete from public.party_roles where business_id='{b}';delete from public.parties where business_id='{b}';
-    delete from public.staff_offices where business_id='{b}';delete from public.staff_profiles where business_id='{b}';delete from public.offices where business_id='{b}';delete from public.businesses where id='{b}';
+    delete from public.expenses where business_id='{b}';delete from public.receipt_files where business_id='{b}';alter table public.issued_documents disable trigger user;delete from public.issued_documents where business_id='{b}';alter table public.issued_documents enable trigger user;delete from public.consignments where business_id='{b}';delete from public.trips where business_id='{b}';delete from public.vehicles where business_id='{b}';delete from public.party_roles where business_id='{b}';delete from public.parties where business_id='{b}';
+    delete from public.routes where business_id='{b}';delete from public.expense_categories where business_id='{b}';delete from public.staff_offices where business_id='{b}';delete from public.staff_profiles where business_id='{b}';delete from public.offices where business_id='{b}';delete from public.businesses where id='{b}';
     alter table public.audit_events enable trigger user;alter table public.journal_lines enable trigger user;alter table public.financial_events enable trigger user;commit;""")
     for user in users:request('/auth/v1/admin/users/'+user,priv=True,method='DELETE')
     ok('synthetic identities and business fixtures removed',sql('select (select count(*) from auth.users)+(select count(*) from public.businesses);')=='0')

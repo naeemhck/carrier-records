@@ -1,0 +1,15 @@
+# T04 company and master setup
+
+After the first administrator has changed their temporary password, open **Company and master records**. Save the actual company name; address, phone, email and logo HTTPS URL are optional. Saving identity enables the backend document setup gate. Issuing staff use their own verified display name. Issuance itself remains T13 and must call `require_document_setup()` inside its transaction.
+
+Create offices using actual names and stable codes. Karachi and Islamabad are editable suggestions, with no automatically saved offices. Return to the account screen to assign offices to staff. Party records support several roles on one contact: owner, driver, customer, broker, business and other. Role removal archives the role link, preserving references already used in history.
+
+Create a vehicle with its registration and one active owner; an active default driver is optional. Owner and driver selection searches active parties in 50-row pages. Create routes with stable codes, origin/destination labels and an optional nonnegative PKR fare with at most two decimal places. Route fares are suggestions for reviewed new drafts, not replacements for agreed quotes. Create and edit expense categories from your actual categories; the suggested category names are not automatically saved.
+
+Use **Edit → Archived → Save** for a used record. **Include archived** makes it available to the administrator for review or restoration. Archiving retains IDs, historical references, trip owner/route snapshots, agreed fares and issued snapshots. A vehicle whose current owner/default driver or required role is archived cannot seed a new draft until its defaults are corrected. Archiving an office removes that office's staff access immediately; a staff account without another active assigned office becomes unavailable. Administrators retain historical access.
+
+Only administrators can maintain these records. Staff receive active choice IDs, names, codes and defaults, without contact details or Auth/creation/version metadata. Office choices include potential destinations and do not grant trip access. Raw master tables and direct financial writes remain client-closed; trip reads retain T03 office RLS. Trips are entered through later T05 commands, using `get_trip_defaults()` to capture authorized active defaults on the server.
+
+Saves require the record's current version and a UUID retry ID. The same retry ID and body return the committed result; a changed body is rejected. A version conflict preserves form entries and requires closing, refreshing and reviewing the current record. A failed request does not display success. No elevated Windows action is needed for master setup.
+
+Local verification on an empty test stack: `python tools/tests/t03_api.py --masters --masters-native`. It refuses existing business/Auth data, uses synthetic fixtures and deletes temporary test configuration and records. Never run the fixture suite against business data. No deployment or GitHub publication is part of this workflow.
