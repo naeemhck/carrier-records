@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T04 company and master records DONE. T05–T20 remain TODO. Next: T05 trips, consignments, stops and car records. Do not interpret a defined acceptance test as an executed test.
+Current phase: T05 draft trips DONE. T06–T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -82,11 +82,16 @@ Actual verification (2026-10-11): All six migrations apply on a clean local rese
 
 ### T05 — Trips, consignments, stops and car records
 
-Status: TODO | Dependencies: T04
+Status: DONE | Dependencies: T04
 
 Implement desktop-first draft entry, multi-customer consignments, stops, car counts/optional IDs, quoted fare/brokerage preview and server reconciliation. Build trip list/detail and scoped searches. Add linked empty/loaded returns and reviewed overlap warnings.
 
 Evidence: Two offices can view only permitted journeys; multi-customer/return/overlap scenarios AT-08/09 pass. Incorrect client pricing cannot override server results.
+
+Implemented: Guarded trip list/detail/editor; multi-customer drafts, ordered pickup/drop stops, counts/optional identifiers, exact previews and explicit fare suggestions, server reconciliation, linked loaded/empty returns and actor-bound reviewed overlap warnings. Aggregate saves enforce current origin/creator or administrator permission, version/retry checks and audit records. Reads/searches and direct RLS access remain office-scoped; no direct financial writes or privileged client credentials are introduced. Historical owner/route/agreed fares survive master changes.
+
+Executed checks: clean seven-migration reset; 95 SQL assertions and database lint PASS; analyzer no issues; 26 Dart/widget tests PASS; 344 real HTTP/native assertions PASS, including direct backend permission/price attacks and native Windows edit persistence. Ordinary Windows/Android debug builds exit 0 (66.6s/67.0s). Local health HTTP 200/PostgreSQL ready; synthetic records and temporary native configuration removed. Final package/source audit passes 678 entries/files with no actual privileged credentials. T05 scoped completion checks pass; local commit only. AT-08 draft/multi-customer portion and AT-09 draft return/overlap/zero-fare portion PASS; AT-08 arrival/delivery/cancelled propagation stays NOT RUN in T06, and expense/financial posting remains later tasks. See docs/trips-evidence.md. No T05 GitHub push.
+
 
 ### T06 — Dispatch, arrival and audit history
 

@@ -4,7 +4,19 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/staff_session.dart';
 import '../features/masters/master_repository.dart';
 import '../features/masters/master_workspace.dart';
+import '../features/trips/trip_draft.dart';
+import '../features/trips/trip_repository.dart';
+import '../features/trips/trip_workspace.dart';
 import 'strings.dart';
+
+String tripScope(Map<String, dynamic>? profile) {
+  final ids =
+      (profile?['offices'] as List? ?? [])
+          .map((o) => o['id'].toString())
+          .toList()
+        ..sort();
+  return '${profile?['id']}:${profile?['role']}:$ids';
+}
 
 class CarrierRecordsApp extends StatefulWidget {
   const CarrierRecordsApp({super.key, this.session, this.setupError});
@@ -259,10 +271,52 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
-                  if (p['role'] != 'ADMIN')
-                    const Text(
-                      'Your office access is active. Trip entry will be available in the next implementation tasks.',
-                    ),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.local_shipping),
+                    label: const Text(TripStrings.trips),
+                    onPressed: () async {
+                      final grantedScope = tripScope(p);
+                      Widget guard(Widget child) => ListenableBuilder(
+                        listenable: widget.session,
+                        builder: (context, _) =>
+                            tripScope(widget.session.profile) == grantedScope &&
+                                widget
+                                        .session
+                                        .profile?['must_change_password'] ==
+                                    false
+                            ? child
+                            : Scaffold(
+                                appBar: AppBar(
+                                  title: const Text(TripStrings.trips),
+                                ),
+                                body: const Center(
+                                  child: Text(TripStrings.failed),
+                                ),
+                              ),
+                      );
+                      await Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => guard(
+                            TripWorkspace(
+                              guard: guard,
+                              repository: SupabaseTripRepository(
+                                widget.session.client,
+                              ),
+                              masters: SupabaseMasterRepository(
+                                widget.session.client,
+                              ),
+                              offices: (p['offices'] as List)
+                                  .map(
+                                    (o) => Map<String, dynamic>.from(o as Map),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                        ),
+                      );
+                      await widget.session.refresh();
+                    },
+                  ),
                   OutlinedButton(
                     onPressed: busy
                         ? null

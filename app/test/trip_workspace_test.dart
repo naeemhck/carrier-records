@@ -1,0 +1,233 @@
+import 'package:carrier_records/features/masters/master_repository.dart';
+import 'package:carrier_records/features/trips/trip_draft.dart';
+import 'package:carrier_records/features/trips/trip_repository.dart';
+import 'package:carrier_records/features/trips/trip_workspace.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class FakeTrips implements TripRepository {
+  final requests = <String>[], bodies = <Map<String, dynamic>>[];
+  bool conflict = false;
+  int reviews = 0;
+  @override
+  Future<Map<String, dynamic>> overlap(TripDraft d) async {
+    reviews++;
+    return {
+      'review_token': 'ticket-$reviews',
+      'requires_confirmation': false,
+      'visible_trips': [],
+      'restricted_conflict': false,
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> save(
+    String id,
+    String request,
+    int version,
+    Map<String, dynamic> payload,
+  ) async {
+    requests.add(request);
+    bodies.add(payload);
+    if (conflict) {
+      throw const PostgrestException(
+        message: 'VERSION_CONFLICT',
+        code: 'PT409',
+      );
+    }
+    throw Exception('Response lost');
+  }
+
+  @override
+  Future<TripPage> list({
+    String search = '',
+    int offset = 0,
+    String? office,
+    String? vehicle,
+    String? state,
+    String? from,
+    String? to,
+  }) async => TripPage('ASSIGNED_OFFICES', []);
+  @override
+  Future<Map<String, dynamic>> detail(String id) async => {};
+  @override
+  Future<Map<String, dynamic>> defaults(TripDraft d) async => {};
+}
+
+class FakeMasters implements MasterRepository {
+  @override
+  Future<List<MasterRecord>> list(
+    MasterKind kind, {
+    String search = '',
+    int offset = 0,
+    bool archived = false,
+  }) async => [];
+  @override
+  Future<MasterRecord> save(
+    MasterKind kind,
+    String id,
+    String requestId,
+    int version,
+    Map<String, dynamic> payload,
+  ) => throw UnimplementedError();
+}
+
+TripDraft emptyDraft() => TripDraft()
+  ..vehicle = 'vehicle'
+  ..origin = 'origin'
+  ..destination = 'destination'
+  ..kind = 'EMPTY';
+void main() {
+  testWidgets('scope change hides an already opened draft editor', (
+    tester,
+  ) async {
+    final access = ValueNotifier(true);
+    Widget guard(Widget child) => ValueListenableBuilder<bool>(
+      valueListenable: access,
+      builder: (_, allowed, _) =>
+          allowed ? child : const Scaffold(body: Text('Access changed')),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: TripWorkspace(
+          repository: FakeTrips(),
+          masters: FakeMasters(),
+          offices: const [
+            {'id': 'origin', 'name': 'Origin'},
+          ],
+          guard: guard,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(TripStrings.newTrip));
+    await tester.pumpAndSettle();
+    expect(find.byType(TripEditor), findsOneWidget);
+    access.value = false;
+    await tester.pumpAndSettle();
+    expect(find.byType(TripEditor), findsNothing);
+    expect(find.text('Access changed'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    access.dispose();
+  });
+  testWidgets(
+    'office trip workspace loads without asynchronous setState return',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TripWorkspace(
+            repository: FakeTrips(),
+            masters: FakeMasters(),
+            offices: const [
+              {'id': 'origin', 'name': 'Origin'},
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(TripStrings.scope), findsOneWidget);
+      expect(find.text(TripStrings.empty), findsOneWidget);
+    },
+  );
+  testWidgets(
+    'lost save response retains request, prices and exact overlap ticket',
+    (tester) async {
+      final repository = FakeTrips();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TripEditor(
+            repository: repository,
+            masters: FakeMasters(),
+            offices: const [
+              {'id': 'origin', 'name': 'Origin'},
+            ],
+            draft: emptyDraft(),
+          ),
+        ),
+      );
+      Future<void> save({bool review = true}) async {
+        await tester.scrollUntilVisible(
+          find.text(TripStrings.save),
+          400,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(
+          find.widgetWithText(FilledButton, TripStrings.save),
+        );
+        await tester.pump();
+        await tester.tap(find.text(TripStrings.save));
+        await tester.pump(const Duration(seconds: 1));
+        if (review) {
+          await tester.tap(find.text(TripStrings.confirm));
+          await tester.pumpAndSettle();
+        }
+      }
+
+      await save();
+      expect(find.text(TripStrings.failed), findsOneWidget);
+      await save(review: false);
+      expect(repository.requests[0], repository.requests[1]);
+      expect(repository.bodies[0], repository.bodies[1]);
+      expect(repository.reviews, 1);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('notes:')),
+        -400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('notes:')),
+        'Changed draft',
+      );
+      await save();
+      expect(repository.requests[2], isNot(repository.requests[1]));
+      expect(repository.bodies[2]['review_token'], 'ticket-2');
+    },
+  );
+  testWidgets(
+    'version conflict keeps entries and disables overwrite until reopening',
+    (tester) async {
+      final repository = FakeTrips()..conflict = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TripEditor(
+            repository: repository,
+            masters: FakeMasters(),
+            offices: const [
+              {'id': 'origin', 'name': 'Origin'},
+            ],
+            draft: emptyDraft()..notes = 'Keep this entry',
+          ),
+        ),
+      );
+      await tester.scrollUntilVisible(
+        find.text(TripStrings.save),
+        400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.widgetWithText(FilledButton, TripStrings.save),
+      );
+      await tester.pump();
+      await tester.tap(find.text(TripStrings.save));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.tap(find.text(TripStrings.confirm));
+      await tester.pumpAndSettle();
+      expect(find.text(TripStrings.conflict), findsOneWidget);
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, TripStrings.save),
+            )
+            .onPressed,
+        isNull,
+      );
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('notes:')),
+        -400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Keep this entry'), findsOneWidget);
+    },
+  );
+}
