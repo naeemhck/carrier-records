@@ -387,7 +387,9 @@ deno_version = 2
 # secret_key = "env(SECRET_VALUE)"
 
 [analytics]
-enabled = true
+# Optional local logging is disabled: Vector cannot reach Docker's API on
+# this Windows host. Core Auth/database/Storage/Edge services stay enabled.
+enabled = false
 port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"

@@ -12,7 +12,9 @@ cd app
 
 Verified SDK: Flutter 3.47.4 stable, framework 9584c6713b, Dart 3.13.3. Direct application dependencies are pinned: flutter_riverpod 3.4.3, go_router 18.0.2, supabase_flutter 2.18.2, flutter_secure_storage 11.2.0. Transitive versions are in `app/pubspec.lock`. Do not upgrade them without rerunning the relevant checks.
 
-Windows requires Developer Mode for plugin symlinks and Visual Studio's C++ workload. Android requires an Android SDK, command-line tools, accepted SDK licences, and a compatible JDK (Android Studio provides one). `flutter doctor -v` reports readiness. See [Flutter Windows setup](https://docs.flutter.dev/platform-integration/windows/setup) and [Android setup](https://docs.flutter.dev/platform-integration/android/setup).
+Windows requires Developer Mode for plugin symlinks, Visual Studio's C++ workload, and **C++ ATL for latest v143 build tools (x86 & x64)** for the pinned secure-storage plugin. Doctor does not detect every plugin-specific header/library requirement; the native build must pass too. Add ATL using Visual Studio Installer → Build Tools 2022 → Modify → Individual components → search `ATL for latest` → select the x86/x64 latest v143 component without Spectre Mitigations → Modify. If needed, search `14.44` and select its standard x86/x64 ATL entry to match the installed MSVC toolset. The installer needs administrator approval. The standard x64 `atls.lib` must exist under that toolset's `atlmfc/lib/x64/`; installing only Spectre libraries does not satisfy this build.
+
+Android requires an Android SDK, command-line tools, accepted SDK licences, and a compatible JDK (Android Studio provides one). This Flutter SDK requests Android API 36 and NDK 28.2.13676358. `flutter doctor -v` reports readiness. See [Flutter Windows setup](https://docs.flutter.dev/platform-integration/windows/setup), [Android setup](https://docs.flutter.dev/platform-integration/android/setup), and [Microsoft ATL component IDs](https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022).
 
 ## Local backend
 
@@ -28,6 +30,8 @@ Windows requires Developer Mode for plugin symlinks and Visual Studio's C++ work
 ```
 
 Never use local reset against a hosted project. No hosted project is linked or deployed by T01. The local backend and its test records are disposable, separate from future production setup. Public signup must be disabled even locally; accounts will be provisioned through T03.
+
+Optional local analytics is disabled because Vector could not reach Docker's logging endpoint on this workstation. Auth, database, REST, Storage and Edge Runtime remain enabled. Do not enable an unauthenticated Docker TCP listener to make optional logs work.
 
 ## Client configuration
 
