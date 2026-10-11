@@ -1,3 +1,6 @@
+import '../features/expenses/expense_workspace.dart';
+import '../features/expenses/expense_repository.dart';
+
 import 'package:flutter/material.dart';
 
 import '../features/finance/financial_repository.dart';
@@ -316,6 +319,59 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                     (o) => Map<String, dynamic>.from(o as Map),
                                   )
                                   .toList(),
+                            ),
+                          ),
+                        ),
+                      );
+                      await widget.session.refresh();
+                    },
+                  ),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.receipt_long),
+                    label: const Text('Expenses and reimbursements'),
+                    onPressed: () async {
+                      final scope = tripScope(p);
+                      Widget guard(Widget child) => ListenableBuilder(
+                        listenable: widget.session,
+                        builder: (_, _) =>
+                            tripScope(widget.session.profile) == scope &&
+                                widget
+                                        .session
+                                        .profile?['must_change_password'] ==
+                                    false
+                            ? child
+                            : const Scaffold(
+                                body: Center(
+                                  child: Text(
+                                    'Current office access required.',
+                                  ),
+                                ),
+                              ),
+                      );
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => guard(
+                            ExpenseWorkspace(
+                              administrator: p['role'] == 'ADMIN',
+                              expenses: ExpenseRepository(
+                                widget.session.client,
+                              ),
+                              finance: FinancialRepository(
+                                widget.session.client,
+                              ),
+                              trips: SupabaseTripRepository(
+                                widget.session.client,
+                              ),
+                              masters: SupabaseMasterRepository(
+                                widget.session.client,
+                              ),
+                              offices: (p['offices'] as List)
+                                  .map(
+                                    (o) => Map<String, dynamic>.from(o as Map),
+                                  )
+                                  .toList(),
+                              guard: guard,
                             ),
                           ),
                         ),

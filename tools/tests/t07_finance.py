@@ -58,7 +58,7 @@ def verify(env):
     for mutation in [lambda x:x.update(actor_id=user['id']),lambda x:x.update(journal_lines=[]),lambda x:x.update(payer_id=other['id']),lambda x:x.update(amount='59999.99'),lambda x:x['allocations'][0].update(amount=60000),lambda x:x['allocations'].append(x['allocations'][0].copy())]:
         bad=copy.deepcopy(p);mutation(bad);ok('T07 spoofing/wrong-party/duplicate/mismatch denied',post(bad)[0]==400)
     ok('T07 nonzero create version denied',post(p,version=1)[0]==400)
-    ok('T07 unimplemented recognition/expense/correction workflows blocked',all(post(p,kind=k)[1].get('message')=='WORKFLOW_NOT_AVAILABLE' for k in ['DISPATCH','EXPENSE','REIMBURSEMENT','REVERSAL']))
+    ok('T07 unimplemented recognition/expense/correction workflows blocked',all(post(p,kind=k)[1].get('message')=='WORKFLOW_NOT_AVAILABLE' for k in ['DISPATCH','REVERSAL']))
     p['office_id']=offices[1]
     receipt=success('AT-04 customer receipt by destination staff',post(p,dt,rid))
     ok('AT-04 customer debt, held money and owner debt separate',balances(a)=={'CUSTOMER_RECEIVABLE':'40000.00','CUSTODY_RECEIVABLE':'60000.00','OWNER_PAYABLE':'-95000.00','BROKER_COMMISSION_PAYABLE':'-5000.00'})

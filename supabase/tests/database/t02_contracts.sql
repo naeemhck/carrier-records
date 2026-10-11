@@ -106,7 +106,7 @@ select ok(not has_table_privilege('authenticated','public.financial_events','INS
 select ok(not has_function_privilege('authenticated','public.calculate_quote(text,text,text,text,boolean)','EXECUTE'),
   'RPC grants remain closed until T03');
 select is((select count(*)::integer from pg_tables where schemaname = 'public' and rowsecurity),
-  27, 'All 27 application tables have default-deny RLS');
+  28, 'All 28 application tables have default-deny RLS');
 
 -- Historical output snapshot is append-only, not a mutable report cache.
 insert into auth.users (id) values ('00000000-0000-0000-0000-000000000061');

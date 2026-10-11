@@ -14,7 +14,7 @@ select throws_ok($$select public.post_financial_event('ADVANCE',gen_random_uuid(
 select throws_ok($$select public.post_financial_event('REFUND',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','Refund requires a live staff session');
 select throws_ok($$select public.post_financial_event('CUSTODY_TRANSFER',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','Custody transfer requires a live staff session');
 select throws_ok($$select public.post_financial_event('PERSONAL_FUNDING',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','Personal funding requires a live staff session');
-select throws_ok($$select public.post_financial_event('REIMBURSEMENT',gen_random_uuid(),0,'{}')$$,'22023','WORKFLOW_NOT_AVAILABLE','Expense workflow stays T09');
+select throws_ok($$select public.post_financial_event('REIMBURSEMENT',gen_random_uuid(),0,'{}')$$,'42501','FORBIDDEN','Reimbursement requires live staff in T09');
 reset role;
 select * from finish();
 rollback;

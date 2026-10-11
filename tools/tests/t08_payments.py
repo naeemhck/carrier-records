@@ -135,7 +135,7 @@ def verify(env):
     rp=payload('1.00',[alloc(claim(split,'OWNER_PAYABLE'),'1.00')],broker['id'],owner['id'])
     for mutation in [lambda x:x.update(journal_lines=[]),lambda x:x.update(actor_id=user['id']),lambda x:x['allocations'][0].update(amount='1.001'),lambda x:x['allocations'][0].update(amount=1),lambda x:x.update(amount='0.00')]:
         bad=copy.deepcopy(rp);mutation(bad);ok('T08 forged fields and exact input violations denied',post(bad,kind='PERSONAL_FUNDING')[0]==400)
-    ok('T08 expense offsets remain unavailable until T09',post(rp,kind='REIMBURSEMENT')[1].get('message')=='WORKFLOW_NOT_AVAILABLE')
+    ok('T09 reimbursement rejects non-expense claim',post(rp,kind='REIMBURSEMENT')[0]>=400)
     # Force a deferred transaction failure, then retry the identical request.
     rollback=draft();p=payload('1.00',[{'trip_id':rollback['id'],'amount':'1.00'}]);rid=uid();before=ledger(rollback)[1]
     sql("create function public.t08_fail_commit() returns trigger language plpgsql as $$ begin if new.kind='ADVANCE' then raise exception 'T08_COMMIT_FAILURE';end if;return null;end $$;create constraint trigger t08_commit_failure after insert on public.financial_events deferrable initially deferred for each row execute function public.t08_fail_commit();")

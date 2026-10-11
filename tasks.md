@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T08 DONE. Next: T09 expenses, receipts and reimbursements. T09-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T09 DONE. Next: T10 corrections, cancellation and recovery claims. T10-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -133,11 +133,17 @@ T08 completion checks PASS at the documented boundary: AT-04/06/18 and non-expen
 
 ### T09 — Expenses, receipts and reimbursements
 
-Status: TODO | Dependencies: T07, T08
+Status: DONE | Dependencies: T07, T08
 
 Build expense entry with payer/cost bearer/funding source, private evidence storage, standalone maintenance and linked trip costs. Post owner-borne costs correctly for owner-funded, personally advanced and held-funds cases. Implement reimbursement/offset reference checks.
 
 Evidence: AT-05/19/20 pass, including both diesel examples and no duplicated reimbursement. Receipt upload errors are distinguishable from financial posting.
+
+Actual completion (2026-10-11): implemented exact confirmed vehicle/trip/standalone expenses with actual payer, cost bearer, personal/self/held funding and immutable historical owner classification. Explicit locked owner offsets, original-expense reimbursements/cost recovery and later non-cash offsets preserve customer agreements, commission and one effective cost. Private trusted PNG/JPEG/PDF upload validates real signatures/MIME/size/hash, finalizes only after Storage exists and appends independent evidence; authenticated RLS downloads, upload-only retry and safe administrator abandoned-upload cleanup preserve referenced files. Forms and selectors enforce current scope; no client privileged keys or direct financial/evidence writes.
+
+Executed evidence: final eleven-migration clean reset PASS; 148 SQL assertions/lint PASS; analyzer no issues and 50 Flutter tests PASS. Combined T03/T05/T06/T07/T08/T09 real backend/native suite passes 890 assertions. Final standalone-office-hardening suite passes 309 assertions, including direct administrator scope-spoof attempts and denied journal metadata reads. Windows native expense/receipt UI and independent persistence/download PASS (52.2s build/13s test). Ordinary Windows/Android debug builds exit 0 (45.2s/144.6s including command overhead); staged source/ordinary artifact privileged-value audit PASS. Auth/REST/Storage HTTP 200; PostgreSQL ready; synthetic records/sessions/financial/private caches/evidence/storage zero, triggers enabled, temporary role access and native configuration absent. Evidence, failures, fixes and hashes: docs/expenses-evidence.md; entry guide: docs/expenses-setup.md.
+
+T09 completion checks PASS: AT-05 actual owner profit 85,000 in both diesel cases with owner cash respectively 95,000/85,000, separate reimbursement 10,000 and brokerage 5,000, no duplicated cost. AT-19 maintenance, different bearer, expense-date/lifetime basis and historical owner costs PASS at the expense boundary. AT-20 privacy, actual Storage failure, MIME/size, retry/concurrency, revocation and abandoned-upload protection PASS. Deferred financial commit rolls back all expense/claim effects and T06 rollback/arrival separation regressions remain verified. T10 retains dependent corrections/cancellation; T11 retains full report presentation. No Android device, release/restore or hosted deployment is claimed. No administrator action needed. Commit locally only; no GitHub push before the T10 checkpoint.
 
 ### T10 — Corrections, cancellation and recovery claims
 
@@ -299,3 +305,5 @@ Before pilot, administrator supplies actual company identity, five staff names/o
 ## 6. Deferred backlog
 
 After Windows and Android stability: Urdu UI/documents with reviewed translations; web client; additional-business onboarding if required; historical/opening-balance migration if explicitly approved; richer maintenance tracking. Reassess free-tier capacity before expansion. No deferred item is silently included in v1 progress.
+
+2026-10-11 T09: AT-05/19/20 expense-boundary checks PASS, migration 20261011001100. Both diesel remittances/profit, standalone costs, original-expense claims, private evidence and financial-versus-upload failure separation verified. See docs/expenses-evidence.md. Local commit only; no GitHub push.

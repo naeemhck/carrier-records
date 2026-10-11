@@ -420,3 +420,6 @@ enabled = true
 [functions.staff-accounts]
 # Token verification is explicit through Auth.getUser plus live database authorization.
 verify_jwt = false
+
+[functions.expense-receipts]
+verify_jwt = false
