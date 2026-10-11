@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T06 DONE. Next: T07 immutable financial engine. T07-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T07 DONE. Next: T08 transfers, retention, funding and credits. T08-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -107,11 +107,15 @@ Acceptance boundaries: AT-08 pending arrival/delivery/cancelled checks now PASS;
 
 ### T07 — Immutable financial engine
 
-Status: TODO | Dependencies: T02, T03, T06
+Status: DONE | Dependencies: T02, T03, T06
 
 Implement account purposes and balanced journal events in rules.md. Build locked allocation/claim operations, exact validation, idempotency, dispatch earnings and explicit customer receipt/custody separation. Derive balances from effective events rather than editable summary totals.
 
 Evidence: AT-01/02/04/16/17 pass. Every posting balances, unauthorized operations fail and duplicate retries create one event.
+
+Executed checks (2026-10-11): final clean nine-migration reset PASS; database lint no issues; 121 SQL assertions PASS. Combined T03/T05/T06/T07 suite (`--trips --lifecycle --finance`) passes 602 assertions, including real dispatch/receipt postings, exact deducted/added splits, private canonical retention/remittance results, strict decimal and allocation validation, unauthorized/direct write and office/party attacks, duplicate/concurrent retries with one event, competing customer/custody claims, insufficient custody, wide exact aggregates, archived-recipient retry behavior, and T06 plus receipt deferred-commit rollback. Thirty-six Flutter tests and analyzer PASS. Ordinary Windows/Android debug builds exit 0 (36.8s/16.7s); package/source audit passes 692 entries/files without actual privileged values. Auth/REST/Storage HTTP 200, PostgreSQL ready; all synthetic records, journals, allocations, idempotency and private caches/storage return to zero; triggers enabled and migration/test roles cannot be SET. No native UI test, deployment, release/restore or GitHub push is claimed for T07. See docs/financial-engine-evidence.md.
+
+T07 completion checks PASS at the engine boundary: AT-01/02/04 use real dispatch/receipt RPCs and the authorized private settlement kernel, not finished T08 client entry flows. AT-16/17 verify concurrency, exact validation and idempotency. Existing atomic dispatch is retained without duplicate recognition; arrival does not change money. Public posting currently exposes CUSTOMER_RECEIPT only. Private funding/reimbursement/advance consumption tests use explicitly identified balanced metadata fixtures; actual T08/T09 creation/entry, custody transfers, personal funding, excess credits, refunds, expense posting/evidence and mixed offsets remain pending. T10 retains dependent corrections/cancellation plans; T11 retains full profit/period reports. Local commit only; private backup checkpoint remains after T10.
 
 ### T08 — Transfers, retention, funding and credits
 
@@ -277,6 +281,8 @@ All scenarios below are specifications; execution status is NOT RUN until implem
 
 2026-10-11 T06: AT-08 arrival/delivery/cancelled propagation and AT-12 lifecycle permissions PASS; AT-07 effective earnings-date and AT-15 creator/concurrency/linked date corrections PASS within the documented boundary. Full expense/payment/profit reports and dependent financial unwind remain later tasks; see docs/lifecycle-evidence.md. Local commit only.
 
+
+2026-10-11 T07: AT-01/02/04 financial-kernel examples and AT-16/17 exact concurrency/idempotency checks PASS, migration 20261011000900. T06 rollback and permission regressions retained. T08/T09 client workflows and actual expense/advance creation remain pending; see docs/financial-engine-evidence.md. No GitHub push before the T10 backup checkpoint.
 
 For each executed scenario, record date, commit/migration version, platform, test environment, result and evidence path. Store example data without identifying real customers. Record failures and remediation rather than relabeling them passed.
 

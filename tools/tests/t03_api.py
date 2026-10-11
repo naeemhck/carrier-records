@@ -188,6 +188,9 @@ try:
     if '--lifecycle' in sys.argv:
         from t06_lifecycle import verify
         verify(globals())
+    if '--finance' in sys.argv:
+        from t07_finance import verify
+        verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify
         verify(globals())
@@ -198,9 +201,9 @@ finally:
     # Local test fixtures only; preserve production immutability by never using this against hosted data.
     request('/storage/v1/object/receipts',{'prefixes':[b+'/synthetic.png']},priv=True,method='DELETE')
     sql(f"""begin;delete from private.lifecycle_requests where business_id='{b}';delete from private.trip_recognition where business_id='{b}';delete from private.trip_reviews where business_id='{b}';delete from private.trip_requests where business_id='{b}';delete from private.trip_sequences where business_id='{b}';delete from private.master_requests where business_id='{b}';delete from private.password_operations where target_id in(select id from public.staff_profiles where business_id='{b}');
-    alter table public.audit_events disable trigger user;alter table public.journal_lines disable trigger user;alter table public.financial_events disable trigger user;
+    alter table public.allocations disable trigger user;alter table public.idempotency_records disable trigger user;delete from public.allocations where business_id='{b}';delete from public.idempotency_records where business_id='{b}';alter table public.allocations enable trigger user;alter table public.idempotency_records enable trigger user;alter table public.audit_events disable trigger user;alter table public.journal_lines disable trigger user;alter table public.financial_events disable trigger user;
     delete from public.audit_events where business_id='{b}';delete from public.journal_lines where business_id='{b}';delete from public.financial_events where business_id='{b}';
-    delete from public.expenses where business_id='{b}';delete from public.receipt_files where business_id='{b}';alter table public.issued_documents disable trigger user;delete from public.issued_documents where business_id='{b}';alter table public.issued_documents enable trigger user;alter table public.consignment_cars disable trigger user;alter table public.consignments disable trigger user;delete from public.consignment_cars where business_id='{b}';delete from public.consignments where business_id='{b}';alter table public.consignment_cars enable trigger user;alter table public.consignments enable trigger user;delete from public.stops where business_id='{b}';delete from public.trips where business_id='{b}';delete from public.vehicles where business_id='{b}';delete from public.party_roles where business_id='{b}';delete from public.parties where business_id='{b}';
+    alter table public.expenses disable trigger user;delete from public.expenses where business_id='{b}';alter table public.expenses enable trigger user;delete from public.receipt_files where business_id='{b}';alter table public.issued_documents disable trigger user;delete from public.issued_documents where business_id='{b}';alter table public.issued_documents enable trigger user;alter table public.consignment_cars disable trigger user;alter table public.consignments disable trigger user;delete from public.consignment_cars where business_id='{b}';delete from public.consignments where business_id='{b}';alter table public.consignment_cars enable trigger user;alter table public.consignments enable trigger user;delete from public.stops where business_id='{b}';delete from public.trips where business_id='{b}';delete from public.vehicles where business_id='{b}';delete from public.party_roles where business_id='{b}';delete from public.parties where business_id='{b}';
     delete from public.routes where business_id='{b}';delete from public.expense_categories where business_id='{b}';delete from public.staff_offices where business_id='{b}';delete from public.staff_profiles where business_id='{b}';delete from public.offices where business_id='{b}';delete from public.businesses where id='{b}';
     alter table public.audit_events enable trigger user;alter table public.journal_lines enable trigger user;alter table public.financial_events enable trigger user;commit;""")
     for user in users:request('/auth/v1/admin/users/'+user,priv=True,method='DELETE')
