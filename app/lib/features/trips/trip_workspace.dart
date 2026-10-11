@@ -10,6 +10,8 @@ import 'trip_lifecycle.dart';
 import 'trip_operation_dialog.dart';
 import '../finance/financial_repository.dart';
 import '../finance/payment_workspace.dart';
+import '../finance/correction_repository.dart';
+import '../finance/correction_workspace.dart';
 
 Widget unguardedTrip(Widget child) => child;
 
@@ -29,12 +31,14 @@ class TripWorkspace extends StatefulWidget {
     required this.offices,
     this.guard = unguardedTrip,
     this.finance,
+    this.corrections,
   });
   final TripRepository repository;
   final MasterRepository masters;
   final List<Map<String, dynamic>> offices;
   final Widget Function(Widget) guard;
   final FinancialCommands? finance;
+  final CorrectionCommands? corrections;
   @override
   State<TripWorkspace> createState() => _TripWorkspaceState();
 }
@@ -107,6 +111,21 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             canReturn: (o) => widget.offices.any((a) => a['id'] == o),
             onEdit: edit,
             guard: widget.guard,
+            onCorrections: widget.corrections == null
+                ? null
+                : () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => widget.guard(
+                        CorrectionWorkspace(
+                          commands: widget.corrections!,
+                          trips: widget.repository,
+                          guard: widget.guard,
+                          initialTrip: id,
+                        ),
+                      ),
+                    ),
+                  ),
             onPayments: widget.finance == null
                 ? null
                 : () => Navigator.push<void>(
@@ -236,7 +255,9 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                   Card(
                     child: ListTile(
                       key: ValueKey('trip:${r['id']}'),
-                      title: Text('${r['trip_number']} · ${r['registration']}'),
+                      title: Text(
+                        '${r['trip_number']} · ${r['registration']}',
+                      ),
                       subtitle: Text(
                         '${r['origin_name']} → ${r['destination_name']}\n${r['state']} · ${r['load_kind']} · ${r['dispatch_date'] ?? r['planned_dispatch_date'] ?? ''}',
                       ),
@@ -1047,9 +1068,10 @@ class TripDetail extends StatefulWidget {
     this.saved = false,
     this.guard = unguardedTrip,
     this.onPayments,
+    this.onCorrections,
   });
   final TripRepository repository;
-  final Future<void> Function()? onPayments;
+  final Future<void> Function()? onPayments, onCorrections;
   final Widget Function(Widget) guard;
   final String id;
   final bool saved;
@@ -1188,6 +1210,11 @@ class _TripDetailState extends State<TripDetail> {
                   onPressed: history,
                   child: const Text(LifecycleStrings.history),
                 ),
+                if (widget.onCorrections != null)
+                  TextButton(
+                    onPressed: widget.onCorrections,
+                    child: const Text('Corrections and cancellation'),
+                  ),
                 if (widget.onPayments != null)
                   TextButton(
                     onPressed: widget.onPayments,

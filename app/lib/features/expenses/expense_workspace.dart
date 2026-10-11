@@ -6,6 +6,8 @@ import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../finance/financial_repository.dart';
 import '../finance/payment_model.dart';
+import '../finance/correction_repository.dart';
+import '../finance/correction_workspace.dart';
 import 'expense_model.dart';
 import 'expense_repository.dart';
 
@@ -137,8 +139,10 @@ class ExpenseWorkspace extends StatefulWidget {
     required this.guard,
     this.picker,
     this.administrator = false,
+    this.corrections,
   });
   final bool administrator;
+  final CorrectionCommands? corrections;
   final ExpenseCommands expenses;
   final FinancialCommands finance;
   final TripRepository trips;
@@ -268,6 +272,17 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
           icon: const Icon(Icons.add),
           label: const Text('New expense'),
         ),
+        if (widget.corrections != null)
+          TextButton(
+            onPressed: () => open(
+              CorrectionWorkspace(
+                commands: widget.corrections!,
+                trips: widget.trips,
+                guard: widget.guard,
+              ),
+            ),
+            child: const Text('Corrections and history'),
+          ),
         if (widget.administrator)
           TextButton(
             onPressed: busy
@@ -306,6 +321,14 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                   ),
                   Text('${row['notes']}'),
                   Text('${row['funding_source']}'),
+                  if (row['effective'] == false)
+                    const Text(
+                      'Historical expense - voided or replaced; excluded from current costs.',
+                    ),
+                  if (row['replaces_expense_id'] != null)
+                    Text(
+                      'Replaces original expense ${row['replaces_expense_id']}. ${row['correction_reason']}',
+                    ),
                   Wrap(
                     spacing: 8,
                     children: [

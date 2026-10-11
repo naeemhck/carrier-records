@@ -181,11 +181,19 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     final party =
         source ||
             action == PaymentAction.receipt ||
+            action == PaymentAction.cancellationRecovery ||
             action == PaymentAction.application
         ? payer
         : payee;
     return row.claims
-        .where((c) => c['account_purpose'] == purpose && c['party_id'] == party)
+        .where(
+          (c) =>
+              (action == PaymentAction.cancellationRecovery
+                  ? c['direction'] == 'RECOVERY'
+                  : c['direction'] != 'RECOVERY' &&
+                        c['account_purpose'] == purpose) &&
+              c['party_id'] == party,
+        )
         .toList();
   }
 

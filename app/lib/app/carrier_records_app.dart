@@ -4,6 +4,7 @@ import '../features/expenses/expense_repository.dart';
 import 'package:flutter/material.dart';
 
 import '../features/finance/financial_repository.dart';
+import '../features/finance/correction_repository.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -304,6 +305,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                         MaterialPageRoute<void>(
                           builder: (_) => guard(
                             TripWorkspace(
+                              corrections: CorrectionRepository(
+                                widget.session.client,
+                              ),
                               finance: FinancialRepository(
                                 widget.session.client,
                               ),
@@ -353,6 +357,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                         MaterialPageRoute<void>(
                           builder: (_) => guard(
                             ExpenseWorkspace(
+                              corrections: CorrectionRepository(
+                                widget.session.client,
+                              ),
                               administrator: p['role'] == 'ADMIN',
                               expenses: ExpenseRepository(
                                 widget.session.client,

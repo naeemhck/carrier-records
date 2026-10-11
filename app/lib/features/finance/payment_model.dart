@@ -1,6 +1,18 @@
 import '../../core/domain/money.dart';
 
 enum PaymentAction {
+  refundFunding(
+    'REFUND_FUNDING',
+    'Personally fund a customer refund',
+    'CUSTOMER_ADVANCE_CREDIT',
+    null,
+  ),
+  cancellationRecovery(
+    'RECOVERY_RECEIPT',
+    'Receive owner / broker recovery',
+    'RECOVERY',
+    null,
+  ),
   receipt('CUSTOMER_RECEIPT', 'Customer receipt', 'CUSTOMER_RECEIVABLE', null),
   owner(
     'OWNER_SETTLEMENT',

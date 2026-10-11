@@ -49,7 +49,7 @@ def verify(env):
     def balances(t):return {x['account_purpose']:x['balance'] for x in ledger(t,at)[1]['balances']}
     a=dispatch(draft());ca=claim(a,'CUSTOMER_RECEIVABLE')
     ok('AT-01 recognized exact deducted split',balances(a)=={'CUSTOMER_RECEIVABLE':'100000.00','OWNER_PAYABLE':'-95000.00','BROKER_COMMISSION_PAYABLE':'-5000.00'})
-    ok('T07 scoped claim read omits raw event/actor/business metadata',set(ledger(a)[1])=={'scope','complete','label','balances','claims'} and all(set(x)=={'line_id','party_id','account_purpose','consignment_id','expense_id','effective_date','remaining','version'} for x in ledger(a)[1]['claims']))
+    ok('T07 scoped claim read omits raw event/actor/business metadata',set(ledger(a)[1])=={'scope','complete','label','balances','claims'} and all(set(x)=={'line_id','party_id','account_purpose','consignment_id','expense_id','effective_date','remaining','version','direction'} and x['direction'] in ('NORMAL','RECOVERY') for x in ledger(a)[1]['claims']))
     ok('T07 unrelated/anonymous ledger reads denied',ledger(a,xt)[0]==403 and ledger(a,None)[0] in (401,403))
     p=payload('60000.00',[alloc(ca,'60000.00')]);rid=uid()
     for token in [xt,None]:ok('T07 unauthorized receipt denied',post(p,token,rid)[0] in (401,403))

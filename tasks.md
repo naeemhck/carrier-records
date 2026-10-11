@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T09 DONE. Next: T10 corrections, cancellation and recovery claims. T10-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T10 DONE. Next: T11 reports and dashboard. T11-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -147,11 +147,15 @@ T09 completion checks PASS: AT-05 actual owner profit 85,000 in both diesel case
 
 ### T10 — Corrections, cancellation and recovery claims
 
-Status: TODO | Dependencies: T08, T09
+Status: DONE | Dependencies: T08, T09
 
 Implement creator/admin correction workflows, reasons, operational history and append-only financial reversal/replacement. Unwind dependent settlements explicitly. Implement cancellation adjustments, fees, customer credits/refunds and recovery balances while retaining real expenses.
 
 Evidence: AT-07/15/21 pass. A journal cannot be reversed twice; cancellation cannot quietly delete money or evidence.
+
+Executed evidence: twelve-migration clean reset PASS; 163 SQL assertions PASS; lint has no errors (unused-variable warnings recorded). Final analyzer has no issues; 52 Flutter tests and two focused correction widget tests PASS. Combined account/trip/lifecycle/finance/payment/expense/correction HTTP suite passes 1,062 checks, including real Windows creator correction entry and independent persisted replacement verification (59.7s build/8s test). Ordinary Windows/Android debug builds PASS (37.7s/50.3s reported build times). Privileged-value source/package audit PASS across 726 entries/files; source/history audit PASS. Auth/REST/Storage HTTP 200, PostgreSQL ready, all synthetic public/private/Auth/Storage records zero, no disabled triggers/temporary role access/native config remains. See docs/corrections-evidence.md and docs/corrections-setup.md.
+
+T10 completion checks PASS: AT-07 effective-date corrections retain distinct earnings/cash/expense bases; AT-15 current creator/admin and origin permissions, direct backend attacks, stale/concurrent edits, exact retries and deferred commit rollback verified; AT-21 settled/partial cancellation, exact fee splits, explicit dependent reversal, credit/refund/recovery and personally funded refund liability verified. Double reversal/repeated consumption denied, actual expenses/private evidence/history retained, every event balanced. Existing T06 arrival/rollback guarantees and T07-T09 regressions pass. Full report presentation remains T11; issuance T13, release/device/restore checks remain later. No administrator action needed. Local commit and authorized private source checkpoint follow verification.
 
 #### Source backup checkpoint after T10
 
