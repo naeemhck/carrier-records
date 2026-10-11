@@ -10,6 +10,8 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 - The user requested customizable output attributes after the initial template decision; the revised plan includes them in both PDF and Excel.
 - The user asked to implement the revised plan, then directed work to begin with document generation.
 - Six planning Markdown files have been generated. No application source, hosted backend, production staff accounts, installer or APK is delivered by this phase.
+- The working project folder is D:\portfolio\transport_project. The user will continue in VS Code with the Codex extension.
+- Local Git is initialized on main with the six planning documents, README.md, AGENTS.md and .gitignore. GitHub publication is pending authentication; no remote repository is confirmed yet.
 - T00 covers documentation. T01–T20 remain TODO; application acceptance scenarios remain NOT RUN.
 - A VS Code Flutter SDK path exists on the user's computer. Full SDK/build verification was interrupted when work was redirected to documents. Do not claim native build readiness from that discovery.
 
@@ -124,6 +126,7 @@ Backups must be recoverable after losing the original PC. Keeping an encryption 
 | 2026-10-11 | Free Supabase pilot and daily PC backups | Zero-cost constraint and selected hosting/recovery approach |
 | 2026-10-11 | Attribute selection/order/presets in output workflow | User requested easy output customization; preserve recipient restrictions |
 | 2026-10-11 | Document generation prioritized | User explicitly asked to start with the six documents before application work |
+| 2026-10-11 | Continue in VS Code with Codex using the existing D:\portfolio\transport_project folder; private GitHub versioning requested | User selected the development workflow; local Git prepared, remote publication pending authentication |
 
 Dates above record this specification baseline, not an inferred timestamp for every earlier interview answer.
 
