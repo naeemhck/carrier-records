@@ -7,6 +7,8 @@ import '../features/finance/financial_repository.dart';
 import '../features/finance/correction_repository.dart';
 import '../features/reports/report_repository.dart';
 import '../features/reports/report_workspace.dart';
+import '../features/reports/output_repository.dart';
+import '../features/reports/output_workspace.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -327,6 +329,25 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                     .toList(),
                                 dashboard: dashboard,
                                 guard: guard,
+                                outputs: OutputWorkspace(
+                                  commands: OutputRepository(
+                                    widget.session.client,
+                                  ),
+                                  masters: SupabaseMasterRepository(
+                                    widget.session.client,
+                                  ),
+                                  trips: SupabaseTripRepository(
+                                    widget.session.client,
+                                  ),
+                                  offices: (p['offices'] as List)
+                                      .map(
+                                        (o) =>
+                                            Map<String, dynamic>.from(o as Map),
+                                      )
+                                      .toList(),
+                                  administrator: p['role'] == 'ADMIN',
+                                  guard: guard,
+                                ),
                               ),
                             ),
                           ),

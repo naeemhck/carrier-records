@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T11 DONE. Next: T12 field catalogue, customization and presets. T12-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T12 DONE. Next: T13 immutable document issuance. T13-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -185,11 +185,17 @@ AT-07/19/22 report checks PASS: independent date bases, cross-month earning/rece
 
 ### T12 — Field catalogue, customization and presets
 
-Status: TODO | Dependencies: T03, T11
+Status: DONE | Dependencies: T03, T11
 
 Implement server-owned field keys/eligibility/defaults/required flags. Build type/recipient/filter selection, grouped checkboxes, select-all-permitted, reset, ordering, preview and named presets. Implement personal versus admin-shared management. Revalidate presets on every use.
 
 Evidence: AT-23/24/25 pass; selected fields do not alter financial calculations. Revoked access cannot be restored through a saved preset.
+
+Implemented: server-owned recipient catalogue and selected-only preview payloads, required/default fields, grouped selection/order/reset, desktop side-by-side and compact sequential previews, personal and administrator-shared versioned/idempotent presets, live revalidation and authorized receipt choices. Filters determine records; selected fields and formatting never change accounting. Current company/issuer previews allocate no numbers or snapshots.
+
+Executed: clean fourteen-migration reset; 182 SQL assertions/error-level lint; analyzer no issues; 59 Flutter tests PASS. Final complete backend/native regression exits 0 with 1,268 PASS checks and successful zero-fixture cleanup. Windows real preview/select-all/hide-cost/save/reload/use and independent committed preset check PASS (141.5s build/18s test). Ordinary Windows/Android debug builds PASS (58.9s/177.3s); privileged-value audit PASS across 744 source/package entries. Source/history audit no findings. Health HTTP200/PGready; 27 public/10 private/Auth/Storage synthetic records zero, no disabled triggers/temporary role grants/native config.
+
+AT-23/25 PASS: required locks, default reset, ordering, eligible-only selection, customer-specific cars/stops/notes/whole-trip credits, owner and broker forbidden totals absent recursively, forged field/format/cache requests denied, ownership/shared-admin restrictions, actor-bound retry, version/concurrency checks, incompatible preset listing sanitized and use denied. After office reassignment, both old JWT and fresh session cannot restore historical-trip access through a saved shared preset; reusable layout returns no revoked-office rows/balances. AT-24 T12 payload/order/accounting portion PASS, including hidden expense columns preserving profit and 50-row pages with constant canonical totals. Actual PDF/Excel parity and metadata/hidden-sheet inspection remain T14; issuance remains T13. Actual failures/fixes/golden amounts/hashes: docs/outputs-evidence.md. Guide: docs/outputs-setup.md. T12 gate passes. Commit locally separately from T11; do not push.
 
 ### T13 — Immutable document issuance
 
