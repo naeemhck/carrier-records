@@ -6,6 +6,8 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 
 ## 1. Current state
 
+- Latest screen-control request blocked by native tooling: bundled @oai/sky import succeeds but list_apps reports native pipe unavailable/system cannot find file/os error2. Two-second retry plus node_repl reset/reinitialize/final retry all fail (three inventory attempts). No window/screenshot/input or new UI test results; no helper spawn/search or alternate shell UI automation. Reconnect native computer-use runtime before retrying. Prior UI/API evidence retained; restart deferred/T19 IN PROGRESS/T20 TODO/no push/scheduling.
+
 - Latest hosted permission evidence: user executes existing staff preflight probes; both ignored reports independently read/exit0, seven PASS each (14 total), trip matrix NOT_RUN each. Real Auth/profile200/one correct office, account-admin/global-balance403 with required42501, scoped balance/draft-list200 and local probe logout204. No credentials/raw balances retained. Empty lists don't prove unrelated-trip exclusion or trip action denial; valid new pilot draft/matrix and other field gates pending. Restart deferred/T19 IN PROGRESS/T20 TODO/no financial mutation, push or scheduling.
 
 - Latest staff field result: user confirms both existing pilot staff password changes/fresh logins, correct single-office dashboard labels and absent admin controls. Read-only hosted verification confirms both STAFF/active/not pending/must_change=false/one correct office each; Auth count still three. UI PASS is user-observed on development PC, not direct API proof. No sanitized probe reports yet; live API checks NOT RUN, zero trips/vehicles/drivers leaves operation matrix pending. Restart deferred/T19 IN PROGRESS/T20 TODO; no push or scheduling.

@@ -297,6 +297,8 @@ Staff UI follow-up: user confirms both required password changes/fresh logins, s
 
 Actual user-executed hosted staff preflight reports verified: exit0 for both existing accounts, seven PASS each (14 total), trip matrix NOT_RUN each. Real Auth/profile200/correct single office; account-admin and complete-business balance denied403/required42501; assigned scoped balances/draft lists200; local probe logout204. No credentials/raw balances in reports/source; no financial writes. Empty list doesn't pass unrelated-trip exclusion or fare/dispatch/arrival denial; new valid pilot draft and matrix still pending. Restart deferred/T19 IN PROGRESS/T20 TODO; no push/scheduling.
 
+Requested screen-controlled app checks blocked: @oai/sky initialization succeeds, three list_apps attempts (initial, documented two-second retry, reset/reinitialize retry) fail native-pipe-unavailable/system-cannot-find-file/os error2. No app window/screenshot/input or new UI PASS. No helper spawn/search/shell UI workaround. Native connection must become available before screen testing. Prior user/UI/backend evidence retained; restart deferred/T19 IN PROGRESS/T20 TODO/no push/scheduling.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
