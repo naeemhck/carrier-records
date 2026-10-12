@@ -46,7 +46,13 @@ backups/
 receipts/
 exports/
 *.dump
+*.sql
 *.sql.gz
+storage-backup-*/
+supabase-backup-*
+# Reviewed SQL source stays versioned; ad-hoc dumps remain excluded.
+!supabase/migrations/*.sql
+!supabase/tests/**/*.sql
 *.crb
 *.recovery.json
 *.apk
