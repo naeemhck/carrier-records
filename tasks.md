@@ -303,6 +303,8 @@ Explicitly authorized private GitHub backup: source/history audit255 tracked/454
 
 Explicit @Computer retry after private backup still fails all three documented inventory attempts with identical native-pipe-unavailable/os error2, including reset/reinitialize. No window/screenshot/input or new app-test result. Runtime repair pending; prior checks/backup retained. No automatic push/host restart/security change; Windows restart deferred/T19 IN PROGRESS/T20 TODO.
 
+Continue-without-Computer verification: every gate/status in docs/t19-test-register.md and every executed case in docs/t19-executed-tests.md. Fresh isolated base169 PASS; fault firstattempt fails early account-input assertion before fault phase, cleanupPASS/causeunestablished. Added sanitized HTTP status only to assertion; rerun199 PASS (30 added fault/concurrency/revocation checks), no validation weakening. Unit initial5PASS/1sandbox-tempERROR, permitted unchanged rerun6PASS. Hosted13 read-only/public checks and60 payload file audits PASS; each case/failed attempt documented. Postcleanup localusers/businesses/events/trips/disabledtriggers0/AuthHTTP200. Hosted3Auth/both ready correctstaff,2vehicles/1customer/0drivers/0trips; actual hosted matrix/installed field gates still pending pilot draft and user observations. Restart deferred/T19 IN PROGRESS/T20 TODO; no new native build/product change, push or scheduling.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
