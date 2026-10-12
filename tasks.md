@@ -295,6 +295,8 @@ Existing pilot staff read-only verification exits 0: three Auth identities, both
 
 Staff UI follow-up: user confirms both required password changes/fresh logins, single assigned office dashboard labels and absent admin controls; user-observed development-PC PASS. Fresh read-only verification confirms both active STAFF/not pending/must_change=false/one correct office each, three Auth identities total. No probe reports exist; actual direct API scoped reads/admin/global-balance denials remain NOT RUN. Zero trips/vehicles/drivers means trip matrix still pending. UI hiding not counted as backend authorization. Restart deferred/T19 IN PROGRESS/T20 TODO.
 
+Actual user-executed hosted staff preflight reports verified: exit0 for both existing accounts, seven PASS each (14 total), trip matrix NOT_RUN each. Real Auth/profile200/correct single office; account-admin and complete-business balance denied403/required42501; assigned scoped balances/draft lists200; local probe logout204. No credentials/raw balances in reports/source; no financial writes. Empty list doesn't pass unrelated-trip exclusion or fare/dispatch/arrival denial; new valid pilot draft and matrix still pending. Restart deferred/T19 IN PROGRESS/T20 TODO; no push/scheduling.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
