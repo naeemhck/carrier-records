@@ -2,6 +2,8 @@
 
 This is a pilot package, not authorization for broader rollout. T19 remains in progress until actual installation and office reconciliation/sign-off are recorded. T20 is not started. The ordinary installer never installs the administrator backup helper or a scheduled task.
 
+Current supplemental instructions: use [the practical six-stage field checklist](windows-field-checks.md). The latest task requires **physical** customer, owner, broker and internal printing. PDF/virtual-print testing is useful preparation but does not replace paper inspection. The published build-3 installer is preserved unchanged; this supplemental checklist and the corrected Storage bucket wording in the source backend guide are newer than its bundled manuals.
+
 ## Requirements and administrator setup
 
 Use Windows 10 build 19041 or later on x64, an active Internet connection, and the Microsoft Visual C++ v14 x64 runtime at least as recent as the build tools (14.44.35207). If launch reports a missing MSVCP140/VCRUNTIME140 library, an administrator must download the x64 redistributable from [Microsoft's official page](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist), verify its Microsoft signature, run it, select Install/Repair and approve UAC. Reboot if requested. Do not download individual DLLs from third parties. Flutter/Visual Studio/Docker are not staff-PC prerequisites.
