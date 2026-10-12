@@ -31,7 +31,7 @@ Map<String, dynamic> expensePayload({
 }) {
   BusinessDate.parse(date);
   final cost = Money.parse(amount);
-  if (cost.paisa <= 0 || reason.trim().isEmpty) {
+  if (cost.paisa <= BigInt.zero || reason.trim().isEmpty) {
     throw const FormatException('Enter a positive amount and notes.');
   }
   if (funding == ExpenseFunding.self && payer != bearer ||
@@ -64,15 +64,12 @@ Map<String, dynamic> expensePayload({
   if (offsets !=
           (offset
               ? (availableOwner == null
-                    ? BigInt.from(cost.paisa)
-                    : BigInt.from(cost.paisa) < BigInt.parse(availableOwner)
-                    ? BigInt.from(cost.paisa)
+                    ? cost.paisa
+                    : cost.paisa < BigInt.parse(availableOwner)
+                    ? cost.paisa
                     : BigInt.parse(availableOwner))
               : BigInt.zero) ||
-      cash !=
-          (funding == ExpenseFunding.held
-              ? BigInt.from(cost.paisa)
-              : BigInt.zero)) {
+      cash != (funding == ExpenseFunding.held ? cost.paisa : BigInt.zero)) {
     throw const FormatException(
       'Allocate the exact offset and held-funds spending separately.',
     );

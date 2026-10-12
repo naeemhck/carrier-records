@@ -53,7 +53,7 @@ final class FinancialClaim {
 final class ReceiptAllocation {
   ReceiptAllocation(this.claim, this.amount) {
     if (claim.purpose != AccountPurpose.customerReceivable ||
-        amount.paisa <= 0 ||
+        amount.paisa <= BigInt.zero ||
         amount.compareTo(claim.remaining) > 0) {
       throw const FormatException(
         'Positive allocation within customer claim required',
@@ -79,7 +79,7 @@ final class CustomerReceipt {
     required this.reason,
     required List<ReceiptAllocation> allocations,
   }) : allocations = List.unmodifiable(allocations) {
-    if (amount.paisa <= 0 ||
+    if (amount.paisa <= BigInt.zero ||
         reason.trim().isEmpty ||
         reason.trim().length > 500 ||
         allocations.isEmpty ||
@@ -87,11 +87,8 @@ final class CustomerReceipt {
         allocations.map((a) => a.claim.id.value).toSet().length !=
             allocations.length ||
         allocations.any((a) => a.claim.party.value != payer.value) ||
-        allocations.fold(
-              BigInt.zero,
-              (sum, a) => sum + BigInt.from(a.amount.paisa),
-            ) !=
-            BigInt.from(amount.paisa)) {
+        allocations.fold(BigInt.zero, (sum, a) => sum + a.amount.paisa) !=
+            amount.paisa) {
       throw const FormatException(
         'Receipt amount and explicit customer allocations must match',
       );

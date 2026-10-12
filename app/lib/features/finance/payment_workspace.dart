@@ -214,7 +214,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     for (final row in rows) {
       if (row.amount.text.trim().isEmpty) continue;
       final value = Money.parse(row.amount.text.trim());
-      if (value.paisa <= 0) {
+      if (value.paisa <= BigInt.zero) {
         throw const FormatException('Allocation must be positive.');
       }
       final item = <String, dynamic>{'amount': value.toString()};
@@ -262,9 +262,8 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
         item['target_line_id'],
         item['source_line_id'],
       ].whereType<String>()) {
-        used[id] = (used[id] ?? BigInt.zero) + BigInt.from(value.paisa);
-        if (used[id]! >
-            BigInt.from(Money.fromJson(row.find(id)!['remaining']).paisa)) {
+        used[id] = (used[id] ?? BigInt.zero) + value.paisa;
+        if (used[id]! > Money.fromJson(row.find(id)!['remaining']).paisa) {
           throw const FormatException(
             'Allocated amount exceeds the remaining claim or source.',
           );
@@ -695,11 +694,11 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             BigInt.zero,
             (n, r) =>
                 n +
-                BigInt.from(
-                  r.amount.text.isEmpty ? 0 : Money.parse(r.amount.text).paisa,
-                ),
+                (r.amount.text.isEmpty
+                    ? BigInt.zero
+                    : Money.parse(r.amount.text).paisa),
           );
-      return AllocationTotals.decimal(BigInt.from(original.paisa) - consumed);
+      return AllocationTotals.decimal(original.paisa - consumed);
     } catch (_) {
       return 'Check amount';
     }

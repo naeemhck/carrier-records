@@ -1,10 +1,12 @@
 /// Exact PKR value, bounded by PostgreSQL NUMERIC(18,2).
 final class Money implements Comparable<Money> {
-  static const maxPaisa = 999999999999999999;
+  static final maxPaisa = BigInt.parse('999999999999999999');
   static final zero = Money.fromPaisa(0);
-  final int paisa;
+  final BigInt paisa;
 
-  Money.fromPaisa(this.paisa) {
+  Money.fromPaisa(int value) : this.fromExactPaisa(BigInt.from(value));
+
+  Money.fromExactPaisa(this.paisa) {
     if (paisa < -maxPaisa || paisa > maxPaisa) {
       throw RangeError('Money exceeds NUMERIC(18,2)');
     }
@@ -23,10 +25,10 @@ final class Money implements Comparable<Money> {
       amount += BigInt.parse(parts[1].padRight(2, '0'));
     }
     if (negative) amount = -amount;
-    if (amount.abs() > BigInt.from(maxPaisa)) {
+    if (amount.abs() > maxPaisa) {
       throw RangeError('Money exceeds NUMERIC(18,2)');
     }
-    return Money.fromPaisa(amount.toInt());
+    return Money.fromExactPaisa(amount);
   }
 
   factory Money.fromJson(Object? value) {
@@ -36,16 +38,17 @@ final class Money implements Comparable<Money> {
     return Money.parse(value);
   }
 
-  Money operator +(Money other) => Money.fromPaisa(paisa + other.paisa);
-  Money operator -(Money other) => Money.fromPaisa(paisa - other.paisa);
-  Money operator -() => Money.fromPaisa(-paisa);
-  bool get isNegative => paisa < 0;
+  Money operator +(Money other) => Money.fromExactPaisa(paisa + other.paisa);
+  Money operator -(Money other) => Money.fromExactPaisa(paisa - other.paisa);
+  Money operator -() => Money.fromExactPaisa(-paisa);
+  bool get isNegative => paisa.isNegative;
   String toJson() => toString();
 
   @override
   String toString() {
     final absolute = paisa.abs();
-    return '${paisa < 0 ? '-' : ''}${absolute ~/ 100}.${(absolute % 100).toString().padLeft(2, '0')}';
+    final hundred = BigInt.from(100);
+    return '${paisa.isNegative ? '-' : ''}${absolute ~/ hundred}.${(absolute % hundred).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -63,18 +66,18 @@ final class Percentage {
 
   factory Percentage.parse(String value) {
     final parsed = Money.parse(value);
-    if (parsed.paisa < 0 || parsed.paisa > 10000) {
+    if (parsed.paisa.isNegative || parsed.paisa > BigInt.from(10000)) {
       throw RangeError('Percentage must be between 0 and 100');
     }
-    return Percentage._(parsed.paisa);
+    return Percentage._(parsed.paisa.toInt());
   }
 
   Money applyTo(Money quote) {
     if (quote.isNegative) throw ArgumentError('Quote cannot be negative');
     // BigInt avoids overflow before the division, including maximum quotes.
-    final numerator = BigInt.from(quote.paisa) * BigInt.from(basisPoints);
-    return Money.fromPaisa(
-      ((numerator + BigInt.from(5000)) ~/ BigInt.from(10000)).toInt(),
+    final numerator = quote.paisa * BigInt.from(basisPoints);
+    return Money.fromExactPaisa(
+      (numerator + BigInt.from(5000)) ~/ BigInt.from(10000),
     );
   }
 

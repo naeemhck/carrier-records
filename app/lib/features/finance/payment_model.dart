@@ -76,15 +76,15 @@ final class AllocationTotals {
   final BigInt cash, offsets, credits;
   static BigInt sum(List<String> values) => values.fold(BigInt.zero, (n, v) {
     final amount = Money.parse(v);
-    if (amount.paisa <= 0) {
+    if (amount.paisa <= BigInt.zero) {
       throw const FormatException('Allocation must be positive.');
     }
-    return n + BigInt.from(amount.paisa);
+    return n + amount.paisa;
   });
   void validate(String amount, bool offset) {
     final entered = Money.parse(amount);
-    if (entered.paisa <= 0 ||
-        BigInt.from(entered.paisa) != cash + offsets + credits ||
+    if (entered.paisa <= BigInt.zero ||
+        entered.paisa != cash + offsets + credits ||
         (offset
             ? cash != BigInt.zero || credits != BigInt.zero
             : offsets != BigInt.zero)) {

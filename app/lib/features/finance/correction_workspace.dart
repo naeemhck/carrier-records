@@ -415,10 +415,11 @@ class _CorrectionFormState extends State<CorrectionForm> {
       for (var n = 0; n < consignments.length; n++) {
         final fee = Money.parse(fees[n].text),
             broker = Money.parse(brokerFees[n].text);
-        if (fee.paisa < 0 ||
-            broker.paisa < 0 ||
+        if (fee.paisa < BigInt.zero ||
+            broker.paisa < BigInt.zero ||
             broker.paisa > fee.paisa ||
-            consignments[n]['broker_id'] == null && broker.paisa != 0) {
+            consignments[n]['broker_id'] == null &&
+                broker.paisa != BigInt.zero) {
           throw const FormatException(
             'Agreed brokerage must be within the cancellation charge and have a broker.',
           );
@@ -675,7 +676,7 @@ class _CorrectionFormState extends State<CorrectionForm> {
           if (cancellation)
             for (var n = 0; n < fees.length; n++)
               Text(
-                'Charge PKR ${fees[n].text}; broker PKR ${brokerFees[n].text}; owner PKR ${AllocationTotals.decimal(BigInt.from(Money.parse(fees[n].text).paisa) - BigInt.from(Money.parse(brokerFees[n].text).paisa))}',
+                'Charge PKR ${fees[n].text}; broker PKR ${brokerFees[n].text}; owner PKR ${AllocationTotals.decimal(Money.parse(fees[n].text).paisa - Money.parse(brokerFees[n].text).paisa)}',
               ),
           FilledButton(
             onPressed: busy || conflict ? null : confirm,

@@ -4,6 +4,8 @@ Version: 1.1 | Specification date: 2026-10-11
 
 Current phase: T00-T18 DONE; T19 Windows installer and office pilot IN PROGRESS; T20 TODO. Do not interpret a defined acceptance test as an executed test.
 
+2026-10-12 explicit additional web request: free Cloudflare Pages deployment verified at https://carrier-records.pages.dev, production main deployment 9b1fcaf9-b04d-4251-a08a-dfef8472d2b3. User explicitly waived the previously required database backup; no dump/object backup completed. Added web scaffold and native-I/O guards; exact Money/allocations use BigInt integer paisa across native/JavaScript while preserving decimal interfaces/range. Release web build PASS (544.0s), final analyzer no issues, 86 Flutter tests PASS, 11 compiled-JavaScript money checks PASS, release artifact audit43 files/45,076,926 bytes/no findings. Actual local authenticated dashboard and live sign-in render with no captured console errors/warnings. Curl six public routes/scripts HTTP200 and byte-for-byte match. Cloudflare auth expiry/email verification/internal error and corrections recorded; two Chrome test-runner attempts stalled/cancelled without PASS. See docs/web-deployment-evidence.md and docs/web-deployment.md. This independent requested deployment supersedes the deferred-web scope; T19 remains IN PROGRESS, T20 TODO, restart deferred; no backend writes/migrations/scheduling/paid upgrades or automatic GitHub push.
+
 ## 1. Status convention
 
 Use TODO, IN PROGRESS, BLOCKED or DONE. DONE requires the stated evidence and relevant checks; record actual command/results or review evidence. A source scaffold is not a working feature. A build script is not an installer. A backup file is not a verified restore.

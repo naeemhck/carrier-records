@@ -227,9 +227,9 @@ class TripDraft {
     var customer = BigInt.zero, commission = BigInt.zero, owner = BigInt.zero;
     for (final c in consignments) {
       final q = c.preview();
-      customer += BigInt.from(q.customerCharge.paisa);
-      commission += BigInt.from(q.commission.paisa);
-      owner += BigInt.from(q.ownerEntitlement.paisa);
+      customer += q.customerCharge.paisa;
+      commission += q.commission.paisa;
+      owner += q.ownerEntitlement.paisa;
     }
     String decimal(BigInt n) =>
         '${n ~/ BigInt.from(100)}.${(n % BigInt.from(100)).toString().padLeft(2, '0')}';

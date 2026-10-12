@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -17,7 +19,7 @@ class BackupRepository implements BackupCommands {
       Map<String, dynamic>.from(await client.rpc('get_backup_status') as Map);
   @override
   Future<bool> manual() async {
-    if (!Platform.isWindows) {
+    if (kIsWeb || !Platform.isWindows) {
       throw const FormatException(
         'Run backups on the configured administrator Windows PC.',
       );

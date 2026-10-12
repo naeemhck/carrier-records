@@ -5,6 +5,7 @@
 .packages
 build/
 coverage/
+.wrangler/
 **/Flutter/ephemeral/
 **/flutter/ephemeral/
 android/local.properties

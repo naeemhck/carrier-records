@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'public_config.dart';
 
 /// Public configuration only. Sessions stay in the native protected store.
@@ -10,7 +12,8 @@ class InstalledConfig {
     bool? windows,
     String? localAppData,
   }) async {
-    if (!(windows ?? Platform.isWindows) ||
+    if (kIsWeb ||
+        !(windows ?? Platform.isWindows) ||
         compiled.environment != 'production') {
       return compiled;
     }

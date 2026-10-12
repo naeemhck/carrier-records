@@ -4,6 +4,8 @@ Version: 1.1 | Specification date: 2026-10-11
 
 Status: Business scope confirmed. Planning documents generated; application implementation pending.
 
+2026-10-12 user scope update: public Flutter web hosting on free Cloudflare Pages is explicitly authorized and deployed at https://carrier-records.pages.dev. This supersedes the original deferred-web item for the hosting request. Existing backend authorization and exact accounting rules apply unchanged. Web field/export checks and the Windows/Android release gates are separate; see docs/web-deployment-evidence.md. The user explicitly waived the database backup prerequisite for this deployment.
+
 ## 1. Purpose
 
 Replace registers and fragmented spreadsheets with an internal system for recording car-carrier journeys, fares, brokerage, payments, expenses, and settlements. Produce accurate vehicle and owner reports and customizable recipient-specific bills without requiring customers, owners, or brokers to use the app.

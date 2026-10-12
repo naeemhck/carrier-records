@@ -8,6 +8,8 @@ Status: Implementation specification. No application, cloud deployment or native
 
 Use Flutter/Dart for shared Windows and Android client code. Use Supabase Auth, PostgreSQL, private Storage, database RPCs and small privileged Edge Functions. Avoid a separate always-running API server for the free pilot.
 
+2026-10-12 explicitly requested web deployment adds a Flutter JavaScript client served from Cloudflare Pages direct upload. It uses the same authorized backend through compiled public configuration (APP_ENV, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, APP_BUSINESS_ID). Integer paisa uses BigInt so the full PostgreSQL money range remains exact in JavaScript. Browser secure storage is origin-specific and requires HTTPS/localhost; native protected-storage checks do not establish browser release evidence. Native Windows configuration and backup-helper I/O are guarded from web execution. No privileged helper, direct database credential or private records are distributed as static web assets. See docs/web-deployment-evidence.md for executed checks and limitations.
+
 ```mermaid
 flowchart LR
     W[Windows Flutter client] --> A[Supabase Auth]
