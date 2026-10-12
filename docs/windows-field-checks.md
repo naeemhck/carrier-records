@@ -4,7 +4,7 @@ Status: IN PROGRESS. Use this with windows-installation.md and windows-release-e
 
 ## Current resources and next step
 
-The user will initially use the development PC and act as the pilot operator. No physical printer is available. This PC is not a clean-machine substitute. Hyper-V inventory was denied by Windows permissions, so an available clean guest has not been verified. The installed release is 0.1.0+4. A new free `carrier-records-pilot` project has been created separately from the pre-existing project. Existing administrator mapping and public configuration are present; required password change and office setup must finish before operational records.
+The user will initially use the development PC and act as the pilot operator. No physical printer is available. This PC is not a clean-machine substitute. Hyper-V inventory was denied by Windows permissions, so an available clean guest has not been verified. The installed release is 0.1.0+4. A new free `carrier-records-pilot` project has been created separately from the pre-existing project. Existing administrator mapping, completed password change, user-observed dashboard login, public configuration, company setup and two offices/administrator assignments are now verified. Session, restricted-role, network and actual pilot checks remain to be executed; setup does not imply these checks passed.
 
 Use the verified project identity from the current session and windows-backend-prerequisites.md. Finish migration application, token hook, private Storage and Edge Functions, first administrator mapping, public client configuration and actual company/issuer/office setup. Never copy service keys or database credentials into client.json. Never run the empty-database fixture harness against a real pilot.
 

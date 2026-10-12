@@ -283,6 +283,10 @@ Fresh restart/sign-in still fails per user. Windows diagnostic candidate **0.1.0
 
 Post-update installed login observed: user confirms password changed, signed in with new credential and dashboard visible. Read-only backend verifies active/version 3/forced-change false/not pending, one password operation/current session. Existing identity preserved. Normal initial office creation/reuse and explicit existing-admin assignments now being guided; no raw writes or password gate bypass. Development-PC login is a narrow actual result, not clean-PC/protected restart/logout/restricted-staff/network/physical-print/pilot acceptance. Earlier post-fix retry cause not conclusively observed. T19 remains IN PROGRESS.
 
+Office follow-up: user reports save; read-only backend verifies two active agreed offices with lowercase stable codes khi/isb. Initial uppercase-only probe mismatch corrected case-insensitively in ignored diagnostic, without modifying valid offices. Explicit ADMIN assignments still zero/profile version 3; account save not yet verified. Guided existing account Manage/both offices/ADMIN/Active/Save account and fresh sign-in as needed. Session/logout and remaining field gates pending; no duplicate rows, push or schedule change.
+
+Existing-account assignments now verified: after normal Save account and user success report, fresh read-only hosted check exits 0 with one Auth identity/one staff profile, ready active ADMIN, two agreed active offices/two explicit assignments and one completed password operation. Company setup_completed=true verified separately without private fields. No duplicates/direct office writes. Guided development-PC signed-in close/reopen and logout/close/reopen/login checks; actual results pending. Windows restart and remaining clean-PC/staff/network/physical-print/real pilot/recovery gates pending; T19 IN PROGRESS/T20 TODO.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
