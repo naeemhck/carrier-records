@@ -299,6 +299,8 @@ Actual user-executed hosted staff preflight reports verified: exit0 for both exi
 
 Requested screen-controlled app checks blocked: @oai/sky initialization succeeds, three list_apps attempts (initial, documented two-second retry, reset/reinitialize retry) fail native-pipe-unavailable/system-cannot-find-file/os error2. No app window/screenshot/input or new UI PASS. No helper spawn/search/shell UI workaround. Native connection must become available before screen testing. Prior user/UI/backend evidence retained; restart deferred/T19 IN PROGRESS/T20 TODO/no push/scheduling.
 
+Explicitly authorized private GitHub backup: source/history audit255 tracked/454 blobs/no findings and installer audit60 pass; account/origin PRIVATE verified. No-force main push/remote match at initial checkpoint4b51041b15abf259aa29e2524a1fb7e6624efd56; private draft installer/checksum backup uploaded and downloaded hash independently matches current candidate. Follow-up evidence committed/pushed for same backup with final SHA reported to user/ignored metadata. Local secrets/operations/receipts/recovery/build folders excluded without deletion. Fresh native screen inventory still fails before window discovery; no explicit user-config disable found, cause limited to unavailable native connection, lifecycle unproven. Official setup and ChatGPT-only restart suggestion documented, not a fix/pass. docs/github-backup-evidence.md. Restart deferred/T19 IN PROGRESS/T20 TODO; no rollout/production scheduling, future pushes require authorization.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
