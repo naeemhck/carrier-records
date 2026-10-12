@@ -40,13 +40,25 @@ def change(token,pw=password,new=real):
     p=profile(token);code,data=edge({'action':'change','current_password':pw,'password':new,'expected_version':p['version']},token)
     ok('verified password change through Edge (HTTP '+str(code)+')',code==200);return data
 try:
+    # Dashboard-created identities may predate the app's new-password policy.
+    # Verify the existing credential through Auth, without accepting weak new ones.
+    legacy_password=secrets.token_hex(4)
     admin=create_auth('admin')
+    # Isolated existing-identity fixture; keep the configured Auth minimum at 12.
+    sql(f"update auth.users set encrypted_password=extensions.crypt('{legacy_password}',extensions.gen_salt('bf')) where id='{admin}';")
     code,result=rpc('bootstrap_staff_admin',{'business_id':b,'company_name':'ISOLATED T03 TEST','auth_user_id':admin,'username':'admin','display_name':'Test Admin'},priv=True)
     ok('service-only first administrator bootstrap',code in (200,204))
-    code,data=login('admin');ok('temporary administrator sign-in',code==200);at=data['access_token'];ar=data['refresh_token']
+    code,data=login('admin',legacy_password);ok('temporary administrator sign-in',code==200);at=data['access_token'];ar=data['refresh_token']
     ok('temporary password cannot list accounts',rpc('list_staff_accounts',token=at)[0]==403)
     ok('temporary password cannot read offices',request('/rest/v1/offices?select=*',token=at,method='GET')[1]==[])
-    change(at)
+    version=profile(at)['version']
+    for current in ['',None,123,'x'*129]:
+        ok('invalid current credential rejected',edge({'action':'change','current_password':current,'password':real,'expected_version':version},at)[0]==400)
+    ok('incorrect short current credential denied by Auth',edge({'action':'change','current_password':'wrong123','password':real,'expected_version':version},at)[0]==403)
+    for next_password in ['x'*11,'x'*129,None]:
+        ok('new password policy preserved',edge({'action':'change','current_password':legacy_password,'password':next_password,'expected_version':version},at)[0]==400)
+    ok('rejected changes preserve password gate and version',profile(at)['version']==version and profile(at)['must_change_password'] is True)
+    change(at,legacy_password)
     ok('old access token revoked after password change',rpc('get_session_profile',token=at)[0]==403)
     ok('old refresh token revoked after password change',request('/auth/v1/token?grant_type=refresh_token',{'refresh_token':ar})[0]>=400)
     code,data=login('admin',real);ok('changed administrator password login',code==200);at=data['access_token'];ap=profile(at)

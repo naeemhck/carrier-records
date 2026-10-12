@@ -58,7 +58,10 @@ Deno.serve(async request => {
  if (reset && (profile.role !== 'ADMIN' || profile.must_change_password)) throw new ApiError(403,'Administrator access required.');
  if (!Number.isInteger(body.expected_version) || body.expected_version < 1) throw new ApiError(400,'Version required.');
  if (!reset) {
- const currentPassword = password(body.current_password);
+ // Existing dashboard-created credentials can predate our new-password policy.
+ // Auth must verify them; the 12-character minimum still applies to all new ones.
+ const currentPassword = body.current_password;
+ if (typeof currentPassword !== 'string' || currentPassword.length < 1 || currentPassword.length > 128) throw new ApiError(400,'Current password required (maximum 128 characters).');
  if (currentPassword === nextPassword) throw new ApiError(400,'Choose a different password.');
  const verified = await call('/auth/v1/token?grant_type=password',publicKey,publicKey,{email:`${profile.username}.${profile.business_id}@staff.invalid`,password:currentPassword});
  if (verified.user.id !== user.id) throw new ApiError(403,'Password verification failed.');
