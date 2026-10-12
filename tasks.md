@@ -315,6 +315,8 @@ User-authorized private code backup before deployment: initialbranchmain/HEADc1e
 
 Code-backup dated local commit b61d4ef413ed61345e0ca476553b85ddca266e5b (4files/23insertions) summary shown before push. Full audits PASS; supplemental ignored wrapper stopped early at shared-auditor success, corrected/exact committed-diff scan and9 exclusions/source-SQL exceptions PASS. Full260tracked/479historyblobs/no findings. Audit clarification scanned/committed before same authorized private push; no secrets/rewrite/deployment. Separate DB backup pending local password/dump execution.
 
+2026-10-12 installed-app continuation: native inventory now works and the actual installed accessibility tree confirms an administrator session and three existing accounts. File version 0.1.0+4 and strict public configuration match the intended hosted pilot; values withheld. Initial launch approval timed out, second launch exposed the installed window. Screenshot capture repeatedly times out; accessibility-only master-page click fails with coordinate input geometry unavailable; two Tab attempts have no verifiable control focus; Raise plus capture still times out. One intervening attempt was stopped by physical Escape and input stopped immediately. No master form, synthetic record, draft, lifecycle or financial submission was reached. No application defect established, source/build/regressions unchanged. All attempts are recorded separately in docs/t19-installed-continuation.md. T19 IN PROGRESS; T20 TODO; restart DEFERRED; clean-machine and physical-printer gates PENDING; pilot/recovery approvals unsigned. No push, hosted data write, deployment, reset, deletion or scheduling.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
@@ -385,3 +387,5 @@ Before pilot, administrator supplies actual company identity, five staff names/o
 After Windows and Android stability: Urdu UI/documents with reviewed translations; web client; additional-business onboarding if required; historical/opening-balance migration if explicitly approved; richer maintenance tracking. Reassess free-tier capacity before expansion. No deferred item is silently included in v1 progress.
 
 2026-10-11 T09: AT-05/19/20 expense-boundary checks PASS, migration 20261011001100. Both diesel remittances/profit, standalone costs, original-expense claims, private evidence and financial-versus-upload failure separation verified. See docs/expenses-evidence.md. Local commit only; no GitHub push.
+
+Latest recovery: user manually opens Company and master records; actual installed accessibility observation confirms the page/configured company. Keyboard focus briefly reaches Back/Offices, later returns to root; latest indexed Parties click rejected as unavailable in cached app state. CU26-20 through CU26-27 recorded separately in docs/t19-installed-continuation.md; no party editor, new record or save. T19 IN PROGRESS; T20 TODO.

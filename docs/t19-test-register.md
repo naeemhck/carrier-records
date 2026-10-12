@@ -17,7 +17,7 @@ Updated 2026-10-12. T19 **IN PROGRESS**, T20 **TODO**. Every executed assertion 
 | F11 | Karachi fare/dispatch allowed, arrival denied | NOT RUN | Existing-user `--trip-checks` once draft exists; local regression passes separately |
 | F12 | Islamabad fare/dispatch denied, arrival allowed | NOT RUN | Same; no actual transition is claimed from an authorization probe |
 | F13 | Staff excludes unrelated trips/reports | NOT RUN | Two-office shared trip is visible to both legitimately; need valid unrelated case or label isolated result |
-| F14 | Installed destination fare save denied with unchanged server values | NOT RUN | Needs valid draft and user-operated UI; Computer Use native bridge unavailable |
+| F14 | Installed destination fare save denied with unchanged server values | NOT RUN | Needs valid draft and installed UI; native inventory works but current capture/input geometry fails |
 | F15 | Installed role switch does not reuse prior role/session/data | PARTIAL | Distinct dashboards reported; persisted cross-role/reopen sequence not explicitly observed |
 | F16 | Disabled staff/removed office invalidates open installed access | NOT RUN | User must exercise designated staff with separate admin session; never disable only admin |
 | F17 | Installed draft save during connection loss, no false success, one retry result | NOT RUN | Needs pilot draft/input and user-operated network/UI; see field walkthrough |
@@ -46,6 +46,10 @@ Updated 2026-10-12. T19 **IN PROGRESS**, T20 **TODO**. Every executed assertion 
 | S03 | Probe-tool valid/invalid configuration/privacy/permission helper tests | PASS ON RERUN | Six mocked tests; first attempt five pass/one sandbox temp-write error, permitted rerun all pass; validation unchanged |
 | S04 | Fresh hosted signup/anonymous/perimeter/RLS/ACL/hook/bucket/migration checks | PASS | 13 non-mutating checks, actual pilot endpoint/metadata; no content-privacy proof from bucket config alone |
 | S05 | Current staged/installed payload bytes/hash/credential exclusion | PASS | 60 inspections, every file listed in ledger; no client/backend product behavior change or new build claimed |
-| S06 | Native screen-control inventory | BLOCKED | Explicit plugin invocation/retry/reset still cannot connect native pipe; no screenshots/input |
+| S06 | Native screen-control observation/input | PARTIAL / BLOCKED | Current native inventory and installed administrator accessibility observation work; captures time out and indexed click has no geometry. See CU26-01 through CU26-19; no master form/save |
 
 Raw private logs/reports and actual operational result sheets remain excluded from Git. Record future checks by their ID with observed outcome, environment, executor, failure/fix/retest and private evidence reference. Keep all financial confirmations in normal reviewed workflows; do not make test transitions merely to fill a checklist.
+
+Current continuation: [twenty-seven separately recorded installed/tooling attempts](t19-installed-continuation.md). Installed version/public-config validation and administrator accessibility observation PASS within their narrow scope; no draft or money workflow executed. Latest user authorizes labelled synthetic pilot records, superseding prior genuine-operation-only restrictions for this continuation. Clean machine and physical printing PENDING; restart DEFERRED; approvals unsigned.
+
+Latest recovery: user manually opens Company and master records; actual installed accessibility observation confirms the page/configured company. Keyboard focus briefly reaches Back/Offices, later returns to root; latest indexed Parties click rejected as unavailable in cached app state. CU26-20 through CU26-27 recorded separately in docs/t19-installed-continuation.md; no party editor, new record or save. T19 IN PROGRESS; T20 TODO.

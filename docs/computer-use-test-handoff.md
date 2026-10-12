@@ -1,3 +1,9 @@
+# Latest continuation state
+
+2026-10-12 installed-app continuation: native inventory now works and the actual installed accessibility tree confirms an administrator session and three existing accounts. File version 0.1.0+4 and strict public configuration match the intended hosted pilot; values withheld. Initial launch approval timed out, second launch exposed the installed window. Screenshot capture repeatedly times out; accessibility-only master-page click fails with coordinate input geometry unavailable; two Tab attempts have no verifiable control focus; Raise plus capture still times out. One intervening attempt was stopped by physical Escape and input stopped immediately. No master form, synthetic record, draft, lifecycle or financial submission was reached. No application defect established, source/build/regressions unchanged. All attempts are recorded separately in docs/t19-installed-continuation.md. T19 IN PROGRESS; T20 TODO; restart DEFERRED; clean-machine and physical-printer gates PENDING; pilot/recovery approvals unsigned. No push, hosted data write, deployment, reset, deletion or scheduling.
+
+Latest user instruction authorizes clearly labelled synthetic pilot records through normal administrator workflows and user-reviewed financial confirmations; prior real-operation-only wording below is historical for that restriction. Reuse existing accounts. Start from a fresh native observation, not stale indexes.
+
 # Resume installed hosted app tests in a working Computer Use chat
 
 Workspace: `D:\portfolio\transport_project`.
@@ -9,3 +15,5 @@ Copy this request into the chat where Computer Use successfully controls Windows
 Current successful results: administrator setup/login and company/two-office assignments verified; user-observed app close/reopen/logout and staff office dashboards pass. Both actual hosted staff preflight probes pass seven checks each. Fresh hosted security checks pass13; isolated current base169/fault-rerun199/helper-rerun6 and installed file audit60 are documented separately and do not substitute for pending installed hosted UI checks. Current last read-only hosted inventory has three Auth identities, two vehicles, one customer, no drivers/trips. This may change during user work.
 
 The previous chat could import the skill module but native app/window inventory always failed with missing pipe/os error2. Its unified inventory exposes only browser surfaces; the user reports another chat controls the desktop successfully. Therefore switching to the known working chat is a recovery path, not proof any pending test passed. Do not repeat computer/plugin installation or reboot recommendations solely because that previous chat's connection failed.
+
+Latest recovery: user manually opens Company and master records; actual installed accessibility observation confirms the page/configured company. Keyboard focus briefly reaches Back/Offices, later returns to root; latest indexed Parties click rejected as unavailable in cached app state. CU26-20 through CU26-27 recorded separately in docs/t19-installed-continuation.md; no party editor, new record or save. T19 IN PROGRESS; T20 TODO.

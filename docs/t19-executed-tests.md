@@ -532,3 +532,9 @@ These are failed tooling connection attempts, not failed Carrier Records operati
 User subsequently reports Computer Use works in another chat. This narrows the likely fault to this chat's native runtime attachment; exact attachment failure remains unproven. Prepared [working-chat handoff](computer-use-test-handoff.md) to resume the same workspace/field gates without duplicate setup. No need to infer global plugin/PC failure from this chat's missing connection.
 
 Fresh local fixture cleanup/health and hosted inventory are recorded in windows-release-evidence.md. Protected-store contents are never extracted. Raw current run logs and sanitized hosted/probe reports remain ignored under tools/.local; this ledger records every emitted assertion without importing private data. Local fixture tests exercise real API enforcement but do not prove a hosted installed UI save, physical printing, clean-machine installation or office/recovery sign-off. See t19-test-register.md for field gates that remain pending.
+
+## Installed continuation with working native inventory
+
+All twenty-seven CU26 attempts, including each capture failure, physical-Escape stop, keyboard recovery, strict config validation and actual installed administrator observation, are individually recorded with inputs, expected/actual results, account/environment, status, evidence and retest in [installed continuation](t19-installed-continuation.md). No master form/save, trip or financial workflow was reached. T19 IN PROGRESS; T20 TODO.
+
+Latest recovery: user manually opens Company and master records; actual installed accessibility observation confirms the page/configured company. Keyboard focus briefly reaches Back/Offices, later returns to root; latest indexed Parties click rejected as unavailable in cached app state. CU26-20 through CU26-27 recorded separately in docs/t19-installed-continuation.md; no party editor, new record or save. T19 IN PROGRESS; T20 TODO.
