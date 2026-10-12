@@ -6,6 +6,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'backup'))
 from core import BackupError,atomic_json,digest,due,export_recovery,recover_key,read_manifest,retention,run_backup,unseal,verify_archive
 from vault import WindowsVault
 from backup import validate_config
+from transport import Transport
 
 class FakeTransport:
     excluded_sessions=['auth.sessions','auth.refresh_tokens']
@@ -32,6 +33,15 @@ class HelperTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.base=Path(self.temp.name);self.key=os.urandom(32);self.transport=FakeTransport();self.config={'business_id':str(uuid.uuid4()),'backup_root':str(self.base/'backups'),'status_path':str(self.base/'status.json'),'daily_time':'18:00','retention_days':30}
     def tearDown(self):self.temp.cleanup()
+    def test_local_backup_records_runtime_images_without_environment_secrets(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        transport=Transport.__new__(Transport);transport.config={'docker_container':'supabase_db_synthetic'}
+        images=['supabase/postgres:17.11.0.004','ghcr.io/supabase/gotrue:v2.197.0','public.ecr.aws/supabase/postgrest:v16.4','ghcr.io/supabase/storage-api:v1.79.36']
+        with patch.object(transport,'query',return_value={'roles':[]}),patch('transport.subprocess.run',side_effect=[SimpleNamespace(stdout=x+'\n') for x in images]) as command:
+            metadata=transport.metadata();self.assertEqual(list(metadata['local_runtime_images'].values()),images)
+            self.assertTrue(all('{{.Config.Image}}' in c.args[0] for c in command.call_args_list))
+            self.assertTrue(all('Env' not in str(c) for c in command.call_args_list))
     def configuration(self):
         return {'format_version':1,'business_id':str(uuid.uuid4()),'supabase_url':'http://127.0.0.1:54321','credential_prefix':'CarrierRecordsBackup/test/'+str(uuid.uuid4()),'backup_root':str(self.base/'backups'),'status_path':str(self.base/'local-status.json'),'daily_time':'18:00','time_zone':'Pacific Standard Time','task_name':'CarrierRecordsBackup-'+str(uuid.uuid4()),'config_path':str(self.base/'config.json'),'docker_container':'supabase_db_transport_project','retention_days':30}
     def test_setup_configuration_required_backend_url_is_accepted(self):

@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T16 DONE. Next: T17 restoration rehearsal. T17-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T17 DONE. Next: T18 security, resilience and performance gate. T18-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -237,11 +237,13 @@ Full T03-T16 command exits 0 with 1,486 main-harness PASS lines plus 32 real-hel
 
 ### T17 — Restoration rehearsal
 
-Status: TODO | Dependencies: T16
+Status: DONE | Dependencies: T16
 
 Restore a backup into an isolated clean environment. Verify schema, staff identity mappings/office roles, current balances, source/reversal history, receipt hashes and issued-document digests. Revoke obsolete sessions and verify subsequent authentication. Document sequence and measured recovery time.
 
 Evidence: AT-32 passes with actual restored records and files. Do not call a generated archive a successful restore.
+
+T17 actual evidence (2026-10-12): AT-32 complete rehearsal exits 0. Measured recovery 121.834 seconds including separate-key verification, compatible target startup, database and receipt restoration and final checks; fixture creation/backup time excluded. Restored 15 trips, 88 financial events/20 reversals, 17 issued documents, 3 receipt objects, 13 identities and 8 office assignments. Schema/functions/policies/grants, exact records/balances, receipt hashes/sizes, document snapshots/digests, old-session denial, fresh administrator/two staff authentication, scoped RLS, denied cross-office operations/direct money writes and nonempty-target refusal PASS. Eight restore boundary tests and 12 helper regressions PASS. Actual CLI startup failure was Windows reserved TCP 55322 (excluded 55280-55379), diagnosed before target-only port probing; successful target used 57321. Prior failures/fixes and limits are recorded in docs/restoration-evidence.md. Existing encrypted archives/recovery files retained unchanged; disposable target/vault credentials removed; source cleanup/health verified. Local commit only; no push or production scheduling.
 
 ### T18 — Security, resilience and performance gate
 

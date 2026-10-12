@@ -218,6 +218,9 @@ try:
     if '--backups' in sys.argv:
         from t16_backups import verify
         verify(globals())
+    if '--restore' in sys.argv:
+        from t17_restoration import verify
+        verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify
         verify(globals())

@@ -67,7 +67,15 @@ class Transport:
         r=subprocess.run(args,input=data,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,timeout=120)
         if r.returncode or b'TABLE DATA auth users' not in r.stdout or b'TABLE DATA auth identities' not in r.stdout:raise BackupError('ARCHIVE_VERIFY_FAILED')
     def metadata(self):
-        return self.query("select jsonb_build_object('postgres_version',version(),'roles',(select jsonb_agg(jsonb_build_object('name',rolname,'login',rolcanlogin,'inherit',rolinherit,'bypass_rls',rolbypassrls)) from pg_roles),'memberships',(select coalesce(jsonb_agg(jsonb_build_object('role',r.rolname,'member',m.rolname,'admin_option',g.admin_option,'inherit_option',g.inherit_option,'set_option',g.set_option)),'[]') from pg_auth_members g join pg_roles r on r.oid=g.roleid join pg_roles m on m.oid=g.member),'migration_versions',(select jsonb_agg(version order by version) from supabase_migrations.schema_migrations),'identity_count',(select count(*) from auth.users),'identity_mapping_count',(select count(*) from auth.identities));")
+        metadata=self.query("select jsonb_build_object('postgres_version',version(),'roles',(select jsonb_agg(jsonb_build_object('name',rolname,'login',rolcanlogin,'inherit',rolinherit,'bypass_rls',rolbypassrls)) from pg_roles),'memberships',(select coalesce(jsonb_agg(jsonb_build_object('role',r.rolname,'member',m.rolname,'admin_option',g.admin_option,'inherit_option',g.inherit_option,'set_option',g.set_option)),'[]') from pg_auth_members g join pg_roles r on r.oid=g.roleid join pg_roles m on m.oid=g.member),'migration_versions',(select jsonb_agg(version order by version) from supabase_migrations.schema_migrations),'identity_count',(select count(*) from auth.users),'identity_mapping_count',(select count(*) from auth.identities));")
+        if self.config.get('docker_container'):
+            project=self.config['docker_container'].removeprefix('supabase_db_')
+            images={}
+            for key,service in [('database','db'),('auth','auth'),('rest','rest'),('storage','storage')]:
+                r=subprocess.run(['docker','inspect','--format','{{.Config.Image}}','supabase_'+service+'_'+project],capture_output=True,text=True,check=True)
+                images[key]=r.stdout.strip()
+            metadata['local_runtime_images']=images
+        return metadata
     def receipts(self):
         return self.query("select coalesce(jsonb_agg(jsonb_build_object('object_path',object_path,'sha256',sha256,'byte_size',byte_size)),'[]') from public.receipt_files where business_id='"+self.business+"';")
     def usage(self):
