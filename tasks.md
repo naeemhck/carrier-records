@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T18 DONE. Next: T19 Windows installer and office pilot; T19-T20 TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T18 DONE; T19 Windows installer and office pilot IN PROGRESS; T20 TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -257,11 +257,19 @@ T18 actual evidence (2026-10-12): optimized integrated/native-export/current-sch
 
 ### T19 — Windows installer and office pilot
 
-Status: TODO | Dependencies: T18
+Status: IN PROGRESS | Dependencies: T18
 
 Build release Windows binaries with installed tooling; package a per-user installer. Keep backend configuration public-client-only and document administrator setup. Install on a clean Windows machine, check launch/login, printer output and update workflow. Begin with new records and reconcile representative real trips before broader use.
 
 Evidence: Installable artifact with version/hash, successful clean-machine run, printing, confirmed money totals, usable custom outputs and restore sign-off. A source ZIP is not this artifact.
+
+Actual progress (2026-10-12): Verified T18 DONE at local 6c8e435 and preserved 1,527-PASS terminal acceptance/cleanup log and 12,000-trip/five-user benchmark. Built release Windows with production-only public configuration; strict versioned per-user HTTPS/public-key/business configuration outside installer directory, stable native protected-session namespace, no privileged/test/operational payload. Packaged signed-compiler Inno per-user candidate 0.1.0+2 (release 134.7s, compiler 20.297s), installer SHA-256 `7f486d9c16ca13c4d9ee1a7d2bb062c4ae83b4ddfe36d4972bbe06fac6d1c03d` at `app/build/windows/installer/0.1.0+2/CarrierRecords-0.1.0+2-windows-x64-setup.exe`. 81 Flutter tests, final analyzer/no issues and staged/installed hash/credential audits pass (24 staged/48 combined inspections). Actual per-user installation exits 0 on development PC; file version/HKCU entry match. First hidden-launch main-window probe fails; owned-window diagnostic then proves hidden window/process initialization only, not visual launch/login. First payload allowlist rejected Flutter native_assets.json; inspected empty runtime manifest and allowed exact Flutter manifest paths, retaining failed build-1 staging. Evidence: docs/windows-release-evidence.md.
+
+Pending gates: user will self-check and requests PDF printing. Separate clean-PC visible installed launch/login/permissions/secure sessions/connection faults, actual cross-version preservation, installed customized multi-page PDF/Excel and PDF print-path checks remain NOT RUN; no physical output claimed. Real backend/company/admin/office setup, new-record office reconciliation, participants and actual pilot/recovery sign-off are unavailable/unperformed. Exact admin/install/update/PDF/pilot steps in docs/windows-installation.md, docs/windows-backend-prerequisites.md and docs/windows-pilot-checklist.md; T17 technical recovery included but not office sign-off. T19 remains IN PROGRESS; T20 TODO. Local commit only; no push or production scheduling.
+
+Final packaging/update evidence: candidate **0.1.0+3** supersedes build 2 and includes six linked admin/pilot/recovery guides (release 140.6s, compile 19.453s). Artifact `app/build/windows/installer/0.1.0+3/CarrierRecords-0.1.0+3-windows-x64-setup.exe`, 14,127,206 bytes, SHA-256 `6da5dee7740ebe5659d10c7b228fb2a694bf7372b5ecc7bb77a54d1a15cc6eef`. Actual development-PC update 2→3 exits 0 and preserves the temporary public-config hash; only the helper's own unchanged synthetic config is removed. Thirty staged/sixty staged+installed byte/hash/credential inspections and final owned-window smoke pass. This resolves development-PC binary/config update checks, not clean-PC protected sessions or refreshed access. Those and actual PDF/pilot/recovery approval remain pending; T19 stays IN PROGRESS.
+
+Final staged source/history audit exits 0: 250 intended source files, zero untracked intended files, 387 historical blobs, no findings. Release/installers, local tools, private settings, recovery archives and other ignored files are excluded from the local commit.
 
 ### T20 — Android release
 

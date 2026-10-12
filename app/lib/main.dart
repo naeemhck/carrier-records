@@ -4,17 +4,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/carrier_records_app.dart';
 import 'features/auth/public_config.dart';
+import 'features/auth/installed_config.dart';
 import 'features/auth/secure_session_storage.dart';
 import 'features/auth/staff_session.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final config = PublicConfig.fromEnvironment();
-  if (!config.configured) {
-    _launch(const CarrierRecordsApp());
-    return;
-  }
   try {
+    final config = await InstalledConfig.load(
+      compiled: PublicConfig.fromEnvironment(),
+    );
+    if (!config.configured) {
+      _launch(const CarrierRecordsApp());
+      return;
+    }
     config.validate();
     final storage = SecureSessionStorage(
       namespace:

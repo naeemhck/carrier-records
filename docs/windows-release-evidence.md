@@ -1,0 +1,49 @@
+# T19 Windows packaging and pilot evidence
+
+Date: 2026-10-12. Status: **IN PROGRESS**. T20 not started. No GitHub push or production scheduling change.
+
+## Dependency verified
+
+Local HEAD at task start was `6c8e435fc80d51dd504964d6760de920b62905a9`; working tree was clean. Read AGENTS.md and the six planning documents. T18 tasks/memory/security-performance evidence records DONE, and the preserved final integrated log has exactly 1,527 `PASS ` lines, terminal acceptance success and fixture cleanup. Preserved benchmark JSON confirms 12,000 trips/five users. T18's separate helper/restore results, 219 SQL assertions, 78 tests, Windows/Android builds and runtime limits remain recorded in that evidence; they were not rerun or relabelled as installed-release checks here. T17 actual separately keyed restoration evidence is linked in the installation/pilot instructions.
+
+## Artifact and configuration
+
+Final pilot candidate: **0.1.0+3**, x64, release mode, compiled only with `APP_ENV=production`; URL/key/business are not compiled. No local/test backend config is embedded. Public Windows runtime settings live outside the program directory at `%LOCALAPPDATA%\CarrierRecords\client.json`. Strict version-1 fields, HTTPS, valid business UUID and public-only keys are validated before Auth startup; unknown fields, privileged keys, malformed/oversized config fail closed. UTF-8 BOM from Windows PowerShell 5.1 is supported. Non-Windows and explicit development configuration paths retain their existing behavior. Secure sessions continue using the native protected store and the same backend/business namespace, independent of version. No financial/backend authorization behavior changed.
+
+Per-user Inno installer has a permanent AppId, `PrivilegesRequired=lowest`, x64/Windows build prerequisite, explicit installed VC runtime minimum, Start-menu shortcut and uninstall entry. Program installation is `%LOCALAPPDATA%\Programs\CarrierRecords`. No helper, privileged credentials, scheduler, receipts, backup/recovery archive, operational database, test config or signing material is bundled. No data-removal/uninstall directive or session/config overwrite exists. Actual cross-version preservation and refreshed access remain pending, rather than inferred from the script.
+
+| Artifact | Actual result |
+|---|---|
+| Installer | `D:\portfolio\transport_project\app\build\windows\installer\0.1.0+3\CarrierRecords-0.1.0+3-windows-x64-setup.exe` |
+| Installer bytes | 14,127,206 |
+| Installer SHA-256 | `6da5dee7740ebe5659d10c7b228fb2a694bf7372b5ecc7bb77a54d1a15cc6eef` |
+| Release executable | `app/build/windows/x64/runner/Release/carrier_records.exe` |
+| Executable SHA-256 | `efced6522d75aa0136ebf47028ed01127e7c41e538e5efb90793fdd24b7419b0` |
+| Payload/hash manifest | `app/build/windows/installer/0.1.0+3/manifest.json`: 30 files, per-file byte counts/SHA-256 |
+| Compiler | Official Inno Setup 6.7.3, valid Authenticode Pyrsys B.V.; portable ignored local tooling, install exit 0 |
+| Compiler download SHA-256 | `9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732` |
+
+The pilot installer is unsigned; no purchased certificate or private signing key was introduced. It must be distributed with its trusted hash/provenance. The compiler signature is not a signature on the generated app/installer.
+
+## Executed verification and failures
+
+1. First release build exits 0 in **704.3s**. Analyzer exits 0/no issues (497.4s). After the BOM/config fix, packaging build exits 0 in **161.0s**, but the file allowlist rejects Flutter's root `native_assets.json`. Inspected actual JSON: `{"format-version":[1,0,0],"native-assets":{}}`, not operational configuration. Allowed only the three exact Flutter manifest paths; other JSON/settings remain excluded. Preserved partial `0.1.0+1` output, did not overwrite/delete it, and incremented build number for the new candidate.
+2. `tools/windows/package-release.ps1 -Compiler tools/.local/inno/compiler/ISCC.exe` build-2 run exits 0: release build **134.7s**, successful installer compile **20.297s**. Full payload includes release plugins, Flutter engine, PDFium, fonts/assets and installation instructions, excludes PDBs. Build logs are ignored `tools/.local/t19-package-final.log`.
+3. `flutter test --no-pub` exits 0: **81 tests** pass, including production configuration valid/invalid/extra fields/BOM/HTTPS/public key/version cases, file missing/corrupt/oversize and no rewrite, plus prior connection-failure/no-false-save and scope tests. Final analyzer exits 0/no issues (**17.5s**). Focused three config tests rerun after renaming the test to describe actual no-rewrite coverage; this is not an upgrade test.
+4. `python tools/tests/t19_package_audit.py <manifest>` exits 0: **24 staged files**; after actual installation, `--installed C:/Users/Naeem/AppData/Local/Programs/CarrierRecords` exits 0: **48 staged/installed file inspections**, exact byte/hash parity, no unexpected installed files beyond Inno uninstall files. Actual local public/test and privileged keys are read only in memory and absent, as are private-key/token/dump patterns. The installer hash independently matches its manifest.
+5. Installer `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART` exits 0 under the existing Windows user. Installed EXE file version is **0.1.0+2**, HKCU uninstall entry and intended per-user install location exist. Host VC runtime **14.51.36247** satisfies the checked **14.44.35207** minimum. This is the development PC, **not a clean-machine acceptance pass**.
+6. First hidden-launch probe incorrectly requires `Process.MainWindowHandle` within ten seconds and fails with “No installed app window”; stopped only its own process. Follow-up `t19_installed_smoke.ps1` enumerates windows owned by the launched PID, including hidden ones, and exits 0: owned Carrier Records window created, process alive/Responding, version correct, **windowVisible=false**, public config absent and **loginVerified=false**. Windows' visible-main-window selection explains the diagnostic failure. This proves process/window initialization only; it does not prove visual launch, login, secure-session restoration or clean-PC access. Both attempts are recorded, without claiming hidden execution as user acceptance.
+7. Existing read-only source/history audit exits 0 with no findings (initial 239 tracked/seven intended new files/387 historical blobs). Final staged audit also exits 0: **250 intended tracked files, zero untracked intended files, 387 reachable historical blobs**, no findings; 15,748 ignored local files remain outside the commit. Build artifacts, compiler/downloads/logs/manifests, receipts, backup/recovery files and private settings remain ignored and local. No production/backend data was provisioned or overwritten.
+8. Final build **0.1.0+3** includes the six linked core admin/pilot/recovery guides so installer documentation links work on another PC. Packaging exits 0: release **140.6s**, compiler **19.453s** (`tools/.local/t19-package-build3.log`). Release audit exits 0 for **30 staged files**, then **60 staged/installed inspections** with exact hash/byte parity and no sensitive material. Real installed update **0.1.0+2 → 0.1.0+3** exits 0 and preserves SHA-256 of a temporary synthetic PUBLIC config outside the program directory. The helper refuses any existing config, does not authenticate or use real accounts, and removes only its own unchanged test file afterward. `cleanMachine=false`, `authorizedAccessVerified=false`, `protectedSessionVerified=false` are recorded in `t19-update.json`. Actual clean-PC session/access preservation is still pending. Final hidden-process/window smoke exits 0 with public config absent; visible/login acceptance remains unverified. Earlier installer `app/build/windows/installer/0.1.0+2/CarrierRecords-0.1.0+2-windows-x64-setup.exe` (14,113,375 bytes, SHA-256 `7f486d9c16ca13c4d9ee1a7d2bb062c4ae83b4ddfe36d4972bbe06fac6d1c03d`) remains preserved and can provide the earlier candidate for a controlled clean-PC update check; build 3 is final.
+
+## Pending actual acceptance
+
+User said they will check installation themselves first and clarified printing means PDF. Prepared [installation/admin/update instructions](windows-installation.md) and [blank private pilot checklist](windows-pilot-checklist.md). No participant, operational record or sign-off was invented.
+
+- Separate clean Windows machine/VM installation, visible installed launch, actual backend/admin setup, username/password change, protected-session restart/logout and disabled/revoked access.
+- Installed origin/destination/report permissions and direct-request attacks as actual restricted staff, plus connection loss/canonical retry without false save.
+- Actual cross-version update with config hash, protected-session scope and refreshed authorized access preserved.
+- Customized multi-page PDF printing (the user's selected check), actual PDF/XLSX privacy/order/totals on the installed candidate. Prior T14/T18 generation/privacy/rendering evidence is not a T19 installed print-path result. Physical printing remains unverified; no hardware test is inferred from PDF generation or virtual printing.
+- Real office inputs/participants, new representative trip/customer/owner/broker/expense/held-money reconciliation, usable customized statements, and actual office pilot **and recovery** approval before broader rollout. Prior synthetic T17 restoration is technical evidence, not office sign-off.
+
+No hosted backend, real company/issuer/admin/office identities or active production schedule is claimed. Public config is deliberately absent on this PC until the administrator supplies it securely. Existing local bootstrap helper remains loopback-only; it was not weakened for hosted use. Do not run destructive test fixtures against real pilot data. T19 cannot be marked DONE on current evidence.
