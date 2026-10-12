@@ -1,3 +1,4 @@
+import '../features/backup/backup_workspace.dart';
 import '../features/imports/import_workspace.dart';
 import '../features/expenses/expense_workspace.dart';
 import '../features/expenses/expense_repository.dart';
@@ -284,6 +285,40 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       },
                     ),
                   if (p['role'] == 'ADMIN')
+                    FilledButton.icon(
+                      icon: const Icon(Icons.backup),
+                      label: const Text('Administrator backups'),
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => ListenableBuilder(
+                              listenable: widget.session,
+                              builder: (_, _) =>
+                                  widget.session.profile?['role'] == 'ADMIN' &&
+                                      widget
+                                              .session
+                                              .profile?['must_change_password'] ==
+                                          false
+                                  ? BackupWorkspace(
+                                      commands: BackupRepository(
+                                        widget.session.client,
+                                      ),
+                                    )
+                                  : const Scaffold(
+                                      body: Center(
+                                        child: Text(
+                                          'Administrator access required.',
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        );
+                        await widget.session.refresh();
+                      },
+                    ),
+                  if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
                   FilledButton.icon(
                     icon: const Icon(Icons.upload_file),
@@ -372,6 +407,13 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                     )
                                     .toList(),
                                 dashboard: dashboard,
+                                backupStatus: p['role'] == 'ADMIN'
+                                    ? BackupStatusPanel(
+                                        commands: BackupRepository(
+                                          widget.session.client,
+                                        ),
+                                      )
+                                    : null,
                                 guard: guard,
                                 outputs: OutputWorkspace(
                                   exporter: OutputExportService(

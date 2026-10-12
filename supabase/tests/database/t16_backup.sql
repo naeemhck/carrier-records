@@ -1,0 +1,13 @@
+begin;
+select plan(9);
+select has_function('public','get_backup_status',array[]::text[],'administrator backup status');
+select has_function('public','record_backup_status',array['uuid','uuid','uuid','text','text','jsonb','integer','text','jsonb'],'service-only report');
+select ok(not has_function_privilege('authenticated','public.record_backup_status(uuid,uuid,uuid,text,text,jsonb,integer,text,jsonb)','EXECUTE'),'ordinary admin cannot forge verified backup');
+select ok(has_function_privilege('service_role','public.record_backup_status(uuid,uuid,uuid,text,text,jsonb,integer,text,jsonb)','EXECUTE'),'trusted helper report available');
+select ok(not has_table_privilege('authenticated','private.backup_runs','SELECT'),'run details private');
+select ok(not has_table_privilege('authenticated','public.backup_status','UPDATE'),'no direct status changes');
+select ok(not has_table_privilege('anon','public.backup_status','SELECT'),'anonymous status unavailable');
+select ok((select relrowsecurity from pg_class where oid='private.backup_runs'::regclass),'run RLS enabled');
+select ok((select not rolcanlogin and not rolbypassrls from pg_roles where rolname='carrier_security'),'status owner restricted');
+select * from finish();
+rollback;

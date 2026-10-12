@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T15 DONE. Next: T16 backup helper, encryption and status. T16-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T16 DONE. Next: T17 restoration rehearsal. T17-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -225,11 +225,15 @@ Actual evidence: AT-30 PASS, including duplicate/concurrent batch retries, chang
 
 ### T16 — Backup helper, encryption and status
 
-Status: TODO | Dependencies: T03, T09, T13
+Status: DONE | Dependencies: T03, T09, T13
 
 Implement trusted administrator-only Windows helper and daily Task Scheduler setup. Use OS-protected credentials, database/Auth export, incremental receipt manifests/hashes, AES-GCM archives and a separate recovery key. Add manual action, last verified success, stale/failure indicators and off-PC reminder. Include backup traffic in free-tier monitoring.
 
 Evidence: AT-31 passes for archive creation/failure handling and key protection. No backup secret is included in the distributed staff app.
+
+Actual T16 evidence (2026-10-12): AT-31 PASS. The original scheduler failure was a version-1 contract mismatch: setup writes required supabase_url but the validator rejected it as unknown. Fixed the allowlist/required field and shared safe endpoint checks without weakening unknown-field/path/credential/admin restrictions. Regression red: 11 tests/two errors; final green: 11 tests PASS. Real invalid configuration cannot register a task; actual temporary daily/logon/hourly registration, StartWhenAvailable, scheduled online catch-up after a simulated 48-hour gap and NOT_DUE duplicate retry PASS. Temporary task/vault values removed; production helper/schedule remain unconfigured, exact setup/elevation steps in docs/backups-setup.md.
+
+Full T03-T16 command exits 0 with 1,486 main-harness PASS lines plus 32 real-helper checks. Actual database/Auth exports, incremental private receipt blobs, AES-GCM/recovery-key protection, failure/interruption/status reporting, administrator-only access and financial nonmutation pass. Clean 18 migrations; 219 SQL assertions/15 files, lint (no errors; unused-variable and existing-function warnings recorded)/advisors PASS. Analyzer no issues; 78 Flutter tests PASS; Windows/Android builds PASS (53.1s/63.0s). Package/source/history audits find no secrets; HTTP200/PGready, all synthetic rows zero and test privileges/config removed. Evidence: docs/backups-evidence.md records original failure/cause/fix and actual commands. Archive integrity does not prove restoration; T17 remains TODO. Local commit only, no push.
 
 ### T17 — Restoration rehearsal
 

@@ -16,6 +16,7 @@ class ReportWorkspace extends StatefulWidget {
     this.dashboard = false,
     this.guard = unguardedTrip,
     this.outputs,
+    this.backupStatus,
   });
   final ReportCommands reports;
   final TripRepository trips;
@@ -24,6 +25,7 @@ class ReportWorkspace extends StatefulWidget {
   final bool dashboard;
   final Widget Function(Widget) guard;
   final Widget? outputs;
+  final Widget? backupStatus;
   @override
   State<ReportWorkspace> createState() => _ReportWorkspaceState();
 }
@@ -158,6 +160,8 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (widget.dashboard && widget.backupStatus != null)
+            widget.backupStatus!,
           Wrap(
             spacing: 12,
             runSpacing: 12,

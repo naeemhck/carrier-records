@@ -47,6 +47,8 @@ receipts/
 exports/
 *.dump
 *.sql.gz
+*.crb
+*.recovery.json
 *.apk
 *.aab
 *.msix
