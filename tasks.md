@@ -281,6 +281,8 @@ Post-deployment retry still fails per user (existing/new lengths 8/13). Actual h
 
 Fresh restart/sign-in still fails per user. Windows diagnostic candidate **0.1.0+4** adds server-owned safe failure-stage codes and client allowlisted messages/HTTP status with no private response echo. Final T03 API 169 checks, Flutter 83 tests, analyzer/no issues pass. Release 274.2s/Inno 24.875s; artifact `app/build/windows/installer/0.1.0+4/CarrierRecords-0.1.0+4-windows-x64-setup.exe`, 14,123,997 bytes, SHA-256 `c77439b6d4e6ac8e5f0ea781ad8b6229ced242609a47d16c503d217454d3dfc8`. User confirms app closed; installed update exits 0/version4/current public config hash preserved. Stage/installed audits pass 30/60 inspections; source/history 251 tracked/two new/416 blobs/no findings. Existing account untouched; actual updated-app error/login remains pending, no clean-PC/session/office PASS inferred. No Android build, push or schedule change; T19 IN PROGRESS/T20 TODO.
 
+Post-update installed login observed: user confirms password changed, signed in with new credential and dashboard visible. Read-only backend verifies active/version 3/forced-change false/not pending, one password operation/current session. Existing identity preserved. Normal initial office creation/reuse and explicit existing-admin assignments now being guided; no raw writes or password gate bypass. Development-PC login is a narrow actual result, not clean-PC/protected restart/logout/restricted-staff/network/physical-print/pilot acceptance. Earlier post-fix retry cause not conclusively observed. T19 remains IN PROGRESS.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
