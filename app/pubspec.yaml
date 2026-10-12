@@ -21,6 +21,7 @@ dependencies:
   archive: 4.5.1
   crypto: 3.0.7
   share_plus: 13.3.1
+  xml: 7.0.1
 
 dev_dependencies:
   integration_test:

@@ -1,3 +1,4 @@
+import '../features/imports/import_workspace.dart';
 import '../features/expenses/expense_workspace.dart';
 import '../features/expenses/expense_repository.dart';
 
@@ -284,6 +285,47 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text('Excel imports'),
+                    onPressed: () async {
+                      final scope = tripScope(p);
+                      Widget guard(Widget child) => ListenableBuilder(
+                        listenable: widget.session,
+                        builder: (_, _) =>
+                            tripScope(widget.session.profile) == scope &&
+                                widget
+                                        .session
+                                        .profile?['must_change_password'] ==
+                                    false
+                            ? child
+                            : const Scaffold(
+                                body: Center(
+                                  child: Text(
+                                    'Current office access required.',
+                                  ),
+                                ),
+                              ),
+                      );
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => guard(
+                            ImportWorkspace(
+                              client: widget.session.client,
+                              offices: (p['offices'] as List)
+                                  .map(
+                                    (o) => Map<String, dynamic>.from(o as Map),
+                                  )
+                                  .toList(),
+                              guard: guard,
+                            ),
+                          ),
+                        ),
+                      );
+                      await widget.session.refresh();
+                    },
+                  ),
                   for (final dashboard in [true, false])
                     FilledButton.icon(
                       icon: Icon(

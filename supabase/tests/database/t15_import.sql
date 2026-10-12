@@ -1,0 +1,16 @@
+begin;
+select plan(12);
+select has_function('public','get_import_templates',array[]::text[],'server-owned import catalogue');
+select has_function('public','validate_import',array['jsonb'],'review validation');
+select has_function('public','commit_import',array['jsonb','uuid','boolean'],'atomic reviewed commit');
+select has_function('public','confirm_import_expense',array['uuid','integer','uuid','jsonb'],'normal expense confirmation');
+select ok(not has_table_privilege('authenticated','public.import_batches','INSERT'),'no direct batch insert');
+select ok(not has_table_privilege('authenticated','public.import_rows','UPDATE'),'no direct imported row rewrite');
+select ok(not has_table_privilege('authenticated','private.import_reviews','SELECT'),'reviews private');
+select ok(not has_function_privilege('authenticated','private.import_apply(jsonb,boolean)','EXECUTE'),'cannot invoke private apply');
+select ok(not has_function_privilege('anon','public.commit_import(jsonb,uuid,boolean)','EXECUTE'),'anonymous commit unavailable');
+select ok((select relrowsecurity from pg_class where oid='private.import_expense_drafts'::regclass),'expense draft RLS');
+select ok((select attgenerated='s' from pg_attribute where attrelid='public.expense_categories'::regclass and attname='code'),'stable category code generated');
+select ok((select not rolcanlogin and not rolbypassrls from pg_roles where rolname='carrier_security'),'import command owner narrowly privileged');
+select * from finish();
+rollback;

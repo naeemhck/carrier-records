@@ -393,6 +393,7 @@ class ExpenseEntry extends StatefulWidget {
     required this.offices,
     required this.guard,
     this.picker,
+    this.initialDraft,
   });
   final ExpenseCommands expenses;
   final FinancialCommands finance;
@@ -401,6 +402,7 @@ class ExpenseEntry extends StatefulWidget {
   final List<Map<String, dynamic>> offices;
   final ExpenseGuard guard;
   final ReceiptPicker? picker;
+  final Map<String, dynamic>? initialDraft;
   @override
   State<ExpenseEntry> createState() => _ExpenseEntryState();
 }
@@ -431,6 +433,27 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
   void initState() {
     super.initState();
     office = widget.offices.firstOrNull?['id'] as String?;
+    final d = widget.initialDraft;
+    if (d != null) {
+      final p = Map<String, dynamic>.from(d['payload'] as Map);
+      vehicle = MasterRecord(Map<String, dynamic>.from(d['vehicle'] as Map));
+      category = MasterRecord(Map<String, dynamic>.from(d['category'] as Map));
+      payer = MasterRecord(Map<String, dynamic>.from(d['payer'] as Map));
+      bearer = MasterRecord(Map<String, dynamic>.from(d['bearer'] as Map));
+      office = p['office_id'] as String;
+      owner = vehicle!.data['current_owner_id'] as String;
+      amount.text = p['amount'] as String;
+      notes.text = p['reason'] as String;
+      date.text = p['effective_date'] as String;
+      funding = ExpenseFunding.values.firstWhere(
+        (f) => f.key == p['funding_source'],
+      );
+      if (d['trip'] != null) {
+        trip = Map<String, dynamic>.from(d['trip'] as Map);
+        owner = trip!['owner_id'] as String;
+        WidgetsBinding.instance.addPostFrameCallback((_) => reload());
+      }
+    }
   }
 
   @override

@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T14 DONE. Next: T15 template-based Excel imports. T15-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T15 DONE. Next: T16 backup helper, encryption and status. T16-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -217,11 +217,11 @@ Verification: AT-24/28/29 and all T14 checks pass. Clean local reset applied 16 
 
 ### T15 — Template-based Excel imports
 
-Status: TODO | Dependencies: T04, T05, T09
+Status: DONE | Dependencies: T04, T05, T09
 
 Define versioned templates for parties, vehicles, routes, trip/consignment/stop/car drafts and expense drafts. Resolve by stable record codes, use unambiguous dates and decimal values, reject formulas and show row-level errors. Repeat validation on the server and commit the reviewed draft batch atomically. Confirmation then follows normal operational/financial workflows.
 
-Evidence: AT-30 passes, including duplicate batch retry, ambiguous references, invalid amounts and no partial commit. No historical/opening-balance import is added.
+Actual evidence: AT-30 PASS, including duplicate/concurrent batch retries, changed bodies/actors, ambiguous/unknown references, exact amount/date errors, staff master denial, office revocation, modified API calls, orphan children and deferred late failure with no partial commit. Full T03-T15 backend/native regression exits 0 with 1,465 PASS checks and cleanup. Windows real XLSX template/preview/cancel/confirm flow PASS (118.5s build, 6s test), with independent persisted draft and eight-sheet file inspection. Analyzer no issues; 77 Flutter tests PASS. Final clean 17-migration reset; 210 SQL assertions/14 files, lint/security advisors PASS. Windows/Android ordinary debug builds PASS (54.4s/189.9s); 792-entry privileged-value audit and source/history audit no findings. HTTP200/PGready, synthetic rows zero and test configuration removed. Normal expense confirmation is separate and retry-safe. No historical/opening-balance or journal import is added. T15 gate passes. Evidence: docs/imports-evidence.md; usage: docs/imports-setup.md. Local commit precedes T16; no GitHub push.
 
 ### T16 — Backup helper, encryption and status
 
