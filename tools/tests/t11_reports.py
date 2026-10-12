@@ -1,5 +1,5 @@
 """Isolated local report acceptance and five-user annual benchmark; no real data."""
-import copy,json,time,uuid,platform,statistics
+import base64,copy,json,time,uuid,platform,statistics,math
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
@@ -79,18 +79,34 @@ def verify(env):
         return
     # One year, 1,000 dispatched/arrived trips each month, twenty vehicles.
     # Only this empty loopback business exists; fixtures never enter source control.
+    seed_start=time.perf_counter()
     sql(f"""begin;
     insert into public.vehicles(id,business_id,registration,current_owner_id) select gen_random_uuid(),'{b}','BENCH-'||i,'{owner['id']}' from generate_series(1,20)i;
     create temporary table bench as select gen_random_uuid() tid,gen_random_uuid() eid,gen_random_uuid() cid,gen_random_uuid() xid,gen_random_uuid() xeid,w.id vid,i,(date '2026-01-01'+((i-1)/1000)*interval '1 month')::date as business_day from generate_series(1,12000)i join (select id,row_number()over(order by registration) n from public.vehicles where business_id='{b}' and registration like 'BENCH-%')w on w.n=1+(i-1)%20;
     insert into public.trips(id,business_id,trip_number,vehicle_id,origin_office_id,destination_office_id,owner_id,owner_snapshot,load_kind,state,dispatch_date,arrival_date) select tid,'{b}','BENCH-'||i,vid,'{off[0]}','{off[1]}','{owner['id']}',jsonb_build_object('display_name','Synthetic T11 OWNER'),'LOADED','ARRIVED',business_day,business_day+1 from bench;
+    analyze public.trips;
     insert into public.consignments(id,business_id,trip_id,customer_id,broker_id,car_count,quoted_amount,quote_mode,commission_method,commission_value,commission,customer_charge,owner_entitlement) select cid,'{b}',tid,'{customer['id']}','{broker['id']}',1,100000,'DEDUCTED','FIXED',5000,5000,100000,95000 from bench;
+    analyze public.consignments;
     insert into public.financial_events(id,business_id,kind,effective_date,actor_id,office_id,vehicle_id,trip_id,consignment_id,amount,request_id) select eid,'{b}','DISPATCH',business_day,'{env['ap']['id']}','{off[0]}',vid,tid,cid,100000,gen_random_uuid() from bench;
+    analyze public.financial_events;
     insert into public.journal_lines(business_id,event_id,party_id,office_id,vehicle_id,trip_id,consignment_id,account_purpose,signed_amount) select '{b}',eid,z.party,'{off[0]}',vid,tid,cid,z.purpose,z.amount from bench cross join(values('{customer['id']}'::uuid,'CUSTOMER_RECEIVABLE',100000),('{owner['id']}'::uuid,'OWNER_PAYABLE',-95000),('{broker['id']}'::uuid,'BROKER_COMMISSION_PAYABLE',-5000))z(party,purpose,amount);
     insert into public.expenses(id,business_id,vehicle_id,trip_id,office_id,category_id,expense_date,amount,payer_id,cost_bearer_id,funding_source,state,owner_id) select xid,'{b}',vid,tid,'{off[0]}','{category['id']}',business_day+2,100,'{owner['id']}','{owner['id']}','SELF_FUNDED_COST','CONFIRMED','{owner['id']}' from bench;
+    analyze public.expenses;
     insert into public.financial_events(id,business_id,kind,effective_date,actor_id,office_id,vehicle_id,trip_id,expense_id,amount,request_id) select xeid,'{b}','EXPENSE',business_day+2,'{env['ap']['id']}','{off[0]}',vid,tid,xid,100,gen_random_uuid() from bench;
-    commit;analyze public.trips;analyze public.financial_events;analyze public.journal_lines;analyze public.expenses;""")
+    analyze public.trips;analyze public.financial_events;analyze public.journal_lines;analyze public.expenses;commit;""")
     args={'report_kind':'MONTHLY_VEHICLE','filters':{'from':'2026-12-01','to':'2026-12-31','search':'BENCH'},'page_offset':0}
+    seed_seconds=time.perf_counter()-seed_start
     measured=success('T11 annual fixture exact summary',rpc('get_scoped_report',args,st));ok('T11 benchmark counts and amounts',measured['totals']['dispatched']=='1000.00' and measured['totals']['owner_earnings']=='95000000.00' and measured['totals']['vehicle_cost']=='100000.00' and measured['row_count']==20)
+    if '--reports-diagnose' in sys.argv:
+        claims=json.loads(base64.urlsafe_b64decode(st.split('.')[1]+'==='))
+        statement="begin;select set_config('request.jwt.claims',"+"'"+json.dumps(claims).replace("'","''")+"',true);load 'auto_explain';set client_min_messages=log;set auto_explain.log_min_duration=0;set auto_explain.log_analyze=true;set auto_explain.log_buffers=true;set auto_explain.log_timing=false;set auto_explain.log_nested_statements=true;set role authenticated;select public.get_scoped_report('MONTHLY_VEHICLE','"+json.dumps(args['filters']).replace("'","''")+"',0);rollback;"
+        trace=env['subprocess'].run(['docker','exec','-i','supabase_db_transport_project','psql','-U','supabase_admin','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=statement,text=True,capture_output=True)
+        safe=trace.stderr
+        for value in [env['secret'],env['anon'],st,env['real'],env['cfg'].get('JWT_SECRET','')]:
+            if value:safe=safe.replace(value,'<redacted>')
+        Path(env['ROOT']/'tools/.local/t18-query-plan.log').write_text(safe,encoding='utf-8')
+        ok('T18 nested EXPLAIN actual restricted-role report captured',trace.returncode==0)
+        return
     def worker(token):
         times={'summary':[],'screen':[]}
         for _ in range(10):
@@ -99,10 +115,14 @@ def verify(env):
         return times
     results=list(ThreadPoolExecutor(max_workers=5).map(worker,tokens));measure={}
     for key in ['summary','screen']:
-        values=sorted(v for r in results for v in r[key]);measure[key]={'requests':len(values),'p50_seconds':round(statistics.median(values),4),'p95_seconds':round(values[int(len(values)*.95)-1],4),'max_seconds':round(max(values),4)}
+        values=sorted(v for r in results for v in r[key]);measure[key]={'requests':len(values),'p50_seconds':round(statistics.median(values),4),'p95_seconds':round(values[math.ceil(len(values)*.95)-1],4),'max_seconds':round(max(values),4),'percentile_method':'nearest rank ceil(0.95*N)'}
     cpu=env['subprocess'].run(['powershell','-NoProfile','-Command','Get-CimInstance Win32_Processor | Select-Object Name,NumberOfLogicalProcessors | ConvertTo-Json -Compress'],capture_output=True,text=True).stdout.strip()
     evidence={'fixture_trips':12000,'months':12,'trips_per_month':1000,'vehicles':20,'concurrent_users':5,'network':'HTTP loopback 127.0.0.1:54321; active local Docker backend; not a hosted network benchmark','platform':platform.platform(),'cpu':cpu,'measurements':measure}
-    Path(env['ROOT']/'tools/.local/t11-performance.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8');print('T11 measured '+json.dumps(evidence),flush=True)
+    evidence['database_bytes']=int(sql('select pg_database_size(current_database())'))
+    evidence['fixture_setup_seconds']=round(seed_seconds,3)
+    evidence['docker_resources']=env['subprocess'].run(['docker','info','--format','CPUs={{.NCPU}} MemoryBytes={{.MemTotal}}'],capture_output=True,text=True,check=True).stdout.strip()
+    samples={key:[round(v,6) for r in results for v in r[key]] for key in ['summary','screen']}
+    Path(env['ROOT']/'tools/.local/t11-performance.json').write_text(json.dumps(evidence|{'latencies_seconds':samples},indent=2),encoding='utf-8');print('T11 measured '+json.dumps(evidence),flush=True)
     ok('T11 monthly summary p95 <=5s',measure['summary']['p95_seconds']<=5)
     ok('T11 paginated screen p95 <=2s',measure['screen']['p95_seconds']<=2)
     # More than one report page, preserving canonical whole-filter totals.

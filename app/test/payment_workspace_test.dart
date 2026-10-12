@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:carrier_records/core/domain/record_context.dart';
 import 'package:carrier_records/features/finance/financial_repository.dart';
@@ -184,7 +185,7 @@ void main() {
       await tester.pump();
       expect(find.text('Payment confirmed. Balances reloaded.'), findsNothing);
       expect(fake.requests.length, 1);
-      fake.pending.completeError(Exception('Lost response'));
+      fake.pending.completeError(const SocketException('Lost response'));
       await tester.pumpAndSettle();
       expect(find.text('Synthetic review'), findsOneWidget);
       fake.pending = Completer();

@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T17 DONE. Next: T18 security, resilience and performance gate. T18-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T18 DONE. Next: T19 Windows installer and office pilot; T19-T20 TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -247,11 +247,13 @@ T17 actual evidence (2026-10-12): AT-32 complete rehearsal exits 0. Measured rec
 
 ### T18 — Security, resilience and performance gate
 
-Status: TODO | Dependencies: T10–T17
+Status: DONE | Dependencies: T10–T17
 
 Run integrated acceptance suite using real restricted roles, altered requests, concurrent operations and connection faults. Audit client artifacts for secrets and exported files for forbidden fields. Seed one isolated year at the benchmark load and measure five-user concurrency, pagination and summaries.
 
 Evidence: All applicable AT checks pass; p95 targets/results/environment recorded; remaining provider/runtime limits stated. No fabricated timing or coverage results.
+
+T18 actual evidence (2026-10-12): optimized integrated/native-export/current-schema restore run exits 0 with 1,527 parent checks plus 32 real-helper/54 restore checks. Real restricted roles, altered direct requests, recipient/preset privacy, locked concurrent claims, exact/idempotent posting, deferred rollback and before/after-commit connection loss/expired sessions pass without false confirmation. Initial AT-33 profile-shape KeyError and T04 initial-state fixture conflict are recorded; corrected AT-33/T04 standalone run exits 0 (332 checks). First annual benchmark failed summary p95 5.2039s; actual nested plan exposed 43,000 fact rows/materialization/temp spills. Two-function migration narrows intermediate projections and aggregates report groups earlier with unchanged owner/ACL/definer/search_path/permissions/money/date contracts. Final 12,000-trip/five-user benchmark: summary p95 3.2032s, 50-row screen p95 0.2951s (50 requests each, nearest rank, independently recomputed samples); fixture statistics before parent/commit checks reduce setup to 19.258s without disabling integrity. Nineteen migrations replay/diff cleanly, 219 SQL assertions, analyzer/78 Flutter tests pass. Fresh eight PDF/XLSX pairs/61 pages privacy/content audits and selected Poppler visual reviews pass; Windows/Android debug builds pass (final ordinary Windows 33.7s, Android 236.1s). Current-schema restore 88.202s verifies 123 trips/222 events/22 reversals/17 documents/7 objects/22 users/16 assignments. Package/source/history audits and zero-fixture HTTP200/PGready health pass. Existing lint/advisor/toolchain warnings and loopback limits recorded, not hidden. Evidence: docs/security-performance-evidence.md. Physical-printer/installer-pilot/Android-device AT-35 gates remain T19/T20. Local commit only; no push or production scheduling.
 
 ### T19 — Windows installer and office pilot
 

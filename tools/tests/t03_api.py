@@ -221,6 +221,9 @@ try:
     if '--restore' in sys.argv:
         from t17_restoration import verify
         verify(globals())
+    if '--resilience' in sys.argv:
+        from t18_resilience import verify
+        verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify
         verify(globals())
