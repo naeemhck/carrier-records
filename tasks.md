@@ -289,6 +289,8 @@ Existing-account assignments now verified: after normal Save account and user su
 
 Installed development-PC session checks: user explicitly reports PASS for signed-in close/reopen restoring dashboard and Sign out/close/reopen requiring login. Recorded as user-observed results only; no protected-store extraction/native UI observation claimed. Windows-restart persistence requested next and remains pending, alongside role-switch/disabled/revoked staff, clean-PC, network/physical-print/pilot/recovery gates. T19 IN PROGRESS/T20 TODO; no push or scheduling.
 
+Windows-restart session persistence explicitly deferred by user because they cannot restart now; NOT RUN/pending. Continue independent T19 field checks without rebooting. Existing close/reopen/logout reports retained; T19 IN PROGRESS/T20 TODO.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
