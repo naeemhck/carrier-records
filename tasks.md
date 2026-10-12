@@ -279,6 +279,8 @@ Existing-account/password follow-up (2026-10-12): verified exactly one confirmed
 
 Post-deployment retry still fails per user (existing/new lengths 8/13). Actual hosted password-change issue remains unresolved, not a field PASS. Account function ACTIVE/version 2 verified; read-only profile remains active/version 1/forced change/not pending, one session, zero password operations. Fresh installed restart/sign-in/change requested, result pending. Fresh source/history audit passes 251 files/411 blobs/no findings, unchanged installed package audit passes 60 inspections, local fixture users/businesses/disabled triggers zero; diff check passes.
 
+Fresh restart/sign-in still fails per user. Windows diagnostic candidate **0.1.0+4** adds server-owned safe failure-stage codes and client allowlisted messages/HTTP status with no private response echo. Final T03 API 169 checks, Flutter 83 tests, analyzer/no issues pass. Release 274.2s/Inno 24.875s; artifact `app/build/windows/installer/0.1.0+4/CarrierRecords-0.1.0+4-windows-x64-setup.exe`, 14,123,997 bytes, SHA-256 `c77439b6d4e6ac8e5f0ea781ad8b6229ced242609a47d16c503d217454d3dfc8`. User confirms app closed; installed update exits 0/version4/current public config hash preserved. Stage/installed audits pass 30/60 inspections; source/history 251 tracked/two new/416 blobs/no findings. Existing account untouched; actual updated-app error/login remains pending, no clean-PC/session/office PASS inferred. No Android build, push or schedule change; T19 IN PROGRESS/T20 TODO.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19

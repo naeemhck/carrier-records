@@ -54,7 +54,9 @@ try:
     version=profile(at)['version']
     for current in ['',None,123,'x'*129]:
         ok('invalid current credential rejected',edge({'action':'change','current_password':current,'password':real,'expected_version':version},at)[0]==400)
-    ok('incorrect short current credential denied by Auth',edge({'action':'change','current_password':'wrong123','password':real,'expected_version':version},at)[0]==403)
+    rejected_code,rejected_body=edge({'action':'change','current_password':'wrong123','password':real,'expected_version':version},at)
+    ok('incorrect short current credential denied by Auth',rejected_code==403)
+    ok('safe account failure identifies stage without credentials',rejected_body.get('error_code')=='CURRENT_PASSWORD_VERIFICATION_FAILED' and all(x not in json.dumps(rejected_body) for x in [legacy_password,real,at]))
     for next_password in ['x'*11,'x'*129,None]:
         ok('new password policy preserved',edge({'action':'change','current_password':legacy_password,'password':next_password,'expected_version':version},at)[0]==400)
     ok('rejected changes preserve password gate and version',profile(at)['version']==version and profile(at)['must_change_password'] is True)

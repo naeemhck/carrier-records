@@ -3,11 +3,14 @@ const url = Deno.env.get('SUPABASE_URL')!;
 const publicKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const secret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
-class ApiError extends Error { constructor(public status: number, message: string) { super(message); } }
+class ApiError extends Error { constructor(public status: number, message: string, public code = 'ACCOUNT_REQUEST_REJECTED') { super(message); } }
 async function call(path: string, key: string, token: string, body?: unknown, method = 'POST'): Promise<any> {
  const response = await fetch(`${url}${path}`, { method, headers: { apikey: key, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, ...(body === undefined ? {} : {body: JSON.stringify(body)}) });
  const data = await response.json().catch(() => null);
- if (!response.ok) throw new ApiError(response.status === 409 || data?.code === '40001' ? 409 : 403, data?.code === '40001' ? 'Record changed. Reload and retry.' : 'Request denied or unavailable.');
+ if (!response.ok) {
+ const code = path.startsWith('/auth/v1/token') ? 'CURRENT_PASSWORD_VERIFICATION_FAILED' : path === '/auth/v1/user' ? 'ACCOUNT_SESSION_REJECTED' : path.endsWith('/get_session_profile') ? 'ACCOUNT_ACCESS_REJECTED' : path.endsWith('/begin_staff_password') ? 'PASSWORD_PREPARATION_FAILED' : 'ACCOUNT_SERVICE_REJECTED';
+ throw new ApiError(response.status === 409 || data?.code === '40001' ? 409 : 403, data?.code === '40001' ? 'Record changed. Reload and retry.' : 'Request denied or unavailable.', code);
+ }
  return data;
 }
 function password(value: unknown): string {
@@ -77,6 +80,6 @@ Deno.serve(async request => {
  }
  return respond(200,{sign_in_required:true});
  } catch (error) {
- return respond(error instanceof ApiError ? error.status : 400,{error:error instanceof ApiError ? error.message : 'Invalid request.'});
+ return respond(error instanceof ApiError ? error.status : 400,{error:error instanceof ApiError ? error.message : 'Invalid request.',error_code:error instanceof ApiError ? error.code : 'ACCOUNT_REQUEST_INVALID'});
  }
 });

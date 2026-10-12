@@ -17,6 +17,7 @@ import '../features/reports/output_export_service.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/staff_session.dart';
+import '../features/auth/account_error.dart';
 import '../features/masters/master_repository.dart';
 import '../features/masters/master_workspace.dart';
 import '../features/trips/trip_draft.dart';
@@ -125,8 +126,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
       password.clear();
       next.clear();
       confirm.clear();
-    } catch (_) {
-      if (mounted) message = 'Request failed. Check your credentials, connection or administrator access.';
+    } catch (error) {
+      if (mounted) message = accountErrorMessage(error);
     } finally {
       if (mounted) setState(() => busy = false);
     }
