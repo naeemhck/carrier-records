@@ -9,6 +9,7 @@ import '../features/reports/report_repository.dart';
 import '../features/reports/report_workspace.dart';
 import '../features/reports/output_repository.dart';
 import '../features/reports/output_workspace.dart';
+import '../features/reports/document_repository.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -330,6 +331,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                 dashboard: dashboard,
                                 guard: guard,
                                 outputs: OutputWorkspace(
+                                  documents: DocumentRepository(
+                                    widget.session.client,
+                                  ),
                                   commands: OutputRepository(
                                     widget.session.client,
                                   ),

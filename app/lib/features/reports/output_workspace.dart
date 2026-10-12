@@ -5,6 +5,8 @@ import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../trips/trip_workspace.dart';
 import 'output_repository.dart';
+import 'document_repository.dart';
+import 'document_workspace.dart';
 
 const outputReports = {
   'MONTHLY_VEHICLE': 'Vehicle monthly',
@@ -32,6 +34,9 @@ class OutputWorkspace extends StatefulWidget {
     required this.offices,
     required this.administrator,
     this.guard = unguardedTrip,
+    this.documents,
+    this.initialCommand,
+    this.supersedesId,
   });
   final OutputCommands commands;
   final MasterRepository masters;
@@ -39,6 +44,9 @@ class OutputWorkspace extends StatefulWidget {
   final List<Map<String, dynamic>> offices;
   final bool administrator;
   final Widget Function(Widget) guard;
+  final DocumentCommands? documents;
+  final Map<String, dynamic>? initialCommand;
+  final String? supersedesId;
   @override
   State<OutputWorkspace> createState() => _OutputWorkspaceState();
 }
@@ -90,6 +98,24 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
   @override
   void initState() {
     super.initState();
+    final initial = widget.initialCommand;
+    if (initial != null) {
+      report = initial['report_kind'] as String;
+      recipient = initial['recipient_kind'] as String;
+      party = initial['recipient_id'] as String?;
+      final f = initial['filters'] as Map;
+      from.text = f['from'] as String;
+      to.text = f['to'] as String;
+      office = f['office_id'] as String?;
+      vehicle = f['vehicle_id'] as String?;
+      owner = f['owner_id'] as String?;
+      trip = f['trip_id'] as String?;
+      search.text = f['search'] as String? ?? '';
+      event = initial['event_id'] as String?;
+      partyName = 'Saved document recipient';
+      tripName = trip == null ? null : 'Saved document trip';
+      eventName = event == null ? null : 'Saved document payment';
+    }
     load();
   }
 
@@ -126,6 +152,16 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
         presets = p;
         orientation = 'AUTO';
         sheet.text = 'Records';
+        if (widget.initialCommand?['field_order'] != null) {
+          selection!.load(
+            (widget.initialCommand!['field_order'] as List).cast<String>(),
+          );
+          orientation =
+              widget.initialCommand!['format_options']['orientation'] ?? 'AUTO';
+          sheet.text =
+              widget.initialCommand!['format_options']['sheet_name'] ??
+              'Records';
+        }
       });
     } catch (e) {
       if (mounted) setState(() => error = outputError(e));
@@ -249,6 +285,79 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
       }
     }
   }
+
+  Future<void> issueDocument() async {
+    final committed = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => widget.guard(
+        IssueDocumentDialog(
+          commands: widget.documents!,
+          superseding: widget.supersedesId != null,
+          payload: {
+            'report_kind': report,
+            'recipient_kind': recipient,
+            'recipient_id': party,
+            'filters': filters,
+            'field_order': List.of(selection!.order),
+            'format_options': {
+              'orientation': orientation,
+              'sheet_name': sheet.text.trim(),
+            },
+            'preset_id': presetId,
+            'event_id': event,
+            'supersedes_id': widget.supersedesId,
+          },
+        ),
+      ),
+    );
+    if (committed != null && mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => widget.guard(IssuedDocumentView(document: committed)),
+        ),
+      );
+      if (mounted) setState(() => preview = null);
+    }
+  }
+
+  void supersede(Map<String, dynamic> contextCommand, String id) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => widget.guard(
+          OutputWorkspace(
+            commands: widget.commands,
+            masters: widget.masters,
+            trips: widget.trips,
+            offices: widget.offices,
+            administrator: widget.administrator,
+            guard: widget.guard,
+            documents: widget.documents,
+            initialCommand: contextCommand,
+            supersedesId: id,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget previewPanel() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (widget.documents != null &&
+          ['CUSTOMER_INVOICE', 'PAYMENT_RECEIPT'].contains(report) &&
+          recipient != 'INTERNAL')
+        FilledButton(
+          onPressed: busy ? null : issueDocument,
+          child: const Text('Issue document'),
+        ),
+      OutputPreview(
+        data: preview!,
+        onPage: (start) => prepare(start: start),
+        busy: busy,
+      ),
+    ],
+  );
 
   Future<void> manage({
     Map<String, dynamic>? existing,
@@ -620,7 +729,30 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
       ),
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Outputs and presets')),
+      appBar: AppBar(
+        title: Text(
+          widget.supersedesId == null
+              ? 'Outputs and presets'
+              : 'Superseding document',
+        ),
+        actions: [
+          if (widget.documents != null)
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => widget.guard(
+                    DocumentWorkspace(
+                      commands: widget.documents!,
+                      onSupersede: supersede,
+                      guard: widget.guard,
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('Issued documents'),
+            ),
+        ],
+      ),
       body: wide
           ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,11 +768,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                         )
                       : SingleChildScrollView(
                           padding: const EdgeInsets.all(16),
-                          child: OutputPreview(
-                            data: preview!,
-                            onPage: (start) => prepare(start: start),
-                            busy: busy,
-                          ),
+                          child: previewPanel(),
                         ),
                 ),
               ],
@@ -656,11 +784,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    child: OutputPreview(
-                      data: preview!,
-                      onPage: (start) => prepare(start: start),
-                      busy: busy,
-                    ),
+                    child: previewPanel(),
                   ),
                 ),
               ],

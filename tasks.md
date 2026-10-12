@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T12 DONE. Next: T13 immutable document issuance. T13-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T13 DONE. Next: T14 PDF, print and Excel export. T14-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -199,11 +199,13 @@ AT-23/25 PASS: required locks, default reset, ordering, eligible-only selection,
 
 ### T13 — Immutable document issuance
 
-Status: TODO | Dependencies: T10, T12
+Status: DONE | Dependencies: T10, T12
 
 Implement transactional numbering, customer-per-trip grouping, company/issuer/recipient snapshots, selected output configuration, template version, content digest and supersession links. Reprint from snapshots, not current source joins.
 
 Evidence: AT-26/27 pass, including simultaneous issuance, changed issuer/company names and changed presets.
+
+Executed: clean fifteen-migration reset, 194 SQL assertions/lint/security advisors, analyzer and 61 Flutter tests PASS. Full T03/T05-T13 real backend/native regression exits 0 with 1,347 PASS checks and zero-fixture cleanup. Windows actual permanent issuance/snapshot UI PASS (64.9s build/10s test); ordinary Windows/Android debug builds PASS (47.4s/58.3s). Source/package audit passes 753 entries; source/history audit no findings. Health HTTP200/PGready, 27 public/12 private/Auth/Storage records zero, no disabled triggers/temporary grants/native config. AT-26/27 simultaneous distinct/duplicate issuance, independent digest, customer-per-trip grouping, exact retries including after supersession, current permissions, direct attacks, commit rollback, changed company/issuer/recipient/preset/source fare and competing supersessions PASS. Original content/number/digest retained; replacement linked with new identity/values. Issuance never posts money. Actual failures, fixes, contracts and hashes: docs/documents-evidence.md; guide: docs/documents-setup.md. T13 gate passes; separate local commit precedes T14. No push.
 
 ### T14 — PDF, print and Excel export
 
