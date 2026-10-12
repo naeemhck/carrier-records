@@ -307,6 +307,8 @@ Continue-without-Computer verification: every gate/status in docs/t19-test-regis
 
 Latest installed-hosted @Computer request: initial/two-second-retry/reset-reinitialize native inventories all fail unchanged missing-pipe/os error2; SCREEN-01/02/03 individually documented. No app/password screen/credential entry/screenshot/input or hosted UI test performed; asked ChatGPT-only restart status, pending. No substitute local run/hosted writes/push/scheduling. Windows restart deferred/T19 IN PROGRESS/T20 TODO.
 
+User reports Computer Use works in another chat. Current chat enabled surfaces apps=[]/browser-only, direct native list_windows still missing pipe/os error2 (SCREEN-04/05). Likely chat-specific native attachment; cause unknown, no global plugin failure inferred. Working-chat continuation prompt in docs/computer-use-test-handoff.md preserves existing accounts/state/every-test documentation; no new hosted UI PASS. Restart deferred/T19 IN PROGRESS/T20 TODO/no push.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19

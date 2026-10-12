@@ -524,7 +524,11 @@ User explicitly requests screen tests of the installed hosted app and offers loc
 | SCREEN-01 | Initial native app inventory | BLOCKED — native pipe unavailable, system cannot find specified file, os error 2 |
 | SCREEN-02 | Inventory retry after two seconds | BLOCKED — same error |
 | SCREEN-03 | Reset JavaScript session/reinitialize/inventory retry | BLOCKED — same error |
+| SCREEN-04 | Enabled-surface inventory after user reports another chat works | OBSERVED — native apps empty, only browser surfaces listed in this chat |
+| SCREEN-05 | Direct open-window inventory with app reported open | BLOCKED — same native pipe unavailable/os error 2 |
 
 These are failed tooling connection attempts, not failed Carrier Records operations or passed hosted UI tests. Asked whether ChatGPT itself had been fully reopened; answer pending. No Windows restart, credential entry, native input, backend write or additional isolated regression performed for this request.
+
+User subsequently reports Computer Use works in another chat. This narrows the likely fault to this chat's native runtime attachment; exact attachment failure remains unproven. Prepared [working-chat handoff](computer-use-test-handoff.md) to resume the same workspace/field gates without duplicate setup. No need to infer global plugin/PC failure from this chat's missing connection.
 
 Fresh local fixture cleanup/health and hosted inventory are recorded in windows-release-evidence.md. Protected-store contents are never extracted. Raw current run logs and sanitized hosted/probe reports remain ignored under tools/.local; this ledger records every emitted assertion without importing private data. Local fixture tests exercise real API enforcement but do not prove a hosted installed UI save, physical printing, clean-machine installation or office/recovery sign-off. See t19-test-register.md for field gates that remain pending.
