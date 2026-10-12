@@ -42,6 +42,29 @@ A trip from office A to B is legitimately visible to staff of either office. Do 
 
 ## 3. Connection loss, recovery and retries
 
+### Existing pilot staff: direct backend permission checks
+
+The existing `pilot_khi` and `pilot_isb` accounts must finish their mandatory password changes in the installed app first. Sign out fully between users. Confirm each dashboard lists only its assigned office and does not offer company/account administration. Report UI outcomes separately from backend probes.
+
+In your own interactive PowerShell terminal, run one command at a time:
+
+```powershell
+Set-Location -LiteralPath 'D:\portfolio\transport_project'
+python tools/pilot_permissions.py pilot_khi
+python tools/pilot_permissions.py pilot_isb
+```
+
+Enter each current staff password only at the local hidden prompt. No token/password is requested in chat. The helper reads the existing public-only installed config, requires the intended pilot HTTPS project, rejects privileged keys, authenticates the actual existing staff user, and holds its short-lived token only in memory. It checks ready role/one expected office, denied account administration and complete-business balances (HTTP403/SQLSTATE42501), allowed scoped balances and draft lists. Its own probe session is signed out with local scope; it does not globally log the app out. Sanitized check labels/statuses go to ignored `tools/.local/t19-permissions-<username>.json`; no response data, identifiers, balances, passwords or tokens are written. An unconfirmed probe logout remains a failure to resolve.
+
+Trip-operation checks require one new, valid Karachi-to-Islamabad pilot draft, created through normal administrator/origin workflows with real pilot master records. Do not invent an actual dispatch/arrival or post test money into the pilot to manufacture a permission result. The current zero-vehicle/zero-trip state cannot pass this matrix. Once the draft exists, use:
+
+```powershell
+python tools/pilot_permissions.py pilot_khi --trip-checks
+python tools/pilot_permissions.py pilot_isb --trip-checks
+```
+
+The helper requires exactly one matching draft on an untruncated first page. It calls the non-mutating `authorize_trip_operation` directly. Expected Karachi: EDIT_FARE/DISPATCH allowed, ARRIVAL denied; expected Islamabad: EDIT_FARE/DISPATCH denied, ARRIVAL allowed; both POST_MONEY/EXPENSE permissions allowed. These are operation-permission probes, not executed dispatch/arrival/payment/expense acceptance. Actual UI fare-save denial and lifecycle behavior still need the separately guided new-record pilot. With only two offices, a trip involving both is visible to both legitimately; unrelated-trip exclusion needs a genuine unrelated case or isolated fixtures, not a manufactured hidden business office.
+
 Use a designated new pilot draft/transaction and keep its reference privately. Record starting state, exact amount and existing event/receipt IDs before the test. Never intentionally interrupt unrelated office work.
 
 1. Open and fill a draft form while connected. Turn off this test PC's Wi-Fi or unplug its network cable using normal Windows controls. Click Save once. Expect an explicit failure/uncertain status, no success message and preserved form input. Do not close/recreate the form or replace its retry identity.
