@@ -6,6 +6,8 @@ Purpose: Preserve agreed decisions across development sessions. This file is a d
 
 ## 1. Current state
 
+- Latest staff field result: user confirms both existing pilot staff password changes/fresh logins, correct single-office dashboard labels and absent admin controls. Read-only hosted verification confirms both STAFF/active/not pending/must_change=false/one correct office each; Auth count still three. UI PASS is user-observed on development PC, not direct API proof. No sanitized probe reports yet; live API checks NOT RUN, zero trips/vehicles/drivers leaves operation matrix pending. Restart deferred/T19 IN PROGRESS/T20 TODO; no push or scheduling.
+
 - Existing pilot staff verified read-only: total three Auth identities, both pilot accounts STAFF/active/not pending with one correct mutually exclusive office each; both still require password change at this check. Zero vehicles/trips/drivers, one customer; no cross-office trip PASS possible yet. Guided first-password changes/actual staff dashboards. Added read-only interactive actual-user public-key probe tools/pilot_permissions.py, sanitized ignored reports and local-session logout; six mocked helper tests pass, not hosted acceptance. Live UI/API checks pending, no duplicate accounts/fixtures/financial writes; restart deferred/T19 IN PROGRESS/T20 TODO/no push or scheduling.
 
 - User defers the Windows-restart persistence check until later because the PC cannot be restarted now. Keep it NOT RUN/pending; do not reboot the host. Continue independent T19 checks without changing scheduling. Prior development-PC close/reopen/logout PASS reports remain as recorded; T19 IN PROGRESS/T20 TODO.

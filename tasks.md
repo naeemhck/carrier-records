@@ -293,6 +293,8 @@ Windows-restart session persistence explicitly deferred by user because they can
 
 Existing pilot staff read-only verification exits 0: three Auth identities, both STAFF/active/not pending, exactly one correct mutually exclusive office each; both forced password change still true. Zero vehicles/trips/drivers, one customer; cross-office trip actions not tested yet. Guided normal first-password changes/dashboard/admin-control checks. Read-only actual-user public-key probe prepared with hidden local password entry, sanitized ignored reports/local probe logout; six mocked helper tests pass, CLI help/diff pass. These are tool tests, not hosted permission results. Live UI/API and pilot draft matrix pending; no duplicates/financial fixtures/native rebuild, restart still deferred, T19 IN PROGRESS/T20 TODO/no push/scheduling.
 
+Staff UI follow-up: user confirms both required password changes/fresh logins, single assigned office dashboard labels and absent admin controls; user-observed development-PC PASS. Fresh read-only verification confirms both active STAFF/not pending/must_change=false/one correct office each, three Auth identities total. No probe reports exist; actual direct API scoped reads/admin/global-balance denials remain NOT RUN. Zero trips/vehicles/drivers means trip matrix still pending. UI hiding not counted as backend authorization. Restart deferred/T19 IN PROGRESS/T20 TODO.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
