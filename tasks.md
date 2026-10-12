@@ -287,6 +287,8 @@ Office follow-up: user reports save; read-only backend verifies two active agree
 
 Existing-account assignments now verified: after normal Save account and user success report, fresh read-only hosted check exits 0 with one Auth identity/one staff profile, ready active ADMIN, two agreed active offices/two explicit assignments and one completed password operation. Company setup_completed=true verified separately without private fields. No duplicates/direct office writes. Guided development-PC signed-in close/reopen and logout/close/reopen/login checks; actual results pending. Windows restart and remaining clean-PC/staff/network/physical-print/real pilot/recovery gates pending; T19 IN PROGRESS/T20 TODO.
 
+Installed development-PC session checks: user explicitly reports PASS for signed-in close/reopen restoring dashboard and Sign out/close/reopen requiring login. Recorded as user-observed results only; no protected-store extraction/native UI observation claimed. Windows-restart persistence requested next and remains pending, alongside role-switch/disabled/revoked staff, clean-PC, network/physical-print/pilot/recovery gates. T19 IN PROGRESS/T20 TODO; no push or scheduling.
+
 ### T20 — Android release
 
 Status: TODO | Dependencies: T19
