@@ -1,0 +1,13 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path=public,extensions;
+select no_plan();
+select ok(not has_function_privilege('anon','public.prepare_output_export(jsonb)','EXECUTE'),'Anonymous full export denied');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid='public.prepare_output_export(jsonb)'::regprocedure),'Full export pins its search path');
+select ok(not has_table_privilege('carrier_security','public.financial_events','INSERT,UPDATE,DELETE'),'Full export cannot post finance');
+select set_config('request.jwt.claims','{}',true);
+set local role authenticated;
+select throws_ok($$select public.prepare_output_export('{}')$$,'42501','FORBIDDEN','Export requires current authenticated staff');
+reset role;
+select * from finish();
+rollback;

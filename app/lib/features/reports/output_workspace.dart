@@ -7,6 +7,8 @@ import '../trips/trip_workspace.dart';
 import 'output_repository.dart';
 import 'document_repository.dart';
 import 'document_workspace.dart';
+import 'output_export_service.dart';
+import 'output_file_actions.dart';
 
 const outputReports = {
   'MONTHLY_VEHICLE': 'Vehicle monthly',
@@ -35,6 +37,7 @@ class OutputWorkspace extends StatefulWidget {
     required this.administrator,
     this.guard = unguardedTrip,
     this.documents,
+    this.exporter,
     this.initialCommand,
     this.supersedesId,
   });
@@ -45,6 +48,7 @@ class OutputWorkspace extends StatefulWidget {
   final bool administrator;
   final Widget Function(Widget) guard;
   final DocumentCommands? documents;
+  final OutputExportService? exporter;
   final Map<String, dynamic>? initialCommand;
   final String? supersedesId;
   @override
@@ -314,7 +318,18 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
     if (committed != null && mounted) {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => widget.guard(IssuedDocumentView(document: committed)),
+          builder: (_) => widget.guard(
+            IssuedDocumentView(
+              document: committed,
+              actions: widget.exporter == null
+                  ? null
+                  : OutputFileActions(
+                      service: widget.exporter!,
+                      load: () =>
+                          widget.exporter!.issued(committed['id'] as String),
+                    ),
+            ),
+          ),
         ),
       );
       if (mounted) setState(() => preview = null);
@@ -333,6 +348,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
             administrator: widget.administrator,
             guard: widget.guard,
             documents: widget.documents,
+            exporter: widget.exporter,
             initialCommand: contextCommand,
             supersedesId: id,
           ),
@@ -350,6 +366,23 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
         FilledButton(
           onPressed: busy ? null : issueDocument,
           child: const Text('Issue document'),
+        ),
+      if (widget.exporter != null)
+        OutputFileActions(
+          service: widget.exporter!,
+          load: () => widget.exporter!.live({
+            'report_kind': report,
+            'recipient_kind': recipient,
+            'recipient_id': party,
+            'filters': filters,
+            'field_order': List.of(selection!.order),
+            'format_options': {
+              'orientation': orientation,
+              'sheet_name': sheet.text.trim(),
+            },
+            'preset_id': presetId,
+            'event_id': event,
+          }),
         ),
       OutputPreview(
         data: preview!,
@@ -745,6 +778,13 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                       commands: widget.documents!,
                       onSupersede: supersede,
                       guard: widget.guard,
+                      fileActions: widget.exporter == null
+                          ? null
+                          : (doc) => OutputFileActions(
+                              service: widget.exporter!,
+                              load: () =>
+                                  widget.exporter!.issued(doc['id'] as String),
+                            ),
                     ),
                   ),
                 ),

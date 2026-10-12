@@ -38,7 +38,7 @@ def profile(token):
     code,p=rpc('get_session_profile',token=token);ok('live session profile',code==200);return p
 def change(token,pw=password,new=real):
     p=profile(token);code,data=edge({'action':'change','current_password':pw,'password':new,'expected_version':p['version']},token)
-    ok('verified password change through Edge',code==200);return data
+    ok('verified password change through Edge (HTTP '+str(code)+')',code==200);return data
 try:
     admin=create_auth('admin')
     code,result=rpc('bootstrap_staff_admin',{'business_id':b,'company_name':'ISOLATED T03 TEST','auth_user_id':admin,'username':'admin','display_name':'Test Admin'},priv=True)
@@ -208,6 +208,9 @@ try:
         verify(globals())
     if '--documents' in sys.argv:
         from t13_documents import verify
+        verify(globals())
+    if '--exports' in sys.argv:
+        from t14_exports import verify
         verify(globals())
     if '--masters' in sys.argv:
         from t04_masters import verify

@@ -2,7 +2,7 @@
 
 Version: 1.1 | Specification date: 2026-10-11
 
-Current phase: T00-T13 DONE. Next: T14 PDF, print and Excel export. T14-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
+Current phase: T00-T14 DONE. Next: T15 template-based Excel imports. T15-T20 remain TODO. Do not interpret a defined acceptance test as an executed test.
 
 ## 1. Status convention
 
@@ -207,13 +207,13 @@ Evidence: AT-26/27 pass, including simultaneous issuance, changed issuer/company
 
 Executed: clean fifteen-migration reset, 194 SQL assertions/lint/security advisors, analyzer and 61 Flutter tests PASS. Full T03/T05-T13 real backend/native regression exits 0 with 1,347 PASS checks and zero-fixture cleanup. Windows actual permanent issuance/snapshot UI PASS (64.9s build/10s test); ordinary Windows/Android debug builds PASS (47.4s/58.3s). Source/package audit passes 753 entries; source/history audit no findings. Health HTTP200/PGready, 27 public/12 private/Auth/Storage records zero, no disabled triggers/temporary grants/native config. AT-26/27 simultaneous distinct/duplicate issuance, independent digest, customer-per-trip grouping, exact retries including after supersession, current permissions, direct attacks, commit rollback, changed company/issuer/recipient/preset/source fare and competing supersessions PASS. Original content/number/digest retained; replacement linked with new identity/values. Issuance never posts money. Actual failures, fixes, contracts and hashes: docs/documents-evidence.md; guide: docs/documents-setup.md. T13 gate passes; separate local commit precedes T14. No push.
 
-### T14 — PDF, print and Excel export
+### T14 - PDF, print and Excel export
 
-Status: TODO | Dependencies: T12, T13
+Status: DONE | Dependencies: T12, T13
 
-Generate local files from redacted authorized payloads. Implement A4 automatic orientation, wrapping, repeated headings, pagination and summaries. Implement Excel selected-field order, metadata, formatting and safe text handling. Test actual file contents, including metadata and hidden sheets.
+Generate local files from freshly authorized, recipient-redacted payloads. PDF uses A4 automatic or selected orientation, wrapping, ordered wide-table sections, repeated headings, pagination and summaries. Excel preserves exact decimal values, selected fields/order, scope metadata, formatting and safe inline text. Issued documents are fetched under current permissions and rendered from digest-verified snapshots. Exporting does not post money or issue documents.
 
-Evidence: AT-24/28/29 pass; Windows print and Android export/share checks are completed at their release gates. Visually inspect rendered multi-page PDFs.
+Verification: AT-24/28/29 and all T14 checks pass. Clean local reset applied 16 migrations; 198 SQL assertions across 13 files, database lint/security advisors, Flutter analyze and all 70 Flutter tests pass. Full T03-T13 plus T14 API/native regression exits 0 with 1,383 PASS checks and fixture cleanup. Windows native export generates eight authorized PDF/XLSX pairs (61 PDF pages); independent inspection and visual QA pass. Windows ordinary debug build passes in 147.3s; Android debug APK passes in 631.0s using installed Android Platform 35 for the printing plugin. Fresh package audit scans 781 APK/Windows/source entries with no privileged values; ordinary APK contains no T14 test fixture markers. Source/history audit: 202 tracked files, zero intended untracked files, 321 historical blobs, no findings. Local Supabase health HTTP 200/PG ready, 16 migrations, zero synthetic database/Auth/Storage rows. Microsoft Excel read-only rendering and Microsoft Print to PDF spooler checks pass. `flutter devices` lists Windows/Chrome/Edge only; physical printer checks remain T19 and Android device share checks T20. These hardware/release checks are pending at their documented gates and are not claimed as T14 checks. Evidence and exact limitations: docs/exports-evidence.md; setup: docs/exports-setup.md. T14 committed locally; do not push automatically.
 
 ### T15 — Template-based Excel imports
 

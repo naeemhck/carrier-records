@@ -10,10 +10,12 @@ class DocumentWorkspace extends StatefulWidget {
     required this.commands,
     required this.onSupersede,
     required this.guard,
+    this.fileActions,
   });
   final DocumentCommands commands;
   final void Function(Map<String, dynamic>, String) onSupersede;
   final Widget Function(Widget) guard;
+  final Widget Function(Map<String, dynamic>)? fileActions;
   @override
   State<DocumentWorkspace> createState() => _DocumentWorkspaceState();
 }
@@ -47,6 +49,7 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
           builder: (_) => widget.guard(
             IssuedDocumentView(
               document: doc,
+              actions: widget.fileActions?.call(doc),
               onSupersede: doc['can_supersede'] == true
                   ? () {
                       Navigator.of(context).pop();
