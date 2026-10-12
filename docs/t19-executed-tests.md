@@ -515,4 +515,16 @@ Each row is one executed assertion/test or one audited payload file. Repeated ca
 
 ## Limits and evidence retention
 
+## Requested installed/hosted Computer Use retry
+
+User explicitly requests screen tests of the installed hosted app and offers local password entry. Module initialization succeeds, but no password handoff or app interaction is reached.
+
+| ID | Check | Actual result |
+|---|---|---|
+| SCREEN-01 | Initial native app inventory | BLOCKED — native pipe unavailable, system cannot find specified file, os error 2 |
+| SCREEN-02 | Inventory retry after two seconds | BLOCKED — same error |
+| SCREEN-03 | Reset JavaScript session/reinitialize/inventory retry | BLOCKED — same error |
+
+These are failed tooling connection attempts, not failed Carrier Records operations or passed hosted UI tests. Asked whether ChatGPT itself had been fully reopened; answer pending. No Windows restart, credential entry, native input, backend write or additional isolated regression performed for this request.
+
 Fresh local fixture cleanup/health and hosted inventory are recorded in windows-release-evidence.md. Protected-store contents are never extracted. Raw current run logs and sanitized hosted/probe reports remain ignored under tools/.local; this ledger records every emitted assertion without importing private data. Local fixture tests exercise real API enforcement but do not prove a hosted installed UI save, physical printing, clean-machine installation or office/recovery sign-off. See t19-test-register.md for field gates that remain pending.
