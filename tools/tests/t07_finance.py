@@ -2,6 +2,12 @@
 import base64, copy, json, uuid
 from concurrent.futures import ThreadPoolExecutor
 
+def canonical_ledger(snapshot):
+    """Only balances have unspecified SQL aggregate order; preserve every value."""
+    result=copy.deepcopy(snapshot)
+    result['balances']=sorted(result['balances'],key=lambda row:json.dumps(row,sort_keys=True))
+    return result
+
 def verify(env):
     rpc,sql,ok=env['rpc'],env['sql'],env['ok'];b,at,offices=env['b'],env['at'],env['office']
     uid=lambda:str(uuid.uuid4())
@@ -151,15 +157,19 @@ def verify(env):
     # Preserve T06 commit-failure guarantees for receipt posting as well.
     rollback=dispatch(draft(q='1.00',c='0.00'));p=payload('1.00',[alloc(claim(rollback,'CUSTOMER_RECEIVABLE'),'1.00')]);rollback_id=uid()
     sql("create function public.t07_fail_commit() returns trigger language plpgsql as $$ begin if new.kind='CUSTOMER_RECEIPT' then raise exception 'T07_COMMIT_FAILURE';end if;return null;end $$;create constraint trigger t07_commit_failure after insert on public.financial_events deferrable initially deferred for each row execute function public.t07_fail_commit();")
-    before=ledger(rollback)[1]
+    # Compare entire business rows, not just the RPC's derived balances.
+    rollback_tables=('financial_events','journal_lines','allocations','audit_events','idempotency_records','trips','consignments')
+    def database_snapshot():
+        return {table:sql(f"select coalesce(jsonb_agg(to_jsonb(r) order by r.id),'[]'::jsonb) from public.{table} r where business_id='{b}';") for table in rollback_tables}
+    before=ledger(rollback)[1];database_before=database_snapshot()
     try:
-        failed=post(p,rid=rollback_id);ok('T07 deferred commit failure returns failure',failed[0]>=400 and failed[1].get('message')=='T07_COMMIT_FAILURE')
-        after=ledger(rollback)[1]
-        retry_rows=sql(f"select (select count(*) from public.financial_events where request_id='{rollback_id}')+(select count(*) from public.idempotency_records where request_id='{rollback_id}');")
-        if after!=before:
-            canonical=lambda snapshot:{k:sorted(v,key=lambda row:json.dumps(row,sort_keys=True)) if isinstance(v,list) else v for k,v in snapshot.items()}
-            print('T07 rollback diagnostic: identical values ignoring row order='+str(canonical(after)==canonical(before))+'; request rows='+retry_rows,flush=True)
-        ok('T07 no partial event/allocations/audit/retry/claim changes',after==before and retry_rows=='0')
+        for attempt in range(10):
+            failed=post(p,rid=rollback_id);ok(f'T07 deferred commit failure returns failure attempt {attempt+1}',failed[0]>=400 and failed[1].get('message')=='T07_COMMIT_FAILURE')
+            after=ledger(rollback)[1]
+            retry_rows=sql(f"select (select count(*) from public.financial_events where request_id='{rollback_id}')+(select count(*) from public.idempotency_records where request_id='{rollback_id}');")
+            if after!=before:
+                print('T07 rollback diagnostic: balance order changed='+str(canonical_ledger(after)==canonical_ledger(before)),flush=True)
+            ok(f'T07 no partial event/allocations/audit/retry/claim changes attempt {attempt+1}',canonical_ledger(after)==canonical_ledger(before) and retry_rows=='0' and database_snapshot()==database_before)
     finally:sql('drop trigger t07_commit_failure on public.financial_events;drop function public.t07_fail_commit();')
     success('T07 same receipt request succeeds after rollback',post(p,rid=rollback_id))
     ok('T07 every created event balanced',sql(f"select count(*) from (select e.id from public.financial_events e left join public.journal_lines l on l.event_id=e.id where e.business_id='{b}' group by e.id having coalesce(sum(l.signed_amount),0)<>0)x;")=='0')
