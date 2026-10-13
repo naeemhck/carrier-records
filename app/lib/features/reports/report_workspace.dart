@@ -122,12 +122,14 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   Widget value(String key, Object? amount, {bool lifetime = false}) =>
       BilingualText(
         L10n.labelValuesfb62fe.withValues([
-          lifetime
-              ? reportLabels[key]
-                    ?.replaceAll('period end', 'current lifetime')
-                    .replaceAll('period costs', 'all linked costs')
-                    .replaceAll('expense date', 'all linked expense dates')
-              : reportLabels[key],
+          ownedMessage(
+            lifetime
+                ? reportLabels[key]
+                      ?.replaceAll('period end', 'current lifetime')
+                      .replaceAll('period costs', 'all linked costs')
+                      .replaceAll('expense date', 'all linked expense dates')
+                : reportLabels[key],
+          ),
           ['dispatched', 'arrived'].contains(key)
               ? amount
               : 'PKR ${LedgerAmount.fromJson(amount)}',

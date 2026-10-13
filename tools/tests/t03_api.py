@@ -234,6 +234,10 @@ try:
     if '--exports' in sys.argv:
         from t14_exports import verify
         verify(globals())
+    if '--bilingual-exports' in sys.argv:
+        if not candidate: raise RuntimeError('Bilingual verification requires the isolated Karvaan backend.')
+        from karvaan_documents import verify
+        verify(globals())
     if '--imports' in sys.argv:
         from t15_imports import verify
         verify(globals())

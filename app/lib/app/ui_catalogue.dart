@@ -4936,6 +4936,103 @@ abstract final class L10n {
   );
   static const heldTripFundsCodeAccessibility =
       "HELD_TRIP_FUNDS. ٹرپ کی رقم زیرِ تحویل";
+  static const receiptsBasisKey = Bilingual(
+    "presentation.receiptsBasisKey",
+    "receipts",
+    "وصولیاں",
+  );
+  static const receiptsBasisKeyAccessibility = "receipts. وصولیاں";
+  static const lifetimeReportLabel3 = Bilingual(
+    "presentation.lifetimeReportLabel3",
+    "Vehicle costs — all linked expense dates",
+    "گاڑی کے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+  );
+  static const lifetimeReportLabel3Accessibility =
+      "Vehicle costs — all linked expense dates. گاڑی کے اخراجات — تمام منسلک اخراجات کی تاریخیں";
+  static const lifetimeReportLabel4 = Bilingual(
+    "presentation.lifetimeReportLabel4",
+    "Owner-borne costs — all linked expense dates",
+    "مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+  );
+  static const lifetimeReportLabel4Accessibility =
+      "Owner-borne costs — all linked expense dates. مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں";
+  static const lifetimeReportLabel5 = Bilingual(
+    "presentation.lifetimeReportLabel5",
+    "Vehicle operating profit — earnings less all linked costs",
+    "گاڑی کا عملی منافع — آمدن منفی مدت کے اخراجات",
+  );
+  static const lifetimeReportLabel5Accessibility =
+      "Vehicle operating profit — earnings less all linked costs. گاڑی کا عملی منافع — آمدن منفی مدت کے اخراجات";
+  static const lifetimeReportLabel13 = Bilingual(
+    "presentation.lifetimeReportLabel13",
+    "Customer outstanding — current lifetime",
+    "گاہک کا واجب الادا بقایا — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel13Accessibility =
+      "Customer outstanding — current lifetime. گاہک کا واجب الادا بقایا — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel14 = Bilingual(
+    "presentation.lifetimeReportLabel14",
+    "Customer credit — current lifetime",
+    "گاہک کی زائد رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel14Accessibility =
+      "Customer credit — current lifetime. گاہک کی زائد رقم — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel15 = Bilingual(
+    "presentation.lifetimeReportLabel15",
+    "Intermediary-held money — current lifetime",
+    "واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel15Accessibility =
+      "Intermediary-held money — current lifetime. واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel16 = Bilingual(
+    "presentation.lifetimeReportLabel16",
+    "Owner settlement due — current lifetime",
+    "مالک کے تصفیے کی واجب الادا رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel16Accessibility =
+      "Owner settlement due — current lifetime. مالک کے تصفیے کی واجب الادا رقم — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel17 = Bilingual(
+    "presentation.lifetimeReportLabel17",
+    "Owner recovery — current lifetime",
+    "مالک سے قابلِ وصول رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel17Accessibility =
+      "Owner recovery — current lifetime. مالک سے قابلِ وصول رقم — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel18 = Bilingual(
+    "presentation.lifetimeReportLabel18",
+    "Brokerage due — current lifetime",
+    "واجب الادا کمیشن — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel18Accessibility =
+      "Brokerage due — current lifetime. واجب الادا کمیشن — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel19 = Bilingual(
+    "presentation.lifetimeReportLabel19",
+    "Broker recovery — current lifetime",
+    "بروکر سے قابلِ وصول رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel19Accessibility =
+      "Broker recovery — current lifetime. بروکر سے قابلِ وصول رقم — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel20 = Bilingual(
+    "presentation.lifetimeReportLabel20",
+    "Personal funding due — current lifetime",
+    "ذاتی طور پر دی گئی واجب الادا رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel20Accessibility =
+      "Personal funding due — current lifetime. ذاتی طور پر دی گئی واجب الادا رقم — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel21 = Bilingual(
+    "presentation.lifetimeReportLabel21",
+    "Expense reimbursement due — current lifetime",
+    "خرچ کی واجب الادا واپسی — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel21Accessibility =
+      "Expense reimbursement due — current lifetime. خرچ کی واجب الادا واپسی — موجودہ مکمل مدت پر";
+  static const lifetimeReportLabel22 = Bilingual(
+    "presentation.lifetimeReportLabel22",
+    "Cost recovery — current lifetime",
+    "خرچ کی قابلِ وصول رقم — موجودہ مکمل مدت پر",
+  );
+  static const lifetimeReportLabel22Accessibility =
+      "Cost recovery — current lifetime. خرچ کی قابلِ وصول رقم — موجودہ مکمل مدت پر";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5722,5 +5819,19 @@ abstract final class L10n {
     selfFundedCostCode,
     personalFundsCode,
     heldTripFundsCode,
+    receiptsBasisKey,
+    lifetimeReportLabel3,
+    lifetimeReportLabel4,
+    lifetimeReportLabel5,
+    lifetimeReportLabel13,
+    lifetimeReportLabel14,
+    lifetimeReportLabel15,
+    lifetimeReportLabel16,
+    lifetimeReportLabel17,
+    lifetimeReportLabel18,
+    lifetimeReportLabel19,
+    lifetimeReportLabel20,
+    lifetimeReportLabel21,
+    lifetimeReportLabel22,
   ];
 }

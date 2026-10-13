@@ -24,7 +24,7 @@ class DocumentRepository implements DocumentCommands {
   ) => call('issue_document', {
     'request_id': request,
     'expected_version': 0,
-    'payload': payload,
+    'payload': {...payload, 'presentation_version': 2},
   });
   @override
   Future<Map<String, dynamic>> get(String id) =>

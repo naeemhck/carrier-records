@@ -308,8 +308,8 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                         L10n.labelValues8a6c87.withValues([
                           r['origin_name'],
                           r['destination_name'],
-                          r['state'],
-                          r['load_kind'],
+                          ownedMessage(r['state']),
+                          ownedMessage(r['load_kind']),
                           r['dispatch_date'] ??
                               r['planned_dispatch_date'] ??
                               '',

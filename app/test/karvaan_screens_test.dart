@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/features/reports/report_repository.dart';
 import 'package:carrier_records/features/trips/trip_draft.dart';
 import 'package:carrier_records/features/trips/trip_lifecycle.dart';
 import 'package:carrier_records/features/trips/trip_operation_dialog.dart';
@@ -42,6 +43,21 @@ void karvaanScreenTests({bool native = false}) {
     );
     final data = L10n.trip3c1efc.withValues([Bilingual.data('TRP-000123')]);
     expect(data.ur, contains('TRP-000123'));
+    final bases = {
+      'earnings': 'Dispatch / explicit adjustment date',
+      'expenses': 'Expense date',
+    };
+    expect(ownedDateBases(bases).en, bases.toString());
+    expect(ownedDateBases(bases).ur, contains('آمدن'));
+    expect(ownedDateBases(bases).ur, contains('اخراجات'));
+    for (final label in reportLabels.values) {
+      final lifetime = label
+          .replaceAll('period end', 'current lifetime')
+          .replaceAll('period costs', 'all linked costs')
+          .replaceAll('expense date', 'all linked expense dates');
+      expect(ownedMessage(label).key, isNot('unresolved.presentation'));
+      expect(ownedMessage(lifetime).key, isNot('unresolved.presentation'));
+    }
   });
   for (final width in native ? [900.0] : [320.0, 1280.0]) {
     for (final scale in [1.0, 2.0]) {

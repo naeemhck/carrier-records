@@ -70,3 +70,16 @@ Bilingual ownedMessage(Object? source) {
   // Coverage tests must flag this key in any source-owned presentation fixture.
   return Bilingual('unresolved.presentation', english, '');
 }
+
+/// Only the backend's controlled date-basis descriptors, never record data.
+Bilingual ownedDateBases(Object? source) {
+  if (source is! Map) return Bilingual.data(source);
+  return Bilingual(
+    'ui.dateBasisValues',
+    source.toString(),
+    '{${source.entries.map((e) {
+      final key = ownedMessage(e.key), value = ownedMessage(e.value);
+      return '${key.ur.isEmpty ? key.en : key.ur}: ${value.ur.isEmpty ? value.en : value.ur}';
+    }).join(', ')}}',
+  );
+}

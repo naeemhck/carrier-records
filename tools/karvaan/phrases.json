@@ -7152,5 +7152,131 @@
     "origins": [
       "reviewed.dynamic.presentation"
     ]
+  },
+  {
+    "key": "receiptsBasisKey",
+    "semantic_key": "presentation.receiptsBasisKey",
+    "en": "receipts",
+    "ur": "وصولیاں",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel3",
+    "semantic_key": "presentation.lifetimeReportLabel3",
+    "en": "Vehicle costs — all linked expense dates",
+    "ur": "گاڑی کے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel4",
+    "semantic_key": "presentation.lifetimeReportLabel4",
+    "en": "Owner-borne costs — all linked expense dates",
+    "ur": "مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel5",
+    "semantic_key": "presentation.lifetimeReportLabel5",
+    "en": "Vehicle operating profit — earnings less all linked costs",
+    "ur": "گاڑی کا عملی منافع — آمدن منفی مدت کے اخراجات",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel13",
+    "semantic_key": "presentation.lifetimeReportLabel13",
+    "en": "Customer outstanding — current lifetime",
+    "ur": "گاہک کا واجب الادا بقایا — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel14",
+    "semantic_key": "presentation.lifetimeReportLabel14",
+    "en": "Customer credit — current lifetime",
+    "ur": "گاہک کی زائد رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel15",
+    "semantic_key": "presentation.lifetimeReportLabel15",
+    "en": "Intermediary-held money — current lifetime",
+    "ur": "واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel16",
+    "semantic_key": "presentation.lifetimeReportLabel16",
+    "en": "Owner settlement due — current lifetime",
+    "ur": "مالک کے تصفیے کی واجب الادا رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel17",
+    "semantic_key": "presentation.lifetimeReportLabel17",
+    "en": "Owner recovery — current lifetime",
+    "ur": "مالک سے قابلِ وصول رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel18",
+    "semantic_key": "presentation.lifetimeReportLabel18",
+    "en": "Brokerage due — current lifetime",
+    "ur": "واجب الادا کمیشن — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel19",
+    "semantic_key": "presentation.lifetimeReportLabel19",
+    "en": "Broker recovery — current lifetime",
+    "ur": "بروکر سے قابلِ وصول رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel20",
+    "semantic_key": "presentation.lifetimeReportLabel20",
+    "en": "Personal funding due — current lifetime",
+    "ur": "ذاتی طور پر دی گئی واجب الادا رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel21",
+    "semantic_key": "presentation.lifetimeReportLabel21",
+    "en": "Expense reimbursement due — current lifetime",
+    "ur": "خرچ کی واجب الادا واپسی — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
+  },
+  {
+    "key": "lifetimeReportLabel22",
+    "semantic_key": "presentation.lifetimeReportLabel22",
+    "en": "Cost recovery — current lifetime",
+    "ur": "خرچ کی قابلِ وصول رقم — موجودہ مکمل مدت پر",
+    "origins": [
+      "reviewed.dynamic.presentation"
+    ]
   }
 ]

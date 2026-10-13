@@ -927,7 +927,9 @@ class OutputPreview extends StatelessWidget {
               meta[f['field_key']] ?? '',
             ]),
           ),
-        BilingualText(L10n.dateBases.withValues([meta['date_bases']])),
+        BilingualText(
+          L10n.dateBases.withValues([ownedDateBases(meta['date_bases'])]),
+        ),
         const BilingualText(
           L10n.currentEffectiveRecordsEarlierPeriodsCanChangeAfterAudited,
         ),
