@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'package:carrier_records/features/reports/report_repository.dart';
 import 'package:carrier_records/features/reports/report_workspace.dart';
 import 'package:flutter/material.dart';
@@ -57,12 +59,12 @@ void main() {
       );
       await t.pumpAndSettle();
       expect(
-        find.textContaining('not a complete business balance'),
+        englishTextContaining('not a complete business balance'),
         findsOneWidget,
       );
-      expect(find.textContaining('Owner profit —'), findsOneWidget);
-      expect(find.textContaining('85000.00'), findsOneWidget);
-      expect(find.textContaining('95000.00'), findsOneWidget);
+      expect(englishTextContaining('Owner profit —'), findsOneWidget);
+      expect(englishTextContaining('85000.00'), findsOneWidget);
+      expect(englishTextContaining('95000.00'), findsOneWidget);
       await t.ensureVisible(find.text('Next'));
       await t.tap(find.text('Next'));
       await t.pumpAndSettle();
@@ -85,8 +87,8 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    await t.ensureVisible(find.textContaining('Owner settlement due'));
-    await t.tap(find.textContaining('Owner settlement due'));
+    await t.ensureVisible(englishTextContaining('Owner settlement due'));
+    await t.tap(englishTextContaining('Owner settlement due'));
     await t.pumpAndSettle();
     expect(fake.offsets, [0, 0]);
     expect(fake.filters[0], fake.filters[1]);

@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'dart:async';
 import 'dart:io';
 
@@ -155,7 +157,7 @@ void main() {
       await tap(find.widgetWithText(ListTile, 'Broker'));
       Future<void> enter(String label, String text) async {
         final f = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == label,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, label),
         );
         await tester.ensureVisible(f);
         await tester.enterText(f, text);
@@ -170,10 +172,10 @@ void main() {
           find.byWidgetPredicate(
             (w) =>
                 w is InputDecorator &&
-                w.decoration.labelText == 'Outstanding claim',
+                hasEnglishLabel(w.decoration, 'Outstanding claim'),
           ),
         );
-        await tap(find.textContaining('Customer outstanding').last);
+        await tap(englishTextContaining('Customer outstanding').last);
         await enter('Allocated amount (PKR)', '5.00');
         await tap(find.widgetWithText(FilledButton, 'Review payment'));
       }
@@ -212,7 +214,13 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
-      await tap(find.byTooltip('Reload balances'));
+      await tap(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Tooltip &&
+              widget.message?.startsWith('Reload balances.') == true,
+        ),
+      );
       expect(find.text('Confirm payment'), findsNothing);
       expect(find.text('Synthetic review'), findsOneWidget);
     },

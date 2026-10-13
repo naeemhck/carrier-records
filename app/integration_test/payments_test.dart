@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
@@ -44,7 +46,7 @@ void main() {
 
       Future<void> field(String label, String value) async {
         final f = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == label,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, label),
         );
         await tester.scrollUntilVisible(
           f,
@@ -73,7 +75,8 @@ void main() {
         );
         await tap(f);
         final search = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Search parties',
+          (w) =>
+              w is TextField && hasEnglishLabel(w.decoration, 'Search parties'),
         );
         await tester.enterText(search, 'T08');
         await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -84,7 +87,7 @@ void main() {
 
       Future<void> select(String label, String option) async {
         final f = find.byWidgetPredicate(
-          (w) => w is InputDecorator && w.decoration.labelText == label,
+          (w) => w is InputDecorator && hasEnglishLabel(w.decoration, label),
         );
         await tester.scrollUntilVisible(
           f,
@@ -92,7 +95,7 @@ void main() {
           scrollable: find.byType(Scrollable).first,
         );
         await tap(f);
-        await tester.tap(find.textContaining(option).last);
+        await tester.tap(englishTextContaining(option).last);
         await settle();
       }
 

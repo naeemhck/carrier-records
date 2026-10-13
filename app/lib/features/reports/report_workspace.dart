@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
 import '../finance/financial_repository.dart';
@@ -118,24 +119,43 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     });
   }
 
-  Widget value(String key, Object? amount, {bool lifetime = false}) => Text(
-    '${lifetime ? reportLabels[key]?.replaceAll('period end', 'current lifetime').replaceAll('period costs', 'all linked costs').replaceAll('expense date', 'all linked expense dates') : reportLabels[key]}: ${['dispatched', 'arrived'].contains(key) ? amount : 'PKR ${LedgerAmount.fromJson(amount)}'}',
-  );
+  Widget value(String key, Object? amount, {bool lifetime = false}) =>
+      BilingualText(
+        L10n.labelValuesfb62fe.withValues([
+          lifetime
+              ? reportLabels[key]
+                    ?.replaceAll('period end', 'current lifetime')
+                    .replaceAll('period costs', 'all linked costs')
+                    .replaceAll('expense date', 'all linked expense dates')
+              : reportLabels[key],
+          ['dispatched', 'arrived'].contains(key)
+              ? amount
+              : 'PKR ${LedgerAmount.fromJson(amount)}',
+        ]),
+      );
   Widget journeys(Future<TripPage>? future, String title) =>
       FutureBuilder<TripPage>(
         future: future,
         builder: (_, s) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            BilingualOwnedText(
+              title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             if (s.hasError)
-              const Text('Unable to load current permitted journeys.'),
+              const BilingualText(L10n.unableToLoadCurrentPermittedJourneys),
             if (s.hasData) ...[
-              Text(s.data!.scope),
+              BilingualOwnedText(s.data!.scope),
               for (final row in s.data!.rows.take(5))
-                Text('${row['trip_number']} · ${row['state']}'),
+                BilingualText(
+                  L10n.labelValuescd55a9.withValues([
+                    row['trip_number'],
+                    row['state'],
+                  ]),
+                ),
               if (s.data!.rows.isEmpty)
-                const Text('No records in this period/scope.'),
+                const BilingualText(L10n.noRecordsInThisPeriodScope),
             ],
           ],
         ),
@@ -143,7 +163,8 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text(widget.dashboard ? 'Dashboard' : 'Reports'),
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: BilingualText((widget.dashboard ? L10n.dashboard : L10n.reports)),
       actions: [
         if (widget.outputs != null)
           TextButton(
@@ -151,7 +172,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               context,
               MaterialPageRoute(builder: (_) => widget.guard(widget.outputs!)),
             ),
-            child: const Text('Outputs'),
+            child: const BilingualCaption(L10n.outputs),
           ),
       ],
     ),
@@ -171,23 +192,26 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
                   initialValue: kind,
-                  decoration: const InputDecoration(labelText: 'Report'),
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(label: BilingualCaption(L10n.report)),
+                  ),
                   items: const [
                     DropdownMenuItem(
                       value: 'MONTHLY_VEHICLE',
-                      child: Text('Vehicle monthly'),
+                      child: BilingualText(L10n.vehicleMonthly),
                     ),
                     DropdownMenuItem(
                       value: 'MONTHLY_OWNER',
-                      child: Text('Owner monthly'),
+                      child: BilingualText(L10n.ownerMonthly),
                     ),
                     DropdownMenuItem(
                       value: 'CLAIMS',
-                      child: Text('Party claims and held money'),
+                      child: BilingualText(L10n.partyClaimsAndHeldMoney),
                     ),
                     DropdownMenuItem(
                       value: 'TRIP_PROFIT',
-                      child: Text('Lifetime trip profit'),
+                      child: BilingualText(L10n.lifetimeTripProfit),
                     ),
                   ],
                   onChanged: (v) {
@@ -206,7 +230,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   width: 200,
                   child: TextField(
                     controller: entry.$2,
-                    decoration: InputDecoration(labelText: entry.$1),
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                    ),
                   ),
                 ),
               SizedBox(
@@ -214,11 +241,14 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
                   initialValue: office,
-                  decoration: const InputDecoration(labelText: 'Office scope'),
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
+                  ),
                   items: [
                     const DropdownMenuItem<String>(
                       value: null,
-                      child: Text('All permitted offices'),
+                      child: BilingualText(L10n.allPermittedOffices),
                     ),
                     for (final o in widget.offices)
                       DropdownMenuItem(
@@ -231,16 +261,28 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               ),
               OutlinedButton(
                 onPressed: () => pick('VEHICLE'),
-                child: Text(vehicleName ?? 'Select vehicle'),
+                child: BilingualCaption(
+                  (vehicleName != null
+                      ? Bilingual.data(vehicleName)
+                      : L10n.selectVehicle),
+                ),
               ),
               OutlinedButton(
                 onPressed: () => pick('OWNER'),
-                child: Text(ownerName ?? 'Select historical owner'),
+                child: BilingualCaption(
+                  (ownerName != null
+                      ? Bilingual.data(ownerName)
+                      : L10n.selectHistoricalOwner),
+                ),
               ),
               if (kind == 'TRIP_PROFIT')
                 OutlinedButton(
                   onPressed: () => pick('TRIP'),
-                  child: Text(tripName ?? 'Select trip'),
+                  child: BilingualCaption(
+                    (tripName != null
+                        ? Bilingual.data(tripName)
+                        : L10n.selectTrip),
+                  ),
                 ),
               TextButton(
                 onPressed: () => setState(() {
@@ -248,11 +290,11 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   vehicleName = ownerName = tripName = null;
                   search.clear();
                 }),
-                child: const Text('Clear record filters'),
+                child: const BilingualCaption(L10n.clearRecordFilters),
               ),
               FilledButton(
                 onPressed: () => reload(),
-                child: const Text('Run report'),
+                child: const BilingualCaption(L10n.runReport),
               ),
             ],
           ),
@@ -264,8 +306,8 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 return const LinearProgressIndicator();
               }
               if (s.hasError) {
-                return const Text(
-                  'Report unavailable. Check dates, trip selection and current office access, then retry.',
+                return const BilingualText(
+                  L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
                 );
               }
               final data = s.data!;
@@ -275,23 +317,31 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  BilingualOwnedText(
                     data['scope'] as String,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  Text('Offices: ${(data['offices'] as List).join(', ')}'),
-                  Text(
-                    lifetime
-                        ? 'Lifetime trip — all linked dates; current balances'
-                        : '${(data['period'] as Map)['from']} to ${(data['period'] as Map)['to']}',
+                  BilingualText(
+                    L10n.offices024b84.withValues([
+                      (data['offices'] as List).join(', '),
+                    ]),
                   ),
-                  Text(
-                    'Generated ${data['generated_at']} · current effective records; corrections can change earlier periods',
+                  BilingualText(
+                    (lifetime
+                        ? L10n.lifetimeTripAllLinkedDatesCurrentBalances
+                        : L10n.to.withValues([
+                            (data['period'] as Map)['from'],
+                            (data['period'] as Map)['to'],
+                          ])),
+                  ),
+                  BilingualText(
+                    L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
+                        .withValues([data['generated_at']]),
                   ),
                   if (rows.isEmpty)
                     const Padding(
                       padding: EdgeInsets.all(16),
-                      child: Text('No records in this period/scope.'),
+                      child: BilingualText(L10n.noRecordsInThisPeriodScope),
                     ),
                   Wrap(
                     spacing: 12,
@@ -340,13 +390,15 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                         ),
                     ],
                   ),
-                  Text('${data['row_count']} groups · 50 rows per page'),
+                  BilingualText(
+                    L10n.groupsRowsPerPage.withValues([data['row_count']]),
+                  ),
                   for (final row in rows)
                     ExpansionTile(
                       title: Text(row['name'] as String),
                       children: [
                         for (final key in reportLabels.keys)
-                          ListTile(
+                          BilingualListTile(
                             dense: true,
                             title: value(
                               key,
@@ -362,14 +414,14 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                         onPressed: offset > 0
                             ? () => reload(start: offset - 50)
                             : null,
-                        child: const Text('Previous'),
+                        child: const BilingualCaption(L10n.previous),
                       ),
-                      Text('Page ${offset ~/ 50 + 1}'),
+                      BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
                       TextButton(
                         onPressed: data['has_more'] == true
                             ? () => reload(start: offset + 50)
                             : null,
-                        child: const Text('Next'),
+                        child: const BilingualCaption(L10n.next),
                       ),
                     ],
                   ),
@@ -436,7 +488,8 @@ class _ReportChoiceState extends State<_ReportChoice> {
 
   @override
   Widget build(BuildContext c) => AlertDialog(
-    title: Text('Select ${widget.kind.toLowerCase()}'),
+    scrollable: true,
+    title: BilingualText(L10n.select.withValues([widget.kind.toLowerCase()])),
     content: SizedBox(
       width: 450,
       height: 450,
@@ -444,7 +497,10 @@ class _ReportChoiceState extends State<_ReportChoice> {
         children: [
           TextField(
             controller: search,
-            decoration: const InputDecoration(labelText: 'Search'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.search)),
+            ),
             onSubmitted: (_) => setState(() {
               offset = 0;
               rows = fetch();
@@ -454,12 +510,14 @@ class _ReportChoiceState extends State<_ReportChoice> {
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: rows,
               builder: (_, s) {
-                if (s.hasError) return const Text('Current access required.');
+                if (s.hasError) {
+                  return const BilingualText(L10n.currentAccessRequired);
+                }
                 if (!s.hasData) return const LinearProgressIndicator();
                 return ListView(
                   children: [
                     for (final r in s.data!)
-                      ListTile(
+                      BilingualListTile(
                         title: Text(r['label'] as String),
                         onTap: () => Navigator.pop(c, r),
                       ),
@@ -477,14 +535,14 @@ class _ReportChoiceState extends State<_ReportChoice> {
                         rows = fetch();
                       })
                     : null,
-                child: const Text('Previous'),
+                child: const BilingualCaption(L10n.previous),
               ),
               TextButton(
                 onPressed: () => setState(() {
                   offset += 50;
                   rows = fetch();
                 }),
-                child: const Text('Next'),
+                child: const BilingualCaption(L10n.next),
               ),
             ],
           ),
@@ -492,7 +550,10 @@ class _ReportChoiceState extends State<_ReportChoice> {
       ),
     ),
     actions: [
-      TextButton(onPressed: () => Navigator.pop(c), child: const Text('Close')),
+      TextButton(
+        onPressed: () => Navigator.pop(c),
+        child: const BilingualCaption(L10n.close),
+      ),
     ],
   );
 }

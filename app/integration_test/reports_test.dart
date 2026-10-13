@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
@@ -50,7 +52,7 @@ void main() {
         ('Trip / vehicle search', 'T11-SYNTHETIC'),
       ]) {
         final f = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == entry.$1,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, entry.$1),
         );
         await tester.ensureVisible(f);
         await tester.enterText(f, entry.$2);
@@ -59,16 +61,19 @@ void main() {
       await tester.tap(find.text('Run report'));
       await tester.pumpAndSettle();
       expect(
-        find.textContaining('not a complete business balance'),
+        englishTextContaining('not a complete business balance'),
         findsOneWidget,
       );
       expect(
-        find.textContaining(
+        englishTextContaining(
           'Owner earnings — dispatch / adjustment date: PKR 95000.00',
         ),
         findsOneWidget,
       );
-        expect(find.widgetWithText(ExpansionTile, 'T11-SYNTHETIC'), findsOneWidget);
+      expect(
+        find.widgetWithText(ExpansionTile, 'T11-SYNTHETIC'),
+        findsOneWidget,
+      );
     } finally {
       await tester.pumpWidget(const SizedBox.shrink());
       await session.signOut();

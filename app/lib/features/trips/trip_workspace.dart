@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -152,25 +154,41 @@ class _TripWorkspaceState extends State<TripWorkspace> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text(TripStrings.trips)),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.trips),
+    ),
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
         FilledButton.icon(
           onPressed: () => edit(TripDraft()),
           icon: const Icon(Icons.add),
-          label: const Text(TripStrings.newTrip),
+          label: const BilingualText(L10n.newDraft),
         ),
         TextField(
           controller: search,
-          decoration: const InputDecoration(labelText: TripStrings.search),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualCaption(L10n.searchTripVehicleOrParty),
+            ),
+          ),
           onSubmitted: (_) => reload(start: 0),
         ),
         DropdownButtonFormField<String>(
+          isExpanded: true,
+          itemHeight: 80,
           initialValue: office,
-          decoration: const InputDecoration(labelText: 'Office filter'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.officeFilter)),
+          ),
           items: [
-            const DropdownMenuItem(value: null, child: Text(TripStrings.all)),
+            const DropdownMenuItem(
+              value: null,
+              child: BilingualText(L10n.allOffices),
+            ),
             for (final o in widget.offices)
               DropdownMenuItem(
                 value: o['id'] as String,
@@ -182,8 +200,12 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             reload(start: 0);
           },
         ),
-        ListTile(
-          title: Text(vehicleName ?? 'Vehicle filter: all'),
+        BilingualListTile(
+          title: BilingualText(
+            (vehicleName != null
+                ? Bilingual.data(vehicleName)
+                : L10n.vehicleFilterAll),
+          ),
           trailing: Wrap(
             children: [
               TextButton(
@@ -199,7 +221,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                     reload(start: 0);
                   }
                 },
-                child: const Text(TripStrings.choose),
+                child: const BilingualCaption(L10n.choose),
               ),
               TextButton(
                 onPressed: () {
@@ -207,18 +229,26 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                   vehicleName = null;
                   reload(start: 0);
                 },
-                child: const Text(TripStrings.clear),
+                child: const BilingualCaption(L10n.clear),
               ),
             ],
           ),
         ),
         DropdownButtonFormField<String>(
+          isExpanded: true,
+          itemHeight: 80,
           initialValue: status,
-          decoration: const InputDecoration(labelText: 'Trip state'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.tripState)),
+          ),
           items: [
-            const DropdownMenuItem(value: null, child: Text('All states')),
+            const DropdownMenuItem(
+              value: null,
+              child: BilingualText(L10n.allStates),
+            ),
             for (final s in ['DRAFT', 'DISPATCHED', 'ARRIVED', 'CANCELLED'])
-              DropdownMenuItem(value: s, child: Text(s)),
+              DropdownMenuItem(value: s, child: BilingualOwnedText(s)),
           ],
           onChanged: (v) {
             status = v;
@@ -227,37 +257,63 @@ class _TripWorkspaceState extends State<TripWorkspace> {
         ),
         TextField(
           controller: from,
-          decoration: InputDecoration(labelText: TripStrings.labels['from']),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualOwnedCaption(TripStrings.labels['from']),
+            ),
+          ),
         ),
         TextField(
           controller: to,
-          decoration: InputDecoration(labelText: TripStrings.labels['to']),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualOwnedCaption(TripStrings.labels['to']),
+            ),
+          ),
         ),
         TextButton(
           onPressed: () => reload(start: 0),
-          child: const Text(TripStrings.refresh),
+          child: const BilingualCaption(L10n.searchRefresh),
         ),
         FutureBuilder<TripPage>(
           future: page,
           builder: (context, snapshot) {
-            if (snapshot.hasError) return Text(tripError(snapshot.error!));
+            if (snapshot.hasError) {
+              return BilingualOwnedText(tripError(snapshot.error!));
+            }
             if (!snapshot.hasData) return const LinearProgressIndicator();
             final result = snapshot.data!;
             return Column(
               children: [
-                Text(
-                  result.scope == 'ALL_OFFICES'
-                      ? TripStrings.all
-                      : TripStrings.scope,
+                BilingualText(
+                  (result.scope == 'ALL_OFFICES'
+                      ? L10n.allOffices
+                      : L10n.assignedOfficeTrips),
                 ),
-                if (result.rows.isEmpty) const Text(TripStrings.empty),
+                if (result.rows.isEmpty)
+                  const BilingualText(L10n.noTripsInThisScope),
                 for (final r in result.rows)
                   Card(
-                    child: ListTile(
+                    child: BilingualListTile(
                       key: ValueKey('trip:${r['id']}'),
-                      title: Text('${r['trip_number']} · ${r['registration']}'),
-                      subtitle: Text(
-                        '${r['origin_name']} → ${r['destination_name']}\n${r['state']} · ${r['load_kind']} · ${r['dispatch_date'] ?? r['planned_dispatch_date'] ?? ''}',
+                      title: BilingualText(
+                        L10n.labelValuescd55a9.withValues([
+                          r['trip_number'],
+                          r['registration'],
+                        ]),
+                      ),
+                      subtitle: BilingualText(
+                        L10n.labelValues8a6c87.withValues([
+                          r['origin_name'],
+                          r['destination_name'],
+                          r['state'],
+                          r['load_kind'],
+                          r['dispatch_date'] ??
+                              r['planned_dispatch_date'] ??
+                              '',
+                        ]),
                       ),
                       onTap: () => detail(r['id'] as String),
                     ),
@@ -269,13 +325,13 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                       onPressed: offset == 0
                           ? null
                           : () => reload(start: offset - 50),
-                      child: const Text(TripStrings.previous),
+                      child: const BilingualCaption(L10n.previous),
                     ),
                     TextButton(
                       onPressed: result.rows.length < 50
                           ? null
                           : () => reload(start: offset + 50),
-                      child: const Text(TripStrings.next),
+                      child: const BilingualCaption(L10n.next),
                     ),
                   ],
                 ),
@@ -341,7 +397,13 @@ class _MasterChoiceState extends State<_MasterChoice> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text('${TripStrings.choose} ${widget.role ?? widget.kind.label}'),
+    scrollable: true,
+    title: BilingualText(
+      L10n.labelValues10866a.withValues([
+        ownedMessage(TripStrings.choose),
+        widget.role ?? widget.kind.label,
+      ]),
+    ),
     content: SizedBox(
       width: 480,
       height: 420,
@@ -349,20 +411,23 @@ class _MasterChoiceState extends State<_MasterChoice> {
         children: [
           TextField(
             controller: search,
-            decoration: const InputDecoration(
-              labelText: TripStrings.searchChoices,
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.searchNameCode)),
             ),
             onSubmitted: (_) => reload(0),
           ),
           TextButton(
             onPressed: () => reload(0),
-            child: const Text(TripStrings.refresh),
+            child: const BilingualCaption(L10n.searchRefresh),
           ),
           Expanded(
             child: FutureBuilder<List<MasterRecord>>(
               future: rows,
               builder: (context, snapshot) {
-                if (snapshot.hasError) return Text(tripError(snapshot.error!));
+                if (snapshot.hasError) {
+                  return BilingualOwnedText(tripError(snapshot.error!));
+                }
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -377,9 +442,10 @@ class _MasterChoiceState extends State<_MasterChoice> {
                     .toList();
                 return ListView(
                   children: [
-                    if (choices.isEmpty) const Text(TripStrings.noChoices),
+                    if (choices.isEmpty)
+                      const BilingualText(L10n.noChoicesOnThisPage),
                     for (final r in choices)
-                      ListTile(
+                      BilingualListTile(
                         title: Text(r.label),
                         subtitle: Text(r.value('code')),
                         onTap: () => Navigator.pop(context, r),
@@ -390,13 +456,13 @@ class _MasterChoiceState extends State<_MasterChoice> {
                           onPressed: offset == 0
                               ? null
                               : () => reload(offset - 50),
-                          child: const Text(TripStrings.previous),
+                          child: const BilingualCaption(L10n.previous),
                         ),
                         TextButton(
                           onPressed: all.length < 50
                               ? null
                               : () => reload(offset + 50),
-                          child: const Text(TripStrings.next),
+                          child: const BilingualCaption(L10n.next),
                         ),
                       ],
                     ),
@@ -411,7 +477,7 @@ class _MasterChoiceState extends State<_MasterChoice> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text(TripStrings.close),
+        child: const BilingualCaption(L10n.close),
       ),
     ],
   );
@@ -504,7 +570,16 @@ class _TripEditorState extends State<TripEditor> {
       key: ValueKey('$key:${revision ?? ''}'),
       initialValue: value,
       enabled: !busy,
-      decoration: InputDecoration(labelText: label ?? TripStrings.labels[key]),
+      decoration: bilingualDecoration(
+        context,
+        InputDecoration(
+          label: BilingualCaption(
+            (label != null
+                ? ownedMessage(label)
+                : ownedMessage(TripStrings.labels[key])),
+          ),
+        ),
+      ),
       onChanged: (v) => setState(() => change(v)),
     ),
   );
@@ -517,11 +592,23 @@ class _TripEditorState extends State<TripEditor> {
   }) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: DropdownButtonFormField<String>(
+      isExpanded: true,
+      itemHeight: 80,
       key: ValueKey('$key:$value:${choices.join(',')}'),
       initialValue: choices.contains(value) ? value : null,
-      decoration: InputDecoration(labelText: label ?? TripStrings.labels[key]),
+      decoration: bilingualDecoration(
+        context,
+        InputDecoration(
+          label: BilingualCaption(
+            (label != null
+                ? ownedMessage(label)
+                : ownedMessage(TripStrings.labels[key])),
+          ),
+        ),
+      ),
       items: [
-        for (final v in choices) DropdownMenuItem(value: v, child: Text(v)),
+        for (final v in choices)
+          DropdownMenuItem(value: v, child: BilingualOwnedText(v)),
       ],
       onChanged: busy ? null : (v) => setState(() => change(v)),
     ),
@@ -531,19 +618,24 @@ class _TripEditorState extends State<TripEditor> {
     String? label,
     VoidCallback select, {
     VoidCallback? clear,
-  }) => ListTile(
+  }) => BilingualListTile(
     contentPadding: EdgeInsets.zero,
-    title: Text('${TripStrings.labels[key]}: ${label ?? TripStrings.none}'),
+    title: BilingualText(
+      L10n.labelValuesfb62fe.withValues([
+        ownedMessage(TripStrings.labels[key]),
+        label ?? ownedMessage(TripStrings.none),
+      ]),
+    ),
     trailing: Wrap(
       children: [
         TextButton(
           onPressed: busy ? null : select,
-          child: const Text(TripStrings.choose),
+          child: const BilingualCaption(L10n.choose),
         ),
         if (clear != null)
           TextButton(
             onPressed: busy ? null : () => setState(clear),
-            child: const Text(TripStrings.clear),
+            child: const BilingualCaption(L10n.clear),
           ),
       ],
     ),
@@ -556,15 +648,21 @@ class _TripEditorState extends State<TripEditor> {
   ) {
     final rows = d.stops.where((s) => s.kind == kind).toList();
     return DropdownButtonFormField<String>(
+      itemHeight: 80,
       key: ValueKey('$key:$id:${rows.map((s) => s.id).join(',')}'),
       initialValue: rows.any((s) => s.id == id) ? id : null,
-      decoration: InputDecoration(
-        labelText: kind == 'PICKUP'
-            ? TripStrings.labels['pickup']
-            : TripStrings.labels['drop'],
+      decoration: bilingualDecoration(
+        context,
+        InputDecoration(
+          label: BilingualCaption(
+            (kind == 'PICKUP'
+                ? ownedMessage(TripStrings.labels['pickup'])
+                : ownedMessage(TripStrings.labels['drop'])),
+          ),
+        ),
       ),
       items: [
-        const DropdownMenuItem(value: null, child: Text(TripStrings.none)),
+        const DropdownMenuItem(value: null, child: BilingualText(L10n.none)),
         for (final s in rows)
           DropdownMenuItem(
             value: s.id,
@@ -584,7 +682,12 @@ class _TripEditorState extends State<TripEditor> {
     runSpacing: 8,
     children: [
       for (final k in ['customer_charge', 'commission', 'owner_entitlement'])
-        Text('${TripStrings.labels[k]}: PKR ${values[k]}'),
+        BilingualText(
+          L10n.pkr274c89.withValues([
+            ownedMessage(TripStrings.labels[k]),
+            values[k],
+          ]),
+        ),
     ],
   );
   Widget preview(DraftConsignment c) {
@@ -596,7 +699,7 @@ class _TripEditorState extends State<TripEditor> {
         'owner_entitlement': q.ownerEntitlement,
       });
     } catch (_) {
-      return const Text(TripStrings.fareInvalid);
+      return const BilingualText(L10n.checkTheQuoteAndBrokerageValues);
     }
   }
 
@@ -607,8 +710,8 @@ class _TripEditorState extends State<TripEditor> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Consignment ${d.consignments.indexOf(c) + 1}',
+          BilingualText(
+            L10n.consignment.withValues([d.consignments.indexOf(c) + 1]),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           picker('customer', c.customerName, () async {
@@ -670,8 +773,11 @@ class _TripEditorState extends State<TripEditor> {
                       c.amount = d.suggestedFare!;
                       c.fareRevision++;
                     }),
-              child: Text(
-                '${TripStrings.applySuggestion}: PKR ${d.suggestedFare}',
+              child: BilingualCaption(
+                L10n.pkr274c89.withValues([
+                  ownedMessage(TripStrings.applySuggestion),
+                  d.suggestedFare,
+                ]),
               ),
             ),
           choice(
@@ -702,7 +808,9 @@ class _TripEditorState extends State<TripEditor> {
             (v) => c.notes = v,
             label: TripStrings.labels['notes'],
           ),
-          const Text(TripStrings.carsHelp),
+          const BilingualText(
+            L10n.countIncludesAllCarsIdentifiersAreOptionalCarStops,
+          ),
           for (final a in c.cars)
             Card(
               key: ValueKey(a.id),
@@ -732,7 +840,7 @@ class _TripEditorState extends State<TripEditor> {
                       onPressed: busy
                           ? null
                           : () => setState(() => c.cars.remove(a)),
-                      child: const Text(TripStrings.remove),
+                      child: const BilingualCaption(L10n.remove),
                     ),
                   ],
                 ),
@@ -744,13 +852,13 @@ class _TripEditorState extends State<TripEditor> {
                 onPressed: busy
                     ? null
                     : () => setState(() => c.cars.add(DraftCar())),
-                child: const Text(TripStrings.addCar),
+                child: const BilingualCaption(L10n.addOptionalIdentifier),
               ),
               TextButton(
                 onPressed: busy
                     ? null
                     : () => setState(() => d.consignments.remove(c)),
-                child: const Text(TripStrings.removeConsignment),
+                child: const BilingualCaption(L10n.removeConsignment),
               ),
             ],
           ),
@@ -808,23 +916,35 @@ class _TripEditorState extends State<TripEditor> {
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
     child: Scaffold(
-      appBar: AppBar(title: Text(d.number ?? TripStrings.newTrip)),
+      appBar: AppBar(
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: BilingualText(
+          (d.number != null ? Bilingual.data(d.number) : L10n.newDraft),
+        ),
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Text(TripStrings.potential),
+              const BilingualText(
+                L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+              ),
               if (d.parent != null)
-                Text('Linked return of ${d.parentNumber ?? d.parent}'),
+                BilingualText(
+                  L10n.linkedReturnOf.withValues([d.parentNumber ?? d.parent]),
+                ),
               picker(
                 'vehicle',
                 d.registration,
                 () => pick('vehicle', MasterKind.vehicle),
               ),
-              Text(
-                '${TripStrings.labels['owner']}: ${d.ownerName ?? 'Reconciled on save'}',
+              BilingualText(
+                L10n.labelValuesfb62fe.withValues([
+                  ownedMessage(TripStrings.labels['owner']),
+                  d.ownerName ?? L10n.reconciledOnSave,
+                ]),
               ),
               picker(
                 'driver',
@@ -837,12 +957,17 @@ class _TripEditorState extends State<TripEditor> {
                 },
               ),
               DropdownButtonFormField<String>(
+                isExpanded: true,
+                itemHeight: 80,
                 key: ValueKey('origin:${d.origin}'),
                 initialValue: widget.offices.any((o) => o['id'] == d.origin)
                     ? d.origin
                     : null,
-                decoration: InputDecoration(
-                  labelText: TripStrings.labels['origin'],
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualOwnedCaption(TripStrings.labels['origin']),
+                  ),
                 ),
                 items: [
                   for (final o in widget.offices)
@@ -889,7 +1014,7 @@ class _TripEditorState extends State<TripEditor> {
               }),
               field('notes', d.notes, (v) => d.notes = v),
               const Divider(),
-              const Text(TripStrings.stops),
+              const BilingualText(L10n.pickupDropStops),
               for (final s in d.stops)
                 Card(
                   key: ValueKey(s.id),
@@ -897,7 +1022,9 @@ class _TripEditorState extends State<TripEditor> {
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       children: [
-                        Text('Stop ${d.stops.indexOf(s) + 1}'),
+                        BilingualText(
+                          L10n.stop.withValues([d.stops.indexOf(s) + 1]),
+                        ),
                         choice(
                           '${s.id}:kind',
                           s.kind,
@@ -923,7 +1050,7 @@ class _TripEditorState extends State<TripEditor> {
                                       d.stops.removeAt(i);
                                       d.stops.insert(i - 1, s);
                                     }),
-                              child: const Text(TripStrings.up),
+                              child: const BilingualCaption(L10n.moveUp),
                             ),
                             TextButton(
                               onPressed:
@@ -935,7 +1062,7 @@ class _TripEditorState extends State<TripEditor> {
                                       d.stops.removeAt(i);
                                       d.stops.insert(i + 1, s);
                                     }),
-                              child: const Text(TripStrings.down),
+                              child: const BilingualCaption(L10n.moveDown),
                             ),
                             TextButton(
                               onPressed: busy
@@ -947,7 +1074,7 @@ class _TripEditorState extends State<TripEditor> {
                                         d.stops.remove(s);
                                       }
                                     }),
-                              child: const Text(TripStrings.remove),
+                              child: const BilingualCaption(L10n.remove),
                             ),
                           ],
                         ),
@@ -959,7 +1086,7 @@ class _TripEditorState extends State<TripEditor> {
                 onPressed: busy
                     ? null
                     : () => setState(() => d.stops.add(DraftStop())),
-                child: const Text(TripStrings.addStop),
+                child: const BilingualCaption(L10n.addStop),
               ),
               for (final c in d.consignments) consignment(c),
               if (d.kind == 'LOADED')
@@ -969,14 +1096,15 @@ class _TripEditorState extends State<TripEditor> {
                       : () => setState(
                           () => d.consignments.add(DraftConsignment()),
                         ),
-                  child: const Text(TripStrings.addConsignment),
+                  child: const BilingualCaption(L10n.addConsignment),
                 ),
               if (d.version > 0) field('reason', d.reason, (v) => d.reason = v),
-              if (error != null) Text(error!, key: const Key('trip-error')),
+              if (error != null)
+                BilingualOwnedText(error!, key: const Key('trip-error')),
               if (busy) const LinearProgressIndicator(),
               FilledButton(
                 onPressed: busy || conflicted ? null : save,
-                child: const Text(TripStrings.save),
+                child: const BilingualCaption(L10n.reviewAndSaveDraft),
               ),
             ],
           ),
@@ -1007,31 +1135,51 @@ class _DraftReviewState extends State<_DraftReview> {
   Widget build(BuildContext context) {
     final needed = widget.warning['requires_confirmation'] == true;
     return AlertDialog(
-      title: const Text(TripStrings.review),
+      scrollable: true,
+      title: const BilingualText(L10n.reviewDraft),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(TripStrings.potential),
+            const BilingualText(
+              L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+            ),
             for (final k in widget.totals.keys)
-              Text('${TripStrings.labels[k]}: PKR ${widget.totals[k]}'),
+              BilingualText(
+                L10n.pkr274c89.withValues([
+                  ownedMessage(TripStrings.labels[k]),
+                  widget.totals[k],
+                ]),
+              ),
             if (needed) ...[
-              const Text(TripStrings.overlap),
+              const BilingualText(
+                L10n.anotherDispatchedJourneyUsesThisVehicleReviewAndConfirm,
+              ),
               for (final t in widget.warning['visible_trips'] as List)
-                Text('${t['trip_number']} · ${t['dispatch_date']}'),
+                BilingualText(
+                  L10n.labelValuescd55a9.withValues([
+                    t['trip_number'],
+                    t['dispatch_date'],
+                  ]),
+                ),
               if (widget.warning['restricted_conflict'] == true)
-                const Text(TripStrings.restricted),
+                const BilingualText(
+                  L10n.anActiveJourneyOutsideYourOfficeScopeAlsoUses,
+                ),
               CheckboxListTile(
                 value: confirmed,
                 onChanged: (v) => setState(() => confirmed = v!),
-                title: const Text(TripStrings.confirmOverlap),
+                title: const BilingualText(L10n.iReviewedThisVehicleOverlap),
               ),
               TextField(
                 controller: reason,
                 maxLength: 500,
-                decoration: const InputDecoration(
-                  labelText: TripStrings.reviewReason,
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualCaption(L10n.reasonForAllowingTheOverlap),
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -1042,7 +1190,7 @@ class _DraftReviewState extends State<_DraftReview> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(TripStrings.cancel),
+          child: const BilingualCaption(L10n.cancel),
         ),
         FilledButton(
           onPressed: needed && (!confirmed || reason.text.trim().isEmpty)
@@ -1051,7 +1199,7 @@ class _DraftReviewState extends State<_DraftReview> {
                   'overlap_confirmed': needed,
                   'overlap_reason': needed ? reason.text.trim() : null,
                 }),
-          child: const Text(TripStrings.confirm),
+          child: const BilingualCaption(L10n.confirmSave),
         ),
       ],
     );
@@ -1114,9 +1262,13 @@ class _TripDetailState extends State<TripDetail> {
     );
     if (committed != null && mounted) {
       reload();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(LifecycleStrings.success)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: BilingualText(
+            L10n.operationCommittedCurrentServerRecordShown,
+          ),
+        ),
+      );
     }
   }
 
@@ -1132,12 +1284,13 @@ class _TripDetailState extends State<TripDetail> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Trip details'),
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.tripDetails),
       actions: [
         IconButton(
           onPressed: reload,
           icon: const Icon(Icons.refresh),
-          tooltip: TripStrings.refresh,
+          tooltip: L10n.searchRefreshAccessibility,
         ),
       ],
     ),
@@ -1145,7 +1298,7 @@ class _TripDetailState extends State<TripDetail> {
       future: data,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text(tripError(snapshot.error!)));
+          return Center(child: BilingualOwnedText(tripError(snapshot.error!)));
         }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -1162,40 +1315,80 @@ class _TripDetailState extends State<TripDetail> {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            if (widget.saved) const Text(TripStrings.saved),
-            Text(
-              '${r['trip_number']} · ${r['registration']}',
+            if (widget.saved)
+              const BilingualText(
+                L10n.draftSavedServerCalculatedAmountsShownBelow,
+              ),
+            BilingualText(
+              L10n.labelValuescd55a9.withValues([
+                r['trip_number'],
+                r['registration'],
+              ]),
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             Text('${r['origin_name']} → ${r['destination_name']}'),
-            Text('${r['state']} · ${r['load_kind']}'),
-            Text(
-              'Recorded owner: ${(r['owner_snapshot'] as Map)['display_name']}',
+            BilingualText(
+              L10n.labelValuescd55a9.withValues([r['state'], r['load_kind']]),
             ),
-            Text(
-              'Recorded route: ${(r['route_snapshot'] as Map)['code'] ?? TripStrings.none}',
+            BilingualText(
+              L10n.recordedOwnere34286.withValues([
+                (r['owner_snapshot'] as Map)['display_name'],
+              ]),
             ),
-            Text('Driver: ${r['driver_name'] ?? TripStrings.none}'),
-            Text(
-              'Planned date: ${r['planned_dispatch_date'] ?? TripStrings.none}',
+            BilingualText(
+              L10n.recordedRoute.withValues([
+                (r['route_snapshot'] as Map)['code'] ??
+                    ownedMessage(TripStrings.none),
+              ]),
             ),
-            Text(
-              'Dispatch: ${r['dispatch_date'] ?? TripStrings.none} · Arrival: ${r['arrival_date'] ?? TripStrings.none}',
+            BilingualText(
+              L10n.driver.withValues([
+                r['driver_name'] ?? ownedMessage(TripStrings.none),
+              ]),
             ),
-            if (r['state'] == 'DRAFT') const Text(TripStrings.potential),
+            BilingualText(
+              L10n.plannedDate.withValues([
+                r['planned_dispatch_date'] ?? ownedMessage(TripStrings.none),
+              ]),
+            ),
+            BilingualText(
+              L10n.dispatchArrival.withValues([
+                r['dispatch_date'] ?? ownedMessage(TripStrings.none),
+                r['arrival_date'] ?? ownedMessage(TripStrings.none),
+              ]),
+            ),
+            if (r['state'] == 'DRAFT')
+              const BilingualText(
+                L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+              ),
             if (r['earnings_recognized'] == true)
-              const Text(LifecycleStrings.recognition),
-            const Text(LifecycleStrings.independent),
+              const BilingualText(
+                L10n.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage,
+              ),
+            const BilingualText(
+              L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
+            ),
             for (final k in [
               'customer_charge',
               'commission',
               'owner_entitlement',
             ])
-              Text('${TripStrings.labels[k]}: PKR ${(r['totals'] as Map)[k]}'),
-            Text('Car count: ${(r['totals'] as Map)['car_count']}'),
-            Text('${r['notes']}'),
+              BilingualText(
+                L10n.pkr274c89.withValues([
+                  ownedMessage(TripStrings.labels[k]),
+                  (r['totals'] as Map)[k],
+                ]),
+              ),
+            BilingualText(
+              L10n.carCount04a594.withValues([
+                (r['totals'] as Map)['car_count'],
+              ]),
+            ),
+            Text((r['notes']).toString()),
             if (r['overlap_confirmed'] == true)
-              Text('Overlap reviewed: ${r['overlap_reason']}'),
+              BilingualText(
+                L10n.overlapReviewed.withValues([r['overlap_reason']]),
+              ),
             Wrap(
               children: [
                 for (final action in TripAction.values.where(
@@ -1204,21 +1397,23 @@ class _TripDetailState extends State<TripDetail> {
                   if (r[action.permission] == true)
                     TextButton(
                       onPressed: () => operate(action, r),
-                      child: Text(action.label),
+                      child: BilingualOwnedCaption(action.label),
                     ),
                 TextButton(
                   onPressed: history,
-                  child: const Text(LifecycleStrings.history),
+                  child: const BilingualCaption(L10n.history),
                 ),
                 if (widget.onCorrections != null)
                   TextButton(
                     onPressed: widget.onCorrections,
-                    child: const Text('Corrections and cancellation'),
+                    child: const BilingualCaption(
+                      L10n.correctionsAndCancellation,
+                    ),
                   ),
                 if (widget.onPayments != null)
                   TextButton(
                     onPressed: widget.onPayments,
-                    child: const Text('Payments and allocations'),
+                    child: const BilingualCaption(L10n.paymentsAndAllocations),
                   ),
                 if (r['can_edit'] == true)
                   TextButton(
@@ -1226,29 +1421,40 @@ class _TripDetailState extends State<TripDetail> {
                       await widget.onEdit(TripDraft.fromDetail(r));
                       if (mounted) reload();
                     },
-                    child: const Text(TripStrings.edit),
+                    child: const BilingualCaption(L10n.editDraft),
                   ),
                 if (r['state'] != 'CANCELLED' &&
                     widget.canReturn(r['destination_office_id'] as String))
                   TextButton(
                     onPressed: () => widget.onEdit(TripDraft.returnFrom(r)),
-                    child: const Text(TripStrings.linkedReturn),
+                    child: const BilingualCaption(L10n.createLinkedReturn),
                   ),
               ],
             ),
             if (r['return_of_trip_id'] != null)
               TextButton(
                 onPressed: () => openLinked(r['return_of_trip_id'] as String),
-                child: const Text('Original trip'),
+                child: const BilingualCaption(L10n.originalTrip),
               ),
             for (final t in r['linked_returns'] as List)
               TextButton(
                 onPressed: () => openLinked(t['id'] as String),
-                child: Text('Return ${t['trip_number']} · ${t['load_kind']}'),
+                child: BilingualCaption(
+                  L10n.returnMessage.withValues([
+                    t['trip_number'],
+                    t['load_kind'],
+                  ]),
+                ),
               ),
-            const Text(TripStrings.stops),
+            const BilingualText(L10n.pickupDropStops),
             for (final s in stops)
-              Text('${s['position']}. ${s['kind']}: ${s['address']}'),
+              BilingualText(
+                L10n.stopRecordIdentity.withValues([
+                  s['position'],
+                  ownedMessage(s['kind']),
+                  s['address'],
+                ]),
+              ),
             for (final c in r['consignments'] as List)
               Card(
                 child: Padding(
@@ -1256,8 +1462,12 @@ class _TripDetailState extends State<TripDetail> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${c['customer_name']} · ${c['state']} · ${c['car_count']} cars',
+                      BilingualText(
+                        L10n.cars7b7a19.withValues([
+                          c['customer_name'],
+                          c['state'],
+                          c['car_count'],
+                        ]),
                       ),
                       if (r['can_cancel_consignment'] == true &&
                           c['state'] == 'ACTIVE')
@@ -1267,25 +1477,48 @@ class _TripDetailState extends State<TripDetail> {
                             r,
                             consignment: c['id'] as String,
                           ),
-                          child: Text(TripAction.cancelConsignment.label),
+                          child: BilingualOwnedCaption(
+                            TripAction.cancelConsignment.label,
+                          ),
                         ),
-                      Text('Broker: ${c['broker_name'] ?? TripStrings.none}'),
-                      Text(
-                        'Quoted: PKR ${c['quoted_amount']} · ${c['quote_mode']} · ${c['commission_method']} ${c['commission_value']}',
+                      BilingualText(
+                        L10n.broker.withValues([
+                          c['broker_name'] ?? ownedMessage(TripStrings.none),
+                        ]),
+                      ),
+                      BilingualText(
+                        L10n.quotedPKR.withValues([
+                          c['quoted_amount'],
+                          c['quote_mode'],
+                          c['commission_method'],
+                          c['commission_value'],
+                        ]),
                       ),
                       for (final k in [
                         'customer_charge',
                         'commission',
                         'owner_entitlement',
                       ])
-                        Text('${TripStrings.labels[k]}: PKR ${c[k]}'),
-                      Text(
-                        'Pickup: ${stopLabel(c['pickup_stop_id'])}\nDrop: ${stopLabel(c['drop_stop_id'])}',
+                        BilingualText(
+                          L10n.pkr274c89.withValues([
+                            ownedMessage(TripStrings.labels[k]),
+                            c[k],
+                          ]),
+                        ),
+                      BilingualText(
+                        L10n.pickupDrop.withValues([
+                          stopLabel(c['pickup_stop_id']),
+                          stopLabel(c['drop_stop_id']),
+                        ]),
                       ),
-                      Text('${c['notes']}'),
+                      Text((c['notes']).toString()),
                       for (final a in c['cars'] as List)
-                        Text(
-                          '${a['identifier']} · Pickup: ${stopLabel(a['pickup_stop_id'])} · Drop: ${stopLabel(a['drop_stop_id'])}',
+                        BilingualText(
+                          L10n.pickupDrop68b36c.withValues([
+                            a['identifier'],
+                            stopLabel(a['pickup_stop_id']),
+                            stopLabel(a['drop_stop_id']),
+                          ]),
                         ),
                     ],
                   ),

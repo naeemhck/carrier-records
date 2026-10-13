@@ -2,6 +2,7 @@
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,7 +19,15 @@ ignored = git('ls-files', '--others', '--ignored', '--exclude-standard', '-z').d
 status = subprocess.run(['powershell', '-NoProfile', '-File', str(ROOT / 'tools/supabase.ps1'),
                          'status', '-o', 'json'], capture_output=True, text=True, check=True)
 cfg = json.loads(status.stdout)
-assert cfg['API_URL'] == 'http://127.0.0.1:54321', 'Audit uses the isolated local environment only.'
+if '--karvaan-local' in sys.argv:
+    sys.path.insert(0, str(ROOT / 'tools/karvaan'))
+    from local_environment import boundary, require, API, IDENTITY, sql
+    boundary()
+    require(cfg['API_URL'] == API, 'Audit requires the pinned local endpoint.')
+    require(json.loads(sql('select public.karvaan_local_identity();')) == IDENTITY,
+            'Audit backend identity mismatch.')
+else:
+    assert cfg['API_URL'] == 'http://127.0.0.1:54321', 'Audit uses the isolated local environment only.'
 values = [v for k, v in cfg.items() if isinstance(v, str) and v and
           any(p in k for p in ['SERVICE_ROLE', 'SECRET', 'ANON_KEY'])]
 patterns = {

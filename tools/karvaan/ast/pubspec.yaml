@@ -1,0 +1,6 @@
+name: karvaan_ui_extraction
+publish_to: none
+environment:
+  sdk: ^3.13.3
+dependencies:
+  analyzer: 10.2.0

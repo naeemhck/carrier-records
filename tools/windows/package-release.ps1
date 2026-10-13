@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$Compiler)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+throw 'Karvaan local-only branch: shipping packaging is disabled. Use the separately guarded local candidate package workflow; never install it over production.'
 $compilerPath = (Resolve-Path -LiteralPath $Compiler).Path
 if ((Get-AuthenticodeSignature -LiteralPath $compilerPath).Status -ne 'Valid') {
     throw 'A valid signed Inno Setup compiler is required.'

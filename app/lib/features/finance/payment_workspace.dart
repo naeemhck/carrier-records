@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -343,8 +345,10 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            reloaded ? 'Payment confirmed. Balances reloaded.' : 'Payment confirmed. Balance reload failed; reload before another payment.',
+          content: BilingualText(
+            (reloaded
+                ? L10n.paymentConfirmedBalancesReloaded
+                : L10n.paymentConfirmedBalanceReloadFailedReloadBeforeAnotherPayment),
           ),
         ),
       );
@@ -437,30 +441,41 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     canPop: !busy,
     child: Scaffold(
       appBar: AppBar(
-        title: const Text('Payments and allocations'),
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: const BilingualText(L10n.paymentsAndAllocations),
         actions: [
           IconButton(
             onPressed: busy ? null : refresh,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Reload balances',
+            tooltip: L10n.reloadBalancesAccessibility,
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Permitted trips only — not a complete party or business balance.',
+          const BilingualText(
+            L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
           ),
-          const Text(
-            'Collections, held funds, owner settlement and earnings are separate. Expense offsets and reimbursements are entered with expenses.',
+          const BilingualText(
+            L10n.collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate,
           ),
           if (busy) const LinearProgressIndicator(),
           DropdownButtonFormField<PaymentAction>(
+            isExpanded: true,
+            itemHeight: 80,
             initialValue: action,
-            decoration: const InputDecoration(labelText: 'Action'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.action)),
+            ),
             items: PaymentAction.values
-                .map((a) => DropdownMenuItem(value: a, child: Text(a.label)))
+                .map(
+                  (a) => DropdownMenuItem(
+                    value: a,
+                    child: BilingualOwnedText(a.label),
+                  ),
+                )
                 .toList(),
             onChanged: busy || pendingRequest != null
                 ? null
@@ -481,19 +496,28 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                 onPressed: busy || pendingRequest != null
                     ? null
                     : () => chooseParty(true),
-                child: Text('Payer: ${payerName ?? 'Choose'}'),
+                child: BilingualCaption(
+                  L10n.payer.withValues([payerName ?? 'Choose']),
+                ),
               ),
               TextButton(
                 onPressed: busy || pendingRequest != null
                     ? null
                     : () => chooseParty(false),
-                child: Text('Recipient: ${payeeName ?? 'Choose'}'),
+                child: BilingualCaption(
+                  L10n.recipient.withValues([payeeName ?? 'Choose']),
+                ),
               ),
             ],
           ),
           DropdownButtonFormField<String>(
+            isExpanded: true,
+            itemHeight: 80,
             initialValue: office,
-            decoration: const InputDecoration(labelText: 'Recording office'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.recordingOffice)),
+            ),
             items: widget.offices
                 .map(
                   (o) => DropdownMenuItem(
@@ -517,20 +541,30 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             TextField(
               controller: field.$1,
               enabled: !busy && pendingRequest == null,
-              decoration: InputDecoration(labelText: field.$2),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualOwnedCaption(field.$2)),
+              ),
               onChanged: (_) => setState(() {
                 reviewed = null;
               }),
             ),
-          Text(totals()),
+          BilingualOwnedText(totals()),
           for (final entry in balances.entries) ...[
             Text(
               rows.firstWhere((r) => r.trip == entry.key).number,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             for (final b in entry.value['balances'] as List)
-              Text(
-                '${accountLabel(b['account_purpose'] as String)} · ${partyLabel(b['party_id'] as String)}: PKR ${displayBalance(b['account_purpose'] as String, b['balance'] as String)}',
+              BilingualText(
+                L10n.pkr8fe30e.withValues([
+                  ownedMessage(accountLabel(b['account_purpose'] as String)),
+                  partyLabel(b['party_id'] as String),
+                  displayBalance(
+                    b['account_purpose'] as String,
+                    b['balance'] as String,
+                  ),
+                ]),
               ),
           ],
           for (final row in rows)
@@ -540,10 +574,10 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Allocation · ${row.number}'),
+                    BilingualText(L10n.allocation.withValues([row.number])),
                     if (action == PaymentAction.receipt)
                       CheckboxListTile(
-                        title: const Text('Identified excess credit'),
+                        title: const BilingualText(L10n.identifiedExcessCredit),
                         value: row.credit,
                         onChanged: busy || pendingRequest != null
                             ? null
@@ -555,25 +589,33 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                       ),
                     if (action == PaymentAction.advance || row.credit)
                       DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        itemHeight: 80,
                         key: ValueKey(
                           '${rows.indexOf(row)}-consignment-$payer',
                         ),
                         initialValue: row.consignment,
-                        decoration: const InputDecoration(
-                          labelText: 'Credit belongs to',
+                        decoration: bilingualDecoration(
+                          context,
+                          InputDecoration(
+                            label: BilingualCaption(L10n.creditBelongsTo),
+                          ),
                         ),
                         items: [
                           const DropdownMenuItem(
                             value: null,
-                            child: Text('This customer’s trip'),
+                            child: BilingualText(L10n.thisCustomerSTrip),
                           ),
                           for (final c in row.consignments.where(
                             (c) => c['customer_id'] == payer,
                           ))
                             DropdownMenuItem(
                               value: c['id'] as String,
-                              child: Text(
-                                '${c['customer_name']} · ${c['car_count']} cars',
+                              child: BilingualText(
+                                L10n.cars.withValues([
+                                  c['customer_name'],
+                                  c['car_count'],
+                                ]),
                               ),
                             ),
                         ],
@@ -590,10 +632,15 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                     TextField(
                       controller: row.amount,
                       enabled: !busy && pendingRequest == null,
-                      decoration: InputDecoration(
-                        labelText: action.offset
-                            ? 'Non-cash offset (PKR)'
-                            : 'Allocated amount (PKR)',
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(
+                            (action.offset
+                                ? L10n.nonCashOffsetPKR
+                                : L10n.allocatedAmountPKR),
+                          ),
+                        ),
                       ),
                       onChanged: (_) => setState(() {
                         reviewed = null;
@@ -603,8 +650,11 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                       row.target,
                       row.source,
                     ].whereType<String>())
-                      Text(
-                        'Remaining: PKR ${row.find(id)?['remaining']} · After allocation: PKR ${remaining(row, id)}',
+                      BilingualText(
+                        L10n.remainingPKRAfterAllocationPKR.withValues([
+                          row.find(id)?['remaining'],
+                          remaining(row, id),
+                        ]),
                       ),
                     TextButton(
                       onPressed: busy || pendingRequest != null
@@ -614,7 +664,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                               row.amount.dispose();
                               reviewed = null;
                             }),
-                      child: const Text('Remove allocation'),
+                      child: const BilingualCaption(L10n.removeAllocation),
                     ),
                   ],
                 ),
@@ -624,39 +674,47 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             children: [
               TextButton(
                 onPressed: busy || pendingRequest != null ? null : addTrip,
-                child: const Text('Add trip allocation'),
+                child: const BilingualCaption(L10n.addTripAllocation),
               ),
               for (final id in rows.map((r) => r.trip).toSet())
                 TextButton(
                   onPressed: busy || pendingRequest != null
                       ? null
                       : () => load(id),
-                  child: Text(
-                    'Add another allocation · ${rows.firstWhere((r) => r.trip == id).number}',
+                  child: BilingualCaption(
+                    L10n.addAnotherAllocation.withValues([
+                      rows.firstWhere((r) => r.trip == id).number,
+                    ]),
                   ),
                 ),
             ],
           ),
           if (error != null)
-            Text(
+            BilingualOwnedText(
               error!,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           if (reviewed == null)
             FilledButton(
               onPressed: busy || conflict ? null : review,
-              child: const Text('Review payment'),
+              child: const BilingualCaption(L10n.reviewPayment),
             ),
           if (reviewed != null) ...[
-            Text(
-              'Review: ${action.label} · ${date.text} · $payerName → $payeeName · PKR ${reviewed!['amount']}',
+            BilingualText(
+              L10n.reviewPKR.withValues([
+                action.label,
+                date.text,
+                payerName,
+                payeeName,
+                reviewed!['amount'],
+              ]),
             ),
-            const Text(
-              'Confirm the allocations and resulting balances above. Arrival and earnings are unchanged.',
+            const BilingualText(
+              L10n.confirmTheAllocationsAndResultingBalancesAboveArrivalAnd,
             ),
             FilledButton(
               onPressed: busy || conflict ? null : confirm,
-              child: const Text('Confirm payment'),
+              child: const BilingualCaption(L10n.confirmPayment),
             ),
             if (pendingRequest == null)
               TextButton(
@@ -665,7 +723,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                     : () => setState(() {
                         reviewed = null;
                       }),
-                child: const Text('Change selections'),
+                child: const BilingualCaption(L10n.changeSelections),
               ),
           ],
         ],
@@ -708,20 +766,30 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     PaymentRow row,
     bool source,
   ) => DropdownButtonFormField<String>(
+    itemHeight: 80,
     key: ValueKey(
       '${rows.indexOf(row)}-$source-${action.key}-$payer-$payee-${row.credit}-${row.claims.hashCode}-${source ? row.source : row.target}',
     ),
     initialValue: source ? row.source : row.target,
     isExpanded: true,
-    decoration: InputDecoration(
-      labelText: source ? 'Available source' : 'Outstanding claim',
+    decoration: bilingualDecoration(
+      context,
+      InputDecoration(
+        label: BilingualCaption(
+          (source ? L10n.availableSource : L10n.outstandingClaim),
+        ),
+      ),
     ),
     items: eligible(row, source)
         .map(
           (c) => DropdownMenuItem(
             value: c['line_id'] as String,
-            child: Text(
-              '${accountLabel(c['account_purpose'] as String)} · ${c['effective_date']} · PKR ${c['remaining']}',
+            child: BilingualText(
+              L10n.pkrd24bdd.withValues([
+                ownedMessage(accountLabel(c['account_purpose'] as String)),
+                c['effective_date'],
+                c['remaining'],
+              ]),
             ),
           ),
         )
@@ -791,14 +859,18 @@ class _PartyPickerState extends State<_PartyPicker> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Choose party'),
+    scrollable: true,
+    title: const BilingualText(L10n.chooseParty),
     content: SizedBox(
       width: 500,
       height: 400,
       child: Column(
         children: [
           TextField(
-            decoration: const InputDecoration(labelText: 'Search parties'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.searchParties)),
+            ),
             onSubmitted: (v) => setState(() {
               search = v;
               offset = 0;
@@ -809,13 +881,13 @@ class _PartyPickerState extends State<_PartyPicker> {
             child: FutureBuilder<List<MasterRecord>>(
               future: page,
               builder: (context, s) => s.hasError
-                  ? const Text('Party choices unavailable.')
+                  ? const BilingualText(L10n.partyChoicesUnavailable)
                   : !s.hasData
                   ? const Center(child: CircularProgressIndicator())
                   : ListView(
                       children: [
                         for (final p in s.data!)
-                          ListTile(
+                          BilingualListTile(
                             title: Text(p.label),
                             onTap: () => Navigator.pop(context, p),
                           ),
@@ -832,18 +904,18 @@ class _PartyPickerState extends State<_PartyPicker> {
           offset = offset >= 50 ? offset - 50 : 0;
           reload();
         }),
-        child: const Text('Previous'),
+        child: const BilingualCaption(L10n.previous),
       ),
       TextButton(
         onPressed: () => setState(() {
           offset += 50;
           reload();
         }),
-        child: const Text('Next'),
+        child: const BilingualCaption(L10n.next),
       ),
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Close'),
+        child: const BilingualCaption(L10n.close),
       ),
     ],
   );
@@ -872,14 +944,18 @@ class _TripPickerState extends State<_TripPicker> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Choose permitted trip'),
+    scrollable: true,
+    title: const BilingualText(L10n.choosePermittedTrip),
     content: SizedBox(
       width: 500,
       height: 400,
       child: Column(
         children: [
           TextField(
-            decoration: const InputDecoration(labelText: 'Search trips'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.searchTrips)),
+            ),
             onSubmitted: (v) => setState(() {
               search = v;
               offset = 0;
@@ -890,16 +966,19 @@ class _TripPickerState extends State<_TripPicker> {
             child: FutureBuilder<TripPage>(
               future: page,
               builder: (context, s) => s.hasError
-                  ? const Text('Trip choices unavailable.')
+                  ? const BilingualText(L10n.tripChoicesUnavailable)
                   : !s.hasData
                   ? const Center(child: CircularProgressIndicator())
                   : ListView(
                       children: [
-                        Text(s.data!.scope),
+                        BilingualOwnedText(s.data!.scope),
                         for (final t in s.data!.rows)
-                          ListTile(
-                            title: Text(
-                              '${t['trip_number']} · ${t['registration']}',
+                          BilingualListTile(
+                            title: BilingualText(
+                              L10n.labelValuescd55a9.withValues([
+                                t['trip_number'],
+                                t['registration'],
+                              ]),
                             ),
                             onTap: () => Navigator.pop(context, t['id']),
                           ),
@@ -916,18 +995,18 @@ class _TripPickerState extends State<_TripPicker> {
           offset = offset >= 50 ? offset - 50 : 0;
           reload();
         }),
-        child: const Text('Previous'),
+        child: const BilingualCaption(L10n.previous),
       ),
       TextButton(
         onPressed: () => setState(() {
           offset += 50;
           reload();
         }),
-        child: const Text('Next'),
+        child: const BilingualCaption(L10n.next),
       ),
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Close'),
+        child: const BilingualCaption(L10n.close),
       ),
     ],
   );

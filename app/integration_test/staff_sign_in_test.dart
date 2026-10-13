@@ -1,5 +1,8 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/app/carrier_records_app.dart';
 import 'package:carrier_records/features/auth/public_config.dart';
+import 'package:carrier_records/features/auth/local_candidate_policy.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +17,7 @@ void main() {
     (tester) async {
       final config = PublicConfig.fromEnvironment();
       config.validate();
+      if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
       const username = String.fromEnvironment('TEST_USERNAME');
       const password = String.fromEnvironment('TEST_PASSWORD');
       expect(username.isNotEmpty && password.isNotEmpty, true);
@@ -33,7 +37,7 @@ void main() {
         await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
         await tester.pumpAndSettle(const Duration(milliseconds: 100));
         expect(session.profile?['role'] == 'STAFF', true);
-        expect(find.textContaining('Assigned offices:'), findsOneWidget);
+        expect(englishTextContaining('Assigned offices:'), findsOneWidget);
         expect(await storage.hasAccessToken(), true);
         await tester.tap(find.widgetWithText(TextButton, 'Sign out'));
         await tester.pumpAndSettle(const Duration(milliseconds: 100));

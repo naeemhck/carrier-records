@@ -1,0 +1,18 @@
+{
+  "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansarabic/",
+  "source_sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+  "license": "SIL OFL 1.1",
+  "tool": "fontTools 4.66.1 static instancer",
+  "fonts": [
+    {
+      "file": "NotoSansArabic-Regular.ttf",
+      "bytes": 194336,
+      "sha256": "7d8bfab8154058b0b4fdaa12a23279c5392ec100c4529b82456cf68f37a43263"
+    },
+    {
+      "file": "NotoSansArabic-Bold.ttf",
+      "bytes": 194552,
+      "sha256": "ef1b7d85325ccae80717ba618166583c14d880bc3a2fdcd0de58c990cb5c1abf"
+    }
+  ]
+}

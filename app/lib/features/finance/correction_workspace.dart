@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -101,43 +103,50 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(correctionError(e))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: BilingualOwnedText(correctionError(e))),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Corrections and history')),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.correctionsAndHistory),
+    ),
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(
-          trip == null
-              ? 'Standalone expenses in your permitted offices'
-              : 'Selected permitted trip',
+        BilingualText(
+          (trip == null
+              ? L10n.standaloneExpensesInYourPermittedOffices
+              : L10n.selectedPermittedTrip),
         ),
         Wrap(
           spacing: 12,
           children: [
-            TextButton(onPressed: pick, child: const Text('Choose trip')),
+            TextButton(
+              onPressed: pick,
+              child: const BilingualCaption(L10n.chooseTrip),
+            ),
             TextButton(
               onPressed: () => setState(() {
                 trip = null;
                 offset = 0;
                 reload();
               }),
-              child: const Text('Standalone expenses'),
+              child: const BilingualCaption(L10n.standaloneExpenses),
             ),
             TextButton(
               onPressed: () => setState(reload),
-              child: const Text('Reload'),
+              child: const BilingualCaption(L10n.reload),
             ),
             if (trip != null)
               TextButton(
                 onPressed: () => form(null),
-                child: const Text('Review cancellation'),
+                child: const BilingualCaption(L10n.reviewCancellation),
               ),
           ],
         ),
@@ -145,7 +154,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
           future: rows,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text(correctionError(snapshot.error!));
+              return BilingualOwnedText(correctionError(snapshot.error!));
             }
             if (!snapshot.hasData) {
               return const LinearProgressIndicator();
@@ -154,20 +163,41 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
             return Column(
               children: [
                 if (data.isEmpty)
-                  const Text('No recorded events in this scope.'),
+                  const BilingualText(L10n.noRecordedEventsInThisScope),
                 for (final row in data)
                   Card(
-                    child: ListTile(
-                      title: Text(
-                        '${eventLabel(row['kind'] as String)} - PKR ${row['amount']} - ${row['effective_date']}',
+                    child: BilingualListTile(
+                      title: BilingualText(
+                        L10n.pkr.withValues([
+                          ownedMessage(eventLabel(row['kind'] as String)),
+                          row['amount'],
+                          row['effective_date'],
+                        ]),
                       ),
-                      subtitle: Text(
-                        '${row['actor']} - ${row['recorded_at']}\n${row['reason'] ?? ''}\n${row['reversed'] == true ? 'Reversed. ' : ''}${row['reversal_of_id'] != null ? 'Reverses ${row['reversal_of_id']}. ' : ''}${row['replacement_of_id'] != null ? 'Replaces ${row['replacement_of_id']}. ' : ''}',
+                      subtitle: BilingualText(
+                        L10n.correctionTrace.withValues([
+                          row['actor'],
+                          row['recorded_at'],
+                          row['reason'] ?? '',
+                          row['reversed'] == true
+                              ? L10n.reversedEntry
+                              : Bilingual.data(''),
+                          row['reversal_of_id'] != null
+                              ? L10n.reversesEntry.withValues([
+                                  row['reversal_of_id'],
+                                ])
+                              : Bilingual.data(''),
+                          row['replacement_of_id'] != null
+                              ? L10n.replacesEntry.withValues([
+                                  row['replacement_of_id'],
+                                ])
+                              : Bilingual.data(''),
+                        ]),
                       ),
                       trailing: row['can_correct'] == true
                           ? TextButton(
                               onPressed: () => form(row),
-                              child: const Text('Correct'),
+                              child: const BilingualCaption(L10n.correct),
                             )
                           : null,
                     ),
@@ -181,7 +211,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
                               offset -= 50;
                               reload();
                             }),
-                      child: const Text('Previous'),
+                      child: const BilingualCaption(L10n.previous),
                     ),
                     TextButton(
                       onPressed: data.length < 50
@@ -190,7 +220,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
                               offset += 50;
                               reload();
                             }),
-                      child: const Text('Next'),
+                      child: const BilingualCaption(L10n.next),
                     ),
                   ],
                 ),
@@ -232,7 +262,8 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Choose permitted trip'),
+    scrollable: true,
+    title: const BilingualText(L10n.choosePermittedTrip),
     content: SizedBox(
       width: 650,
       height: 450,
@@ -240,8 +271,11 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
         children: [
           TextField(
             controller: search,
-            decoration: const InputDecoration(
-              labelText: 'Search trip or vehicle',
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.searchTripOrVehicle),
+              ),
             ),
             onSubmitted: (_) => setState(() {
               offset = 0;
@@ -253,7 +287,7 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
               future: page,
               builder: (_, s) {
                 if (s.hasError) {
-                  return Text(correctionError(s.error!));
+                  return BilingualOwnedText(correctionError(s.error!));
                 }
                 if (!s.hasData) {
                   return const LinearProgressIndicator();
@@ -261,9 +295,13 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
                 return ListView(
                   children: [
                     for (final t in s.data!.rows)
-                      ListTile(
-                        title: Text(
-                          '${t['trip_number']} - ${t['registration']} - ${t['state']}',
+                      BilingualListTile(
+                        title: BilingualText(
+                          L10n.labelValues2bd17e.withValues([
+                            t['trip_number'],
+                            t['registration'],
+                            t['state'],
+                          ]),
                         ),
                         onTap: () => Navigator.pop(context, t['id']),
                       ),
@@ -276,7 +314,7 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
                                   offset -= 50;
                                   reload();
                                 }),
-                          child: const Text('Previous'),
+                          child: const BilingualCaption(L10n.previous),
                         ),
                         TextButton(
                           onPressed: s.data!.rows.length < 50
@@ -285,7 +323,7 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
                                   offset += 50;
                                   reload();
                                 }),
-                          child: const Text('Next'),
+                          child: const BilingualCaption(L10n.next),
                         ),
                       ],
                     ),
@@ -300,7 +338,7 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Close'),
+        child: const BilingualCaption(L10n.close),
       ),
     ],
   );
@@ -510,10 +548,10 @@ class _CorrectionFormState extends State<CorrectionForm> {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            cancellation
-                ? 'Cancellation and adjustments committed. Actual expenses retained; refunds require separate confirmation.'
-                : 'Correction committed. Original records and evidence retained.',
+          content: BilingualText(
+            (cancellation
+                ? L10n.cancellationAndAdjustmentsCommittedActualExpensesRetainedRefundsRequire
+                : L10n.correctionCommittedOriginalRecordsAndEvidenceRetained),
           ),
         ),
       );
@@ -539,29 +577,36 @@ class _CorrectionFormState extends State<CorrectionForm> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text(
-        cancellation ? 'Cancellation review' : 'Correct recorded entry',
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: BilingualText(
+        (cancellation ? L10n.cancellationReview : L10n.correctRecordedEntry),
       ),
     ),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'Original records, reasons and attachments remain in history. Financial changes are posted as new entries.',
+        const BilingualText(
+          L10n.originalRecordsReasonsAndAttachmentsRemainInHistoryFinancial,
         ),
         if (cancellation)
-          const Text(
-            'Review agreed fees for every consignment. Actual payments and incurred expenses remain recorded. Customer credits and owner/broker recoveries remain separate; refunds need available held funds.',
+          const BilingualText(
+            L10n.reviewAgreedFeesForEveryConsignmentActualPaymentsAnd,
           ),
         if (!cancellation)
-          Text(
-            '${eventLabel(widget.event!['kind'] as String)} - original PKR ${widget.event!['amount']} on ${widget.event!['effective_date']}\n${widget.event!['payer'] ?? ''} to ${widget.event!['payee'] ?? ''}',
+          BilingualText(
+            L10n.originalPKROnTo.withValues([
+              ownedMessage(eventLabel(widget.event!['kind'] as String)),
+              widget.event!['amount'],
+              widget.event!['effective_date'],
+              widget.event!['payer'] ?? '',
+              widget.event!['payee'] ?? '',
+            ]),
           ),
         if (!cancellation && !quoteCorrection)
           SwitchListTile(
-            title: const Text('Replace with corrected entry'),
-            subtitle: const Text(
-              'Turn off only to explicitly void an incorrect entry.',
+            title: const BilingualText(L10n.replaceWithCorrectedEntry),
+            subtitle: const BilingualText(
+              L10n.turnOffOnlyToExplicitlyVoidAnIncorrectEntry,
             ),
             value: replace,
             onChanged: request != null || reviewed != null
@@ -574,49 +619,78 @@ class _CorrectionFormState extends State<CorrectionForm> {
         TextField(
           controller: reason,
           enabled: request == null && reviewed == null,
-          decoration: const InputDecoration(labelText: 'Reason'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.reason)),
+          ),
         ),
         TextField(
           controller: date,
           enabled: request == null && reviewed == null && !earnings,
-          decoration: InputDecoration(
-            labelText: cancellation
-                ? 'Cancellation effective date (YYYY-MM-DD)'
-                : 'Corrected effective date (YYYY-MM-DD)',
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualCaption(
+                (cancellation
+                    ? L10n.cancellationEffectiveDateYYYYMMDD
+                    : L10n.correctedEffectiveDateYYYYMMDD),
+              ),
+            ),
           ),
         ),
         if (!cancellation && replace) ...[
           TextField(
             controller: amount,
             enabled: request == null && reviewed == null,
-            decoration: InputDecoration(
-              labelText: quoteCorrection
-                  ? 'Corrected agreed quote'
-                  : 'Corrected amount',
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(
+                  (quoteCorrection
+                      ? L10n.correctedAgreedQuote
+                      : L10n.correctedAmount),
+                ),
+              ),
             ),
           ),
           if (quoteCorrection)
             TextField(
               controller: commission,
               enabled: request == null && reviewed == null,
-              decoration: const InputDecoration(
-                labelText: 'Corrected brokerage value (existing method)',
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(
+                  label: BilingualCaption(
+                    L10n.correctedBrokerageValueExistingMethod,
+                  ),
+                ),
               ),
             ),
           for (var n = 0; n < allocations.length; n++)
             TextField(
               controller: allocations[n],
               enabled: request == null && reviewed == null,
-              decoration: InputDecoration(
-                labelText:
-                    'Allocation ${n + 1} amount - ${originalAllocations[n]['component'] ?? 'cash / credit'}',
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(
+                  label: BilingualCaption(
+                    L10n.allocationAmount.withValues([
+                      n + 1,
+                      originalAllocations[n]['component'] ?? 'cash / credit',
+                    ]),
+                  ),
+                ),
               ),
             ),
         ],
         for (final e in dependents)
           CheckboxListTile(
-            title: Text(
-              'Reverse dependent ${eventLabel(e['kind'] as String)} - PKR ${e['amount']} on ${e['effective_date']}',
+            title: BilingualText(
+              L10n.reverseDependentPKROn.withValues([
+                ownedMessage(eventLabel(e['kind'] as String)),
+                e['amount'],
+                e['effective_date'],
+              ]),
             ),
             value: unwind.contains(e['id']),
             onChanged: request != null || reviewed != null
@@ -629,14 +703,20 @@ class _CorrectionFormState extends State<CorrectionForm> {
                   }),
           ),
         for (var n = 0; n < consignments.length; n++) ...[
-          Text(
-            '${consignments[n]['customer_name']} - original charge PKR ${consignments[n]['customer_charge']}',
+          BilingualText(
+            L10n.originalChargePKR.withValues([
+              consignments[n]['customer_name'],
+              consignments[n]['customer_charge'],
+            ]),
           ),
           TextField(
             controller: fees[n],
             enabled: request == null && reviewed == null,
-            decoration: const InputDecoration(
-              labelText: 'Agreed cancellation charge',
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.agreedCancellationCharge),
+              ),
             ),
           ),
           TextField(
@@ -645,14 +725,19 @@ class _CorrectionFormState extends State<CorrectionForm> {
                 request == null &&
                 reviewed == null &&
                 consignments[n]['broker_id'] != null,
-            decoration: const InputDecoration(
-              labelText: 'Broker share within cancellation charge',
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(
+                  L10n.brokerShareWithinCancellationCharge,
+                ),
+              ),
             ),
           ),
         ],
         if (busy) const LinearProgressIndicator(),
         if (error != null)
-          Text(error!, style: const TextStyle(color: Colors.red)),
+          BilingualOwnedText(error!, style: const TextStyle(color: Colors.red)),
         if (reviewed == null)
           FilledButton(
             onPressed: busy
@@ -667,31 +752,43 @@ class _CorrectionFormState extends State<CorrectionForm> {
                       setState(() => error = correctionError(e));
                     }
                   },
-            child: const Text('Review correction'),
+            child: const BilingualCaption(L10n.reviewCorrection),
           )
         else ...[
-          Text(
-            'Reason: ${reviewed!['reason']}\n${cancellation ? 'Cancellation effective date: ${reviewed!['effective_date']}' : 'Explicit dependent reversals: $unwind\n${replace ? 'Replacement PKR ${amount.text} on ${date.text}' : 'Void original entry; no replacement'}'}',
+          BilingualText(
+            L10n.reason99c1ea.withValues([
+              reviewed!['reason'],
+              cancellation
+                  ? 'Cancellation effective date: ${reviewed!['effective_date']}'
+                  : 'Explicit dependent reversals: $unwind\n${replace ? 'Replacement PKR ${amount.text} on ${date.text}' : 'Void original entry; no replacement'}',
+            ]),
           ),
           if (cancellation)
             for (var n = 0; n < fees.length; n++)
-              Text(
-                'Charge PKR ${fees[n].text}; broker PKR ${brokerFees[n].text}; owner PKR ${AllocationTotals.decimal(Money.parse(fees[n].text).paisa - Money.parse(brokerFees[n].text).paisa)}',
+              BilingualText(
+                L10n.chargePKRBrokerPKROwnerPKR.withValues([
+                  fees[n].text,
+                  brokerFees[n].text,
+                  AllocationTotals.decimal(
+                    Money.parse(fees[n].text).paisa -
+                        Money.parse(brokerFees[n].text).paisa,
+                  ),
+                ]),
               ),
           FilledButton(
             onPressed: busy || conflict ? null : confirm,
-            child: Text(
-              busy
-                  ? 'Confirming...'
-                  : request == null
-                  ? 'Confirm reviewed correction'
-                  : 'Retry reviewed correction',
+            child: BilingualCaption(
+              (busy
+                  ? L10n.confirming
+                  : (request == null
+                        ? L10n.confirmReviewedCorrection
+                        : L10n.retryReviewedCorrection)),
             ),
           ),
           if (request == null)
             TextButton(
               onPressed: () => setState(() => reviewed = null),
-              child: const Text('Edit review'),
+              child: const BilingualCaption(L10n.editReview),
             ),
         ],
       ],

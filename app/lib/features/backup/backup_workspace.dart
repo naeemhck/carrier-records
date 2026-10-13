@@ -1,3 +1,7 @@
+import 'package:carrier_records/app/bilingual.dart';
+
+import '../auth/local_candidate_policy.dart';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -19,6 +23,11 @@ class BackupRepository implements BackupCommands {
       Map<String, dynamic>.from(await client.rpc('get_backup_status') as Map);
   @override
   Future<bool> manual() async {
+    if (karvaanLocalOnly) {
+      throw const FormatException(
+        'Administrator helper is disabled in this isolated candidate.',
+      );
+    }
     if (kIsWeb || !Platform.isWindows) {
       throw const FormatException(
         'Run backups on the configured administrator Windows PC.',
@@ -63,47 +72,64 @@ class BackupSummary extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Last verified backup success: ${status['last_verified_success_at'] ?? 'Never'} (UTC)',
+        BilingualText(
+          L10n.lastVerifiedBackupSuccessUTC.withValues([
+            status['last_verified_success_at'] ?? 'Never',
+          ]),
         ),
-        Text(
-          'Last attempt: ${status['last_attempt_at'] ?? 'Never'} | ${status['outcome']}',
+        BilingualText(
+          L10n.lastAttempt.withValues([
+            status['last_attempt_at'] ?? 'Never',
+            status['outcome'],
+          ]),
         ),
         if (status['stale'] == true)
-          const Text(
-            'Backup is stale or has never succeeded. Run the administrator helper when the PC is online.',
-          ),
+          const BilingualText(L10n.backupIsStaleOrHasNeverSucceededRunThe),
         if (status['outcome'] == 'FAILED')
-          Text(
-            'Backup failed: ${status['safe_error_code'] ?? 'Review the administrator helper status.'}',
+          BilingualText(
+            L10n.backupFailed.withValues([
+              status['safe_error_code'] ??
+                  'Review the administrator helper status.',
+            ]),
           ),
         if (status['interrupted'] == true)
-          const Text(
-            'The last run may have been interrupted. It has no verified success.',
-          ),
-        Text('Pending receipt copies: ${status['pending_receipt_count'] ?? 0}'),
-        Text(
-          schedule['active'] == true
-              ? 'Daily schedule verified: ${schedule['daily_time']} | ${schedule['time_zone']}. Runs during the administrator Windows session; catches up when available.'
-              : 'No active schedule has been verified. Configure the separate Windows helper.',
+          const BilingualText(L10n.theLastRunMayHaveBeenInterruptedItHas),
+        BilingualText(
+          L10n.pendingReceiptCopies.withValues([
+            status['pending_receipt_count'] ?? 0,
+          ]),
         ),
-        Text(
-          'Estimated backup traffic this month: ${status['backup_traffic_monthly_bytes'] ?? '0'} bytes. Database: ${metrics['database_bytes'] ?? 'unknown'} bytes. Files: ${metrics['storage_bytes'] ?? 'unknown'} bytes.',
+        BilingualText(
+          (schedule['active'] == true
+              ? L10n.dailyScheduleVerifiedRunsDuringTheAdministratorWindowsSession
+                    .withValues([schedule['daily_time'], schedule['time_zone']])
+              : L10n.noActiveScheduleHasBeenVerifiedConfigureTheSeparate),
+        ),
+        BilingualText(
+          L10n.estimatedBackupTrafficThisMonthBytesDatabaseBytesFiles
+              .withValues([
+                status['backup_traffic_monthly_bytes'] ?? '0',
+                metrics['database_bytes'] ?? 'unknown',
+                metrics['storage_bytes'] ?? 'unknown',
+              ]),
         ),
         if (status['quota_level'] != 'NORMAL')
-          Text(
-            'Free-tier usage warning: ${status['quota_level']}. Review provider quotas and backup/export options.',
+          BilingualText(
+            L10n.freeTierUsageWarningReviewProviderQuotasAndBackup.withValues([
+              status['quota_level'],
+            ]),
           ),
         if ((status['incomplete_traffic_attempts'] as int? ?? 0) > 0)
-          Text(
-            'Traffic for ${status['incomplete_traffic_attempts']} interrupted or incomplete attempts may be missing. Check provider usage.',
+          BilingualText(
+            L10n.trafficForInterruptedOrIncompleteAttemptsMayBeMissing
+                .withValues([status['incomplete_traffic_attempts']]),
           ),
         if (status['other_traffic_known'] != true)
-          const Text(
-            'Other application/provider traffic is not measured here. Check provider usage; the backup estimate excludes protocol overhead.',
+          const BilingualText(
+            L10n.otherApplicationProviderTrafficIsNotMeasuredHereCheck,
           ),
-        const Text(
-          'Copy encrypted database archives AND receipt object backups off this PC. Keep the recovery key and its passphrase separately. Archive creation does not verify restoration; complete the restoration rehearsal before production use.',
+        const BilingualText(
+          L10n.copyEncryptedDatabaseArchivesANDReceiptObjectBackupsOff,
         ),
       ],
     );
@@ -133,10 +159,10 @@ class _BackupStatusPanelState extends State<BackupStatusPanel> {
         padding: const EdgeInsets.all(12),
         child: snap.hasData
             ? BackupSummary(status: snap.data!)
-            : Text(
-                snap.hasError
-                    ? 'Backup status unavailable. Check the administrator helper and connection.'
-                    : 'Loading backup status...',
+            : BilingualText(
+                (snap.hasError
+                    ? L10n.backupStatusUnavailableCheckTheAdministratorHelperAndConnection
+                    : L10n.loadingBackupStatus),
               ),
       ),
     ),
@@ -211,28 +237,31 @@ class _BackupWorkspaceState extends State<BackupWorkspace> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Administrator backups')),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.administratorBackups),
+    ),
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (busy) const LinearProgressIndicator(),
-        if (message != null) Text(message!),
+        if (message != null) BilingualOwnedText(message!),
         if (status != null) BackupSummary(status: status!),
         Wrap(
           spacing: 8,
           children: [
             FilledButton(
               onPressed: busy ? null : manual,
-              child: const Text('Run manual Windows backup'),
+              child: const BilingualCaption(L10n.runManualWindowsBackup),
             ),
             TextButton(
               onPressed: busy ? null : load,
-              child: const Text('Refresh verified status'),
+              child: const BilingualCaption(L10n.refreshVerifiedStatus),
             ),
           ],
         ),
-        const Text(
-          'Privileged credentials and encryption keys are configured in the separate trusted helper, outside the staff app. No schedule is installed by this screen.',
+        const BilingualText(
+          L10n.privilegedCredentialsAndEncryptionKeysAreConfiguredInThe,
         ),
       ],
     ),

@@ -1,7 +1,7 @@
 name: carrier_records
-description: Internal transport records, reports and bills.
+description: Karvaan bilingual internal transport records, reports and bills.
 publish_to: none
-version: 0.1.0+6
+version: 0.2.0+7
 
 environment:
   sdk: ^3.13.3
@@ -35,3 +35,22 @@ flutter:
   assets:
     - assets/fonts/NotoSans-Regular.ttf
     - assets/fonts/NotoSans-Bold.ttf
+    - assets/fonts/NotoSansArabic-Regular.ttf
+    - assets/fonts/NotoSansArabic-Bold.ttf
+    - assets/fonts/NotoSansArabic-OFL.txt
+    - assets/fonts/NotoSansMath-Regular.ttf
+    - assets/fonts/NotoSansMath-OFL.txt
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-Regular.ttf
+        - asset: assets/fonts/NotoSans-Bold.ttf
+          weight: 700
+    - family: NotoSansArabic
+      fonts:
+        - asset: assets/fonts/NotoSansArabic-Regular.ttf
+        - asset: assets/fonts/NotoSansArabic-Bold.ttf
+          weight: 700
+    - family: NotoSansMath
+      fonts:
+        - asset: assets/fonts/NotoSansMath-Regular.ttf

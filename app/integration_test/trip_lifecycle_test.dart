@@ -1,4 +1,9 @@
+import '../test/bilingual_finders.dart';
+import 'package:carrier_records/app/bilingual.dart';
+import 'package:flutter/services.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
+import 'package:carrier_records/features/auth/local_candidate_policy.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
 import 'package:carrier_records/features/trips/trip_draft.dart';
@@ -16,6 +21,7 @@ void main() {
     tester,
   ) async {
     final config = PublicConfig.fromEnvironment()..validate();
+    if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
     final storage = SecureSessionStorage(
       namespace: 'native-lifecycle.${DateTime.now().microsecondsSinceEpoch}',
     );
@@ -67,6 +73,19 @@ void main() {
       await open();
       expect(find.text(TripAction.arrive.label), findsNothing);
       await action(TripAction.dispatch);
+      // These are actual native dialog interactions against the guarded backend.
+      await tester.enterText(find.byKey(const Key('operation-date')), '2026-02-30');
+      await tester.pump();
+      expect(tester.widget<TextButton>(find.widgetWithText(TextButton,
+        LifecycleStrings.dispatchReview)).onPressed, isNull);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await settle();
+      expect((await repository.detail(id))['state'], 'DRAFT');
+      await action(TripAction.dispatch);
+      await tester.tap(find.widgetWithText(TextButton, L10n.cancel.en));
+      await settle();
+      expect((await repository.detail(id))['state'], 'DRAFT');
+      await action(TripAction.dispatch);
       await tester.enterText(
         find.byKey(const Key('operation-date')),
         '2026-01-30',
@@ -75,11 +94,15 @@ void main() {
         find.byKey(const Key('operation-reason')),
         'Native synthetic dispatch',
       );
+      FocusManager.instance.primaryFocus?.unfocus();
+      await settle();
       final review = find.widgetWithText(
         TextButton,
         LifecycleStrings.dispatchReview,
       );
       await tester.ensureVisible(review);
+      await settle();
+      expect(tester.widget<TextButton>(review).onPressed, isNotNull);
       await tester.tap(review);
       await settle();
       if (find.text(TripStrings.confirmOverlap).evaluate().isNotEmpty) {
@@ -91,6 +114,7 @@ void main() {
         );
       }
       await tester.ensureVisible(find.text(LifecycleStrings.reviewed));
+      expect(find.text(ownedMessage(LifecycleStrings.reviewed).ur), findsOneWidget);
       await tester.tap(find.text(LifecycleStrings.reviewed));
       await tester.pump(const Duration(milliseconds: 200));
       await tester.tap(
@@ -116,6 +140,8 @@ void main() {
         find.byKey(const Key('operation-reason')),
         'Native destination arrival',
       );
+      FocusManager.instance.primaryFocus?.unfocus();
+      await settle();
       await tester.tap(
         find.widgetWithText(FilledButton, LifecycleStrings.confirm),
       );
@@ -144,7 +170,7 @@ void main() {
       await tester.ensureVisible(history);
       await tester.tap(history);
       await settle();
-      expect(find.textContaining('ARRIVE'), findsWidgets);
+      expect(englishTextContaining('ARRIVE'), findsWidgets);
       expect(find.text('Native destination arrival'), findsOneWidget);
     } finally {
       await tester.pumpWidget(const SizedBox.shrink());

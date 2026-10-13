@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,20 +122,20 @@ class _OutputFileActionsState extends State<OutputFileActions> {
         children: [
           OutlinedButton(
             onPressed: busy ? null : () => run('pdf'),
-            child: const Text('Save / share PDF'),
+            child: const BilingualCaption(L10n.saveSharePDF),
           ),
           OutlinedButton(
             onPressed: busy ? null : () => run('xlsx'),
-            child: const Text('Save / share Excel'),
+            child: const BilingualCaption(L10n.saveShareExcel),
           ),
           OutlinedButton(
             onPressed: busy ? null : () => run('print'),
-            child: const Text('Print'),
+            child: const BilingualCaption(L10n.print),
           ),
         ],
       ),
       if (busy) const LinearProgressIndicator(),
-      if (status != null) Text(status!),
+      if (status != null) BilingualOwnedText(status!),
     ],
   );
 }

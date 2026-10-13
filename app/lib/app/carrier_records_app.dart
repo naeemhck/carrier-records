@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import '../features/backup/backup_workspace.dart';
 import '../features/imports/import_workspace.dart';
 import '../features/expenses/expense_workspace.dart';
@@ -20,7 +22,6 @@ import '../features/auth/staff_session.dart';
 import '../features/auth/account_error.dart';
 import '../features/masters/master_repository.dart';
 import '../features/masters/master_workspace.dart';
-import '../features/trips/trip_draft.dart';
 import '../features/trips/trip_repository.dart';
 import '../features/trips/trip_workspace.dart';
 import 'strings.dart';
@@ -49,12 +50,17 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
         path: '/',
         builder: (context, state) => widget.session == null
             ? Scaffold(
-                appBar: AppBar(title: const Text(AppStrings.title)),
+                appBar: AppBar(
+                  toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+                  title: const BilingualText(L10n.brand),
+                ),
                 body: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text(
-                      widget.setupError ?? AppStrings.setupPending,
+                    child: BilingualText(
+                      (widget.setupError != null
+                          ? Bilingual.data(widget.setupError)
+                          : L10n.askYourAdministratorToConfigureThisInstallationForStaff),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -76,6 +82,9 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00695C)),
       useMaterial3: true,
+      fontFamily: 'NotoSans',
+      fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
+      appBarTheme: const AppBarTheme(toolbarHeight: 88),
     ),
     routerConfig: _router,
   );
@@ -140,12 +149,13 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
       final p = widget.session.profile;
       return Scaffold(
         appBar: AppBar(
-          title: const Text(AppStrings.title),
+          toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+          title: const BilingualText(L10n.brand),
           actions: [
             if (p != null)
               TextButton(
                 onPressed: busy ? null : () => run(widget.session.signOut),
-                child: const Text('Sign out'),
+                child: const BilingualCaption(L10n.signOut),
               ),
           ],
         ),
@@ -156,13 +166,19 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
               padding: const EdgeInsets.all(24),
               children: [
                 if (p == null) ...[
-                  const Text('Staff sign-in', style: TextStyle(fontSize: 24)),
-                  const Text('Use the account supplied by your administrator.'),
+                  const BilingualText(
+                    L10n.staffSignIn,
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  const BilingualText(L10n.accountInstruction),
                   TextField(
                     controller: username,
                     enabled: !busy,
                     autocorrect: false,
-                    decoration: const InputDecoration(labelText: 'Username'),
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(label: BilingualCaption(L10n.username)),
+                    ),
                   ),
                   TextField(
                     controller: password,
@@ -170,7 +186,10 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     obscureText: true,
                     autocorrect: false,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(label: BilingualCaption(L10n.password)),
+                    ),
                     onSubmitted: (_) {
                       if (!busy) {
                         run(
@@ -192,38 +211,47 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                               password.text,
                             ),
                           ),
-                    child: const Text('Sign in'),
+                    child: const BilingualCaption(L10n.signIn),
                   ),
                 ] else if (p['must_change_password'] == true) ...[
-                  const Text(
-                    'Change your temporary password',
+                  const BilingualText(
+                    L10n.changeYourTemporaryPassword,
                     style: TextStyle(fontSize: 24),
                   ),
-                  const Text(
-                    'Choose a new password of 12 to 128 characters. Sign in again after changing it.',
+                  const BilingualText(
+                    L10n.chooseANewPasswordOfToCharactersSignIn,
                   ),
                   TextField(
                     controller: password,
                     obscureText: true,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Current password',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.currentPassword),
+                      ),
                     ),
                   ),
                   TextField(
                     controller: next,
                     obscureText: true,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'New password',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.newPassword),
+                      ),
                     ),
                   ),
                   TextField(
                     controller: confirm,
                     obscureText: true,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm new password',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.confirmNewPassword),
+                      ),
                     ),
                   ),
                   FilledButton(
@@ -239,23 +267,27 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                               next.text,
                             );
                           }),
-                    child: const Text('Change password'),
+                    child: const BilingualCaption(L10n.changePassword),
                   ),
                 ] else ...[
-                  Text(
-                    'Signed in as ${p['display_name']}',
+                  BilingualText(
+                    L10n.signedInAs.withValues([p['display_name']]),
                     style: const TextStyle(fontSize: 24),
                   ),
-                  Text(
-                    p['role'] == 'ADMIN'
-                        ? 'Administrator — all offices'
-                        : 'Assigned offices: ${(p['offices'] as List).map((o) => o['name']).join(', ')}',
+                  BilingualText(
+                    (p['role'] == 'ADMIN'
+                        ? L10n.administratorAllOffices
+                        : L10n.assignedOffices.withValues([
+                            (p['offices'] as List)
+                                .map((o) => o['name'])
+                                .join(', '),
+                          ])),
                   ),
                   const SizedBox(height: 16),
                   if (p['role'] == 'ADMIN')
                     FilledButton.icon(
                       icon: const Icon(Icons.settings),
-                      label: const Text(MasterStrings.title),
+                      label: const BilingualText(L10n.companyAndMasterRecords),
                       onPressed: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute<void>(
@@ -274,8 +306,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                     )
                                   : const Scaffold(
                                       body: Center(
-                                        child: Text(
-                                          MasterStrings.accessRequired,
+                                        child: BilingualText(
+                                          L10n.administratorAccessRequired,
                                         ),
                                       ),
                                     ),
@@ -288,7 +320,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   if (p['role'] == 'ADMIN')
                     FilledButton.icon(
                       icon: const Icon(Icons.backup),
-                      label: const Text('Administrator backups'),
+                      label: const BilingualText(L10n.administratorBackups),
                       onPressed: () async {
                         await Navigator.push(
                           context,
@@ -308,8 +340,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                     )
                                   : const Scaffold(
                                       body: Center(
-                                        child: Text(
-                                          'Administrator access required.',
+                                        child: BilingualText(
+                                          L10n.administratorAccessRequired,
                                         ),
                                       ),
                                     ),
@@ -323,7 +355,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     AccountsPanel(session: widget.session),
                   FilledButton.icon(
                     icon: const Icon(Icons.upload_file),
-                    label: const Text('Excel imports'),
+                    label: const BilingualText(L10n.excelImports),
                     onPressed: () async {
                       final scope = tripScope(p);
                       Widget guard(Widget child) => ListenableBuilder(
@@ -337,8 +369,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                             ? child
                             : const Scaffold(
                                 body: Center(
-                                  child: Text(
-                                    'Current office access required.',
+                                  child: BilingualText(
+                                    L10n.currentOfficeAccessRequired,
                                   ),
                                 ),
                               ),
@@ -367,7 +399,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       icon: Icon(
                         dashboard ? Icons.dashboard : Icons.assessment,
                       ),
-                      label: Text(dashboard ? 'Dashboard' : 'Reports'),
+                      label: BilingualText(
+                        (dashboard ? L10n.dashboard : L10n.reports),
+                      ),
                       onPressed: () async {
                         final scope = tripScope(p);
                         Widget guard(Widget child) => ListenableBuilder(
@@ -381,8 +415,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                               ? child
                               : const Scaffold(
                                   body: Center(
-                                    child: Text(
-                                      'Current office access required.',
+                                    child: BilingualText(
+                                      L10n.currentOfficeAccessRequired,
                                     ),
                                   ),
                                 ),
@@ -451,7 +485,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   FilledButton.icon(
                     icon: const Icon(Icons.local_shipping),
-                    label: const Text(TripStrings.trips),
+                    label: const BilingualText(L10n.trips),
                     onPressed: () async {
                       final grantedScope = tripScope(p);
                       Widget guard(Widget child) => ListenableBuilder(
@@ -465,10 +499,15 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                             ? child
                             : Scaffold(
                                 appBar: AppBar(
-                                  title: const Text(TripStrings.trips),
+                                  toolbarHeight:
+                                      88 *
+                                      MediaQuery.textScalerOf(context).scale(1),
+                                  title: const BilingualText(L10n.trips),
                                 ),
                                 body: const Center(
-                                  child: Text(TripStrings.failed),
+                                  child: BilingualText(
+                                    L10n.requestFailedYourEntriesRemainHereCheckYourConnection,
+                                  ),
                                 ),
                               ),
                       );
@@ -503,7 +542,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   ),
                   FilledButton.icon(
                     icon: const Icon(Icons.receipt_long),
-                    label: const Text('Expenses and reimbursements'),
+                    label: const BilingualText(L10n.expensesAndReimbursements),
                     onPressed: () async {
                       final scope = tripScope(p);
                       Widget guard(Widget child) => ListenableBuilder(
@@ -517,8 +556,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                             ? child
                             : const Scaffold(
                                 body: Center(
-                                  child: Text(
-                                    'Current office access required.',
+                                  child: BilingualText(
+                                    L10n.currentOfficeAccessRequired,
                                   ),
                                 ),
                               ),
@@ -567,14 +606,14 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                                   PasswordDialog(session: widget.session),
                             );
                           }),
-                    child: const Text('Change my password'),
+                    child: const BilingualCaption(L10n.changeMyPassword),
                   ),
                 ],
                 if (busy) const LinearProgressIndicator(),
                 if (message ?? widget.session.error case final String error)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Text(error),
+                    child: BilingualOwnedText(error),
                   ),
               ],
             ),
@@ -608,35 +647,45 @@ class _PasswordDialogState extends State<PasswordDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Change password'),
+    scrollable: true,
+    title: const BilingualText(L10n.changePassword),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
           controller: current,
           obscureText: true,
-          decoration: const InputDecoration(labelText: 'Current password'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.currentPassword)),
+          ),
         ),
         TextField(
           controller: next,
           obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'New password (12–128 characters)',
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualCaption(L10n.newPasswordCharacters),
+            ),
           ),
         ),
         TextField(
           controller: confirm,
           obscureText: true,
-          decoration: const InputDecoration(labelText: 'Confirm password'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.confirmPassword)),
+          ),
         ),
-        if (error != null) Text(error!),
+        if (error != null) BilingualOwnedText(error!),
         if (busy) const LinearProgressIndicator(),
       ],
     ),
     actions: [
       TextButton(
         onPressed: busy ? null : () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: const BilingualCaption(L10n.cancel),
       ),
       FilledButton(
         onPressed: busy
@@ -659,7 +708,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
                   if (mounted) setState(() => busy = false);
                 }
               },
-        child: const Text('Change'),
+        child: const BilingualCaption(L10n.change),
       ),
     ],
   );
@@ -702,31 +751,40 @@ class _AccountsPanelState extends State<AccountsPanel> {
         children: [
           FilledButton(
             onPressed: () => edit(),
-            child: const Text('Create staff account'),
+            child: const BilingualCaption(L10n.createStaffAccount),
           ),
-          TextButton(onPressed: reload, child: const Text('Refresh accounts')),
+          TextButton(
+            onPressed: reload,
+            child: const BilingualCaption(L10n.refreshAccounts),
+          ),
         ],
       ),
       FutureBuilder(
         future: accounts,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Text(
-              'Accounts unavailable. Verify your session and retry.',
+            return const BilingualText(
+              L10n.accountsUnavailableVerifyYourSessionAndRetry,
             );
           }
           if (!snapshot.hasData) return const LinearProgressIndicator();
           return Column(
             children: snapshot.data!
                 .map(
-                  (a) => ListTile(
+                  (a) => BilingualListTile(
                     title: Text('${a['display_name']} (${a['username']})'),
-                    subtitle: Text(
-                      '${a['role']} · ${a['active'] ? 'Active' : 'Disabled'}${a['must_change_password'] ? ' · Password change required' : ''}',
+                    subtitle: BilingualText(
+                      L10n.labelValues.withValues([
+                        a['role'],
+                        a['active'] ? 'Active' : 'Disabled',
+                        a['must_change_password']
+                            ? ' · Password change required'
+                            : '',
+                      ]),
                     ),
                     trailing: TextButton(
                       onPressed: () => edit(a),
-                      child: const Text('Manage'),
+                      child: const BilingualCaption(L10n.manage),
                     ),
                   ),
                 )
@@ -829,8 +887,11 @@ class _AccountDialogState extends State<AccountDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(
-      widget.account == null ? 'Create staff account' : 'Manage staff account',
+    scrollable: true,
+    title: BilingualText(
+      (widget.account == null
+          ? L10n.createStaffAccount
+          : L10n.manageStaffAccount),
     ),
     content: SizedBox(
       width: 420,
@@ -841,28 +902,40 @@ class _AccountDialogState extends State<AccountDialog> {
             TextField(
               controller: username,
               enabled: widget.account == null && !busy,
-              decoration: const InputDecoration(labelText: 'Username'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.username)),
+              ),
             ),
             TextField(
               controller: display,
               enabled: !busy,
-              decoration: const InputDecoration(labelText: 'Display name'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.displayName)),
+              ),
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
+              itemHeight: 80,
               initialValue: role,
-              items: [
-                'STAFF',
-                'ADMIN',
-              ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+              items: ['STAFF', 'ADMIN']
+                  .map(
+                    (r) => DropdownMenuItem(
+                      value: r,
+                      child: BilingualOwnedText(r),
+                    ),
+                  )
+                  .toList(),
               onChanged: busy ? null : (r) => setState(() => role = r!),
             ),
             if (widget.account != null)
               SwitchListTile(
-                title: const Text('Account active'),
+                title: const BilingualText(L10n.accountActive),
                 value: active,
                 onChanged: busy ? null : (v) => setState(() => active = v),
               ),
-            const Text('Office assignments'),
+            const BilingualText(L10n.officeAssignments),
             for (final o in widget.session.profile!['offices'] as List)
               CheckboxListTile(
                 title: Text(o['name']),
@@ -875,17 +948,20 @@ class _AccountDialogState extends State<AccountDialog> {
                             : offices.remove(o['id']),
                       ),
               ),
-            const Text('Staff need at least one office to sign in.'),
+            const BilingualText(L10n.staffNeedAtLeastOneOfficeToSignIn),
             TextField(
               controller: password,
               enabled: !busy,
               obscureText: true,
               enableSuggestions: false,
-              decoration: const InputDecoration(
-                labelText: 'Temporary password (12–128 characters)',
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(
+                  label: BilingualCaption(L10n.temporaryPasswordCharacters),
+                ),
               ),
             ),
-            if (error != null) Text(error!),
+            if (error != null) BilingualOwnedText(error!),
             if (busy) const LinearProgressIndicator(),
           ],
         ),
@@ -894,16 +970,18 @@ class _AccountDialogState extends State<AccountDialog> {
     actions: [
       TextButton(
         onPressed: busy ? null : () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: const BilingualCaption(L10n.cancel),
       ),
       if (widget.account != null)
         TextButton(
           onPressed: busy ? null : () => submit(true),
-          child: const Text('Reset password'),
+          child: const BilingualCaption(L10n.resetPassword),
         ),
       FilledButton(
         onPressed: busy ? null : () => submit(false),
-        child: Text(widget.account == null ? 'Create' : 'Save account'),
+        child: BilingualCaption(
+          (widget.account == null ? L10n.create : L10n.saveAccount),
+        ),
       ),
     ],
   );

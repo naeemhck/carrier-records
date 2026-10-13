@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Carrier Records" "\0"
-            VALUE "FileDescription", "Carrier Records" "\0"
+            VALUE "CompanyName", "Karvaan" "\0"
+            VALUE "FileDescription", "Karvaan" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "carrier_records" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 Carrier Records. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Karvaan. All rights reserved." "\0"
             VALUE "OriginalFilename", "carrier_records.exe" "\0"
-            VALUE "ProductName", "Carrier Records" "\0"
+            VALUE "ProductName", "Karvaan" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

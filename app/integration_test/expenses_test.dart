@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'dart:convert';
 
 import 'package:carrier_records/features/auth/public_config.dart';
@@ -59,7 +61,7 @@ void main() {
 
       Future<void> field(String label, String text) async {
         final f = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == label,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, label),
         );
         await tester.scrollUntilVisible(
           f,
@@ -75,7 +77,8 @@ void main() {
       Future<void> pick(String button, String name) async {
         await tap(button, direction: -250);
         final search = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Search records',
+          (w) =>
+              w is TextField && hasEnglishLabel(w.decoration, 'Search records'),
         );
         await tester.enterText(search, 'T09');
         await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -118,7 +121,8 @@ void main() {
         await field('Notes / reason', 'Synthetic native T09 expense');
         final funding = find.byWidgetPredicate(
           (w) =>
-              w is InputDecorator && w.decoration.labelText == 'Funding source',
+              w is InputDecorator &&
+              hasEnglishLabel(w.decoration, 'Funding source'),
         );
         await tester.scrollUntilVisible(
           funding,
@@ -135,7 +139,7 @@ void main() {
         await tap('Review expense');
         await tap('Confirm expense');
         expect(
-          find.textContaining('Expense confirmed: PKR 1234.56'),
+          englishTextContaining('Expense confirmed: PKR 1234.56'),
           findsOneWidget,
         );
         expect(find.text('Receipt attached.'), findsOneWidget);

@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/app/carrier_records_app.dart';
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
@@ -70,7 +72,7 @@ void main() {
         await tester.tap(find.text(MasterStrings.includeArchived));
         await tester.pumpAndSettle(const Duration(milliseconds: 100));
         expect(find.text('Native UI synthetic renamed'), findsOneWidget);
-        expect(find.textContaining(MasterStrings.archived), findsWidgets);
+        expect(englishTextContaining(MasterStrings.archived), findsWidgets);
       } finally {
         await session.signOut();
         session.dispose();

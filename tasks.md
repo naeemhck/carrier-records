@@ -1,6 +1,10 @@
 # Implementation tasks and acceptance: Carrier Records
 
+2026-10-13 user-supplied build6 browser QA and owner dispositions recorded in docs/t19-owner-qa-20261013.md: restart userPASS, clean-PC skipped, physical printer waived, pilot/recovery sign-off reported. Core browser tests reported passing; installed-Windows connection/update-session gates not independently established. Supports owner acceptance with documented exceptions rather than every original gate PASS. Current instruction remains finishlocalKarvaanupdate; T20 notstarted. Preserve deferred brokerNone/generic-error issues and untested expense completion; no hostedcleanup/testing in this update.
+
 ## U-series — local-only Karvaan bilingual update (2026-10-13)
+
+2026-10-13 catalogue checkpoint:554/554 inventoried owned messages have provisional Urdu drafts/generated typed stable keys. Fresh10 focused Flutter tests PASS, including catalogue placeholder/digit/key checks and responsive/auth isolation; whitespace check PASS. Initial generator quoting/reserved-word failures corrected and recorded in docs/karvaan-evidence.md. Screen extraction, office wording review, full UI checks, immutable exports and candidate builds remain pending. U03 remains IN PROGRESS; no hosted action/T20 start.
 
 T00–T20 IDs and gates are unchanged: T19 IN PROGRESS, T20 TODO. No previous shipping authorization applies.
 
@@ -10,7 +14,7 @@ T00–T20 IDs and gates are unchanged: T19 IN PROGRESS, T20 TODO. No previous sh
 | U01 Local isolation and fail-closed launcher | IN PROGRESS | Distinct local identity/nonconflicting ports, guarded configuration/project probe, separate sessions; reject hosted config before network/session access. |
 | U02 Karvaan branding | IN PROGRESS | Visible app/native/web/installer labels changed, compatibility IDs unchanged, new version/artifact paths. |
 | U03 Catalogue, Urdu font and widgets | IN PROGRESS | Typed stable keys/licensed font, verified glyph joining/mixed text/layout/accessibility prototype. |
-| U04 Complete UI extraction | TODO | Inventory decorations/dialogs/tooltips/status/errors and dynamic labels; all permitted presentation bilingual, user data unchanged. |
+| U04 Complete UI extraction | IN PROGRESS | 785-entry provisional catalogue and broad typed UI integration; fresh full Flutter suite 105 PASS. Native isolated-backend checkpoint running; further screen coverage review remains. |
 | U05 Bilingual PDF/XLSX and snapshots | TODO | Early shaping prototype, new immutable template, legacy reprints unchanged, selected-field/order/privacy/exact-total checks. |
 | U06 Verification and candidate artifacts | TODO | Analyzer/regressions, local Windows/web/Android builds, visual/content audits, hashes and actual limitations. |
 | U07 Local review handoff | TODO | Coherent local commits, review vocabulary/issues, future installation/deployment/rollback checklist; no actual push/merge/install/deployment. |

@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
@@ -51,7 +53,7 @@ void main() {
         ('Trip / vehicle search', 'T12-SYNTHETIC'),
       ]) {
         final field = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == entry.$1,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, entry.$1),
         );
         await t.ensureVisible(field);
         await t.enterText(field, entry.$2);
@@ -66,7 +68,7 @@ void main() {
       await tap(find.text('Preview'));
       expect(find.text('Vehicle operating profit: 85000.00'), findsOneWidget);
       expect(
-        find.textContaining('not a complete business balance'),
+        englishTextContaining('not a complete business balance'),
         findsOneWidget,
       );
       if (find.text('Edit configuration').evaluate().isNotEmpty) {
@@ -88,7 +90,7 @@ void main() {
       await tap(find.text('Save named preset'));
       await t.enterText(
         find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Preset name',
+          (w) => w is TextField && hasEnglishLabel(w.decoration, 'Preset name'),
         ),
         'Synthetic native T12',
       );

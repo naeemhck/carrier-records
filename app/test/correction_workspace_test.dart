@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'dart:async';
 
 import 'package:carrier_records/features/finance/correction_repository.dart';
@@ -50,7 +52,7 @@ final event = {
 };
 Future<void> field(WidgetTester t, String label, String value) async {
   final finder = find.byWidgetPredicate(
-    (w) => w is TextField && w.decoration?.labelText == label,
+    (w) => w is TextField && hasEnglishLabel(w.decoration, label),
   );
   await t.ensureVisible(finder);
   await t.enterText(finder, value);
@@ -59,6 +61,13 @@ Future<void> field(WidgetTester t, String label, String value) async {
 
 Future<void> tap(WidgetTester t, String label) async {
   final f = find.text(label);
+  if (f.evaluate().isEmpty) {
+    await t.scrollUntilVisible(
+      f,
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+  }
   await t.ensureVisible(f);
   await t.pump();
   await t.tap(f);
@@ -99,13 +108,14 @@ void main() {
       await tap(t, 'Review correction');
       await tap(t, 'Confirm reviewed correction');
       expect(fake.requests.length, 1);
-      expect(find.textContaining('Correction committed.'), findsNothing);
+      expect(englishTextContaining('Correction committed.'), findsNothing);
       fake.pending.completeError(TimeoutException('Lost response'));
       await t.pumpAndSettle();
       final amount = t.widget<TextField>(
         find.byWidgetPredicate(
           (w) =>
-              w is TextField && w.decoration?.labelText == 'Corrected amount',
+              w is TextField &&
+              hasEnglishLabel(w.decoration, 'Corrected amount'),
         ),
       );
       expect(amount.enabled, false);
@@ -115,7 +125,7 @@ void main() {
       expect(fake.payloads[0], fake.payloads[1]);
       fake.pending.complete({'record_id': event['id']});
       await t.pumpAndSettle();
-      expect(find.textContaining('Correction committed.'), findsOneWidget);
+      expect(englishTextContaining('Correction committed.'), findsOneWidget);
     },
   );
   testWidgets(
@@ -149,13 +159,18 @@ void main() {
       await field(t, 'Agreed cancellation charge', '10000.01');
       await field(t, 'Broker share within cancellation charge', '1000.00');
       await tap(t, 'Review correction');
-      expect(find.textContaining('owner PKR 9000.01'), findsOneWidget);
+      await t.scrollUntilVisible(
+        englishTextContaining('owner PKR 9000.01'),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(englishTextContaining('owner PKR 9000.01'), findsOneWidget);
       await tap(t, 'Confirm reviewed correction');
       fake.pending.completeError(
         const PostgrestException(message: 'VERSION_CONFLICT', code: 'PT409'),
       );
       await t.pumpAndSettle();
-      expect(find.textContaining('Records changed.'), findsOneWidget);
+      expect(englishTextContaining('Records changed.'), findsOneWidget);
       expect(
         t
             .widget<FilledButton>(

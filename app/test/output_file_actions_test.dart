@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -93,7 +95,7 @@ void main() {
     await tester.tap(find.text('Save / share Excel'));
     await tester.pumpAndSettle();
     expect(destination.calls, 0);
-    expect(find.textContaining('Unable to export'), findsOneWidget);
+    expect(englishTextContaining('Unable to export'), findsOneWidget);
     expect(
       find.text(
         defaultTargetPlatform == TargetPlatform.android
@@ -153,7 +155,7 @@ void main() {
       );
       if (!confirmed) {
         expect(
-          find.textContaining('cancelled or not confirmed'),
+          englishTextContaining('cancelled or not confirmed'),
           findsOneWidget,
         );
       }

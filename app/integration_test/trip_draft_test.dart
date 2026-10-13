@@ -1,5 +1,8 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/app/carrier_records_app.dart';
 import 'package:carrier_records/features/auth/public_config.dart';
+import 'package:carrier_records/features/auth/local_candidate_policy.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
 import 'package:carrier_records/features/trips/trip_draft.dart';
@@ -16,6 +19,7 @@ void main() {
   ) async {
     final config = PublicConfig.fromEnvironment();
     config.validate();
+    if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
     final storage = SecureSessionStorage(
       namespace: 'native-trips.${DateTime.now().microsecondsSinceEpoch}',
     );
@@ -68,11 +72,11 @@ void main() {
       debugPrint('T05 native detail loaded');
       expect(find.byType(TripDetail), findsOneWidget);
       await tester.scrollUntilVisible(
-        find.textContaining('Customer charge: PKR 101244.57'),
+        englishTextContaining('Customer charge: PKR 101244.57'),
         300,
       );
       expect(
-        find.textContaining('Customer charge: PKR 101244.57'),
+        englishTextContaining('Customer charge: PKR 101244.57'),
         findsOneWidget,
       );
       await tester.scrollUntilVisible(find.text(TripStrings.edit), 300);

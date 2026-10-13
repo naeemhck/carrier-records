@@ -1,0 +1,3344 @@
+[
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 52,
+    "key": "brand",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 56,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 143,
+    "key": "brand",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 148,
+    "key": "auth.signOut",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 159,
+    "key": "auth.staffSignIn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 160,
+    "key": "auth.accountInstruction",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 165,
+    "key": "auth.username",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 173,
+    "key": "auth.password",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 195,
+    "key": "auth.signIn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 198,
+    "key": "ui.changeYourTemporaryPassword",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 202,
+    "key": "ui.chooseANewPasswordOfToCharactersSignIn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 210,
+    "key": "ui.currentPassword",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 218,
+    "key": "ui.newPassword",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 226,
+    "key": "ui.confirmNewPassword",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 242,
+    "key": "ui.changePassword",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 245,
+    "key": "ui.signedInAs",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 249,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 258,
+    "key": "ui.companyAndMasterRecords",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 277,
+    "key": "ui.administratorAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 291,
+    "key": "ui.administratorBackups",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 311,
+    "key": "ui.administratorAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 326,
+    "key": "ui.excelImports",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 340,
+    "key": "ui.currentOfficeAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 370,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 384,
+    "key": "ui.currentOfficeAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 454,
+    "key": "ui.trips",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 468,
+    "key": "ui.trips",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 471,
+    "key": "ui.requestFailedYourEntriesRemainHereCheckYourConnection",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 506,
+    "key": "ui.expensesAndReimbursements",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 520,
+    "key": "ui.currentOfficeAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 570,
+    "key": "ui.changeMyPassword",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 611,
+    "key": "ui.changePassword",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 618,
+    "key": "ui.currentPassword",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 624,
+    "key": "ui.newPasswordCharacters",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 630,
+    "key": "ui.confirmPassword",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 639,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 662,
+    "key": "ui.change",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 705,
+    "key": "ui.createStaffAccount",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 707,
+    "key": "ui.refreshAccounts",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 714,
+    "key": "ui.accountsUnavailableVerifyYourSessionAndRetry",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 724,
+    "key": "ui.labelValues",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 729,
+    "key": "ui.manage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 832,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 844,
+    "key": "auth.username",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 849,
+    "key": "ui.displayName",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 861,
+    "key": "ui.accountActive",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 865,
+    "key": "ui.officeAssignments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 878,
+    "key": "ui.staffNeedAtLeastOneOfficeToSignIn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 885,
+    "key": "ui.temporaryPasswordCharacters",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 897,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 902,
+    "key": "ui.resetPassword",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 906,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 66,
+    "key": "ui.lastVerifiedBackupSuccessUTC",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 69,
+    "key": "ui.lastAttempt",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 73,
+    "key": "ui.backupIsStaleOrHasNeverSucceededRunThe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 77,
+    "key": "ui.backupFailed",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 81,
+    "key": "ui.theLastRunMayHaveBeenInterruptedItHas",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 84,
+    "key": "ui.pendingReceiptCopies",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 85,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 90,
+    "key": "ui.estimatedBackupTrafficThisMonthBytesDatabaseBytesFiles",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 94,
+    "key": "ui.freeTierUsageWarningReviewProviderQuotasAndBackup",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 98,
+    "key": "ui.trafficForInterruptedOrIncompleteAttemptsMayBeMissing",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 102,
+    "key": "ui.otherApplicationProviderTrafficIsNotMeasuredHereCheck",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 105,
+    "key": "ui.copyEncryptedDatabaseArchivesANDReceiptObjectBackupsOff",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 136,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 214,
+    "key": "ui.administratorBackups",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 226,
+    "key": "ui.runManualWindowsBackup",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 230,
+    "key": "ui.refreshVerifiedStatus",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 234,
+    "key": "ui.privilegedCredentialsAndEncryptionKeysAreConfiguredInThe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 84,
+    "key": "ui.searchRecords",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 112,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 121,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 200,
+    "key": "ui.receiptAttachedExpensePostingIsUnchanged",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 209,
+    "key": "ui.privateReceipt",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 213,
+    "key": "ui.pdfReceiptDownloadedSecurelyBytes",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 221,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 242,
+    "key": "ui.expensesAndReimbursements",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 253,
+    "key": "ui.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 273,
+    "key": "ui.newExpense",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 284,
+    "key": "ui.correctionsAndHistory",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 310,
+    "key": "ui.cleanAbandonedReceiptUploads",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 322,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 323,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 325,
+    "key": "ui.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 329,
+    "key": "ui.replacesOriginalExpense",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 347,
+    "key": "ui.claimsReimburseRecover",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 351,
+    "key": "ui.privateReceipt",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 368,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 377,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 705,
+    "key": "ui.recordExpense",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 712,
+    "key": "ui.expenseConfirmedPKRReceiptStatusIsSeparate",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 719,
+    "key": "ui.retryReceiptOnly",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 726,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 730,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 744,
+    "key": "ui.keepAsStandaloneMaintenance",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 748,
+    "key": "ui.expenseOffice",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 768,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 774,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 782,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 788,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 798,
+    "key": "ui.fundingSource",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 812,
+    "key": "ui.ownerHasAlreadyPaidThisPersonallyOwnerSettlementIs",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 823,
+    "key": "ui.confirmAgreedOwnerSettlementOffsetWhenApplicable",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 827,
+    "key": "ui.allocateCashSpentFromCustodyAndNonCashOwner",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 837,
+    "key": "ui.optionalPrivateReceiptPNGJPEGPDFMB",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 845,
+    "key": "ui.reloadClaimsAndReview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 850,
+    "key": "ui.reviewExpense",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 853,
+    "key": "ui.expensePKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 854,
+    "key": "ui.cashSpentPKROwnerOffsetPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 859,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 917,
+    "key": "ui.choosePermittedTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 925,
+    "key": "ui.searchTrips",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 938,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 939,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 954,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 963,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1168,
+    "key": "ui.expenseSettlementConfirmedPKRNoAdditionalExpenseOrBrokerage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1193,
+    "key": "ui.expenseClaimsAndSettlement",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1198,
+    "key": "ui.reloadClaimsAndReview",
+    "surface": "tooltip"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1205,
+    "key": "ui.originalExpensePKRSettlementAddsNoCostOrBrokerage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1220,
+    "key": "ui.receivePaymentFromADifferentCostBearer",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1233,
+    "key": "ui.nonCashOwnerOffsetAgainstThisOriginalExpense",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1239,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1245,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1256,
+    "key": "ui.paymentDateYYYYMMDD",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1263,
+    "key": "ui.settlementReason",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1271,
+    "key": "ui.cashAllocationClaimRemainingPKR",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1279,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1295,
+    "key": "ui.remainingPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1310,
+    "key": "ui.reloadClaimsAndReview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1315,
+    "key": "ui.reviewExpenseSettlement",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1318,
+    "key": "ui.cashPKRNonCashOffsetPKROriginalExpenseIs",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1323,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 112,
+    "key": "ui.correctionsAndHistory",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 116,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 124,
+    "key": "ui.chooseTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 131,
+    "key": "ui.standaloneExpenses",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 135,
+    "key": "ui.reload",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 140,
+    "key": "ui.reviewCancellation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 157,
+    "key": "ui.noRecordedEventsInThisScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 161,
+    "key": "ui.pkr",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 170,
+    "key": "ui.correct",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 184,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 193,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 235,
+    "key": "ui.choosePermittedTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 244,
+    "key": "ui.searchTripOrVehicle",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 265,
+    "key": "ui.labelValues2bd17e",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 279,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 288,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 303,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 513,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 542,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 549,
+    "key": "ui.originalRecordsReasonsAndAttachmentsRemainInHistoryFinancial",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 553,
+    "key": "ui.reviewAgreedFeesForEveryConsignmentActualPaymentsAnd",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 557,
+    "key": "ui.originalPKROnTo",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 562,
+    "key": "ui.replaceWithCorrectedEntry",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 563,
+    "key": "ui.turnOffOnlyToExplicitlyVoidAnIncorrectEntry",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 577,
+    "key": "ui.reason",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 583,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 593,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 603,
+    "key": "ui.correctedBrokerageValueExistingMethod",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 611,
+    "key": "ui.allocationAmount",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 618,
+    "key": "ui.reverseDependentPKROn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 632,
+    "key": "ui.originalChargePKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 639,
+    "key": "ui.agreedCancellationCharge",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 649,
+    "key": "ui.brokerShareWithinCancellationCharge",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 670,
+    "key": "ui.reviewCorrection",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 673,
+    "key": "ui.reason99c1ea",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 678,
+    "key": "ui.chargePKRBrokerPKROwnerPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 683,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 694,
+    "key": "ui.editReview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 346,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 440,
+    "key": "ui.paymentsAndAllocations",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 445,
+    "key": "ui.reloadBalances",
+    "surface": "tooltip"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 452,
+    "key": "ui.permittedTripsOnlyNotACompletePartyOrBusiness",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 455,
+    "key": "ui.collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 461,
+    "key": "ui.action",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 484,
+    "key": "ui.payer",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 490,
+    "key": "ui.recipient",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 496,
+    "key": "ui.recordingOffice",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 532,
+    "key": "ui.pkr8fe30e",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 543,
+    "key": "ui.allocation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 546,
+    "key": "ui.identifiedExcessCredit",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 563,
+    "key": "ui.creditBelongsTo",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 568,
+    "key": "ui.thisCustomerSTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 575,
+    "key": "ui.cars",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 594,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 606,
+    "key": "ui.remainingPKRAfterAllocationPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 617,
+    "key": "ui.removeAllocation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 627,
+    "key": "ui.addTripAllocation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 634,
+    "key": "ui.addAnotherAllocation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 648,
+    "key": "ui.reviewPayment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 651,
+    "key": "ui.reviewPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 654,
+    "key": "ui.confirmTheAllocationsAndResultingBalancesAboveArrivalAnd",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 659,
+    "key": "ui.confirmPayment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 668,
+    "key": "ui.changeSelections",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 717,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 723,
+    "key": "ui.pkrd24bdd",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 794,
+    "key": "ui.chooseParty",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 801,
+    "key": "ui.searchParties",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 812,
+    "key": "ui.partyChoicesUnavailable",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 835,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 842,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 846,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 875,
+    "key": "ui.choosePermittedTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 882,
+    "key": "ui.searchTrips",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 893,
+    "key": "ui.tripChoicesUnavailable",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 901,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 919,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 926,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 930,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 228,
+    "key": "ui.confirmReviewedImport",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 229,
+    "key": "ui.createNewRowsTogetherTripsAndExpensesRemainDrafts",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 235,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 239,
+    "key": "ui.confirmImport",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 300,
+    "key": "ui.excelImports",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 304,
+    "key": "ui.templateVersionNewRecordsOnlyEnterDatesAsYYYY",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 311,
+    "key": "ui.recordingOffice",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 333,
+    "key": "ui.downloadTemplate",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 337,
+    "key": "ui.chooseXLSX",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 347,
+    "key": "ui.validateAndPreview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 352,
+    "key": "ui.row",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 354,
+    "key": "ui.readRows",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 360,
+    "key": "ui.labelValues10866a",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 371,
+    "key": "ui.iReviewedTheActiveVehicleOverlapWarningsAndThe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 383,
+    "key": "ui.confirmReviewedImport",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 387,
+    "key": "ui.importCommittedUseTripsToReviewDispatchTripDrafts",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 391,
+    "key": "ui.expenseCategoryCodes",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 398,
+    "key": "ui.importedExpenseDraftsAwaitingNormalReview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 406,
+    "key": "ui.reviewExpenseDraft",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 418,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 427,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 54,
+    "key": "ui.savedByTheServer",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 61,
+    "key": "ui.companyAndMasterRecords",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 83,
+    "key": "ui.enterYourActualCompanyIdentitySaveItBeforeIssuing",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 85,
+    "key": "ui.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 87,
+    "key": "ui.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 89,
+    "key": "ui.ownerChangesApplyToNewTripsSavedTripOwners",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 95,
+    "key": "ui.searchNamesCodes",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 109,
+    "key": "ui.newRecord",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 116,
+    "key": "ui.searchRefresh",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 119,
+    "key": "ui.includeArchived",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 138,
+    "key": "ui.recordsUnavailableRetry",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 150,
+    "key": "ui.noRecordsFound",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 182,
+    "key": "ui.edit",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 199,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 209,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 339,
+    "key": "ui.labelValues10866a",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 364,
+    "key": "ui.onePersonCanHaveSeveralRolesRemovedRolesAre",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 378,
+    "key": "ui.currentOwnerRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 379,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 386,
+    "key": "ui.choose",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 390,
+    "key": "ui.defaultDriverOptional",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 391,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 398,
+    "key": "ui.choose",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 406,
+    "key": "ui.clearDefaultDriver",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 408,
+    "key": "ui.ownerChangesApplyToNewTripsSavedTripOwners",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 412,
+    "key": "ui.archived",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 413,
+    "key": "ui.excludedFromNewEntryChoicesExistingHistoryIsRetained",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 428,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 434,
+    "key": "action.save",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 487,
+    "key": "ui.searchPartyNameCode",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 499,
+    "key": "action.search",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 508,
+    "key": "ui.unavailableRetry",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 524,
+    "key": "ui.noMatchingRoleOnThisPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 543,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 552,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 567,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 74,
+    "key": "ui.unableToRetrieveDocumentCurrentAccessIsRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 85,
+    "key": "ui.issuedDocuments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 93,
+    "key": "ui.documentNumberRecipient",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 107,
+    "key": "ui.unableToLoadAuthorizedDocuments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 121,
+    "key": "ui.noIssuedDocumentsInYourCurrentScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 130,
+    "key": "ui.issuedBy",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 148,
+    "key": "ui.previousDocuments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 150,
+    "key": "ui.page",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 158,
+    "key": "ui.nextDocuments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 190,
+    "key": "ui.issuedSnapshotReprintsRetainTheOriginalCompanyIssuerAmounts",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 194,
+    "key": "ui.supersededBy",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 196,
+    "key": "ui.supersedes",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 200,
+    "key": "ui.prepareSupersedingDocument",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 271,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 281,
+    "key": "ui.theServerCapturesCurrentAuthorizedAmountsAndAssignsA",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 289,
+    "key": "ui.correctionReason",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 300,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 304,
+    "key": "ui.confirmIssuance",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_file_actions.dart",
+    "line": 124,
+    "key": "ui.saveSharePDF",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_file_actions.dart",
+    "line": 128,
+    "key": "ui.saveShareExcel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_file_actions.dart",
+    "line": 132,
+    "key": "ui.print",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 368,
+    "key": "ui.issueDocument",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 448,
+    "key": "ui.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 467,
+    "key": "ui.reportOutputType",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 492,
+    "key": "ui.recipientTemplate",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 512,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 533,
+    "key": "ui.officeScope",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 537,
+    "key": "ui.allPermittedOffices",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 555,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 559,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 563,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 568,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 579,
+    "key": "ui.clearRecordFilters",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 591,
+    "key": "ui.reloadCatalogueAndPresets",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 600,
+    "key": "ui.savedPreset",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 605,
+    "key": "ui.systemDefaults",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 610,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 625,
+    "key": "ui.selectAllPermitted",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 635,
+    "key": "ui.resetDefaults",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 639,
+    "key": "ui.saveNamedPreset",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 644,
+    "key": "ui.updateRenamePreset",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 650,
+    "key": "ui.deletePreset",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 660,
+    "key": "ui.pdfOrientation",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 680,
+    "key": "ui.excelSheetLabel",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 687,
+    "key": "ui.preview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 692,
+    "key": "ui.requiredFieldsStayInTheHeaderOrSummarySelecting",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 709,
+    "key": "ui.requiredHeaderIdentityField",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 724,
+    "key": "ui.selectedFieldOrder",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 738,
+    "key": "ui.moveUp81ba09",
+    "surface": "tooltip"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 748,
+    "key": "ui.moveDowndcbe95",
+    "surface": "tooltip"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 766,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 792,
+    "key": "ui.issuedDocuments",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 805,
+    "key": "ui.chooseFieldsAndPreviewTheAuthorizedReport",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 822,
+    "key": "ui.editConfiguration",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 858,
+    "key": "ui.authorizedPreview",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 860,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 861,
+    "key": "ui.dateBases",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 862,
+    "key": "ui.currentEffectiveRecordsEarlierPeriodsCanChangeAfterAudited",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 869,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 875,
+    "key": "ui.noRecordsInThisPeriodScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 888,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 900,
+    "key": "ui.previousPreviewPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 902,
+    "key": "ui.recordsPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 907,
+    "key": "ui.nextPreviewPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 986,
+    "key": "ui.select",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 995,
+    "key": "action.search",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1006,
+    "key": "ui.chooseTheRecipientDatesAndCurrentScopeFirst",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1014,
+    "key": "ui.noPermittedRecordsInThisPageScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1034,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1041,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1049,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1140,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1152,
+    "key": "ui.presetName",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1155,
+    "key": "ui.sharedCompanyPresetAdministrator",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1166,
+    "key": "ui.storesFieldsAndFormattingOnlyCurrentFiltersAndAccess",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1175,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1179,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 121,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 132,
+    "key": "ui.unableToLoadCurrentPermittedJourneys",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 136,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 138,
+    "key": "ui.noRecordsInThisPeriodScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 146,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 154,
+    "key": "ui.outputs",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 174,
+    "key": "ui.report",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 178,
+    "key": "ui.vehicleMonthly",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 182,
+    "key": "ui.ownerMonthly",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 186,
+    "key": "ui.partyClaimsAndHeldMoney",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 190,
+    "key": "ui.lifetimeTripProfit",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 217,
+    "key": "ui.officeScope",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 221,
+    "key": "ui.allPermittedOffices",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 234,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 238,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 243,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 251,
+    "key": "ui.clearRecordFilters",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 255,
+    "key": "ui.runReport",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 267,
+    "key": "ui.reportUnavailableCheckDatesTripSelectionAndCurrentOffice",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 282,
+    "key": "ui.offices024b84",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 283,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 288,
+    "key": "ui.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 294,
+    "key": "ui.noRecordsInThisPeriodScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 343,
+    "key": "ui.groupsRowsPerPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 365,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 367,
+    "key": "ui.page",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 372,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 439,
+    "key": "ui.select",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 447,
+    "key": "action.search",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 457,
+    "key": "ui.currentAccessRequired",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 480,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 487,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 495,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 211,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 220,
+    "key": "ui.actualBusinessDateYYYYMMDD",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 234,
+    "key": "ui.reasonForRecordingOrCorrectingThisOperation",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 248,
+    "key": "ui.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 251,
+    "key": "ui.confirmedFareChangesAndDependentFinancialCorrectionsNeedThe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 253,
+    "key": "ui.cancelledConsignmentsStayOnTheTripAndAreNot",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 255,
+    "key": "ui.enterAnActualDateAndReasonReviewDispatchEarnings",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 258,
+    "key": "ui.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 264,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 269,
+    "key": "ui.reviewDispatchEarnings",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 273,
+    "key": "ui.anotherDispatchedJourneyUsesThisVehicleReviewAndConfirm",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 275,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 277,
+    "key": "ui.anActiveJourneyOutsideYourOfficeScopeAlsoUses",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 283,
+    "key": "ui.iReviewedThisVehicleOverlap",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 290,
+    "key": "ui.reasonForAllowingTheOverlap",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 300,
+    "key": "ui.iReviewedTheActualDateAndTheFareBrokerage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 306,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 320,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 334,
+    "key": "ui.confirmOperation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 369,
+    "key": "ui.history",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 383,
+    "key": "ui.noRecordedHistoryInThisScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 394,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 397,
+    "key": "ui.labelValuesbeea2b",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 408,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 414,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 155,
+    "key": "ui.trips",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 162,
+    "key": "ui.newDraft",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 166,
+    "key": "ui.searchTripVehicleOrParty",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 171,
+    "key": "ui.officeFilter",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 173,
+    "key": "ui.allOffices",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 186,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 202,
+    "key": "ui.choose",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 210,
+    "key": "ui.clear",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 217,
+    "key": "ui.tripState",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 219,
+    "key": "ui.allStates",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 238,
+    "key": "ui.searchRefresh",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 248,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 253,
+    "key": "ui.noTripsInThisScope",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 258,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 259,
+    "key": "ui.labelValues8a6c87",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 272,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 278,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 344,
+    "key": "ui.labelValues10866a",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 353,
+    "key": "ui.searchNameCode",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 359,
+    "key": "ui.searchRefresh",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 380,
+    "key": "ui.noChoicesOnThisPage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 393,
+    "key": "ui.previous",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 399,
+    "key": "ui.next",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 414,
+    "key": "ui.close",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 507,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 522,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 536,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 541,
+    "key": "ui.choose",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 546,
+    "key": "ui.clear",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 562,
+    "key": "classified.branch",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 567,
+    "key": "ui.none",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 587,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 599,
+    "key": "ui.checkTheQuoteAndBrokerageValues",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 610,
+    "key": "ui.consignment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 673,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 705,
+    "key": "ui.countIncludesAllCarsIdentifiersAreOptionalCarStops",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 735,
+    "key": "ui.remove",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 747,
+    "key": "ui.addOptionalIdentifier",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 753,
+    "key": "ui.removeConsignment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 811,
+    "key": "classified.branch",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 818,
+    "key": "ui.draftQuotesArePotentialFareNoEarningsOrPayment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 820,
+    "key": "ui.linkedReturnOf",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 826,
+    "key": "ui.labelValuesfb62fe",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 892,
+    "key": "ui.pickupDropStops",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 900,
+    "key": "ui.stop",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 926,
+    "key": "ui.moveUp",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 938,
+    "key": "ui.moveDown",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 950,
+    "key": "ui.remove",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 962,
+    "key": "ui.addStop",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 972,
+    "key": "ui.addConsignment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 979,
+    "key": "ui.reviewAndSaveDraft",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1010,
+    "key": "ui.reviewDraft",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1016,
+    "key": "ui.draftQuotesArePotentialFareNoEarningsOrPayment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1018,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1020,
+    "key": "ui.anotherDispatchedJourneyUsesThisVehicleReviewAndConfirm",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1022,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1024,
+    "key": "ui.anActiveJourneyOutsideYourOfficeScopeAlsoUses",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1028,
+    "key": "ui.iReviewedThisVehicleOverlap",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1034,
+    "key": "ui.reasonForAllowingTheOverlap",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1045,
+    "key": "action.cancel",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1054,
+    "key": "ui.confirmSave",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1119,
+    "key": "ui.operationCommittedCurrentServerRecordShown",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1135,
+    "key": "ui.tripDetails",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1140,
+    "key": "ui.searchRefresh",
+    "surface": "tooltip"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1165,
+    "key": "ui.draftSavedServerCalculatedAmountsShownBelow",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1166,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1171,
+    "key": "ui.labelValuescd55a9",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1172,
+    "key": "ui.recordedOwnere34286",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1175,
+    "key": "ui.recordedRoute",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1178,
+    "key": "ui.driver",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1179,
+    "key": "ui.plannedDate",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1182,
+    "key": "ui.dispatchArrival",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1185,
+    "key": "ui.draftQuotesArePotentialFareNoEarningsOrPayment",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1187,
+    "key": "ui.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1188,
+    "key": "ui.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1194,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1195,
+    "key": "ui.carCount04a594",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1196,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1198,
+    "key": "ui.overlapReviewed",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1211,
+    "key": "ui.history",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1216,
+    "key": "ui.correctionsAndCancellation",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1221,
+    "key": "ui.paymentsAndAllocations",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1229,
+    "key": "ui.editDraft",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1235,
+    "key": "ui.createLinkedReturn",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1242,
+    "key": "ui.originalTrip",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1247,
+    "key": "ui.return",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1249,
+    "key": "ui.pickupDropStops",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1259,
+    "key": "ui.cars7b7a19",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1272,
+    "key": "ui.broker",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1273,
+    "key": "ui.quotedPKR",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1281,
+    "key": "ui.pkr274c89",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1282,
+    "key": "ui.pickupDrop",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1285,
+    "key": "ui.labelValuesa00644",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1287,
+    "key": "ui.pickupDrop68b36c",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 576,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 631,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 855,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/app/carrier_records_app.dart",
+    "line": 887,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/backup/backup_workspace.dart",
+    "line": 216,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 77,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 92,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 258,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 700,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 711,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 716,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 797,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 838,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 927,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/expenses/expense_workspace.dart",
+    "line": 1204,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 106,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 147,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 255,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/correction_workspace.dart",
+    "line": 647,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 464,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 521,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 526,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 640,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/finance/payment_workspace.dart",
+    "line": 897,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/imports/import_workspace.dart",
+    "line": 309,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 72,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 358,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 368,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 416,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/masters/master_workspace.dart",
+    "line": 474,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/document_workspace.dart",
+    "line": 291,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_file_actions.dart",
+    "line": 138,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 454,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 497,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 525,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 665,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 700,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 708,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 729,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 880,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/output_workspace.dart",
+    "line": 1146,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 131,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 135,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 210,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/reports/report_workspace.dart",
+    "line": 279,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 204,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 246,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 305,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_operation_dialog.dart",
+    "line": 373,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 222,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 231,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 235,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 244,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 364,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 523,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 842,
+    "key": "owned.dynamic",
+    "surface": "labelText"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 972,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1145,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1204,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  },
+  {
+    "file": "app/lib/features/trips/trip_workspace.dart",
+    "line": 1267,
+    "key": "owned.dynamic",
+    "surface": "Text"
+  }
+]

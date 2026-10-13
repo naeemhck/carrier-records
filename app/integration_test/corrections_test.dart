@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
@@ -31,7 +33,7 @@ void main() {
     );
     Future<void> field(String label, String value) async {
       final f = find.byWidgetPredicate(
-        (w) => w is TextField && w.decoration?.labelText == label,
+        (w) => w is TextField && hasEnglishLabel(w.decoration, label),
       );
       await tester.scrollUntilVisible(
         f,
@@ -96,7 +98,7 @@ void main() {
       await field('Corrected amount', '3600.13');
       await tap('Review correction');
       await tap('Confirm reviewed correction');
-      expect(find.textContaining('Correction committed.'), findsOneWidget);
+      expect(englishTextContaining('Correction committed.'), findsOneWidget);
       final history = await commands.history(null, 0);
       expect(
         history

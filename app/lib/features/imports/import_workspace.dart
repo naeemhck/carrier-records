@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
@@ -225,18 +227,21 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
     final accepted = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Confirm reviewed import'),
-        content: Text(
-          'Create ${command!['rows'].length} new rows together? Trips and expenses remain drafts. No earnings, payment or expense is posted.',
+        scrollable: true,
+        title: const BilingualText(L10n.confirmReviewedImport),
+        content: BilingualText(
+          L10n.createNewRowsTogetherTripsAndExpensesRemainDrafts.withValues([
+            command!['rows'].length,
+          ]),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const BilingualCaption(L10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm import'),
+            child: const BilingualCaption(L10n.confirmImport),
           ),
         ],
       ),
@@ -297,18 +302,24 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Excel imports')),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.excelImports),
+    ),
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          'Template version 1. New records only. Enter dates as YYYY-MM-DD text and exact decimal amounts as text. Use stable record codes, not names. Parties/vehicles/routes require an administrator. Operational and expense rows remain drafts.',
-        ),
+        const BilingualText(L10n.templateVersionNewRecordsOnlyEnterDatesAsYYYY),
         if (busy) const LinearProgressIndicator(),
-        if (error != null) Text(error!),
+        if (error != null) BilingualOwnedText(error!),
         DropdownButtonFormField<String>(
+          isExpanded: true,
+          itemHeight: 80,
           initialValue: office,
-          decoration: const InputDecoration(labelText: 'Recording office'),
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(label: BilingualCaption(L10n.recordingOffice)),
+          ),
           items: [
             for (final o in importOffices)
               DropdownMenuItem(
@@ -330,11 +341,11 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
           children: [
             TextButton(
               onPressed: busy || fields.isEmpty ? null : template,
-              child: const Text('Download template'),
+              child: const BilingualCaption(L10n.downloadTemplate),
             ),
             TextButton(
               onPressed: busy || office == null ? null : choose,
-              child: const Text('Choose XLSX'),
+              child: const BilingualCaption(L10n.chooseXLSX),
             ),
             TextButton(
               onPressed:
@@ -344,20 +355,24 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                       result != null
                   ? null
                   : validate,
-              child: const Text('Validate and preview'),
+              child: const BilingualCaption(L10n.validateAndPreview),
             ),
           ],
         ),
         for (final e in localErrors)
-          Text('${e['kind']} row ${e['row']}: ${e['code']}'),
+          BilingualText(L10n.row.withValues([e['kind'], e['row'], e['code']])),
         if (command != null)
-          Text('Read ${(command!['rows'] as List).length} rows.'),
+          BilingualText(
+            L10n.readRows.withValues([(command!['rows'] as List).length]),
+          ),
         if (preview != null) ...[
           for (final e in preview!['errors'] as List)
             Text('${e['kind']} ${e['row_key']}: ${e['code']}'),
           for (final r in preview!['rows'] as List)
             ExpansionTile(
-              title: Text('${r['kind']} ${r['row_key']}'),
+              title: BilingualText(
+                L10n.labelValues10866a.withValues([r['kind'], r['row_key']]),
+              ),
               children: [
                 SelectableText(
                   const JsonEncoder.withIndent('  ').convert(r['values']),
@@ -368,8 +383,8 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
             CheckboxListTile(
               value: overlaps,
               onChanged: busy ? null : (v) => setState(() => overlaps = v!),
-              title: const Text(
-                'I reviewed the active-vehicle overlap warnings and the reasons in these trip rows.',
+              title: const BilingualText(
+                L10n.iReviewedTheActiveVehicleOverlapWarningsAndThe,
               ),
             ),
           if (result == null)
@@ -380,30 +395,30 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                       ((preview!['warnings'] as List).isNotEmpty && !overlaps)
                   ? null
                   : confirm,
-              child: const Text('Confirm reviewed import'),
+              child: const BilingualCaption(L10n.confirmReviewedImport),
             ),
         ],
         if (result != null)
-          const Text(
-            'Import committed. Use Trips to review/dispatch trip drafts. Review expense drafts below before financial confirmation.',
+          const BilingualText(
+            L10n.importCommittedUseTripsToReviewDispatchTripDrafts,
           ),
         ExpansionTile(
-          title: const Text('Expense category codes'),
+          title: const BilingualText(L10n.expenseCategoryCodes),
           children: [
             for (final c in categories)
               SelectableText('${c['code']}: ${c['name']}'),
           ],
         ),
         const Divider(),
-        const Text('Imported expense drafts awaiting normal review'),
+        const BilingualText(L10n.importedExpenseDraftsAwaitingNormalReview),
         for (final d in drafts)
-          ListTile(
+          BilingualListTile(
             title: Text(
               '${d['payload']['effective_date']} | PKR ${d['payload']['amount']} | ${d['payload']['reason']}',
             ),
             trailing: TextButton(
               onPressed: busy ? null : () => expense(d),
-              child: const Text('Review expense draft'),
+              child: const BilingualCaption(L10n.reviewExpenseDraft),
             ),
           ),
         Row(
@@ -415,7 +430,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                       draftOffset -= 50;
                       load();
                     },
-              child: const Text('Previous'),
+              child: const BilingualCaption(L10n.previous),
             ),
             TextButton(
               onPressed: busy || drafts.length < 50
@@ -424,7 +439,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                       draftOffset += 50;
                       load();
                     },
-              child: const Text('Next'),
+              child: const BilingualCaption(L10n.next),
             ),
           ],
         ),

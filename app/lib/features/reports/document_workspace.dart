@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
 import 'document_repository.dart';
@@ -71,8 +72,8 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Unable to retrieve document. Current access is required.',
+            content: BilingualText(
+              L10n.unableToRetrieveDocumentCurrentAccessIsRequired,
             ),
           ),
         );
@@ -82,15 +83,21 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Issued documents')),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.issuedDocuments),
+    ),
     body: Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: TextField(
             controller: search,
-            decoration: const InputDecoration(
-              labelText: 'Document number / recipient',
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.documentNumberRecipient),
+              ),
             ),
             onSubmitted: (_) => setState(() {
               offset = 0;
@@ -104,7 +111,7 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
             builder: (_, result) {
               if (result.hasError) {
                 return const Center(
-                  child: Text('Unable to load authorized documents.'),
+                  child: BilingualText(L10n.unableToLoadAuthorizedDocuments),
                 );
               }
               if (!result.hasData) {
@@ -117,18 +124,24 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                     child: ListView(
                       children: [
                         if (list.isEmpty)
-                          const ListTile(
-                            title: Text(
-                              'No issued documents in your current scope.',
+                          const BilingualListTile(
+                            title: BilingualText(
+                              L10n.noIssuedDocumentsInYourCurrentScope,
                             ),
                           ),
                         for (final d in list)
-                          ListTile(
+                          BilingualListTile(
                             title: Text(
                               '${d['permanent_number']} - ${d['recipient']}',
                             ),
-                            subtitle: Text(
-                              '${d['issued_at']} | Issued by ${d['issuer']} | ${d['superseded'] == true ? 'Superseded' : 'Original / current'}',
+                            subtitle: BilingualText(
+                              L10n.issuedBy.withValues([
+                                d['issued_at'],
+                                d['issuer'],
+                                d['superseded'] == true
+                                    ? 'Superseded'
+                                    : 'Original / current',
+                              ]),
                             ),
                             trailing: const Icon(Icons.description_outlined),
                             onTap: () => open(d['id'] as String),
@@ -145,9 +158,9 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                                 offset -= 50;
                                 reload();
                               }),
-                        child: const Text('Previous documents'),
+                        child: const BilingualCaption(L10n.previousDocuments),
                       ),
-                      Text('Page ${offset ~/ 50 + 1}'),
+                      BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
                       TextButton(
                         onPressed: data['has_more'] == true
                             ? () => setState(() {
@@ -155,7 +168,7 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                                 reload();
                               })
                             : null,
-                        child: const Text('Next documents'),
+                        child: const BilingualCaption(L10n.nextDocuments),
                       ),
                     ],
                   ),
@@ -181,23 +194,30 @@ class IssuedDocumentView extends StatelessWidget {
   final Widget? actions;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(document['permanent_number'] as String)),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: Text(document['permanent_number'] as String),
+    ),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Issued snapshot. Reprints retain the original company, issuer, amounts and selected layout.',
+          const BilingualText(
+            L10n.issuedSnapshotReprintsRetainTheOriginalCompanyIssuerAmounts,
           ),
           if (document['superseded_by_number'] != null)
-            Text('Superseded by ${document['superseded_by_number']}'),
+            BilingualText(
+              L10n.supersededBy.withValues([document['superseded_by_number']]),
+            ),
           if (document['supersedes_number'] != null)
-            Text('Supersedes ${document['supersedes_number']}'),
+            BilingualText(
+              L10n.supersedes.withValues([document['supersedes_number']]),
+            ),
           if (onSupersede != null)
             OutlinedButton(
               onPressed: onSupersede,
-              child: const Text('Prepare superseding document'),
+              child: const BilingualCaption(L10n.prepareSupersedingDocument),
             ),
           ?actions,
           OutputPreview(
@@ -268,28 +288,32 @@ class _IssueDocumentDialogState extends State<IssueDocumentDialog> {
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
     child: AlertDialog(
-      title: Text(
-        widget.superseding
-            ? 'Issue superseding document'
-            : 'Issue permanent document',
+      scrollable: true,
+      title: BilingualText(
+        (widget.superseding
+            ? L10n.issueSupersedingDocument
+            : L10n.issuePermanentDocument),
       ),
       content: SizedBox(
         width: 500,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'The server captures current authorized amounts and assigns a permanent number. The issued original remains available.',
+            const BilingualText(
+              L10n.theServerCapturesCurrentAuthorizedAmountsAndAssignsA,
             ),
             if (widget.superseding)
               TextField(
                 controller: reason,
                 enabled: frozen == null,
-                decoration: const InputDecoration(
-                  labelText: 'Correction reason',
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualCaption(L10n.correctionReason),
+                  ),
                 ),
               ),
-            if (error != null) Text(error!),
+            if (error != null) BilingualOwnedText(error!),
             if (busy) const LinearProgressIndicator(),
           ],
         ),
@@ -297,11 +321,11 @@ class _IssueDocumentDialogState extends State<IssueDocumentDialog> {
       actions: [
         TextButton(
           onPressed: busy ? null : () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: const BilingualCaption(L10n.close),
         ),
         FilledButton(
           onPressed: busy ? null : issue,
-          child: const Text('Confirm issuance'),
+          child: const BilingualCaption(L10n.confirmIssuance),
         ),
       ],
     ),

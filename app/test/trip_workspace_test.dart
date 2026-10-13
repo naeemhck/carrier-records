@@ -139,6 +139,11 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text(TripStrings.scope),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text(TripStrings.scope), findsOneWidget);
       expect(find.text(TripStrings.empty), findsOneWidget);
     },
@@ -227,6 +232,11 @@ void main() {
       await tester.tap(find.text(TripStrings.confirm));
       await tester.pumpAndSettle();
       expect(find.text(TripStrings.conflict), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.widgetWithText(FilledButton, TripStrings.save),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(
         tester
             .widget<FilledButton>(

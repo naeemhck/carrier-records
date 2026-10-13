@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -200,7 +202,8 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
       child: PopScope(
         canPop: !posting,
         child: AlertDialog(
-          title: Text(widget.action.label),
+          scrollable: true,
+          title: BilingualOwnedText(widget.action.label),
           content: SizedBox(
             width: 560,
             child: SingleChildScrollView(
@@ -208,16 +211,24 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${widget.trip['trip_number']} · ${widget.trip['state']}',
+                  BilingualText(
+                    L10n.labelValuescd55a9.withValues([
+                      widget.trip['trip_number'],
+                      widget.trip['state'],
+                    ]),
                   ),
                   if (widget.action.dateField != null)
                     TextField(
                       key: const Key('operation-date'),
                       controller: date,
                       enabled: !busy,
-                      decoration: const InputDecoration(
-                        labelText: LifecycleStrings.date,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(
+                            L10n.actualBusinessDateYYYYMMDD,
+                          ),
+                        ),
                       ),
                       onChanged: (_) => setState(() {
                         reviewed = false;
@@ -230,8 +241,13 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                     controller: reason,
                     enabled: !busy,
                     maxLength: 500,
-                    decoration: const InputDecoration(
-                      labelText: LifecycleStrings.reason,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(
+                          L10n.reasonForRecordingOrCorrectingThisOperation,
+                        ),
+                      ),
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -241,53 +257,87 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                       controller: notes,
                       enabled: !busy,
                       maxLength: 2000,
-                      decoration: InputDecoration(
-                        labelText: TripStrings.labels['notes'],
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualOwnedCaption(
+                            TripStrings.labels['notes'],
+                          ),
+                        ),
                       ),
                     ),
-                  const Text(LifecycleStrings.independent),
+                  const BilingualText(
+                    L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
+                  ),
                   if (widget.action == TripAction.correctDispatch ||
                       widget.action == TripAction.correctArrival)
-                    const Text(LifecycleStrings.correction),
-                  if (widget.action == TripAction.cancelConsignment)
-                    const Text(LifecycleStrings.cancelled),
-                  if (widget.action == TripAction.dispatch) ...[
-                    const Text(
-                      'Enter an actual date and reason, review dispatch earnings, then acknowledge the reviewed amounts to enable confirmation.',
+                    const BilingualText(
+                      L10n.confirmedFareChangesAndDependentFinancialCorrectionsNeedThe,
                     ),
-                    const Text(LifecycleStrings.recognition),
+                  if (widget.action == TripAction.cancelConsignment)
+                    const BilingualText(
+                      L10n.cancelledConsignmentsStayOnTheTripAndAreNot,
+                    ),
+                  if (widget.action == TripAction.dispatch) ...[
+                    const BilingualText(
+                      L10n.enterAnActualDateAndReasonReviewDispatchEarnings,
+                    ),
+                    const BilingualText(
+                      L10n.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage,
+                    ),
                     for (final k in [
                       'customer_charge',
                       'commission',
                       'owner_entitlement',
                     ])
-                      Text(
-                        '${TripStrings.labels[k]}: PKR ${(widget.trip['totals'] as Map)[k]}',
+                      BilingualText(
+                        L10n.pkr274c89.withValues([
+                          ownedMessage(TripStrings.labels[k]),
+                          (widget.trip['totals'] as Map)[k],
+                        ]),
                       ),
                     TextButton(
                       onPressed: busy || !inputsValid ? null : reviewDispatch,
-                      child: const Text(LifecycleStrings.dispatchReview),
+                      child: const BilingualCaption(
+                        L10n.reviewDispatchEarnings,
+                      ),
                     ),
                     if (warning != null) ...[
                       if (warning!['requires_confirmation'] == true) ...[
-                        const Text(TripStrings.overlap),
+                        const BilingualText(
+                          L10n.anotherDispatchedJourneyUsesThisVehicleReviewAndConfirm,
+                        ),
                         for (final t in warning!['visible_trips'] as List)
-                          Text('${t['trip_number']} · ${t['dispatch_date']}'),
+                          BilingualText(
+                            L10n.labelValuescd55a9.withValues([
+                              t['trip_number'],
+                              t['dispatch_date'],
+                            ]),
+                          ),
                         if (warning!['restricted_conflict'] == true)
-                          const Text(TripStrings.restricted),
+                          const BilingualText(
+                            L10n.anActiveJourneyOutsideYourOfficeScopeAlsoUses,
+                          ),
                         CheckboxListTile(
                           value: overlapApproved,
                           onChanged: busy
                               ? null
                               : (v) => setState(() => overlapApproved = v!),
-                          title: const Text(TripStrings.confirmOverlap),
+                          title: const BilingualText(
+                            L10n.iReviewedThisVehicleOverlap,
+                          ),
                         ),
                         TextField(
                           controller: overlapReason,
                           enabled: !busy,
                           maxLength: 500,
-                          decoration: const InputDecoration(
-                            labelText: TripStrings.reviewReason,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(
+                                L10n.reasonForAllowingTheOverlap,
+                              ),
+                            ),
                           ),
                           onChanged: (_) => setState(() {}),
                         ),
@@ -297,16 +347,18 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                         onChanged: busy
                             ? null
                             : (v) => setState(() => reviewed = v!),
-                        title: const Text(LifecycleStrings.reviewed),
+                        title: const BilingualText(
+                          L10n.iReviewedTheActualDateAndTheFareBrokerage,
+                        ),
                       ),
                     ],
                   ],
-                  if (error != null) Text(error!),
+                  if (error != null) BilingualOwnedText(error!),
                   if (busy) ...[
-                    Text(
-                      posting
-                          ? LifecycleStrings.pending
-                          : 'Checking the dispatch review...',
+                    BilingualText(
+                      (posting
+                          ? L10n.waitingForTheServerTransactionToCommit
+                          : L10n.checkingTheDispatchReview),
                     ),
                     const LinearProgressIndicator(),
                   ],
@@ -317,7 +369,7 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
           actions: [
             TextButton(
               onPressed: posting ? null : dismiss,
-              child: const Text(TripStrings.cancel),
+              child: const BilingualCaption(L10n.cancel),
             ),
             FilledButton(
               onPressed:
@@ -331,7 +383,7 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                                       overlapReason.text.trim().isEmpty))))
                   ? null
                   : submit,
-              child: const Text(LifecycleStrings.confirm),
+              child: const BilingualCaption(L10n.confirmOperation),
             ),
           ],
         ),
@@ -366,12 +418,15 @@ class _TripHistoryState extends State<TripHistory> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text(LifecycleStrings.history)),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.history),
+    ),
     body: FutureBuilder<List<Map<String, dynamic>>>(
       future: rows,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text(tripError(snapshot.error!)));
+          return Center(child: BilingualOwnedText(tripError(snapshot.error!)));
         }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -380,7 +435,8 @@ class _TripHistoryState extends State<TripHistory> {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            if (history.isEmpty) const Text(LifecycleStrings.emptyHistory),
+            if (history.isEmpty)
+              const BilingualText(L10n.noRecordedHistoryInThisScope),
             for (final h in history)
               Card(
                 child: Padding(
@@ -388,14 +444,24 @@ class _TripHistoryState extends State<TripHistory> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${h['action']} · ${h['actor_name']} · ${h['recorded_at']}',
+                      BilingualText(
+                        L10n.auditEventIdentity.withValues([
+                          ownedMessage(h['action']),
+                          h['actor_name'],
+                          h['recorded_at'],
+                        ]),
                       ),
-                      Text('${h['reason'] ?? ''}'),
+                      Text((h['reason'] ?? '').toString()),
                       for (final k in (h['after'] as Map).keys)
                         if ((h['before'] as Map)[k] != (h['after'] as Map)[k])
-                          Text(
-                            '$k: ${LifecycleStrings.before} ${(h['before'] as Map)[k] ?? ''} → ${LifecycleStrings.after} ${(h['after'] as Map)[k]}',
+                          BilingualText(
+                            L10n.labelValuesbeea2b.withValues([
+                              k,
+                              ownedMessage(LifecycleStrings.before),
+                              (h['before'] as Map)[k] ?? '',
+                              ownedMessage(LifecycleStrings.after),
+                              (h['after'] as Map)[k],
+                            ]),
                           ),
                     ],
                   ),
@@ -405,13 +471,13 @@ class _TripHistoryState extends State<TripHistory> {
               children: [
                 TextButton(
                   onPressed: offset == 0 ? null : () => reload(offset - 50),
-                  child: const Text(TripStrings.previous),
+                  child: const BilingualCaption(L10n.previous),
                 ),
                 TextButton(
                   onPressed: history.length < 50
                       ? null
                       : () => reload(offset + 50),
-                  child: const Text(TripStrings.next),
+                  child: const BilingualCaption(L10n.next),
                 ),
               ],
             ),

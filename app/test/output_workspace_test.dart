@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'dart:async';
 
 import 'package:carrier_records/features/reports/output_repository.dart';
@@ -204,7 +206,7 @@ void main() {
       final table = t.widget<DataTable>(find.byType(DataTable));
       expect(
         table.columns.where(
-          (c) => (c.label as Text).data == 'Owner-borne costs',
+          (c) => englishWidgetLabel(c.label) == 'Owner-borne costs',
         ),
         isEmpty,
       );
@@ -230,7 +232,7 @@ void main() {
     await t.tap(find.text('Save named preset'));
     await t.pumpAndSettle();
     final field = find.byWidgetPredicate(
-      (w) => w is TextField && w.decoration?.labelText == 'Preset name',
+      (w) => w is TextField && hasEnglishLabel(w.decoration, 'Preset name'),
     );
     await t.enterText(field, 'Personal');
     await t.tap(find.text('Save preset'));

@@ -1,3 +1,5 @@
+import 'bilingual_finders.dart';
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -123,7 +125,7 @@ void main() {
       await pick('Choose cost bearer', 'Owner');
       Future<void> field(String label, String value) async {
         final f = find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == label,
+          (w) => w is TextField && hasEnglishLabel(w.decoration, label),
         );
         await tester.scrollUntilVisible(
           f,
@@ -138,7 +140,8 @@ void main() {
       await field('Notes / reason', 'Diesel paid personally');
       final funding = find.byWidgetPredicate(
         (w) =>
-            w is InputDecorator && w.decoration.labelText == 'Funding source',
+            w is InputDecorator &&
+            hasEnglishLabel(w.decoration, 'Funding source'),
       );
       await tester.scrollUntilVisible(
         funding,
@@ -161,12 +164,17 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(confirm);
       await tester.pump();
-      expect(find.textContaining('Expense confirmed:'), findsNothing);
+      expect(englishTextContaining('Expense confirmed:'), findsNothing);
       expect(commands.requests, hasLength(1));
       commands.pending.completeError(Exception('Lost response'));
       await tester.pumpAndSettle();
       commands.pending = Completer();
       final retry = find.text('Retry same expense request');
+      await tester.scrollUntilVisible(
+        retry,
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.ensureVisible(retry);
       await tester.pumpAndSettle();
       await tester.tap(retry);
@@ -175,8 +183,8 @@ void main() {
       expect(commands.bodies[0], commands.bodies[1]);
       commands.pending.complete({'record_id': 'expense', 'amount': '10000.00'});
       await tester.pumpAndSettle();
-      expect(find.textContaining('Expense confirmed:'), findsOneWidget);
-      expect(find.textContaining('Receipt upload failed.'), findsOneWidget);
+      expect(englishTextContaining('Expense confirmed:'), findsOneWidget);
+      expect(englishTextContaining('Receipt upload failed.'), findsOneWidget);
       expect(commands.attachments, hasLength(1));
       await tap('Retry receipt only', direction: -250);
       expect(commands.requests, hasLength(2));

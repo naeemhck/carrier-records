@@ -37,3 +37,5 @@ The draft was supplied later on 2026-10-13 and is preserved in docs/karvaan-bili
 | Preview | پیش نظارہ | Provisional |
 
 Money, dates and reference numbers use Latin digits. English wording is retained during extraction. Overall page direction is LTR; only Urdu text is RTL. Unresolved vocabulary does not authorize changed accounting or broader access.
+
+Additional unresolved review items: catalogue uses رپورٹس where the initial glossary proposes رپورٹیں; choose one office wording. Distinguish car/consignment identifiers from carrier vehicle. Review settlement offsets, recovery balances and personal-funding claims in context; do not merge them with profit, commission or customer receipts. No provisional terminology approval is inferred from automated tests.

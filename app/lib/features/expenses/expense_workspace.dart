@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -73,7 +74,8 @@ class _MasterPickerState extends State<_MasterPicker> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.kind.label),
+    scrollable: true,
+    title: BilingualOwnedText(widget.kind.label),
     content: SizedBox(
       width: 500,
       height: 400,
@@ -81,19 +83,22 @@ class _MasterPickerState extends State<_MasterPicker> {
         children: [
           TextField(
             controller: search,
-            decoration: const InputDecoration(labelText: 'Search records'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.searchRecords)),
+            ),
             onSubmitted: (_) {
               offset = 0;
               load();
             },
           ),
           if (busy) const LinearProgressIndicator(),
-          if (error != null) Text(error!),
+          if (error != null) BilingualOwnedText(error!),
           Expanded(
             child: ListView(
               children: [
                 for (final row in rows)
-                  ListTile(
+                  BilingualListTile(
                     title: Text(row.label),
                     onTap: () => Navigator.pop(context, row),
                   ),
@@ -109,7 +114,7 @@ class _MasterPickerState extends State<_MasterPicker> {
                         offset -= 50;
                         load();
                       },
-                child: const Text('Previous'),
+                child: const BilingualCaption(L10n.previous),
               ),
               TextButton(
                 onPressed: busy || rows.length < 50
@@ -118,7 +123,7 @@ class _MasterPickerState extends State<_MasterPicker> {
                         offset += 50;
                         load();
                       },
-                child: const Text('Next'),
+                child: const BilingualCaption(L10n.next),
               ),
             ],
           ),
@@ -197,7 +202,9 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Receipt attached. Expense posting is unchanged.'),
+              content: BilingualText(
+                L10n.receiptAttachedExpensePostingIsUnchanged,
+              ),
             ),
           );
         }
@@ -206,19 +213,22 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
           context: context,
           builder: (_) => widget.guard(
             AlertDialog(
-              title: const Text('Private receipt'),
+              scrollable: true,
+              title: const BilingualText(L10n.privateReceipt),
               content: SizedBox(
                 width: 500,
                 child: bytes.length > 4 && bytes[0] == 37
-                    ? Text(
-                        'PDF receipt downloaded securely (${bytes.length} bytes).',
+                    ? BilingualText(
+                        L10n.pdfReceiptDownloadedSecurelyBytes.withValues([
+                          bytes.length,
+                        ]),
                       )
                     : Image.memory(bytes),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                  child: const BilingualCaption(L10n.close),
                 ),
               ],
             ),
@@ -239,7 +249,8 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Expenses and reimbursements'),
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.expensesAndReimbursements),
       actions: [
         IconButton(
           onPressed: busy ? null : load,
@@ -250,11 +261,11 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          'Permitted office and trip expenses. Maintenance remains unlinked unless explicitly assigned to a trip.',
+        const BilingualText(
+          L10n.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless,
         ),
         if (busy) const LinearProgressIndicator(),
-        if (error != null) Text(error!),
+        if (error != null) BilingualOwnedText(error!),
         FilledButton.icon(
           onPressed: busy
               ? null
@@ -270,7 +281,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                   ),
                 ),
           icon: const Icon(Icons.add),
-          label: const Text('New expense'),
+          label: const BilingualText(L10n.newExpense),
         ),
         if (widget.corrections != null)
           TextButton(
@@ -281,7 +292,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                 guard: widget.guard,
               ),
             ),
-            child: const Text('Corrections and history'),
+            child: const BilingualCaption(L10n.correctionsAndHistory),
           ),
         if (widget.administrator)
           TextButton(
@@ -307,7 +318,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                       if (mounted) setState(() => busy = false);
                     }
                   },
-            child: const Text('Clean abandoned receipt uploads'),
+            child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
           ),
         for (final row in rows)
           Card(
@@ -316,18 +327,27 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${row['expense_date']} | PKR ${row['amount']} | ${row['trip_id'] == null ? 'Standalone maintenance' : 'Trip cost'}',
+                  BilingualText(
+                    L10n.expenseListIdentity.withValues([
+                      row['expense_date'],
+                      row['amount'],
+                      row['trip_id'] == null
+                          ? L10n.standaloneMaintenance
+                          : L10n.tripCost,
+                    ]),
                   ),
-                  Text('${row['notes']}'),
-                  Text('${row['funding_source']}'),
+                  Text((row['notes']).toString()),
+                  BilingualOwnedText(row['funding_source']),
                   if (row['effective'] == false)
-                    const Text(
-                      'Historical expense - voided or replaced; excluded from current costs.',
+                    const BilingualText(
+                      L10n.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts,
                     ),
                   if (row['replaces_expense_id'] != null)
-                    Text(
-                      'Replaces original expense ${row['replaces_expense_id']}. ${row['correction_reason']}',
+                    BilingualText(
+                      L10n.replacesOriginalExpense.withValues([
+                        row['replaces_expense_id'],
+                        row['correction_reason'],
+                      ]),
                     ),
                   Wrap(
                     spacing: 8,
@@ -344,11 +364,13 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                                   guard: widget.guard,
                                 ),
                               ),
-                        child: const Text('Claims / reimburse / recover'),
+                        child: const BilingualCaption(
+                          L10n.claimsReimburseRecover,
+                        ),
                       ),
                       TextButton(
                         onPressed: busy ? null : () => receipt(row),
-                        child: const Text('Private receipt'),
+                        child: const BilingualCaption(L10n.privateReceipt),
                       ),
                     ],
                   ),
@@ -365,7 +387,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                       offset -= 50;
                       load();
                     },
-              child: const Text('Previous'),
+              child: const BilingualCaption(L10n.previous),
             ),
             TextButton(
               onPressed: busy || rows.length < 50
@@ -374,7 +396,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                       offset += 50;
                       load();
                     },
-              child: const Text('Next'),
+              child: const BilingualCaption(L10n.next),
             ),
           ],
         ),
@@ -696,39 +718,53 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
     controller: c,
     enabled: !locked,
     onChanged: (_) => setState(() => reviewed = null),
-    decoration: InputDecoration(labelText: label),
+    decoration: bilingualDecoration(
+      context,
+      InputDecoration(label: BilingualOwnedCaption(label)),
+    ),
   );
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
     child: Scaffold(
-      appBar: AppBar(title: const Text('Record expense')),
+      appBar: AppBar(
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: const BilingualText(L10n.recordExpense),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (busy) const LinearProgressIndicator(),
-          if (error != null) Text(error!),
+          if (error != null) BilingualOwnedText(error!),
           if (posted != null) ...[
-            Text(
-              'Expense confirmed: PKR ${posted!['amount']}. Receipt status is separate.',
+            BilingualText(
+              L10n.expenseConfirmedPKRReceiptStatusIsSeparate.withValues([
+                posted!['amount'],
+              ]),
             ),
-            Text(receiptStatus),
+            BilingualOwnedText(receiptStatus),
             if (evidence != null && receiptStatus != 'Receipt attached.')
               FilledButton(
                 onPressed: busy ? null : upload,
-                child: const Text('Retry receipt only'),
+                child: const BilingualCaption(L10n.retryReceiptOnly),
               ),
           ] else ...[
             OutlinedButton(
               onPressed: locked
                   ? null
                   : () => choose(MasterKind.vehicle, 'vehicle'),
-              child: Text(vehicle?.label ?? 'Choose vehicle'),
+              child: BilingualCaption(
+                (vehicle?.label != null
+                    ? Bilingual.data(vehicle?.label)
+                    : L10n.chooseVehicle),
+              ),
             ),
             OutlinedButton(
               onPressed: locked || vehicle == null ? null : chooseTrip,
-              child: Text(
-                trip == null ? 'Optional trip' : 'Trip ${trip!['trip_number']}',
+              child: BilingualCaption(
+                (trip == null
+                    ? L10n.optionalTrip
+                    : L10n.trip3c1efc.withValues([trip!['trip_number']])),
               ),
             ),
             if (trip != null)
@@ -741,11 +777,16 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         owner = vehicle!.data['current_owner_id'] as String?;
                         clearClaims();
                       }),
-                child: const Text('Keep as standalone maintenance'),
+                child: const BilingualCaption(L10n.keepAsStandaloneMaintenance),
               ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
+              itemHeight: 80,
               initialValue: office,
-              decoration: const InputDecoration(labelText: 'Expense office'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.expenseOffice)),
+              ),
               items: widget.offices
                   .map(
                     (o) => DropdownMenuItem(
@@ -765,39 +806,57 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               onPressed: locked
                   ? null
                   : () => choose(MasterKind.category, 'category'),
-              child: Text(category?.label ?? 'Choose category'),
+              child: BilingualCaption(
+                (category?.label != null
+                    ? Bilingual.data(category?.label)
+                    : L10n.chooseCategory),
+              ),
             ),
             OutlinedButton(
               onPressed: locked
                   ? null
                   : () => choose(MasterKind.party, 'payer'),
-              child: Text(
-                payer == null ? 'Choose payer' : 'Payer: ${payer!.label}',
+              child: BilingualCaption(
+                (payer == null
+                    ? L10n.choosePayer
+                    : L10n.payer.withValues([payer!.label])),
               ),
             ),
             OutlinedButton(
               onPressed: locked
                   ? null
                   : () => choose(MasterKind.party, 'bearer'),
-              child: Text(
-                bearer == null
-                    ? 'Choose cost bearer'
-                    : 'Cost bearer: ${bearer!.label}',
+              child: BilingualCaption(
+                (bearer == null
+                    ? L10n.chooseCostBearer
+                    : L10n.costBearerf2e025.withValues([bearer!.label])),
               ),
             ),
-            Text(
-              trip != null
-                  ? 'Historical owner: ${(trip!['owner_snapshot'] as Map)['display_name']}'
-                  : 'Confirm the vehicle owner as cost bearer when applicable.',
+            BilingualText(
+              (trip != null
+                  ? L10n.historicalOwner.withValues([
+                      (trip!['owner_snapshot'] as Map)['display_name'],
+                    ])
+                  : L10n.confirmTheVehicleOwnerAsCostBearerWhenApplicable),
             ),
             field(date, 'Expense date (YYYY-MM-DD)'),
             field(amount, 'Expense amount (PKR)'),
             field(notes, 'Notes / reason'),
             DropdownButtonFormField<ExpenseFunding>(
+              isExpanded: true,
+              itemHeight: 80,
               initialValue: funding,
-              decoration: const InputDecoration(labelText: 'Funding source'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.fundingSource)),
+              ),
               items: ExpenseFunding.values
-                  .map((f) => DropdownMenuItem(value: f, child: Text(f.label)))
+                  .map(
+                    (f) => DropdownMenuItem(
+                      value: f,
+                      child: BilingualOwnedText(f.label),
+                    ),
+                  )
                   .toList(),
               onChanged: locked
                   ? null
@@ -809,8 +868,8 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
             if (payer?.id == owner &&
                 bearer?.id == owner &&
                 funding == ExpenseFunding.self)
-              const Text(
-                'Owner has already paid this personally. Owner settlement is unchanged.',
+              const BilingualText(
+                L10n.ownerHasAlreadyPaidThisPersonallyOwnerSettlementIs,
               ),
             CheckboxListTile(
               value: agreed,
@@ -820,12 +879,12 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                       agreed = v!;
                       reviewed = null;
                     }),
-              title: const Text(
-                'Confirm agreed owner settlement offset (when applicable)',
+              title: const BilingualText(
+                L10n.confirmAgreedOwnerSettlementOffsetWhenApplicable,
               ),
             ),
-            const Text(
-              'Allocate cash spent from custody and non-cash owner offsets separately. Remaining claims are server-calculated.',
+            const BilingualText(
+              L10n.allocateCashSpentFromCustodyAndNonCashOwner,
             ),
             for (final c in eligible)
               field(
@@ -834,32 +893,54 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               ),
             OutlinedButton(
               onPressed: locked ? null : pick,
-              child: const Text(
-                'Optional private receipt (PNG / JPEG / PDF, 5 MB)',
+              child: const BilingualCaption(
+                L10n.optionalPrivateReceiptPNGJPEGPDFMB,
               ),
             ),
-            Text(receiptStatus),
+            BilingualOwnedText(receiptStatus),
             if (conflict)
               TextButton(
                 onPressed: busy ? null : reload,
-                child: const Text('Reload claims and review'),
+                child: const BilingualCaption(L10n.reloadClaimsAndReview),
               ),
             if (reviewed == null)
               FilledButton(
                 onPressed: locked ? null : review,
-                child: const Text('Review expense'),
+                child: const BilingualCaption(L10n.reviewExpense),
               )
             else ...[
-              Text('Expense PKR ${reviewed!['amount']} | ${funding.label}'),
-              Text(
-                'Cash spent: PKR ${AllocationTotals.decimal(AllocationTotals.sum((reviewed!['allocations'] as List).where((x) => x['component'] == 'CASH').map((x) => x['amount'] as String).toList()))} | Owner offset: PKR ${AllocationTotals.decimal(AllocationTotals.sum((reviewed!['allocations'] as List).where((x) => x['component'] == 'OFFSET').map((x) => x['amount'] as String).toList()))}',
+              BilingualText(
+                L10n.expensePKR.withValues([
+                  reviewed!['amount'],
+                  funding.label,
+                ]),
+              ),
+              BilingualText(
+                L10n.cashSpentPKROwnerOffsetPKR.withValues([
+                  AllocationTotals.decimal(
+                    AllocationTotals.sum(
+                      (reviewed!['allocations'] as List)
+                          .where((x) => x['component'] == 'CASH')
+                          .map((x) => x['amount'] as String)
+                          .toList(),
+                    ),
+                  ),
+                  AllocationTotals.decimal(
+                    AllocationTotals.sum(
+                      (reviewed!['allocations'] as List)
+                          .where((x) => x['component'] == 'OFFSET')
+                          .map((x) => x['amount'] as String)
+                          .toList(),
+                    ),
+                  ),
+                ]),
               ),
               FilledButton(
                 onPressed: busy || conflict ? null : confirm,
-                child: Text(
-                  request == null
-                      ? 'Confirm expense'
-                      : 'Retry same expense request',
+                child: BilingualCaption(
+                  (request == null
+                      ? L10n.confirmExpense
+                      : L10n.retrySameExpenseRequest),
                 ),
               ),
             ],
@@ -914,7 +995,8 @@ class _TripPickerState extends State<_TripPicker> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Choose permitted trip'),
+    scrollable: true,
+    title: const BilingualText(L10n.choosePermittedTrip),
     content: SizedBox(
       width: 500,
       height: 400,
@@ -922,21 +1004,24 @@ class _TripPickerState extends State<_TripPicker> {
         children: [
           TextField(
             controller: search,
-            decoration: const InputDecoration(labelText: 'Search trips'),
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(label: BilingualCaption(L10n.searchTrips)),
+            ),
             onSubmitted: (_) {
               offset = 0;
               load();
             },
           ),
           if (busy) const LinearProgressIndicator(),
-          if (error != null) Text(error!),
+          if (error != null) BilingualOwnedText(error!),
           Expanded(
             child: ListView(
               children: [
                 for (final t in rows)
-                  ListTile(
-                    title: Text('${t['trip_number']}'),
-                    subtitle: Text('${t['state']}'),
+                  BilingualListTile(
+                    title: Text((t['trip_number']).toString()),
+                    subtitle: BilingualOwnedText(t['state']),
                     onTap: () => Navigator.pop(context, t),
                   ),
               ],
@@ -951,7 +1036,7 @@ class _TripPickerState extends State<_TripPicker> {
                         offset -= 50;
                         load();
                       },
-                child: const Text('Previous'),
+                child: const BilingualCaption(L10n.previous),
               ),
               TextButton(
                 onPressed: busy || rows.length < 50
@@ -960,7 +1045,7 @@ class _TripPickerState extends State<_TripPicker> {
                         offset += 50;
                         load();
                       },
-                child: const Text('Next'),
+                child: const BilingualCaption(L10n.next),
               ),
             ],
           ),
@@ -1165,8 +1250,9 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Expense settlement confirmed: PKR $total. No additional expense or brokerage.',
+            content: BilingualText(
+              L10n.expenseSettlementConfirmedPKRNoAdditionalExpenseOrBrokerage
+                  .withValues([total]),
             ),
           ),
         );
@@ -1190,23 +1276,26 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
       canPop: !busy,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Expense claims and settlement'),
+          toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+          title: const BilingualText(L10n.expenseClaimsAndSettlement),
           actions: [
             IconButton(
               onPressed: busy ? null : load,
               icon: const Icon(Icons.refresh),
-              tooltip: 'Reload claims and review',
+              tooltip: L10n.reloadClaimsAndReviewAccessibility,
             ),
           ],
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(
-              'Original expense ${widget.expense['expense_date']} | PKR ${widget.expense['amount']}. Settlement adds no cost or brokerage.',
+            BilingualText(
+              L10n.originalExpensePKRSettlementAddsNoCostOrBrokerage.withValues(
+                [widget.expense['expense_date'], widget.expense['amount']],
+              ),
             ),
             if (busy) const LinearProgressIndicator(),
-            if (error != null) Text(error!),
+            if (error != null) BilingualOwnedText(error!),
             SwitchListTile(
               value: recovery,
               onChanged: locked
@@ -1217,7 +1306,9 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                       reviewed = null;
                       selected.clear();
                     }),
-              title: const Text('Receive payment from a different cost bearer'),
+              title: const BilingualText(
+                L10n.receivePaymentFromADifferentCostBearer,
+              ),
             ),
             if (widget.expense['trip_id'] != null)
               SwitchListTile(
@@ -1230,55 +1321,76 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                         selected.clear();
                         reviewed = null;
                       }),
-                title: const Text(
-                  'Non-cash owner offset against this original expense',
+                title: const BilingualText(
+                  L10n.nonCashOwnerOffsetAgainstThisOriginalExpense,
                 ),
               ),
             OutlinedButton(
               onPressed: locked ? null : () => party(true),
-              child: Text(
-                payer == null ? 'Actual payer' : 'Payer: ${payer!.label}',
+              child: BilingualCaption(
+                (payer == null
+                    ? L10n.actualPayer
+                    : L10n.payer.withValues([payer!.label])),
               ),
             ),
             OutlinedButton(
               onPressed: locked ? null : () => party(false),
-              child: Text(
-                payee == null
-                    ? 'Actual recipient'
-                    : 'Recipient: ${payee!.label}',
+              child: BilingualCaption(
+                (payee == null
+                    ? L10n.actualRecipient
+                    : L10n.recipient.withValues([payee!.label])),
               ),
             ),
             TextField(
               controller: date,
               onChanged: (_) => setState(() => reviewed = null),
               enabled: !locked,
-              decoration: const InputDecoration(
-                labelText: 'Payment date (YYYY-MM-DD)',
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(
+                  label: BilingualCaption(L10n.paymentDateYYYYMMDD),
+                ),
               ),
             ),
             TextField(
               controller: reason,
               onChanged: (_) => setState(() => reviewed = null),
               enabled: !locked,
-              decoration: const InputDecoration(labelText: 'Settlement reason'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.settlementReason)),
+              ),
             ),
             for (final c in targets) ...[
               TextField(
                 controller: amounts[c['line_id']],
                 enabled: !locked,
                 onChanged: (_) => setState(() => reviewed = null),
-                decoration: InputDecoration(
-                  labelText:
-                      'Cash allocation ? claim remaining PKR ${c['remaining']}',
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualCaption(
+                      L10n.cashAllocationClaimRemainingPKR.withValues([
+                        c['remaining'],
+                      ]),
+                    ),
+                  ),
                 ),
               ),
               if (!recovery || offset)
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  itemHeight: 80,
                   initialValue: selected[c['line_id']],
-                  decoration: InputDecoration(
-                    labelText: offset
-                        ? 'Owner entitlement source'
-                        : 'Held-funds source',
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(
+                      label: BilingualCaption(
+                        (offset
+                            ? L10n.ownerEntitlementSource
+                            : L10n.heldFundsSource),
+                      ),
+                    ),
                   ),
                   items: sources
                       .where(
@@ -1292,7 +1404,9 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                       .map(
                         (s) => DropdownMenuItem(
                           value: s['line_id'] as String,
-                          child: Text('Remaining PKR ${s['remaining']}'),
+                          child: BilingualText(
+                            L10n.remainingPKR.withValues([s['remaining']]),
+                          ),
                         ),
                       )
                       .toList(),
@@ -1307,23 +1421,26 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
             if (conflict)
               TextButton(
                 onPressed: busy ? null : load,
-                child: const Text('Reload claims and review'),
+                child: const BilingualCaption(L10n.reloadClaimsAndReview),
               ),
             if (reviewed == null)
               FilledButton(
                 onPressed: locked ? null : review,
-                child: const Text('Review expense settlement'),
+                child: const BilingualCaption(L10n.reviewExpenseSettlement),
               )
             else ...[
-              Text(
-                'Cash: PKR ${offset ? '0.00' : reviewed!['amount']} | Non-cash offset: PKR ${offset ? reviewed!['amount'] : '0.00'}. Original expense is not reposted.',
+              BilingualText(
+                L10n.cashPKRNonCashOffsetPKROriginalExpenseIs.withValues([
+                  offset ? '0.00' : reviewed!['amount'],
+                  offset ? reviewed!['amount'] : '0.00',
+                ]),
               ),
               FilledButton(
                 onPressed: busy || conflict ? null : confirm,
-                child: Text(
-                  request == null
-                      ? 'Confirm expense settlement'
-                      : 'Retry same settlement request',
+                child: BilingualCaption(
+                  (request == null
+                      ? L10n.confirmExpenseSettlement
+                      : L10n.retrySameSettlementRequest),
                 ),
               ),
             ],

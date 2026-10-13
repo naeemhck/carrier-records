@@ -1,3 +1,5 @@
+import '../test/bilingual_finders.dart';
+
 import 'package:carrier_records/features/auth/public_config.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
@@ -72,9 +74,9 @@ void main() {
         findsNothing,
       ); // Header includes its descriptive label.
       expect(find.text('Company: Changed T13 Company'), findsOneWidget);
-      expect(find.textContaining('INV-'), findsWidgets);
+      expect(englishTextContaining('INV-'), findsWidgets);
       expect(find.text('Authoritative invoice total: 20000.00'), findsWidgets);
-      expect(find.textContaining('Issued snapshot.'), findsOneWidget);
+      expect(englishTextContaining('Issued snapshot.'), findsOneWidget);
     } finally {
       await t.pumpWidget(const SizedBox.shrink());
       await session.signOut();

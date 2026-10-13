@@ -1,9 +1,43 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'master_repository.dart';
+
+Bilingual masterRecordSummary(MasterKind kind, MasterRecord row) {
+  final parts = <Bilingual>[
+    if (row.data['code'] != null) Bilingual.data(row.value('code')),
+    ...row.roles.map(ownedMessage),
+    if (kind == MasterKind.vehicle)
+      L10n.vehicleOwnerDriverSummary.withValues([
+        row.value('current_owner_name'),
+        row.value('default_driver_name'),
+      ]),
+    if (kind == MasterKind.route)
+      Bilingual.data(
+        MasterStrings.routeSummary(
+          row.value('origin_label'),
+          row.value('destination_label'),
+          row.value('suggested_fare'),
+        ),
+      ),
+    if (row.archived) ownedMessage(MasterStrings.archived),
+    if (kind == MasterKind.company)
+      ownedMessage(
+        row.data['setup_completed'] == true
+            ? MasterStrings.companyReady
+            : MasterStrings.setupRequired,
+      ),
+  ];
+  return Bilingual(
+    'master.recordSummary',
+    parts.map((p) => p.en).join(' · '),
+    parts.map((p) => p.ur.isEmpty ? '\u2068${p.en}\u2069' : p.ur).join(' · '),
+  );
+}
 
 class MasterWorkspace extends StatefulWidget {
   const MasterWorkspace({super.key, required this.repository});
@@ -50,15 +84,19 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
     );
     if (!mounted) return;
     if (saved == true) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text(MasterStrings.saved)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: BilingualText(L10n.savedByTheServer)),
+      );
     }
     reload();
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text(MasterStrings.title)),
+    appBar: AppBar(
+      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+      title: const BilingualText(L10n.companyAndMasterRecords),
+    ),
     body: Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -68,7 +106,7 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
             children: [
               for (final item in MasterKind.values)
                 ChoiceChip(
-                  label: Text(item.label),
+                  label: BilingualOwnedText(item.label),
                   selected: item == kind,
                   onSelected: (_) {
                     kind = item;
@@ -80,20 +118,32 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
             ],
           ),
           const SizedBox(height: 12),
-          if (kind == MasterKind.company) const Text(MasterStrings.companyHelp),
+          if (kind == MasterKind.company)
+            const BilingualText(
+              L10n.enterYourActualCompanyIdentitySaveItBeforeIssuing,
+            ),
           if (kind == MasterKind.office)
-            const Text(MasterStrings.officeSuggestion),
+            const BilingualText(
+              L10n.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual,
+            ),
           if (kind == MasterKind.category)
-            const Text(MasterStrings.categorySuggestion),
+            const BilingualText(
+              L10n.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres,
+            ),
           if (kind == MasterKind.vehicle || kind == MasterKind.route)
-            const Text(MasterStrings.history),
+            const BilingualText(
+              L10n.ownerChangesApplyToNewTripsSavedTripOwners,
+            ),
           if (kind != MasterKind.company) ...[
             TextField(
               controller: search,
               maxLength: 100,
-              decoration: const InputDecoration(
-                labelText: MasterStrings.search,
-                suffixIcon: Icon(Icons.search),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(
+                  label: BilingualCaption(L10n.searchNamesCodes),
+                  suffixIcon: Icon(Icons.search),
+                ),
               ),
               onSubmitted: (_) {
                 offset = 0;
@@ -106,17 +156,17 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
               children: [
                 FilledButton(
                   onPressed: () => edit(),
-                  child: const Text(MasterStrings.newRecord),
+                  child: const BilingualCaption(L10n.newRecord),
                 ),
                 TextButton(
                   onPressed: () {
                     offset = 0;
                     reload();
                   },
-                  child: const Text(MasterStrings.refresh),
+                  child: const BilingualCaption(L10n.searchRefresh),
                 ),
                 FilterChip(
-                  label: const Text(MasterStrings.includeArchived),
+                  label: const BilingualText(L10n.includeArchived),
                   selected: archived,
                   onSelected: (v) {
                     archived = v;
@@ -135,7 +185,9 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
                   return Center(
                     child: TextButton(
                       onPressed: reload,
-                      child: const Text(MasterStrings.retryRecords),
+                      child: const BilingualCaption(
+                        L10n.recordsUnavailableRetry,
+                      ),
                     ),
                   );
                 }
@@ -147,39 +199,21 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
                   children: [
                     Expanded(
                       child: rows.isEmpty
-                          ? const Center(child: Text(MasterStrings.empty))
+                          ? const Center(
+                              child: BilingualText(L10n.noRecordsFound),
+                            )
                           : ListView.builder(
                               itemCount: rows.length,
                               itemBuilder: (context, i) {
                                 final row = rows[i];
-                                return ListTile(
+                                return BilingualListTile(
                                   title: Text(row.label),
-                                  subtitle: Text(
-                                    [
-                                      if (row.data['code'] != null)
-                                        row.value('code'),
-                                      ...row.roles,
-                                      if (kind == MasterKind.vehicle)
-                                        MasterStrings.vehicleSummary(
-                                          row.value('current_owner_name'),
-                                          row.value('default_driver_name'),
-                                        ),
-                                      if (kind == MasterKind.route)
-                                        MasterStrings.routeSummary(
-                                          row.value('origin_label'),
-                                          row.value('destination_label'),
-                                          row.value('suggested_fare'),
-                                        ),
-                                      if (row.archived) MasterStrings.archived,
-                                      if (kind == MasterKind.company)
-                                        row.data['setup_completed'] == true
-                                            ? MasterStrings.companyReady
-                                            : MasterStrings.setupRequired,
-                                    ].join(' · '),
+                                  subtitle: BilingualText(
+                                    masterRecordSummary(kind, row),
                                   ),
                                   trailing: TextButton(
                                     onPressed: () => edit(row),
-                                    child: const Text(MasterStrings.edit),
+                                    child: const BilingualCaption(L10n.edit),
                                   ),
                                 );
                               },
@@ -196,7 +230,7 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
                                     offset -= 50;
                                     reload();
                                   },
-                            child: const Text(MasterStrings.previous),
+                            child: const BilingualCaption(L10n.previous),
                           ),
                           Text('${offset + 1}–${offset + rows.length}'),
                           TextButton(
@@ -206,7 +240,7 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
                                     offset += 50;
                                     reload();
                                   },
-                            child: const Text(MasterStrings.next),
+                            child: const BilingualCaption(L10n.next),
                           ),
                         ],
                       ),
@@ -336,8 +370,12 @@ class _MasterDialogState extends State<MasterDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(
-      '${widget.record == null ? 'New' : MasterStrings.edit} ${widget.kind.label}',
+    scrollable: true,
+    title: BilingualText(
+      L10n.labelValues10866a.withValues([
+        widget.record == null ? L10n.newRecordWord : L10n.edit,
+        ownedMessage(widget.kind.label),
+      ]),
     ),
     content: SizedBox(
       width: 500,
@@ -353,18 +391,25 @@ class _MasterDialogState extends State<MasterDialog> {
                     ['address', 'phone', 'email', 'logo_url'].contains(field)
                     ? 500
                     : 150,
-                decoration: InputDecoration(
-                  labelText: MasterStrings.fieldLabels[field],
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualOwnedCaption(
+                      MasterStrings.fieldLabels[field],
+                    ),
+                  ),
                 ),
                 keyboardType: field == 'suggested_fare'
                     ? const TextInputType.numberWithOptions(decimal: true)
                     : TextInputType.text,
               ),
             if (widget.kind == MasterKind.party) ...[
-              const Text(MasterStrings.rolesHelp),
+              const BilingualText(
+                L10n.onePersonCanHaveSeveralRolesRemovedRolesAre,
+              ),
               for (final role in MasterStrings.partyRoles)
                 CheckboxListTile(
-                  title: Text(role),
+                  title: BilingualOwnedText(role),
                   value: roles.contains(role),
                   onChanged: busy || conflict
                       ? null
@@ -374,28 +419,32 @@ class _MasterDialogState extends State<MasterDialog> {
                 ),
             ],
             if (widget.kind == MasterKind.vehicle) ...[
-              ListTile(
-                title: const Text(MasterStrings.owner),
-                subtitle: Text(
-                  owner == null
-                      ? MasterStrings.chooseOwner
-                      : ownerName ?? MasterStrings.ownerUnavailable,
+              BilingualListTile(
+                title: const BilingualText(L10n.currentOwnerRequired),
+                subtitle: BilingualText(
+                  (owner == null
+                      ? L10n.chooseAnActiveOwner
+                      : (ownerName != null
+                            ? Bilingual.data(ownerName)
+                            : L10n.ownerUnavailable)),
                 ),
                 trailing: TextButton(
                   onPressed: busy || conflict ? null : () => chooseParty(true),
-                  child: const Text(MasterStrings.choose),
+                  child: const BilingualCaption(L10n.choose),
                 ),
               ),
-              ListTile(
-                title: const Text(MasterStrings.driver),
-                subtitle: Text(
-                  driver == null
-                      ? MasterStrings.none
-                      : driverName ?? MasterStrings.driverUnavailable,
+              BilingualListTile(
+                title: const BilingualText(L10n.defaultDriverOptional),
+                subtitle: BilingualText(
+                  (driver == null
+                      ? L10n.none
+                      : (driverName != null
+                            ? Bilingual.data(driverName)
+                            : L10n.driverUnavailable)),
                 ),
                 trailing: TextButton(
                   onPressed: busy || conflict ? null : () => chooseParty(false),
-                  child: const Text(MasterStrings.choose),
+                  child: const BilingualCaption(L10n.choose),
                 ),
               ),
               if (driver != null)
@@ -403,20 +452,25 @@ class _MasterDialogState extends State<MasterDialog> {
                   onPressed: busy || conflict
                       ? null
                       : () => setState(() => driver = null),
-                  child: const Text(MasterStrings.clearDriver),
+                  child: const BilingualCaption(L10n.clearDefaultDriver),
                 ),
-              const Text(MasterStrings.history),
+              const BilingualText(
+                L10n.ownerChangesApplyToNewTripsSavedTripOwners,
+              ),
             ],
             if (widget.kind != MasterKind.company && widget.record != null)
               SwitchListTile(
-                title: const Text(MasterStrings.archived),
-                subtitle: const Text(MasterStrings.archiveHelp),
+                title: const BilingualText(L10n.archived),
+                subtitle: const BilingualText(
+                  L10n.excludedFromNewEntryChoicesExistingHistoryIsRetained,
+                ),
                 value: archived,
                 onChanged: busy || conflict
                     ? null
                     : (v) => setState(() => archived = v),
               ),
-            if (error != null) Text(error!, key: const Key('master-error')),
+            if (error != null)
+              BilingualOwnedText(error!, key: const Key('master-error')),
             if (busy) const LinearProgressIndicator(),
           ],
         ),
@@ -425,13 +479,11 @@ class _MasterDialogState extends State<MasterDialog> {
     actions: [
       TextButton(
         onPressed: busy ? null : () => Navigator.pop(context, false),
-        child: Text(
-          conflict ? MasterStrings.closeReview : MasterStrings.cancel,
-        ),
+        child: BilingualCaption((conflict ? L10n.closeAndReview : L10n.cancel)),
       ),
       FilledButton(
         onPressed: busy || conflict ? null : save,
-        child: const Text(MasterStrings.save),
+        child: const BilingualCaption(L10n.save),
       ),
     ],
   );
@@ -474,7 +526,10 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
   });
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(MasterStrings.chooseRole(widget.role)),
+    scrollable: true,
+    title: BilingualText(
+      L10n.chooseRole.withValues([ownedMessage(widget.role.toLowerCase())]),
+    ),
     content: SizedBox(
       width: 450,
       height: 400,
@@ -483,8 +538,11 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
           TextField(
             controller: search,
             maxLength: 100,
-            decoration: const InputDecoration(
-              labelText: MasterStrings.partySearch,
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.searchPartyNameCode),
+              ),
             ),
             onSubmitted: (_) {
               offset = 0;
@@ -496,7 +554,7 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
               offset = 0;
               reload();
             },
-            child: const Text(MasterStrings.searchAction),
+            child: const BilingualCaption(L10n.search),
           ),
           Expanded(
             child: FutureBuilder<List<MasterRecord>>(
@@ -505,7 +563,7 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
                 if (snapshot.hasError) {
                   return TextButton(
                     onPressed: reload,
-                    child: const Text(MasterStrings.retry),
+                    child: const BilingualCaption(L10n.unavailableRetry),
                   );
                 }
                 if (!snapshot.hasData) {
@@ -521,9 +579,9 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
                       child: ListView(
                         children: [
                           if (eligible.isEmpty)
-                            const Text(MasterStrings.noRole),
+                            const BilingualText(L10n.noMatchingRoleOnThisPage),
                           for (final row in eligible)
-                            ListTile(
+                            BilingualListTile(
                               title: Text(row.label),
                               subtitle: Text(row.value('code')),
                               onTap: () => Navigator.pop(context, row),
@@ -540,7 +598,7 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
                                   offset -= 50;
                                   reload();
                                 },
-                          child: const Text(MasterStrings.previous),
+                          child: const BilingualCaption(L10n.previous),
                         ),
                         TextButton(
                           onPressed: all.length < 50
@@ -549,7 +607,7 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
                                   offset += 50;
                                   reload();
                                 },
-                          child: const Text(MasterStrings.next),
+                          child: const BilingualCaption(L10n.next),
                         ),
                       ],
                     ),
@@ -564,7 +622,7 @@ class _PartyChoiceDialogState extends State<PartyChoiceDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text(MasterStrings.cancel),
+        child: const BilingualCaption(L10n.cancel),
       ),
     ],
   );

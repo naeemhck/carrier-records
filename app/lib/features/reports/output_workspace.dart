@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -365,7 +366,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
           recipient != 'INTERNAL')
         FilledButton(
           onPressed: busy ? null : issueDocument,
-          child: const Text('Issue document'),
+          child: const BilingualCaption(L10n.issueDocument),
         ),
       if (widget.exporter != null)
         OutputFileActions(
@@ -445,12 +446,12 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Preview only ? not an issued document. Filters determine records; checkboxes determine presentation.',
+          const BilingualText(
+            L10n.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords,
           ),
           if (busy) const LinearProgressIndicator(),
           if (error != null)
-            Text(
+            BilingualOwnedText(
               error!,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
@@ -463,12 +464,18 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
                   initialValue: report,
-                  decoration: const InputDecoration(
-                    labelText: 'Report / output type',
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(
+                      label: BilingualCaption(L10n.reportOutputType),
+                    ),
                   ),
                   items: [
                     for (final e in outputReports.entries)
-                      DropdownMenuItem(value: e.key, child: Text(e.value)),
+                      DropdownMenuItem(
+                        value: e.key,
+                        child: BilingualOwnedText(e.value),
+                      ),
                   ],
                   onChanged: busy
                       ? null
@@ -485,15 +492,19 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               SizedBox(
                 width: 200,
                 child: DropdownButtonFormField<String>(
+                  itemHeight: 80,
                   key: ValueKey('recipient-$report'),
                   isExpanded: true,
                   initialValue: recipient,
-                  decoration: const InputDecoration(
-                    labelText: 'Recipient template',
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(
+                      label: BilingualCaption(L10n.recipientTemplate),
+                    ),
                   ),
                   items: [
                     for (final r in recipients)
-                      DropdownMenuItem(value: r, child: Text(r)),
+                      DropdownMenuItem(value: r, child: BilingualOwnedText(r)),
                   ],
                   onChanged: busy
                       ? null
@@ -509,7 +520,11 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               if (recipient != 'INTERNAL')
                 OutlinedButton(
                   onPressed: busy ? null : () => pick('RECIPIENT'),
-                  child: Text(partyName ?? 'Select recipient'),
+                  child: BilingualCaption(
+                    (partyName != null
+                        ? Bilingual.data(partyName)
+                        : L10n.selectRecipient),
+                  ),
                 ),
               for (final entry in [
                 ('From (YYYY-MM-DD)', from),
@@ -521,7 +536,10 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   child: TextField(
                     controller: entry.$2,
                     enabled: !busy,
-                    decoration: InputDecoration(labelText: entry.$1),
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                    ),
                     onChanged: (_) => changed(),
                   ),
                 ),
@@ -530,11 +548,14 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 child: DropdownButtonFormField<String>(
                   isExpanded: true,
                   initialValue: office,
-                  decoration: const InputDecoration(labelText: 'Office scope'),
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
+                  ),
                   items: [
                     const DropdownMenuItem<String>(
                       value: null,
-                      child: Text('All permitted offices'),
+                      child: BilingualText(L10n.allPermittedOffices),
                     ),
                     for (final o in widget.offices)
                       DropdownMenuItem(
@@ -552,20 +573,36 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               ),
               OutlinedButton(
                 onPressed: busy ? null : () => pick('VEHICLE'),
-                child: Text(vehicleName ?? 'Select vehicle'),
+                child: BilingualCaption(
+                  (vehicleName != null
+                      ? Bilingual.data(vehicleName)
+                      : L10n.selectVehicle),
+                ),
               ),
               OutlinedButton(
                 onPressed: busy ? null : () => pick('OWNER'),
-                child: Text(ownerName ?? 'Select historical owner'),
+                child: BilingualCaption(
+                  (ownerName != null
+                      ? Bilingual.data(ownerName)
+                      : L10n.selectHistoricalOwner),
+                ),
               ),
               OutlinedButton(
                 onPressed: busy ? null : () => pick('TRIP'),
-                child: Text(tripName ?? 'Select trip'),
+                child: BilingualCaption(
+                  (tripName != null
+                      ? Bilingual.data(tripName)
+                      : L10n.selectTrip),
+                ),
               ),
               if (report == 'PAYMENT_RECEIPT')
                 OutlinedButton(
                   onPressed: busy ? null : () => pick('RECEIPT'),
-                  child: Text(eventName ?? 'Select actual payment receipt'),
+                  child: BilingualCaption(
+                    (eventName != null
+                        ? Bilingual.data(eventName)
+                        : L10n.selectActualPaymentReceipt),
+                  ),
                 ),
               TextButton(
                 onPressed: busy
@@ -576,7 +613,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                         search.clear();
                         preview = null;
                       }),
-                child: const Text('Clear record filters'),
+                child: const BilingualCaption(L10n.clearRecordFilters),
               ),
             ],
           ),
@@ -588,27 +625,34 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               children: [
                 OutlinedButton(
                   onPressed: busy ? null : load,
-                  child: const Text('Reload catalogue and presets'),
+                  child: const BilingualCaption(L10n.reloadCatalogueAndPresets),
                 ),
                 SizedBox(
                   width: 280,
                   child: DropdownButtonFormField<String>(
+                    itemHeight: 80,
                     key: ValueKey('preset-$presetId-${presets.length}'),
                     isExpanded: true,
                     initialValue: presetId,
-                    decoration: const InputDecoration(
-                      labelText: 'Saved preset',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.savedPreset),
+                      ),
                     ),
                     items: [
                       const DropdownMenuItem<String>(
                         value: null,
-                        child: Text('System defaults'),
+                        child: BilingualText(L10n.systemDefaults),
                       ),
                       for (final p in presets)
                         DropdownMenuItem(
                           value: p['id'] as String,
-                          child: Text(
-                            '${p['shared'] == true ? 'Company' : 'Personal'}: ${p['name']}',
+                          child: BilingualText(
+                            L10n.labelValuesfb62fe.withValues([
+                              p['shared'] == true ? 'Company' : 'Personal',
+                              p['name'],
+                            ]),
                           ),
                         ),
                     ],
@@ -622,7 +666,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                           s.all();
                           preview = null;
                         }),
-                  child: const Text('Select all permitted'),
+                  child: const BilingualCaption(L10n.selectAllPermitted),
                 ),
                 OutlinedButton(
                   onPressed: busy
@@ -632,36 +676,43 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                           presetId = null;
                           preview = null;
                         }),
-                  child: const Text('Reset defaults'),
+                  child: const BilingualCaption(L10n.resetDefaults),
                 ),
                 OutlinedButton(
                   onPressed: busy ? null : () => manage(),
-                  child: const Text('Save named preset'),
+                  child: const BilingualCaption(L10n.saveNamedPreset),
                 ),
                 if (current?['can_manage'] == true) ...[
                   OutlinedButton(
                     onPressed: busy ? null : () => manage(existing: current),
-                    child: const Text('Update / rename preset'),
+                    child: const BilingualCaption(L10n.updateRenamePreset),
                   ),
                   TextButton(
                     onPressed: busy
                         ? null
                         : () => manage(existing: current, deleting: true),
-                    child: const Text('Delete preset'),
+                    child: const BilingualCaption(L10n.deletePreset),
                   ),
                 ],
                 SizedBox(
                   width: 190,
                   child: DropdownButtonFormField<String>(
+                    itemHeight: 80,
                     key: ValueKey(orientation),
                     isExpanded: true,
                     initialValue: orientation,
-                    decoration: const InputDecoration(
-                      labelText: 'PDF orientation',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.pdfOrientation),
+                      ),
                     ),
                     items: [
                       for (final v in ['AUTO', 'PORTRAIT', 'LANDSCAPE'])
-                        DropdownMenuItem(value: v, child: Text(v)),
+                        DropdownMenuItem(
+                          value: v,
+                          child: BilingualOwnedText(v),
+                        ),
                     ],
                     onChanged: busy
                         ? null
@@ -676,27 +727,30 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   child: TextField(
                     controller: sheet,
                     enabled: !busy,
-                    decoration: const InputDecoration(
-                      labelText: 'Excel sheet label',
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.excelSheetLabel),
+                      ),
                     ),
                     onChanged: (_) => changed(),
                   ),
                 ),
                 FilledButton(
                   onPressed: busy ? null : () => prepare(),
-                  child: const Text('Preview'),
+                  child: const BilingualCaption(L10n.preview),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Required fields stay in the header or summary. Selecting fewer columns never recalculates totals.',
+            const BilingualText(
+              L10n.requiredFieldsStayInTheHeaderOrSummarySelecting,
             ),
             for (final group
                 in s.fields.map((f) => f['field_group'] as String).toSet())
               ExpansionTile(
                 initiallyExpanded: true,
-                title: Text(group),
+                title: BilingualOwnedText(group),
                 children: [
                   for (final f in s.fields.where(
                     (f) => f['field_group'] == group,
@@ -704,9 +758,11 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                     CheckboxListTile(
                       key: ValueKey('field-${f['field_key']}'),
                       dense: true,
-                      title: Text(f['label'] as String),
+                      title: BilingualOwnedText(f['label'] as String),
                       subtitle: f['required'] == true
-                          ? const Text('Required header / identity field')
+                          ? const BilingualText(
+                              L10n.requiredHeaderIdentityField,
+                            )
                           : null,
                       secondary: f['required'] == true
                           ? const Icon(Icons.lock)
@@ -721,11 +777,11 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                     ),
                 ],
               ),
-            const Text('Selected field order'),
+            const BilingualText(L10n.selectedFieldOrder),
             for (var i = 0; i < s.order.length; i++)
-              ListTile(
+              BilingualListTile(
                 dense: true,
-                title: Text(
+                title: BilingualOwnedText(
                   s.fields.firstWhere(
                         (f) => f['field_key'] == s.order[i],
                       )['label']
@@ -735,7 +791,9 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      tooltip: 'Move up ${s.order[i]}',
+                      tooltip: L10n.moveUp81ba09.withValues([
+                        s.order[i],
+                      ]).inline,
                       onPressed: busy || i == 0
                           ? null
                           : () => setState(() {
@@ -745,7 +803,9 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                       icon: const Icon(Icons.arrow_upward),
                     ),
                     IconButton(
-                      tooltip: 'Move down ${s.order[i]}',
+                      tooltip: L10n.moveDowndcbe95.withValues([
+                        s.order[i],
+                      ]).inline,
                       onPressed: busy || i == s.order.length - 1
                           ? null
                           : () => setState(() {
@@ -763,10 +823,11 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
     );
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.supersedesId == null
-              ? 'Outputs and presets'
-              : 'Superseding document',
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: BilingualText(
+          (widget.supersedesId == null
+              ? L10n.outputsAndPresets
+              : L10n.supersedingDocument),
         ),
         actions: [
           if (widget.documents != null)
@@ -789,7 +850,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   ),
                 ),
               ),
-              child: const Text('Issued documents'),
+              child: const BilingualCaption(L10n.issuedDocuments),
             ),
         ],
       ),
@@ -802,8 +863,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 Expanded(
                   child: preview == null
                       ? const Center(
-                          child: Text(
-                            'Choose fields and preview the authorized report.',
+                          child: BilingualText(
+                            L10n.chooseFieldsAndPreviewTheAuthorizedReport,
                           ),
                         )
                       : SingleChildScrollView(
@@ -819,7 +880,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               children: [
                 TextButton(
                   onPressed: busy ? null : () => setState(() => preview = null),
-                  child: const Text('Edit configuration'),
+                  child: const BilingualCaption(L10n.editConfiguration),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -855,37 +916,64 @@ class OutputPreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(),
-        const Text('Authorized preview', style: TextStyle(fontSize: 20)),
+        const BilingualText(
+          L10n.authorizedPreview,
+          style: TextStyle(fontSize: 20),
+        ),
         for (final f in fields.where((f) => f['header'] == true))
-          Text('${f['label']}: ${meta[f['field_key']] ?? ''}'),
-        Text('Date bases: ${meta['date_bases']}'),
-        const Text(
-          'Current effective records. Earlier periods can change after audited corrections.',
+          BilingualText(
+            L10n.labelValuesfb62fe.withValues([
+              ownedMessage(f['label']),
+              meta[f['field_key']] ?? '',
+            ]),
+          ),
+        BilingualText(L10n.dateBases.withValues([meta['date_bases']])),
+        const BilingualText(
+          L10n.currentEffectiveRecordsEarlierPeriodsCanChangeAfterAudited,
         ),
         Wrap(
           spacing: 12,
           children: [
             for (final e in (data['totals'] as Map).entries)
-              Text(
-                '${summaries.where((f) => f['field_key'] == e.key).firstOrNull?['label'] ?? e.key}: ${e.value}',
+              BilingualText(
+                L10n.labelValuesfb62fe.withValues([
+                  summaries
+                          .where((f) => f['field_key'] == e.key)
+                          .firstOrNull?['label'] ??
+                      e.key,
+                  e.value,
+                ]),
               ),
           ],
         ),
         if ((data['rows'] as List).isEmpty)
-          const Text('No records in this period/scope.'),
+          const BilingualText(L10n.noRecordsInThisPeriodScope),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
+            headingRowHeight: 100,
+            dataRowMinHeight: 56,
+            dataRowMaxHeight: double.infinity,
             columns: [
               for (final f in columns)
-                DataColumn(label: Text(f['label'] as String)),
+                DataColumn(
+                  label: SizedBox(
+                    width: 220,
+                    child: BilingualOwnedCaption(f['label'] as String),
+                  ),
+                ),
             ],
             rows: [
               for (final row in data['rows'] as List)
                 DataRow(
                   cells: [
                     for (final f in columns)
-                      DataCell(Text('${row[f['field_key']] ?? ''}')),
+                      DataCell(
+                        SizedBox(
+                          width: 220,
+                          child: Text((row[f['field_key']] ?? '').toString()),
+                        ),
+                      ),
                   ],
                 ),
             ],
@@ -897,14 +985,19 @@ class OutputPreview extends StatelessWidget {
           children: [
             TextButton(
               onPressed: busy || offset == 0 ? null : () => onPage(offset - 50),
-              child: const Text('Previous preview page'),
+              child: const BilingualCaption(L10n.previousPreviewPage),
             ),
-            Text('${data['row_count']} records · Page ${offset ~/ 50 + 1}'),
+            BilingualText(
+              L10n.recordsPage.withValues([
+                data['row_count'],
+                offset ~/ 50 + 1,
+              ]),
+            ),
             TextButton(
               onPressed: busy || data['has_more'] != true
                   ? null
                   : () => onPage(offset + 50),
-              child: const Text('Next preview page'),
+              child: const BilingualCaption(L10n.nextPreviewPage),
             ),
           ],
         ),
@@ -983,7 +1076,8 @@ class _OutputChoiceState extends State<_OutputChoice> {
 
   @override
   Widget build(BuildContext c) => AlertDialog(
-    title: Text('Select ${widget.kind.toLowerCase()}'),
+    scrollable: true,
+    title: BilingualText(L10n.select.withValues([widget.kind.toLowerCase()])),
     content: SizedBox(
       width: 450,
       height: 450,
@@ -992,7 +1086,10 @@ class _OutputChoiceState extends State<_OutputChoice> {
           if (widget.kind != 'RECEIPT')
             TextField(
               controller: search,
-              decoration: const InputDecoration(labelText: 'Search'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.search)),
+              ),
               onSubmitted: (_) => setState(() {
                 offset = 0;
                 rows = fetch();
@@ -1003,17 +1100,19 @@ class _OutputChoiceState extends State<_OutputChoice> {
               future: rows,
               builder: (_, s) {
                 if (s.hasError) {
-                  return const Text(
-                    'Choose the recipient, dates and current scope first.',
+                  return const BilingualText(
+                    L10n.chooseTheRecipientDatesAndCurrentScopeFirst,
                   );
                 }
                 if (!s.hasData) return const LinearProgressIndicator();
                 return ListView(
                   children: [
                     if (s.data!.isEmpty)
-                      const Text('No permitted records in this page/scope.'),
+                      const BilingualText(
+                        L10n.noPermittedRecordsInThisPageScope,
+                      ),
                     for (final r in s.data!)
-                      ListTile(
+                      BilingualListTile(
                         title: Text(r['label'] as String),
                         onTap: () => Navigator.pop(c, r),
                       ),
@@ -1031,14 +1130,14 @@ class _OutputChoiceState extends State<_OutputChoice> {
                         rows = fetch();
                       })
                     : null,
-                child: const Text('Previous'),
+                child: const BilingualCaption(L10n.previous),
               ),
               TextButton(
                 onPressed: () => setState(() {
                   offset += 50;
                   rows = fetch();
                 }),
-                child: const Text('Next'),
+                child: const BilingualCaption(L10n.next),
               ),
             ],
           ),
@@ -1046,7 +1145,10 @@ class _OutputChoiceState extends State<_OutputChoice> {
       ),
     ),
     actions: [
-      TextButton(onPressed: () => Navigator.pop(c), child: const Text('Close')),
+      TextButton(
+        onPressed: () => Navigator.pop(c),
+        child: const BilingualCaption(L10n.close),
+      ),
     ],
   );
 }
@@ -1137,22 +1239,28 @@ class _PresetDialogState extends State<_PresetDialog> {
 
   @override
   Widget build(BuildContext c) => AlertDialog(
-    title: Text(widget.deleting ? 'Delete named preset' : 'Save named preset'),
+    scrollable: true,
+    title: BilingualText(
+      (widget.deleting ? L10n.deleteNamedPreset : L10n.saveNamedPreset),
+    ),
     content: SizedBox(
       width: 400,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (busy) const LinearProgressIndicator(),
-          if (error != null) Text(error!),
+          if (error != null) BilingualOwnedText(error!),
           if (!widget.deleting) ...[
             TextField(
               controller: name,
               enabled: !busy && frozen == null,
-              decoration: const InputDecoration(labelText: 'Preset name'),
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.presetName)),
+              ),
             ),
             CheckboxListTile(
-              title: const Text('Shared company preset (administrator)'),
+              title: const BilingualText(L10n.sharedCompanyPresetAdministrator),
               value: shared,
               onChanged:
                   widget.administrator &&
@@ -1163,8 +1271,8 @@ class _PresetDialogState extends State<_PresetDialog> {
                   : null,
             ),
           ],
-          const Text(
-            'Stores fields and formatting only. Current filters and access are revalidated at preview time.',
+          const BilingualText(
+            L10n.storesFieldsAndFormattingOnlyCurrentFiltersAndAccess,
           ),
         ],
       ),
@@ -1172,11 +1280,13 @@ class _PresetDialogState extends State<_PresetDialog> {
     actions: [
       TextButton(
         onPressed: busy ? null : () => Navigator.pop(c, false),
-        child: const Text('Close'),
+        child: const BilingualCaption(L10n.close),
       ),
       FilledButton(
         onPressed: busy || review ? null : submit,
-        child: Text(widget.deleting ? 'Confirm delete' : 'Save preset'),
+        child: BilingualCaption(
+          (widget.deleting ? L10n.confirmDelete : L10n.savePreset),
+        ),
       ),
     ],
   );

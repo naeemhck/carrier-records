@@ -14,19 +14,19 @@
 
 [Setup]
 AppId={{A7649C5F-D9C5-4C3C-9A57-6C918B977193}
-AppName=Carrier Records
+AppName=Karvaan
 AppVersion={#AppVersion}
-AppVerName=Carrier Records {#AppVersion} (build {#BuildNumber})
+AppVerName=Karvaan {#AppVersion} (build {#BuildNumber})
 VersionInfoVersion={#AppVersion}.{#BuildNumber}
-AppPublisher=Carrier Records
+AppPublisher=Karvaan
 DefaultDirName={localappdata}\Programs\CarrierRecords
-DefaultGroupName=Carrier Records
+DefaultGroupName=Karvaan
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.19041
 OutputDir={#OutputDir}
-OutputBaseFilename=CarrierRecords-{#AppVersion}+{#BuildNumber}-windows-x64-setup
+OutputBaseFilename=Karvaan-{#AppVersion}+{#BuildNumber}-windows-x64-setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -40,10 +40,10 @@ SetupLogging=yes
 Source: "{#PayloadDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Carrier Records"; Filename: "{app}\carrier_records.exe"
+Name: "{autoprograms}\Karvaan"; Filename: "{app}\carrier_records.exe"
 
 [Run]
-Filename: "{app}\carrier_records.exe"; Description: "Launch Carrier Records"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\carrier_records.exe"; Description: "Launch Karvaan"; Flags: nowait postinstall skipifsilent
 
 ; No Registry credentials, UninstallDelete data, scheduler or privileged helper.
 

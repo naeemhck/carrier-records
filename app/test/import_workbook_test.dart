@@ -122,8 +122,35 @@ void main() {
       containsAll(['FORMULA_NOT_ALLOWED', 'INVALID_OR_DUPLICATE_ROW_KEY']),
     );
   });
-  test('external worksheet links and duplicate parts cannot bypass parsing', () {
-    expect(() => ImportWorkbook.parse(modified('xl/_rels/workbook.xml.rels', (s) => s.replaceFirst('Target="worksheets/', 'TargetMode="External" Target="worksheets/')), fields), throwsFormatException);
-    expect(() => ImportWorkbook.parse(modified('xl/worksheets/sheet1.xml', (s) => s.replaceFirst('<cols>', '<cols><col min="1" max="1" hidden="1"/>')), fields), throwsFormatException);
-  });
+  test(
+    'external worksheet links and duplicate parts cannot bypass parsing',
+    () {
+      expect(
+        () => ImportWorkbook.parse(
+          modified(
+            'xl/_rels/workbook.xml.rels',
+            (s) => s.replaceFirst(
+              'Target="worksheets/',
+              'TargetMode="External" Target="worksheets/',
+            ),
+          ),
+          fields,
+        ),
+        throwsFormatException,
+      );
+      expect(
+        () => ImportWorkbook.parse(
+          modified(
+            'xl/worksheets/sheet1.xml',
+            (s) => s.replaceFirst(
+              '<cols>',
+              '<cols><col min="1" max="1" hidden="1"/>',
+            ),
+          ),
+          fields,
+        ),
+        throwsFormatException,
+      );
+    },
+  );
 }
