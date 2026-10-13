@@ -1,5 +1,7 @@
 # Windows pilot installation and updates
 
+Latest development-PC candidate: **0.1.0+6**, installed with existing public configuration preserved. Installer/hash and pending field checks are recorded in [release evidence](windows-release-evidence.md) and [browser QA evidence](browser-bugs-evidence.md). Installation alone does not establish updated login/session/workflow or clean-PC verification.
+
 This is a pilot package, not authorization for broader rollout. T19 remains in progress until actual installation and office reconciliation/sign-off are recorded. T20 is not started. The ordinary installer never installs the administrator backup helper or a scheduled task.
 
 Current supplemental instructions: use [the practical six-stage field checklist](windows-field-checks.md). The latest task requires **physical** customer, owner, broker and internal printing. PDF/virtual-print testing is useful preparation but does not replace paper inspection. The published build-3 installer is preserved unchanged; this supplemental checklist and the corrected Storage bucket wording in the source backend guide are newer than its bundled manuals.

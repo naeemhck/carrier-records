@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../masters/master_repository.dart';
@@ -35,7 +36,31 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
   bool reviewed = false,
       overlapApproved = false,
       busy = false,
+      posting = false,
       conflict = false;
+
+  bool get inputsValid {
+    try {
+      lifecyclePayload(
+        widget.action,
+        widget.trip,
+        reason: reason.text,
+        date: date.text,
+        notes: notes.text,
+        consignment: widget.consignment,
+      );
+      return true;
+    } on FormatException {
+      return false;
+    }
+  }
+
+  void dismiss() {
+    if (posting) return;
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +124,7 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
   Future<void> submit() async {
     setState(() {
       busy = true;
+      posting = true;
       error = null;
     });
     try {
@@ -156,137 +182,160 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
         );
       }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) {
+        setState(() {
+          busy = false;
+          posting = false;
+        });
+      }
     }
   }
 
   @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: !busy,
-    child: AlertDialog(
-      title: Text(widget.action.label),
-      content: SizedBox(
-        width: 560,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('${widget.trip['trip_number']} · ${widget.trip['state']}'),
-              if (widget.action.dateField != null)
-                TextField(
-                  key: const Key('operation-date'),
-                  controller: date,
-                  enabled: !busy,
-                  decoration: const InputDecoration(
-                    labelText: LifecycleStrings.date,
-                  ),
-                  onChanged: (_) => setState(() {
-                    reviewed = false;
-                    warning = null;
-                    reviewDate = null;
-                  }),
-                ),
-              TextField(
-                key: const Key('operation-reason'),
-                controller: reason,
-                enabled: !busy,
-                maxLength: 500,
-                decoration: const InputDecoration(
-                  labelText: LifecycleStrings.reason,
-                ),
-              ),
-              if (widget.action == TripAction.correctOperation)
-                TextField(
-                  key: const Key('operation-notes'),
-                  controller: notes,
-                  enabled: !busy,
-                  maxLength: 2000,
-                  decoration: InputDecoration(
-                    labelText: TripStrings.labels['notes'],
-                  ),
-                ),
-              const Text(LifecycleStrings.independent),
-              if (widget.action == TripAction.correctDispatch ||
-                  widget.action == TripAction.correctArrival)
-                const Text(LifecycleStrings.correction),
-              if (widget.action == TripAction.cancelConsignment)
-                const Text(LifecycleStrings.cancelled),
-              if (widget.action == TripAction.dispatch) ...[
-                const Text(LifecycleStrings.recognition),
-                for (final k in [
-                  'customer_charge',
-                  'commission',
-                  'owner_entitlement',
-                ])
+  Widget build(BuildContext context) => CallbackShortcuts(
+    bindings: {const SingleActivator(LogicalKeyboardKey.escape): dismiss},
+    child: Focus(
+      autofocus: true,
+      skipTraversal: true,
+      child: PopScope(
+        canPop: !posting,
+        child: AlertDialog(
+          title: Text(widget.action.label),
+          content: SizedBox(
+            width: 560,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    '${TripStrings.labels[k]}: PKR ${(widget.trip['totals'] as Map)[k]}',
+                    '${widget.trip['trip_number']} · ${widget.trip['state']}',
                   ),
-                TextButton(
-                  onPressed: busy ? null : reviewDispatch,
-                  child: const Text(LifecycleStrings.dispatchReview),
-                ),
-                if (warning != null) ...[
-                  if (warning!['requires_confirmation'] == true) ...[
-                    const Text(TripStrings.overlap),
-                    for (final t in warning!['visible_trips'] as List)
-                      Text('${t['trip_number']} · ${t['dispatch_date']}'),
-                    if (warning!['restricted_conflict'] == true)
-                      const Text(TripStrings.restricted),
-                    CheckboxListTile(
-                      value: overlapApproved,
-                      onChanged: busy
-                          ? null
-                          : (v) => setState(() => overlapApproved = v!),
-                      title: const Text(TripStrings.confirmOverlap),
-                    ),
+                  if (widget.action.dateField != null)
                     TextField(
-                      controller: overlapReason,
+                      key: const Key('operation-date'),
+                      controller: date,
                       enabled: !busy,
-                      maxLength: 500,
                       decoration: const InputDecoration(
-                        labelText: TripStrings.reviewReason,
+                        labelText: LifecycleStrings.date,
                       ),
-                      onChanged: (_) => setState(() {}),
+                      onChanged: (_) => setState(() {
+                        reviewed = false;
+                        warning = null;
+                        reviewDate = null;
+                      }),
                     ),
-                  ],
-                  CheckboxListTile(
-                    value: reviewed,
-                    onChanged: busy
-                        ? null
-                        : (v) => setState(() => reviewed = v!),
-                    title: const Text(LifecycleStrings.reviewed),
+                  TextField(
+                    key: const Key('operation-reason'),
+                    controller: reason,
+                    enabled: !busy,
+                    maxLength: 500,
+                    decoration: const InputDecoration(
+                      labelText: LifecycleStrings.reason,
+                    ),
+                    onChanged: (_) => setState(() {}),
                   ),
+                  if (widget.action == TripAction.correctOperation)
+                    TextField(
+                      key: const Key('operation-notes'),
+                      controller: notes,
+                      enabled: !busy,
+                      maxLength: 2000,
+                      decoration: InputDecoration(
+                        labelText: TripStrings.labels['notes'],
+                      ),
+                    ),
+                  const Text(LifecycleStrings.independent),
+                  if (widget.action == TripAction.correctDispatch ||
+                      widget.action == TripAction.correctArrival)
+                    const Text(LifecycleStrings.correction),
+                  if (widget.action == TripAction.cancelConsignment)
+                    const Text(LifecycleStrings.cancelled),
+                  if (widget.action == TripAction.dispatch) ...[
+                    const Text(
+                      'Enter an actual date and reason, review dispatch earnings, then acknowledge the reviewed amounts to enable confirmation.',
+                    ),
+                    const Text(LifecycleStrings.recognition),
+                    for (final k in [
+                      'customer_charge',
+                      'commission',
+                      'owner_entitlement',
+                    ])
+                      Text(
+                        '${TripStrings.labels[k]}: PKR ${(widget.trip['totals'] as Map)[k]}',
+                      ),
+                    TextButton(
+                      onPressed: busy || !inputsValid ? null : reviewDispatch,
+                      child: const Text(LifecycleStrings.dispatchReview),
+                    ),
+                    if (warning != null) ...[
+                      if (warning!['requires_confirmation'] == true) ...[
+                        const Text(TripStrings.overlap),
+                        for (final t in warning!['visible_trips'] as List)
+                          Text('${t['trip_number']} · ${t['dispatch_date']}'),
+                        if (warning!['restricted_conflict'] == true)
+                          const Text(TripStrings.restricted),
+                        CheckboxListTile(
+                          value: overlapApproved,
+                          onChanged: busy
+                              ? null
+                              : (v) => setState(() => overlapApproved = v!),
+                          title: const Text(TripStrings.confirmOverlap),
+                        ),
+                        TextField(
+                          controller: overlapReason,
+                          enabled: !busy,
+                          maxLength: 500,
+                          decoration: const InputDecoration(
+                            labelText: TripStrings.reviewReason,
+                          ),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ],
+                      CheckboxListTile(
+                        value: reviewed,
+                        onChanged: busy
+                            ? null
+                            : (v) => setState(() => reviewed = v!),
+                        title: const Text(LifecycleStrings.reviewed),
+                      ),
+                    ],
+                  ],
+                  if (error != null) Text(error!),
+                  if (busy) ...[
+                    Text(
+                      posting
+                          ? LifecycleStrings.pending
+                          : 'Checking the dispatch review...',
+                    ),
+                    const LinearProgressIndicator(),
+                  ],
                 ],
-              ],
-              if (error != null) Text(error!),
-              if (busy) ...[
-                const Text(LifecycleStrings.pending),
-                const LinearProgressIndicator(),
-              ],
-            ],
+              ),
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: posting ? null : dismiss,
+              child: const Text(TripStrings.cancel),
+            ),
+            FilledButton(
+              onPressed:
+                  busy ||
+                      conflict ||
+                      !inputsValid ||
+                      (widget.action == TripAction.dispatch &&
+                          (!reviewed ||
+                              (warning?['requires_confirmation'] == true &&
+                                  (!overlapApproved ||
+                                      overlapReason.text.trim().isEmpty))))
+                  ? null
+                  : submit,
+              child: const Text(LifecycleStrings.confirm),
+            ),
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: busy ? null : () => Navigator.pop(context),
-          child: const Text(TripStrings.cancel),
-        ),
-        FilledButton(
-          onPressed:
-              busy ||
-                  conflict ||
-                  (widget.action == TripAction.dispatch &&
-                      (!reviewed ||
-                          (warning?['requires_confirmation'] == true &&
-                              (!overlapApproved ||
-                                  overlapReason.text.trim().isEmpty))))
-              ? null
-              : submit,
-          child: const Text(LifecycleStrings.confirm),
-        ),
-      ],
     ),
   );
 }

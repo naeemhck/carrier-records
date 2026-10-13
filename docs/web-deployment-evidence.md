@@ -1,5 +1,7 @@
 # Web deployment evidence — 2026-10-12
 
+Later browser-fix delivery: updated build6 web artifact built/audited locally and partially exercised; user stopped Computer Use before required local/native/live UI checks completed. **No new Pages upload** was performed; deployment below remains the last published version. See [browser QA evidence](browser-bugs-evidence.md) for current results and resume gates. Do not infer that installed Windows build6 is already hosted.
+
 The user explicitly authorized public Flutter web hosting and explicitly waived the previously required database backup for this deployment. No database dump or Storage backup was completed. This web request supersedes the earlier deferred-web scope; T19 remains IN PROGRESS, T20 TODO and the Windows restart check deferred. No production migrations, data changes, backup scheduling or paid upgrades were performed.
 
 ## Build and compatibility

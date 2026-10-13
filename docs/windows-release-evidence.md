@@ -1,5 +1,11 @@
 # T19 Windows packaging and pilot evidence
 
+## Browser-fix update — 2026-10-12
+
+Final per-user candidate **0.1.0+6**: Windows release289.7s / Inno compilation22.485s PASS; installer `app/build/windows/installer/0.1.0+6/CarrierRecords-0.1.0+6-windows-x64-setup.exe`,14,127,143 bytes, SHA-256 **14ab24e537845103e1692f5419f0b5a256ed5b1a9a62cdf65f624a48755df233**. Earlier artifacts, including unshipped build5 candidate, preserved. Final analyzer/no issues and91 Flutter tests PASS; affected backend finance306 and combined615 strict assertions PASS on retries, original failures retained in [browser QA evidence](browser-bugs-evidence.md).
+
+Actual development-PC4→6 update: installer exit0, installed executable version0.1.0+6, existing public configuration hash preserved. Staged30/combined installed+staged60 file/hash/credential inspections PASS. No privileged credentials/test configuration in the package. User physical Escape interrupted Computer Use during updated native launch; stopped all screen input, launch outcome unknown. Native launch/login/session continuity and affected workflows are **PENDING**, not inferred from installation or tests. No clean-machine, printer or pilot/recovery sign-off substitution. T19 IN PROGRESS; T20 TODO; restart DEFERRED; no production schedule change. Source push/web redeploy remain pending required UI verification.
+
 Date: 2026-10-12. Status: **IN PROGRESS**. T20 not started. No GitHub push or production scheduling change.
 
 ## Dependency verified

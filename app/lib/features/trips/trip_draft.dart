@@ -80,6 +80,7 @@ class TripDraft {
       driverName,
       origin,
       destination,
+      destinationName,
       route,
       routeName,
       parent,
@@ -100,6 +101,7 @@ class TripDraft {
       ..driverName = row['driver_name'] as String?
       ..origin = row['origin_office_id'] as String?
       ..destination = row['destination_office_id'] as String?
+      ..destinationName = row['destination_name'] as String?
       ..route = row['route_id'] as String?
       ..parent = row['return_of_trip_id'] as String?
       ..planned = row['planned_dispatch_date'] as String? ?? ''

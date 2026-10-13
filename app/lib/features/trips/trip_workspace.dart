@@ -255,9 +255,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                   Card(
                     child: ListTile(
                       key: ValueKey('trip:${r['id']}'),
-                      title: Text(
-                        '${r['trip_number']} · ${r['registration']}',
-                      ),
+                      title: Text('${r['trip_number']} · ${r['registration']}'),
                       subtitle: Text(
                         '${r['origin_name']} → ${r['destination_name']}\n${r['state']} · ${r['load_kind']} · ${r['dispatch_date'] ?? r['planned_dispatch_date'] ?? ''}',
                       ),
@@ -478,6 +476,7 @@ class _TripEditorState extends State<TripEditor> {
           d.driverName = r.label;
         case 'destination':
           d.destination = r.id;
+          d.destinationName = r.label;
         case 'route':
           d.route = r.id;
           d.routeName = r.label;
@@ -866,7 +865,8 @@ class _TripEditorState extends State<TripEditor> {
                         .map((o) => o['name'])
                         .firstOrNull
                         ?.toString() ??
-                    d.destination,
+                    d.destinationName ??
+                    (d.destination == null ? null : 'Selected office'),
                 () => pick('destination', MasterKind.office),
               ),
               picker(

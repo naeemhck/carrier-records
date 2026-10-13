@@ -1,5 +1,7 @@
 # T19 field-test register
 
+Browser-fix delivery2026-10-12: installed candidate0.1.0+6 now replaces4 on this development PC; exact public-config preservation and60 staged/installed audits PASS. Native launch/session/workflow verification incomplete after user physically stops Computer Use. Updated local web release staff login/navigation observed, critical affected UI checks still incomplete; source push/Pages redeploy pending. User-reported browser observations are separately labelled in [browser QA evidence](browser-bugs-evidence.md); they do not automatically pass this register's installed/clean-machine/physical-print/pilot gates. F10/F11 have narrow hosted-origin draft/review evidence only; destination access/actual dispatch/arrival still pending. F20 remains PARTIAL; F07 DEFERRED; T19 IN PROGRESS/T20 TODO.
+
 Updated 2026-10-12. T19 **IN PROGRESS**, T20 **TODO**. Every executed assertion in the current continuation is listed in [the executed ledger](t19-executed-tests.md); earlier observations retain their source in [Windows release evidence](windows-release-evidence.md). PASS always has the scope below; preparation or automated local regression does not pass a missing field gate.
 
 | ID | Test | Actual result | Scope / evidence / next action |

@@ -154,7 +154,12 @@ def verify(env):
     before=ledger(rollback)[1]
     try:
         failed=post(p,rid=rollback_id);ok('T07 deferred commit failure returns failure',failed[0]>=400 and failed[1].get('message')=='T07_COMMIT_FAILURE')
-        ok('T07 no partial event/allocations/audit/retry/claim changes',ledger(rollback)[1]==before and sql(f"select (select count(*) from public.financial_events where request_id='{rollback_id}')+(select count(*) from public.idempotency_records where request_id='{rollback_id}');")=='0')
+        after=ledger(rollback)[1]
+        retry_rows=sql(f"select (select count(*) from public.financial_events where request_id='{rollback_id}')+(select count(*) from public.idempotency_records where request_id='{rollback_id}');")
+        if after!=before:
+            canonical=lambda snapshot:{k:sorted(v,key=lambda row:json.dumps(row,sort_keys=True)) if isinstance(v,list) else v for k,v in snapshot.items()}
+            print('T07 rollback diagnostic: identical values ignoring row order='+str(canonical(after)==canonical(before))+'; request rows='+retry_rows,flush=True)
+        ok('T07 no partial event/allocations/audit/retry/claim changes',after==before and retry_rows=='0')
     finally:sql('drop trigger t07_commit_failure on public.financial_events;drop function public.t07_fail_commit();')
     success('T07 same receipt request succeeds after rollback',post(p,rid=rollback_id))
     ok('T07 every created event balanced',sql(f"select count(*) from (select e.id from public.financial_events e left join public.journal_lines l on l.event_id=e.id where e.business_id='{b}' group by e.id having coalesce(sum(l.signed_amount),0)<>0)x;")=='0')

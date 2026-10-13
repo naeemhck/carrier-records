@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:carrier_records/features/trips/trip_lifecycle.dart';
 import 'package:carrier_records/features/trips/trip_operation_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -93,6 +94,7 @@ Future<void> open(
     find.byKey(const Key('operation-reason')),
     'Recorded delivery',
   );
+  await tester.pump();
 }
 
 void main() {
@@ -190,6 +192,10 @@ void main() {
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
         isNull,
       );
+      expect(repo.operationRequests.length, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(find.byType(TripOperationDialog), findsOneWidget);
       expect(repo.operationRequests.length, 1);
       repo.commit!.complete({'state': 'ARRIVED'});
       await tester.pumpAndSettle();
