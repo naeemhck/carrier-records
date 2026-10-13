@@ -1,5 +1,7 @@
 # Business, financial and development rules: Carrier Records
 
+2026-10-13 presentation-only compatibility rules: Karvaan branding/English–Urdu must preserve every BR/AT invariant below. Translate interface labels, never user data, enum keys, money, dates, identifiers or company identity. New issued template2 snapshots include bilingual labels/brand/presentation; template1 reprints use original renderer and assets. Any required database change is backward-compatible and local-only. No hosted testing, migration, installation, push or deployment is permitted for this update.
+
 Version: 1.1 | Specification date: 2026-10-11
 
 Status: Authoritative implementation rules for the agreed scope. Implementation and test execution pending.

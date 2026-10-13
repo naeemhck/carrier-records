@@ -1,5 +1,7 @@
 # Architecture: Carrier Records
 
+2026-10-13 isolated update: stable typed string keys and reusable responsive bilingual widgets; English left/Urdu right or stacked, LTR page with per-run Urdu RTL. Bundle licensed Urdu font beside unchanged legacy Latin assets. Candidate runtime and launcher pin verified local endpoint/project identity, separate test config/session storage and cannot load installed production settings. Preserve external IDs/config and template1 renderer; immutable template2 snapshots carry presentation labels/branding. Prefer existing RPC contracts; any needed migration is local-only/backward-compatible. No hosted network application tests or deployment. See docs/karvaan-update.md.
+
 Version: 1.1 | Specification date: 2026-10-11
 
 Status: Implementation specification. No application, cloud deployment or native release is claimed by this document.

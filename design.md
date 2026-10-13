@@ -1,5 +1,7 @@
 # Product and output design: Carrier Records
 
+2026-10-13 Karvaan update overrides earlier English-only/global-RTL assumptions: no toggle or global RTL flip. English left, Urdu right when bounded space permits; compact English-over-Urdu stack elsewhere. Urdu font/line-height/joining/mixed text must be visually verified early in UI and PDF. Keep Latin digits and unchanged user values. Cover form decorations, tooltips, validation, status, safe errors, navigation, previews and new export labels using stable semantic keys. Preserve keyboard/focus/accessibility; legacy documents keep original labels/assets.
+
 Version: 1.1 | Specification date: 2026-10-11
 
 Status: Design specification; screens and document generators are not yet implemented.

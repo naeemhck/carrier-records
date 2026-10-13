@@ -1,5 +1,7 @@
 # Product requirements: Carrier Records
 
+2026-10-13 local-only update: product presentation becomes Karvaan / کارواں, with English/Urdu together across UI and new outputs. This supersedes Urdu deferral for this isolated update only; business/company identities and all financial/permission requirements remain unchanged. No public rollout, hosted changes or installation is authorized. Missing supplied draft means provisional glossary requires office review. See docs/karvaan-update.md and U-series tasks.
+
 Version: 1.1 | Specification date: 2026-10-11
 
 Status: Business scope confirmed. Planning documents generated; application implementation pending.

@@ -1,5 +1,22 @@
 # Implementation tasks and acceptance: Carrier Records
 
+## U-series — local-only Karvaan bilingual update (2026-10-13)
+
+T00–T20 IDs and gates are unchanged: T19 IN PROGRESS, T20 TODO. No previous shipping authorization applies.
+
+| Task | Status | Completion checks |
+| --- | --- | --- |
+| U00 Planning and terminology | DONE | Six planning documents/AGENTS updated; separate branch/worktree; provisional glossary and missing-draft/office-review limitation documented. |
+| U01 Local isolation and fail-closed launcher | IN PROGRESS | Distinct local identity/nonconflicting ports, guarded configuration/project probe, separate sessions; reject hosted config before network/session access. |
+| U02 Karvaan branding | TODO | Visible app/native/web/installer labels changed, compatibility IDs unchanged, new version/artifact paths. |
+| U03 Catalogue, Urdu font and widgets | TODO | Typed stable keys/licensed font, verified glyph joining/mixed text/layout/accessibility prototype. |
+| U04 Complete UI extraction | TODO | Inventory decorations/dialogs/tooltips/status/errors and dynamic labels; all permitted presentation bilingual, user data unchanged. |
+| U05 Bilingual PDF/XLSX and snapshots | TODO | Early shaping prototype, new immutable template, legacy reprints unchanged, selected-field/order/privacy/exact-total checks. |
+| U06 Verification and candidate artifacts | TODO | Analyzer/regressions, local Windows/web/Android builds, visual/content audits, hashes and actual limitations. |
+| U07 Local review handoff | TODO | Coherent local commits, review vocabulary/issues, future installation/deployment/rollback checklist; no actual push/merge/install/deployment. |
+
+U00 actual: clean main base a0bd553b6de18352f587cb1cc6fc662443f9178b; managed worktree C:/Users/Naeem/.codex/worktrees/karvaan-bilingual/transport_project, branch update/karvaan-bilingual created. No existing glossary or supplied bilingual wording found; provisional accounting terms flagged. Source inspection identifies preserved installer AppId/install folder, Android ID and production protected-store/config paths. No candidate execution or backend/hosted changes yet.
+
 Version: 1.1 | Specification date: 2026-10-11
 
 Latest delivery2026-10-12: verification commit9d7520b pushed normally to verified PRIVATE carrier-records; local/remote main equal. Preserved build6 Pages deployment8e6f1210-9d8b-4c53-b142-fc5f4e926759 successful. Both URLs exact local bytes/10 HTTP checks, fresh restricted login, destination/edit/dropdown, Cancel/Escape, invalid date, review/ACK, one live dispatch/history and masked typing/paste PASS. All labelledQA TRP-000002/3/4 audited cancellations retain original history and zero customer/owner balances. Evidence docs/qa-build6-resume.md. Final documentation-only commit follows deployment; no changed artifact/rebuild. T19 remains IN PROGRESS/T20 TODO; deferred native restart/clean-PC/printer/destination field/pilot/recovery gates preserved.
