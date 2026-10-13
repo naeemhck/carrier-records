@@ -1,5 +1,7 @@
 # T19 Windows packaging and pilot evidence
 
+Latest build6 continuation: installed configuration/artifacts preserved, no reinstall/rebuild. Native capture timed out twice; user confirms logged-in session, review/ACK before dispatch, Islamabad and second-draft Cancel/Escape. Browser independently confirms committed trip/history; labelled synthetic records cleaned by audited zero-fee adjustments and zero claims. These are user-observed development-PC checks, not automated native/clean-PC/printer proof. Rollback comparison resolved/633 API checks PASS; exact web artifact now deployed and fresh-live UI verified. See [continuation evidence](qa-build6-resume.md). T19 IN PROGRESS/T20 TODO; restart and release gates unchanged.
+
 ## Browser-fix update — 2026-10-12
 
 Final per-user candidate **0.1.0+6**: Windows release289.7s / Inno compilation22.485s PASS; installer `app/build/windows/installer/0.1.0+6/CarrierRecords-0.1.0+6-windows-x64-setup.exe`,14,127,143 bytes, SHA-256 **14ab24e537845103e1692f5419f0b5a256ed5b1a9a62cdf65f624a48755df233**. Earlier artifacts, including unshipped build5 candidate, preserved. Final analyzer/no issues and91 Flutter tests PASS; affected backend finance306 and combined615 strict assertions PASS on retries, original failures retained in [browser QA evidence](browser-bugs-evidence.md).

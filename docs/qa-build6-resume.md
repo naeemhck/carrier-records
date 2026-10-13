@@ -34,3 +34,28 @@ Prior password keyboard/clipboard probes used masked synthetic text, with no cre
 Delivery status: final documentation commit, ordinary push/equality, deployment and fresh-origin live UI checks pending at this entry. No production scheduling changed. Original/linked financial history must be retained during all QA cleanup.
 
 R41 follow-up: explicit refresh returns CANCELLED, current charge/owner share 0.00, original consignment quote 1.00 retained. Payments overview shows customer outstanding 0.00 and owner settlement due 0.00. No receipt or owner-payment workflow submitted. Parent details initially retained cached DISPATCHED state until explicit refresh; not a failed cancellation transaction.
+
+## Completed delivery and fresh live verification
+
+Verification commit **9d7520b282690fd8f947db4a4b5a0b077cfade4a** pushed normally to PRIVATE https://github.com/naeemhck/carrier-records; remote main equalled local SHA and working tree was clean. Postcommit source/history scan: 279 tracked, zero intended untracked, 539 reachable blobs, zero findings. No archive, database dump, receipt, privileged configuration or build payload committed/uploaded to GitHub.
+
+Pinned Wrangler 4.149.0 upload exited 0: four changed files uploaded, 38 already present; redirects uploaded. Deployment **8e6f1210-9d8b-4c53-b142-fc5f4e926759**, Production/main, source9d7520b. Public URL https://carrier-records.pages.dev; immutable URL https://8e6f1210.carrier-records.pages.dev. Existing deployment preserved. No rebuild, credentials change, paid upgrade or schedule change.
+
+| ID | Fresh live check | Observed result |
+| --- | --- | --- |
+| R44 | HTTP/artifact verification | Root, flutter.js, main.dart.js, version.json and /trips return HTTP200 and exact local bytes on both canonical and immutable origins (10 checks). main.js hash unchanged; version0.1.0/build6. |
+| R45 | Fresh origin authentication | New immutable-origin browser tab starts signed out. User enters pilot_khi credentials only in app; dashboard shows assigned Karachi only, no account/company administration. |
+| R46 | Live navigation/edit | One click Trips and labelled user-saved TRP-000004 opens DRAFT, one car/quote1.00/commission0.00. Edit retains Islamabad; origin dropdown opens and Karachi selection dismisses once. |
+| R47 | Live Cancel | Dispatch Cancel returns DRAFT/no actual dispatch date. |
+| R48 | Live Escape | Reopened Dispatch Escape returns DRAFT/no actual dispatch date. |
+| R49 | Live invalid input | 2026-02-30 plus reason leaves Review/Confirm disabled. |
+| R50 | Live valid input/review/ACK | 2026-10-12 enables Review only; pending review allows Cancel; response exposes unchecked ACK while Confirm disabled; checked ACK enables Confirm. |
+| R51 | Live committed dispatch | One synthetic Confirm shows disabled controls/waiting-for-commit, then DISPATCHED. History contains one DISPATCH/version1→2 and original CREATE_DRAFT; financial history lists one dispatch1.00 and no receipts/settlements. No duplicate submission. |
+| R52 | Live console | Zero captured warning/error entries through dispatch/history verification. |
+| R53 | Original QA cleanup | TRP-000002 zero-fee cancellation effective2026-10-13 commits. Original50000.00 dispatch/quote retained plus adjustment0.00; refreshed CANCELLED/current amounts0.00; customer and owner due0.00. |
+| R54 | Live QA cleanup | TRP-000004 zero-fee cancellation effective2026-10-12 commits with QA reason. Original dispatch1.00 retained plus adjustment0.00; refreshed CANCELLED/current amounts0.00/original quote1.00; customer and owner due0.00. |
+| R55 | Current canonical build password typing | Reloaded canonical site; synthetic keyboard text produces visible masked characters, username empty, no Sign in submission. |
+| R56 | Current build browser paste | Cleared then pasted synthetic text; masked characters observed; no credential or auth submission. |
+| R57 | Current build Ctrl+V | Synthetic browser clipboard text with keyboard Ctrl+V displays masked characters. Cleared password and synthetic clipboard afterward; no user clipboard read. |
+
+All three labelled QA trips TRP-000002/3/4 are cleaned through audited cancellation/linked financial adjustments, with original records preserved. No actual money transfer, customer receipt, owner settlement, arrival or evidence deletion occurred. Latest documentation-only commit records delivery after the immutable artifact deployment; deployment source remains9d7520b and app bytes are unchanged. Native checks remain user-observed because capture failed; physical equipment/pilot/recovery/restart gates remain pending, not substituted by these browser results.

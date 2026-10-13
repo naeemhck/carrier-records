@@ -1,6 +1,6 @@
 # Browser QA and delivery — 2026-10-12
 
-Status: source fixes and build6 installation complete; required local/native/live UI verification unfinished after user stopped Computer Use with physical Escape. GitHub push and web redeployment NOT RUN. T19 IN PROGRESS, T20 TODO, Windows restart DEFERRED. User authorized this PC's update, an ordinary push to PRIVATE naeemhck/carrier-records and deployment to the existing Cloudflare Pages project. Preserve previous artifacts/deployment; no production backup scheduling, reset or deletion.
+Latest status: build6 local and fresh-live critical UI verification completed; installed checks confirmed by user (native capture unavailable). Rollback comparison mechanism reproduced and corrected without backend changes; 633 API checks pass. Private source push and Pages deployment completed. See [continuation evidence](qa-build6-resume.md) for every new result, failures, cleanup and delivery identifiers. Earlier pending statements below describe the interrupted prior turn. T19 IN PROGRESS, T20 TODO, restart DEFERRED; clean-PC, physical-printer and pilot/recovery sign-off gates remain pending. No production backup scheduling/reset/deletion.
 
 ## User-reported observations (not agent-executed)
 
