@@ -7,19 +7,25 @@ import 'features/auth/public_config.dart';
 import 'features/auth/installed_config.dart';
 import 'features/auth/secure_session_storage.dart';
 import 'features/auth/staff_session.dart';
+import 'features/auth/local_candidate_policy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    final config = await InstalledConfig.load(
-      compiled: PublicConfig.fromEnvironment(),
-    );
+    final compiled = PublicConfig.fromEnvironment();
+    final config = karvaanLocalOnly
+        ? compiled
+        : await InstalledConfig.load(compiled: compiled);
+    if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
     if (!config.configured) {
       _launch(const CarrierRecordsApp());
       return;
     }
     config.validate();
     final storage = SecureSessionStorage(
+      keyPrefix: karvaanLocalOnly
+          ? LocalCandidatePolicy.sessionPrefix
+          : 'carrier.session',
       namespace:
           '${config.environment}.${Uri.encodeComponent(config.url)}.${config.businessId}',
     );

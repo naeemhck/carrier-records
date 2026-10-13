@@ -88,6 +88,15 @@ void main() {
       expect(await store.hasAccessToken(), false);
       await store.persistSession('synthetic-session');
       expect(await store.accessToken(), 'synthetic-session');
+      final candidate = SecureSessionStorage(
+        namespace: 'test',
+        keyPrefix: 'karvaan.candidate.session',
+      );
+      expect(await candidate.accessToken(), isNull);
+      await candidate.persistSession('synthetic-candidate-session');
+      expect(await store.accessToken(), 'synthetic-session');
+      await candidate.removePersistedSession();
+      expect(await store.accessToken(), 'synthetic-session');
       expect(
         await SecureSessionStorage(namespace: 'different').accessToken(),
         isNull,

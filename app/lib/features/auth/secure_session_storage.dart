@@ -5,8 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SecureSessionStorage extends LocalStorage {
   SecureSessionStorage({
     required String namespace,
+    String keyPrefix = 'carrier.session',
     FlutterSecureStorage? storage,
-  }) : _key = 'carrier.session.$namespace',
+  }) : _key = '$keyPrefix.$namespace',
        _storage =
            storage ??
            const FlutterSecureStorage(

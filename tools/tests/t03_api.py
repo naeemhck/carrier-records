@@ -1,16 +1,23 @@
 """Destructive synthetic fixtures only on an EMPTY, loopback local Supabase.
 Secrets are obtained in memory from CLI status; output contains case names only.
 """
-import json, subprocess, urllib.request, urllib.error, uuid, secrets, hashlib
+import json, subprocess, urllib.request, urllib.error, uuid, secrets, hashlib, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
+candidate='--karvaan-local' in sys.argv
+if candidate:
+    sys.path.insert(0,str(ROOT/'tools/karvaan'))
+    from local_environment import boundary,IDENTITY,PROJECT
+    boundary()
+container='supabase_db_'+PROJECT if candidate else 'supabase_db_transport_project'
 def sql(query):
-    r=subprocess.run(['docker','exec','-i','supabase_db_transport_project','psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,text=True,encoding='utf-8',capture_output=True)
+    r=subprocess.run(['docker','exec','-i',container,'psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,text=True,encoding='utf-8',capture_output=True)
     if r.returncode: raise RuntimeError('SQL fixture failed: '+r.stderr)
     return r.stdout.strip()
 status=subprocess.run(['powershell','-NoProfile','-File',str(ROOT/'tools/supabase.ps1'),'status','-o','json'],capture_output=True,text=True,check=True)
 cfg=json.loads(status.stdout); base=cfg['API_URL']; anon=cfg['ANON_KEY']; secret=cfg['SERVICE_ROLE_KEY']
-assert base=='http://127.0.0.1:54321'
+assert base==('http://127.0.0.1:60321' if candidate else 'http://127.0.0.1:54321')
+if candidate:assert json.loads(sql('select public.karvaan_local_identity();'))==IDENTITY
 assert sql('select count(*) from public.businesses;')=='0', 'Use a separate empty local test database.'
 assert sql('select count(*) from auth.users;')=='0', 'Test requires no existing accounts.'
 def request(path,body=None,token=None,method='POST',priv=False,raw=None):

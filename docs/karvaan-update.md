@@ -8,6 +8,8 @@ English and Urdu appear together; overall layout remains LTR, with RTL confined 
 
 The attachment references a supplied draft but includes no bilingual wording. No existing bilingual-glossary.md was found. Provisional translations need office review, especially consignment, custody, cost bearer, settlement and brokerage. Independent implementation proceeds without treating provisional vocabulary as approved.
 
+Later same-day clarification: user supplied C:/Users/Naeem/Downloads/bilingual-implementation-draft.md (preserved under docs/) and five provisional choices: کنسائنمنٹ, تحویل / رقم زیرِ تحویل, اخراجات کا ذمہ دار (compact ذمہ دار), تصفیہ, کمیشن. No separate draft glossary was present. Apply these choices; office review remains pending. Initial missing-draft statement above records chronology only.
+
 Before candidate execution: dedicated local Supabase identity, port bind preflight, ignored test-only defines and separate protected session namespace. Launcher and runtime must reject hosted endpoints even with APP_ENV=test, and verify the intended backend identity. Never load production defines, installed client.json or existing sessions. Preserve old local containers/data.
 
 Preserve installer AppId/install directory, Android application ID, ordinary production config/session compatibility, company identity, permanent numbers, historical fares/owners and issued snapshots. New bilingual output uses a new snapshotted template version; legacy renderer/fonts remain unchanged. Rendering does not grant recipient access or change money calculations.

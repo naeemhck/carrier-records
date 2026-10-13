@@ -8,14 +8,16 @@ T00–T20 IDs and gates are unchanged: T19 IN PROGRESS, T20 TODO. No previous sh
 | --- | --- | --- |
 | U00 Planning and terminology | DONE | Six planning documents/AGENTS updated; separate branch/worktree; provisional glossary and missing-draft/office-review limitation documented. |
 | U01 Local isolation and fail-closed launcher | IN PROGRESS | Distinct local identity/nonconflicting ports, guarded configuration/project probe, separate sessions; reject hosted config before network/session access. |
-| U02 Karvaan branding | TODO | Visible app/native/web/installer labels changed, compatibility IDs unchanged, new version/artifact paths. |
-| U03 Catalogue, Urdu font and widgets | TODO | Typed stable keys/licensed font, verified glyph joining/mixed text/layout/accessibility prototype. |
+| U02 Karvaan branding | IN PROGRESS | Visible app/native/web/installer labels changed, compatibility IDs unchanged, new version/artifact paths. |
+| U03 Catalogue, Urdu font and widgets | IN PROGRESS | Typed stable keys/licensed font, verified glyph joining/mixed text/layout/accessibility prototype. |
 | U04 Complete UI extraction | TODO | Inventory decorations/dialogs/tooltips/status/errors and dynamic labels; all permitted presentation bilingual, user data unchanged. |
 | U05 Bilingual PDF/XLSX and snapshots | TODO | Early shaping prototype, new immutable template, legacy reprints unchanged, selected-field/order/privacy/exact-total checks. |
 | U06 Verification and candidate artifacts | TODO | Analyzer/regressions, local Windows/web/Android builds, visual/content audits, hashes and actual limitations. |
 | U07 Local review handoff | TODO | Coherent local commits, review vocabulary/issues, future installation/deployment/rollback checklist; no actual push/merge/install/deployment. |
 
 U00 actual: clean main base a0bd553b6de18352f587cb1cc6fc662443f9178b; managed worktree C:/Users/Naeem/.codex/worktrees/karvaan-bilingual/transport_project, branch update/karvaan-bilingual created. No existing glossary or supplied bilingual wording found; provisional accounting terms flagged. Source inspection identifies preserved installer AppId/install folder, Android ID and production protected-store/config paths. No candidate execution or backend/hosted changes yet.
+
+U-series actual foundation: later supplied draft preserved in docs/karvaan-bilingual-draft.md; user-selected five provisional terms applied to glossary. Distinct local project/60321 API starts with19 migrations, no resets; runtime and launcher fail closed on wrong endpoints/project before sessions. Candidate prefix separates storage from unchanged production keys.633 isolated account/trip/lifecycle/finance checks,2 policy tests,3 optimized-Python boundary tests and9 focused widget/auth tests PASS. Early actual PDF visual comparison detects default bidi date inversion; explicit Arabic shaping preserves Latin date/numbers and joining. Licensed fonts bundled/provenance recorded, initial819-surface/293-literal inventory. Branding sources0.2.0+7 being updated; no candidate run/build/install or complete UI/export claim. See docs/karvaan-evidence.md. U01 remains IN PROGRESS until fixture/config/launcher checks; U02/U03 IN PROGRESS; later U tasks TODO. No push/merge/hosted change.
 
 Version: 1.1 | Specification date: 2026-10-11
 

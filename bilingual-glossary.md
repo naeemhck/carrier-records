@@ -1,25 +1,27 @@
 # Provisional English–Urdu glossary
 
-The request references a supplied draft; none was attached and no earlier glossary exists. Translations here are implementation proposals, not approved office vocabulary. Stable semantic keys will live in the typed catalogue; data/identifiers are never translated.
+The draft was supplied later on 2026-10-13 and is preserved in docs/karvaan-bilingual-draft.md. No separate glossary file accompanied it. The user selected the five accounting terms below explicitly as provisional pending office review. Other translations remain implementation proposals. Stable semantic keys live in the typed catalogue; data/identifiers are never translated.
 
 | English | Urdu | Review |
 | --- | --- | --- |
 | Karvaan | کارواں | Product presentation, not company name |
-| Trip | سفر | Provisional |
-| Consignment | کھیپ | OFFICE REVIEW: customer load/agreed fare, not booking |
+| Trip | ٹرپ | Supplied draft |
+| Consignment | کنسائنمنٹ | USER PICK, OFFICE REVIEW: کنسائنمنٹ versus handwritten مال on print |
 | Customer | گاہک | Provisional |
 | Owner | مالک | Provisional |
 | Broker | بروکر | Provisional |
-| Brokerage | بروکری / کمیشن | OFFICE REVIEW: earned commission, not reimbursement |
+| Brokerage | کمیشن | USER PICK everywhere; office may review, never reimbursement |
 | Customer charge | گاہک کا واجب الادا کرایہ | Provisional |
 | Owner fare share | مالک کا کرایے میں حصہ | Provisional |
 | Profit | منافع | Provisional; distinct from settlement |
-| Custody / held funds | زیرِ تحویل رقم | OFFICE REVIEW: money held for others |
-| Cost bearer | خرچ برداشت کرنے والا | OFFICE REVIEW: distinct from payer |
-| Settlement | واجبات کی ادائیگی | OFFICE REVIEW: cash/offset discharge, not profit |
+| Custody | تحویل | USER PICK, OFFICE REVIEW |
+| Held funds | رقم زیرِ تحویل | USER PICK, OFFICE REVIEW: money held for others |
+| Cost bearer | اخراجات کا ذمہ دار | USER PICK; compact ذمہ دار; OFFICE REVIEW, distinct from payer |
+| Settlement | تصفیہ | USER PICK for print; OFFICE REVIEW, not profit |
 | Expense | خرچ | Provisional |
 | Reimbursement | خرچ کی واپسی | Provisional; distinct from brokerage |
-| Receipt | وصولی | Provisional; not owner settlement |
+| Receipt | رسید | Supplied draft; receipt document, not owner settlement |
+| Money received | وصول شدہ | Supplied draft; not owner settlement |
 | Advance | پیشگی رقم | Provisional |
 | Refund | رقم کی واپسی | Provisional |
 | Office | دفتر | Provisional |
