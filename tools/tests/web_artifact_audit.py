@@ -18,7 +18,7 @@ def audit(root):
         if (path.name.startswith('.env') or path.suffix.lower() in
                 {'.sql', '.gz', '.dump', '.key', '.pem', '.pfx', '.jks', '.exe'} or
                 any(part in {'receipts', 'backups', 'storage-backup', '.local'}
-                    for part in path.parts)):
+                    for part in path.relative_to(root).parts)):
             findings.append((name, 'private/artifact filename'))
         patterns = {
             'privileged project key': rb'sb_secret_[A-Za-z0-9_-]{20,}',

@@ -63,7 +63,7 @@ def verify(env):
         cfg=env['ROOT']/'tools/.local/t14-native-config.json'
         cfg.write_text(json.dumps({'APP_ENV':'test','SUPABASE_URL':env['base'],'SUPABASE_PUBLISHABLE_KEY':env['anon'],'APP_BUSINESS_ID':b,'TEST_USERNAME':'reports3','TEST_PASSWORD':env['real'],'TEST_VEHICLE_ID':vehicle['id'],'TEST_OWNER_ID':data['owner']['id'],'TEST_CUSTOMER_ID':data['customer']['id'],'TEST_BROKER_ID':data['broker']['id'],'TEST_ORIGINAL_ID':env['t13']['original']['id'],'TEST_REPLACEMENT_ID':env['t13']['replacement']['id'],'TEST_RECEIPT_ID':env['t13']['receipt']['id'],'TEST_EXPORT_DIR':str(output_dir)}),encoding='utf-8')
         try:
-            with (env['ROOT']/'tools/.local/t14-native.log').open('w',encoding='utf-8') as log:result=env['subprocess'].run(['powershell','-NoProfile','-File',str(env['ROOT']/'tools/flutter.ps1'),'test','integration_test/exports_test.dart','-d','windows','--no-pub','--dart-define-from-file='+str(cfg)],cwd=env['ROOT']/'app',stdout=log,stderr=env['subprocess'].STDOUT)
+            with (env['ROOT']/'tools/.local/t14-native.log').open('w',encoding='utf-8') as log:result=env['subprocess'].run(['powershell','-NoProfile','-File',str(env['ROOT']/'tools/flutter.ps1'),'test','integration_test/exports_test.dart','-d','windows','--no-pub',*(['--dart-define=use_arabic=true'] if env['candidate'] else []),'--dart-define-from-file='+str(cfg)],cwd=env['ROOT']/'app',stdout=log,stderr=env['subprocess'].STDOUT)
             ok('T14 actual Windows PDF XLSX generation and printing capability',result.returncode==0)
         finally:cfg.unlink(missing_ok=True)
         st=success('T14 fresh login after native global logout',env['login']('reports3',env['real']))['access_token']

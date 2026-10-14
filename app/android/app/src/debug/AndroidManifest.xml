@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Local-only candidate: HTTP is limited to the emulator's host loopback. -->
+    <application android:networkSecurityConfig="@xml/karvaan_local_network"/>
 </manifest>

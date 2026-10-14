@@ -99,8 +99,8 @@ def verify(env):
     measured=success('T11 annual fixture exact summary',rpc('get_scoped_report',args,st));ok('T11 benchmark counts and amounts',measured['totals']['dispatched']=='1000.00' and measured['totals']['owner_earnings']=='95000000.00' and measured['totals']['vehicle_cost']=='100000.00' and measured['row_count']==20)
     if '--reports-diagnose' in sys.argv:
         claims=json.loads(base64.urlsafe_b64decode(st.split('.')[1]+'==='))
-        statement="begin;select set_config('request.jwt.claims',"+"'"+json.dumps(claims).replace("'","''")+"',true);load 'auto_explain';set client_min_messages=log;set auto_explain.log_min_duration=0;set auto_explain.log_analyze=true;set auto_explain.log_buffers=true;set auto_explain.log_timing=false;set auto_explain.log_nested_statements=true;set role authenticated;select public.get_scoped_report('MONTHLY_VEHICLE','"+json.dumps(args['filters']).replace("'","''")+"',0);rollback;"
-        trace=env['subprocess'].run(['docker','exec','-i','supabase_db_transport_project','psql','-U','supabase_admin','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=statement,text=True,capture_output=True)
+        statement="begin;"+("set plan_cache_mode=force_generic_plan;" if '--reports-generic-diagnose' in sys.argv else "")+"select set_config('request.jwt.claims',"+"'"+json.dumps(claims).replace("'","''")+"',true);load 'auto_explain';set client_min_messages=log;set auto_explain.log_min_duration=0;set auto_explain.log_analyze=true;set auto_explain.log_buffers=true;set auto_explain.log_timing=false;set auto_explain.log_nested_statements=true;set role authenticated;select public.get_scoped_report('MONTHLY_VEHICLE','"+json.dumps(args['filters']).replace("'","''")+"',0);rollback;"
+        trace=env['subprocess'].run(['docker','exec','-i',env['container'],'psql','-U','supabase_admin','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=statement,text=True,capture_output=True)
         safe=trace.stderr
         for value in [env['secret'],env['anon'],st,env['real'],env['cfg'].get('JWT_SECRET','')]:
             if value:safe=safe.replace(value,'<redacted>')
@@ -108,21 +108,25 @@ def verify(env):
         ok('T18 nested EXPLAIN actual restricted-role report captured',trace.returncode==0)
         return
     def worker(token):
-        times={'summary':[],'screen':[]}
+        times={'summary':[],'screen':[],'errors':[]}
         for _ in range(10):
-            start=time.perf_counter();r=rpc('get_scoped_report',args,token);times['summary'].append(time.perf_counter()-start);assert r[0]==200,('summary',r[0],r[1].get('message'))
-            start=time.perf_counter();r=rpc('list_trips',{'search_text':'BENCH','page_offset':0},token);times['screen'].append(time.perf_counter()-start);assert r[0]==200,('screen',r[0],r[1].get('message'));assert len(r[1]['rows'])==50
+            start=time.perf_counter();r=rpc('get_scoped_report',args,token);times['summary'].append(time.perf_counter()-start);
+            if r[0]!=200:times['errors'].append({'operation':'summary','http':r[0],'message':r[1].get('message')})
+            start=time.perf_counter();r=rpc('list_trips',{'search_text':'BENCH','page_offset':0},token);times['screen'].append(time.perf_counter()-start);
+            if r[0]!=200:times['errors'].append({'operation':'screen','http':r[0],'message':r[1].get('message')})
+            elif len(r[1]['rows'])!=50:times['errors'].append({'operation':'screen','http':200,'message':'Unexpected page size'})
         return times
     results=list(ThreadPoolExecutor(max_workers=5).map(worker,tokens));measure={}
     for key in ['summary','screen']:
         values=sorted(v for r in results for v in r[key]);measure[key]={'requests':len(values),'p50_seconds':round(statistics.median(values),4),'p95_seconds':round(values[math.ceil(len(values)*.95)-1],4),'max_seconds':round(max(values),4),'percentile_method':'nearest rank ceil(0.95*N)'}
     cpu=env['subprocess'].run(['powershell','-NoProfile','-Command','Get-CimInstance Win32_Processor | Select-Object Name,NumberOfLogicalProcessors | ConvertTo-Json -Compress'],capture_output=True,text=True).stdout.strip()
-    evidence={'fixture_trips':12000,'months':12,'trips_per_month':1000,'vehicles':20,'concurrent_users':5,'network':'HTTP loopback 127.0.0.1:54321; active local Docker backend; not a hosted network benchmark','platform':platform.platform(),'cpu':cpu,'measurements':measure}
+    evidence={'fixture_trips':12000,'months':12,'trips_per_month':1000,'vehicles':20,'concurrent_users':5,'network':'HTTP loopback '+env['base']+'; active local Docker backend; not a hosted network benchmark','platform':platform.platform(),'cpu':cpu,'measurements':measure,'errors':[e for r in results for e in r['errors']]}
     evidence['database_bytes']=int(sql('select pg_database_size(current_database())'))
     evidence['fixture_setup_seconds']=round(seed_seconds,3)
     evidence['docker_resources']=env['subprocess'].run(['docker','info','--format','CPUs={{.NCPU}} MemoryBytes={{.MemTotal}}'],capture_output=True,text=True,check=True).stdout.strip()
     samples={key:[round(v,6) for r in results for v in r[key]] for key in ['summary','screen']}
     Path(env['ROOT']/'tools/.local/t11-performance.json').write_text(json.dumps(evidence|{'latencies_seconds':samples},indent=2),encoding='utf-8');print('T11 measured '+json.dumps(evidence),flush=True)
+    ok('T11 all100 measured requests succeeded',not evidence['errors'])
     ok('T11 monthly summary p95 <=5s',measure['summary']['p95_seconds']<=5)
     ok('T11 paginated screen p95 <=2s',measure['screen']['p95_seconds']<=2)
     # More than one report page, preserving canonical whole-filter totals.

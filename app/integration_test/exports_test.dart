@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:carrier_records/features/auth/public_config.dart';
+import 'package:carrier_records/features/auth/local_candidate_policy.dart';
 import 'package:carrier_records/features/auth/secure_session_storage.dart';
 import 'package:carrier_records/features/auth/staff_session.dart';
 import 'package:carrier_records/features/reports/document_repository.dart';
@@ -21,6 +22,7 @@ void main() {
         storage = SecureSessionStorage(
           namespace: 'native-exports.${DateTime.now().microsecondsSinceEpoch}',
         );
+    if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
     await Supabase.initialize(
       url: config.url,
       publishableKey: config.key,

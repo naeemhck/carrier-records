@@ -1,5 +1,5 @@
 """Read actual application files with independent PDF/OOXML libraries. No authoring."""
-import json,sys,zipfile,subprocess,xml.etree.ElementTree as ET
+import re,json,sys,zipfile,subprocess,xml.etree.ElementTree as ET
 from pathlib import Path
 from decimal import Decimal
 from pypdf import PdfReader
@@ -20,16 +20,24 @@ def inspect(directory):
         fields=payload['fields'];order=payload['field_order'];columns=[next(f for f in fields if f['field_key']==k) for k in order if not next(f for f in fields if f['field_key']==k)['header']]
         reader=PdfReader(pdf);text='\n'.join(p.extract_text() or '' for p in reader.pages);metadata=str(reader.metadata)
         no_keys(pdf.read_bytes());no_keys((text+metadata).encode())
-        font_sizes=[]
+        font_sizes=[];english_pages=[]
         for page in reader.pages:
+            english_chunks=[]
             no_keys(page.get_contents().get_data())
             def visit(value,cm,tm,font,size):
                 if value.strip():font_sizes.append(size)
+                if font is not None and 'Arabic' not in str(font.get('/BaseFont','')):english_chunks.append(value)
             page.extract_text(visitor_text=visit)
+            english_pages.append(''.join(english_chunks))
         assert min(font_sizes)>=9, 'Document text below 9 pt'
         # Selected columns appear in contiguous ordered sections, with repeated table headings.
         compact=lambda value: ''.join(value.split())
-        pages=[compact(page.extract_text() or '') for page in reader.pages]
+        v2=payload['template_version']==2
+        if v2:
+            assert not re.search(r'[\u0660-\u0669\u06f0-\u06f9]',text), 'Non-Latin document digits'
+            presentation=payload['presentation'];assert presentation['version']==2
+            for f in fields:assert presentation['fields'][f['field_key']]['en']==f['label']
+        pages=[compact(value) for value in english_pages] if v2 else [compact(page.extract_text() or '') for page in reader.pages]
         size=4 if float(reader.pages[0].mediabox.width)>float(reader.pages[0].mediabox.height) else 3
         cursor=0
         for start in range(0,len(columns),size):
@@ -43,7 +51,9 @@ def inspect(directory):
         assert all(not p.get('/Annots') for p in reader.pages), 'Unexpected annotations/links'
         assert all(abs(float(p.mediabox.width)-595.276)<1 or abs(float(p.mediabox.width)-841.89)<1 for p in reader.pages)
         assert 'FORBIDDEN-T14-PRIVATE' not in text+metadata
-        assert payload['metadata']['scope'].replace('\u2014','-') in text.replace('\u2014','-')
+        # PDF line wrapping may split the scope; retain every non-whitespace
+        # character, rather than requiring one unwrapped extraction line.
+        assert compact(payload['metadata']['scope'].replace('\u2014','-')) in compact(text.replace('\u2014','-')), 'Authoritative scope missing'
         for value in payload['totals'].values():
             if isinstance(value,str):
                 integer,fraction=value.lstrip('-').split('.');formatted=f'{int(integer):,}.{fraction}'
@@ -62,8 +72,8 @@ def inspect(directory):
             assert sheet.find('m:sheetViews/m:sheetView/m:pane',ns).get('state')=='frozen'
             row_nodes=sheet.findall('m:sheetData/m:row',ns)
             def values(row):return [c.find('m:is/m:t',ns).text or '' if c.find('m:is/m:t',ns) is not None else c.find('m:v',ns).text if c.find('m:v',ns) is not None else None for c in row.findall('m:c',ns)]
-            expected=[f['label'] for f in columns];heading=next(r for r in row_nodes if values(r)==expected)
-            assert [f['label'] for f in columns]==values(heading)
+            expected=[f['label']+'\n\u2067'+presentation['fields'][f['field_key']]['ur']+'\u2069' if v2 else f['label'] for f in columns];heading=next(r for r in row_nodes if values(r)==expected)
+            assert expected==values(heading)
             for row in row_nodes:
                 for cell in row.findall('m:c',ns):
                     value=cell.find('m:v',ns)
