@@ -9,15 +9,15 @@ defines=ROOT/'tools/.local/karvaan-test-defines.json'
 config=json.loads(defines.read_text(encoding='utf-8'))
 validate_defines(config)
 version=(ROOT/'app/pubspec.yaml').read_text().split('version: ',1)[1].splitlines()[0].strip()
-require(version=='0.2.0+9','This unused candidate version must be explicit.')
+require(version=='0.2.0+10','This unused candidate version must be explicit.')
 out=ROOT/'tools/.local/candidates'/version
 require(not out.exists(),'Preserve existing candidate artifacts; use a new version.')
-out.mkdir(parents=True)
 commit=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,check=True).stdout.strip()
 require(not subprocess.run(['git','status','--porcelain'],cwd=ROOT,capture_output=True,text=True,check=True).stdout,'Commit intended source before building.')
+out.mkdir(parents=True)
 manifest={'public_configuration_sha256':hashlib.sha256(defines.read_bytes()).hexdigest(),'version':version,'source_commit':commit,'environment':'isolated local synthetic only','builds':{},'files':[]}
 def record():
- manifest['files']=[{'path':p.relative_to(out).as_posix(),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(out.rglob('*')) if p.is_file() and p.name!='manifest.json']
+ manifest['files']=[{'path':p.relative_to(out).as_posix(),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(out.rglob('*')) if p.is_file() and p.name!='manifest.json' and p.relative_to(out).parts[0]!='review-pack']
  (out/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
 def build(platform,source,target):
  if source.exists():shutil.copytree(source,ROOT/'tools/.local/preserved-artifacts'/version/platform)
@@ -38,12 +38,12 @@ def build(platform,source,target):
  record();print('PASS '+platform+' candidate build '+str(manifest['builds'][platform]['seconds'])+'s',flush=True)
 build('windows',ROOT/'app/build/windows/x64/runner/Release',out/'windows/payload')
 payload=out/'windows/payload'
-(payload/'LOCAL-CANDIDATE.txt').write_text('Karvaan '+version+' — ISOLATED LOCAL SYNTHETIC REVIEW ONLY.\nDo not install over Carrier Records or deploy. Run the copied payload directly for local review.\nOnly verified karvaan_bilingual_u20261013 backend port60321 is permitted. Production configuration and sessions are not read.\nNo production backup helper or scheduling is included. See the source docs/karvaan-candidate-evidence.md.\n',encoding='utf-8')
+(payload/'LOCAL-CANDIDATE.txt').write_text('Karvaan '+version+' â€” ISOLATED LOCAL SYNTHETIC REVIEW ONLY.\nDo not install over Carrier Records or deploy. Run the copied payload directly for local review.\nOnly verified karvaan_bilingual_u20261013 backend port60321 is permitted. Production configuration and sessions are not read.\nNo production backup helper or scheduling is included. See the source docs/karvaan-candidate-evidence.md.\n',encoding='utf-8')
 for p in payload.rglob('*.pdb'):p.unlink() # Candidate copy only; preserve original build symbols.
 compiler=Path('D:/portfolio/transport_project/tools/.local/inno/compiler/ISCC.exe')
 verify_compiler(compiler)
 with (out/'installer-build.log').open('w',encoding='utf-8') as log:
- result=subprocess.run([str(compiler),'/DPayloadDir='+str(payload),'/DOutputDir='+str(out/'windows'),'/DAppVersion=0.2.0','/DBuildNumber=9',str(ROOT/'tools/windows/carrier-records.iss')],stdout=log,stderr=subprocess.STDOUT)
+ result=subprocess.run([str(compiler),'/DPayloadDir='+str(payload),'/DOutputDir='+str(out/'windows'),'/DAppVersion=0.2.0','/DBuildNumber='+version.split('+')[1],str(ROOT/'tools/windows/carrier-records.iss')],stdout=log,stderr=subprocess.STDOUT)
 require(result.returncode==0,'Installer compilation failed.')
 print('PASS candidate installer compiled; NOT installed.',flush=True);record()
 build('web',ROOT/'app/build/web',out/'web')

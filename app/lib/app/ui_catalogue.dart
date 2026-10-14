@@ -5033,6 +5033,32 @@ abstract final class L10n {
   );
   static const lifetimeReportLabel22Accessibility =
       "Cost recovery — current lifetime. خرچ کی قابلِ وصول رقم — موجودہ مکمل مدت پر";
+  static const accountStatusActive = Bilingual(
+    "ui.accountStatusActive",
+    "Active",
+    "فعال",
+  );
+  static const accountStatusActiveAccessibility = "Active. فعال";
+  static const accountStatusDisabled = Bilingual(
+    "ui.accountStatusDisabled",
+    "Disabled",
+    "غیر فعال",
+  );
+  static const accountStatusDisabledAccessibility = "Disabled. غیر فعال";
+  static const passwordChangeRequiredSuffix = Bilingual(
+    "ui.passwordChangeRequiredSuffix",
+    " · Password change required",
+    " · پاس ورڈ بدلنا ضروری ہے",
+  );
+  static const passwordChangeRequiredSuffixAccessibility =
+      " · Password change required.  · پاس ورڈ بدلنا ضروری ہے";
+  static const secureSignInStartupFailed = Bilingual(
+    "ui.secureSignInStartupFailed",
+    "Secure sign-in could not start. Ask your administrator to check this installation.",
+    "محفوظ سائن اِن شروع نہیں ہو سکا۔ اپنے منتظم سے اس تنصیب کی جانچ کروائیں۔",
+  );
+  static const secureSignInStartupFailedAccessibility =
+      "Secure sign-in could not start. Ask your administrator to check this installation.. محفوظ سائن اِن شروع نہیں ہو سکا۔ اپنے منتظم سے اس تنصیب کی جانچ کروائیں۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5833,5 +5859,9 @@ abstract final class L10n {
     lifetimeReportLabel20,
     lifetimeReportLabel21,
     lifetimeReportLabel22,
+    accountStatusActive,
+    accountStatusDisabled,
+    passwordChangeRequiredSuffix,
+    secureSignInStartupFailed,
   ];
 }

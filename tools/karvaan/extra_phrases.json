@@ -328,5 +328,25 @@
     "lifetimeReportLabel22",
     "Cost recovery — current lifetime",
     "خرچ کی قابلِ وصول رقم — موجودہ مکمل مدت پر"
+  ],
+  [
+    "accountStatusActive",
+    "Active",
+    "فعال"
+  ],
+  [
+    "accountStatusDisabled",
+    "Disabled",
+    "غیر فعال"
+  ],
+  [
+    "passwordChangeRequiredSuffix",
+    " · Password change required",
+    " · پاس ورڈ بدلنا ضروری ہے"
+  ],
+  [
+    "secureSignInStartupFailed",
+    "Secure sign-in could not start. Ask your administrator to check this installation.",
+    "محفوظ سائن اِن شروع نہیں ہو سکا۔ اپنے منتظم سے اس تنصیب کی جانچ کروائیں۔"
   ]
 ]

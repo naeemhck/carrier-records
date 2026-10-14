@@ -41,3 +41,5 @@ Money, dates and reference numbers use Latin digits. English wording is retained
 Additional unresolved review items: catalogue uses رپورٹس where the initial glossary proposes رپورٹیں; choose one office wording. Distinguish car/consignment identifiers from carrier vehicle. Review settlement offsets, recovery balances and personal-funding claims in context; do not merge them with profit, commission or customer receipts. No provisional terminology approval is inferred from automated tests.
 
 Dynamic report review: the existing catalogue uses آمدن for earnings; آمدنی is another proposed wording. The original entry is retained pending office review. Controlled lifetime/date-basis descriptors now have paired labels while preserving the English source and numeric/date values.
+
+2026-10-14 provisional account-state additions: Active → فعال; Disabled → غیر فعال; Password change required → پاس ورڈ بدلنا ضروری ہے. Secure startup failure uses the new Urdu administrator-guidance message. These four entries are appended; original catalogue English and keys remain unchanged. Office terminology review is still pending.

@@ -1,4 +1,4 @@
-# Karvaan candidate verification — local only
+# Karvaan candidate verification â€” local only
 
 Worktree: `update/karvaan-bilingual`, based on main `a0bd553b6de18352f587cb1cc6fc662443f9178b`. Document checkpoint: `884fe0f7f872b909d20dcf37d3032c7a2f80061e`. Candidate source version is now `0.2.0+9`; paths and hashes will be recorded only after successful builds. No candidate installer has been installed, and no hosted backend, deployment, main merge or push is authorized.
 
@@ -12,7 +12,7 @@ Native template-2 export generation itself passed (Windows build 120.9 seconds; 
 
 The web artifact auditor previously treated `.local` in the directory containing an artifact as packaged private content. It now checks only paths relative to the artifact root. Two regressions pass: a clean artifact beneath an ignored parent is permitted, a nested private file remains denied, and a synthetic privileged key is rejected without printing its value. This changes the inspector, not client authorization.
 
-## Annual performance recheck — outstanding gate
+## Annual performance recheck â€” outstanding gate
 
 Isolated synthetic dataset: 12,000 trips, 1,000/month for twelve months, twenty vehicles and five genuinely authenticated restricted users. Fifty summary and fifty ordinary paginated-screen requests. HTTP loopback to API 60321, active dedicated Docker backend; both pre-existing and isolated local stacks remained running. Windows 10 build 19045; Intel i5-6200U 2.30GHz, four logical CPUs; Docker four CPUs and 8,262,008,832 bytes memory. No hosted records or services were used. Dataset size is benchmark volume, not a business forecast.
 
@@ -30,10 +30,46 @@ T19's recorded owner acceptance, exceptions and waivers remain intact, without r
 
 Source/history audit before staging:342 tracked files,14 intended untracked files,689 historical blobs,2195 ignored local files; no findings (karvaan-candidate-source-audit.log). Generated exports, fixtures, credentials, configurations and build artifacts remain ignored.
 
-## Preserved partial build8 and packaging fix — 2026-10-14
+## Preserved partial build8 and packaging fix â€” 2026-10-14
 
 Build8 source91e5b6aee174536b27ccab0e6dc0c359cd7ecf3f produced an actual Windows release binary (exit0). Recorded wall time40,864.084s includes long execution/clock gaps; it is not a usable active-build duration estimate. The copied payload and partial manifest remain preserved in tools/.local/candidates/0.2.0+8. No installer, web or Android output was produced by that attempt. Its manifest precedes the subsequent packaging removal of candidate-copy PDB files; do not treat the partial manifest as a completed package audit.
 
 Packaging failed because nested Windows PowerShell could find Get-AuthenticodeSignature but could not autoload Microsoft.PowerShell.Security. Direct verification in the current PowerShell host confirms the existing ISCC.exe signature is Valid. The new helper selects available PowerShell and imports the security module explicitly from that host's PSHOME, retaining mandatory Valid status and nonzero-exit rejection. Actual regression: signed existing compiler accepted; missing and unsigned synthetic files denied (two tests5.447s). No signature bypass, downloaded replacement or installation occurred. Use unused version0.2.0+9 for the next complete artifact set; preserve build8.
 
 Fresh source/history audit356 tracked/two untracked/712 historical blobs reports no findings. Catalogue/app behavior and financial schema are unchanged by this packaging fix; prior current-source111 Flutter/1466 backend checks remain applicable. Another unrelated Flutter development window was observed on the shared PC; no interaction or process changes were made. Performance results retain the shared-machine limitation and the failing summary gate.
+
+## Current-source UI and report checkpoint â€” 2026-10-14
+
+Candidate9 (source a39ec8a3a0405138607b91c7f73aec39f77c7feb) actually built Windows release, installer, web release and Android debug; preserved in tools/.local/candidates/0.2.0+9. Installer NOT installed, Android NOT device-tested. Candidate9 artifact audit639 entries and independent49-file web audit passed. APK SDK PEM parser headers contained no complete private key bodies; actual armored material remains rejected. Original build manifest included mutable QA files: preserved unchanged; derived artifact-manifest.json excludes those review files without recalculating compiled bytes. Candidate10 builder now excludes review-pack. Browser9 three synthetic accounts passed login/role navigation, brand and narrow captures with no console errors/nonlocal requests. These are build9 results, not verification of newer fixes.
+
+Native9 restored its real isolated protected administrator session. Computer Use bare-path launching unexpectedly opened installed Carrier Records twice; no inputs were sent there. Startup network activity of that installed process was not captured, so absolute zero hosted startup traffic cannot be asserted. Explicit process-prefixed candidate launching corrected the target. Native screenshot capture timed out; accessibility observation worked. A later Trips click was rejected on detected user input; native controls stopped immediately and have not resumed. Do not count native trip navigation or candidate10 execution as passed.
+
+Actual account rows exposed untranslated roles/status and a wide-screen2px Manage overflow. Focused red/green checks established the failures; shared bilingual row/status presentation and below-row actions fixed them. Secure startup failure also gains Urdu. Four append-only messages bring catalogue803; original554 fingerprint/English preserved. Focused9 tests passed. Final stabilized-source analyzer18.5s/no issues; full114 Flutter tests passed4:04 (karvaan-final10-analyzer.log / karvaan-final10-flutter.log). Arabic fonts cover100 glyphs/joining; all legacy renderers/Latin assets unchanged.
+
+### Performance investigation and current measurements
+
+The new profiler reuses the established T11 seed SQL verbatim:12,000 trips,12months,20vehicles, five separate authenticated STAFF accounts. Existing local review records are retained; no empty-database guard was bypassed, no reset/deletion. Synthetic credentials remain ignored. Cache conditions: one summary warm-up per user, existing OS/Postgres caches retained; no candidate build during measurement. Nearest-rank ceil(.95*N),50 summaries and50 paginated screens each run; loopback on the same shared i5/Windows/Docker environment as earlier evidence. Volume is a benchmark, not a forecast.
+
+First new run failed HTTP500; actual isolated PostgREST log identified57014 statement timeout. The first profiler aborted on that error, so it is an incomplete failed run, not100 measured successes. Subsequent harness retains all statuses/samples and fails its gate after writing evidence.
+
+Actual restricted-role nested plan: total database call2005.989ms.36,000 balances expanded through ten CASE metric rows. Claim projection now emits the single applicable nonzero metric; exact numeric signs/zero behavior preserved, including customer-credit negatives and due/recovery separation. Database call1553.882ms afterward; first concurrent trial summaryp957.20298s FAIL. Nine entire vehicle/owner/claim payloads across January/June/December matched before/after exactly (only generated_at removed).
+
+Next plan demonstrated36,000 repeated event/consignment PK fetches from estimated38 versus actual12,000 searched trips. Bounded private journal metadata is joined/materialized once; authorization remains applied before facts are returned, with existing owner/ACL/search_path and all office/date/accounting predicates. Non-lifetime journal events after period end are excluded because neither period earnings nor end-date balances can use them. Actual database call780.409ms; generic cached-plan call881.332ms. No global memory, auth, timeout, role or target weakening. Initial optimized concurrent trial summaryp955.59636s FAIL, screen.68050s PASS,100 requests/no failures.
+
+Separate concurrent database-only profile50 measured calls/five users (one additional unmeasured warm-up each):p95 **4069.719ms**,p502567.959ms,max4272.958ms. EXPLAIN total execution includes function/auth/JSON construction; node TIMING OFF. Excludes HTTP/client process startup; it is a separate run and cannot be subtracted from an HTTP p95.
+
+Correlated HTTP run20261014-120344: summaryp953.813052s, screenp95.887998s;100 successful calls. Matching pg_stat_statements delta exactly50 summary calls,113220.866879ms execution/mean2264.417338ms; mean response-header wait2301.239724ms. The average residual36.822386ms includes API/pool/network/scheduling; no unsupported claim that it measures transfer alone. Summary body-readp95.231100ms; Python JSON decodep95.642600ms. These client timings are not Flutter UI rendering.
+
+Repeat20261014-120502: summaryp954.516024s, screenp951.318422s;100 successes, no failures. Summary body-readp95.281700ms/Python JSON decodep95.958900ms. Both final unchanged-workload runs pass the documented5s/2s HTTP targets, with shared-machine variability and earlier failures retained. Raw samples/SQL plans remain ignored locally. Browser/native UI processing/rendering still requires separate available-candidate evidence; do not equate HTTP with painted screens.
+
+### Correctness, failure history and pending candidate10
+
+Current affected T11 backend run74 PASS checks: cross-month dispatch/receipt/expense corrections, lifetime totals, historical owner changes, distinct profit/custody/settlement, raw endpoint denial, unknown filters, denied unrelated offices and revoked-office JWT. All nine full baseline payloads remain identical after both optimizations. Claim projection matrix includes every account purpose, negative/zero/positive amounts and numeric boundary; report SQL permissions included. Current schema220 SQL assertions across15 files pass in rolled-back transactions. Initial SQL runner refused a leading-comment test; corrected transaction parser. Last two files required pgTAP bootstrap inside their transactions; first attempt failed without it, then21 assertions passed. No permanent extension/data mutation.
+
+Retained-fixture harness initially hard-coded Test Office0, then collided on a category on retry; fixed expected office to authenticated exact name and unique fixture codes/categories. SQL subprocess UTF-8 is now explicit, tested without weakening labels. Final temporary run accounts disabled normally; all synthetic financial/correction history retained. Earlier failed-run synthetic accounts/history also retained, never silently deleted.
+
+Regression helpers: four isolation/UTF-8 tests, two percentile tests, three real-private-material tests pass. Source audit initially flagged a complete PEM-shaped synthetic test literal: no staging/commit occurred; test now assembles fake armor at runtime while keeping complete-body rejection, source/history audit then passed. Ordinary client candidates are scanned against every generated synthetic password plus local privileged credentials, including APK contents.
+
+Next unused version0.2.0+10. Current-source commit/build, ordinary candidate smoke, UI readiness decomposition, actual artifact hashes and final review pack remain pending. Preserve8/9 artifacts and installed config. U06 remains IN PROGRESS until all required available checks pass; no fully review-ready claim. T19 owner dispositions retained/T20 TODO. No push/main merge/installation/deployment or production scheduling change.
+
+Local db advisors --local --type all --fail-on error exits0. One existing receipt_files multiple permissive INSERT policies warning (receipt_append/trusted_security), no ERROR. These report changes did not alter receipt RLS. CLI update notice retained; existing2.120.0 used. Final source/history358 tracked/9 intended untracked/720 historical blobs no findings before staging. Whitespace check clean after removing an extra test EOF line.

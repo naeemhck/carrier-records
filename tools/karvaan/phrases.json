@@ -7278,5 +7278,41 @@
     "origins": [
       "reviewed.dynamic.presentation"
     ]
+  },
+  {
+    "key": "accountStatusActive",
+    "semantic_key": "ui.accountStatusActive",
+    "en": "Active",
+    "ur": "فعال",
+    "origins": [
+      "account row integration review; provisional"
+    ]
+  },
+  {
+    "key": "accountStatusDisabled",
+    "semantic_key": "ui.accountStatusDisabled",
+    "en": "Disabled",
+    "ur": "غیر فعال",
+    "origins": [
+      "account row integration review; provisional"
+    ]
+  },
+  {
+    "key": "passwordChangeRequiredSuffix",
+    "semantic_key": "ui.passwordChangeRequiredSuffix",
+    "en": " · Password change required",
+    "ur": " · پاس ورڈ بدلنا ضروری ہے",
+    "origins": [
+      "account row integration review; provisional"
+    ]
+  },
+  {
+    "key": "secureSignInStartupFailed",
+    "semantic_key": "ui.secureSignInStartupFailed",
+    "en": "Secure sign-in could not start. Ask your administrator to check this installation.",
+    "ur": "محفوظ سائن اِن شروع نہیں ہو سکا۔ اپنے منتظم سے اس تنصیب کی جانچ کروائیں۔",
+    "origins": [
+      "main.dart controlled startup failure; provisional"
+    ]
   }
 ]

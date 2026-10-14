@@ -10,10 +10,10 @@ def verify(env):
         ok(name,True);return r[1]
     tokens=[]
     for i in range(5):
-        name='reports'+str(i);u=success('T11 managed benchmark staff',env['edge']({'action':'create','username':name,'display_name':'Synthetic reports','role':'STAFF','office_ids':[off[0]],'password':env['password']},at))
+        name=env.get('report_username_prefix','reports')+str(i);u=success('T11 managed benchmark staff',env['edge']({'action':'create','username':name,'display_name':'Synthetic reports','role':'STAFF','office_ids':[off[0]],'password':env['password']},at))
         env['users'].append(sql(f"select auth_user_id from public.staff_profiles where id='{u['id']}';"))
         env['change'](success('T11 temporary staff login',env['login'](name))['access_token']);tokens.append(success('T11 ready staff login',env['login'](name,env['real']))['access_token'])
-    st=tokens[0];xt=success('T11 unrelated office login',env['login']('outside',env['real']))['access_token']
+    st=tokens[0];xt=success('T11 unrelated office login',env['login'](env.get('outside_username','outside'),env['real']))['access_token']
     def master(kind,p):return success('T11 synthetic '+kind,rpc('save_master_record',{'kind':kind,'target_id':uid(),'request_id':uid(),'expected_version':0,'payload':p},at))
     owner,customer,broker=[master('PARTY',{'code':'T11-'+role,'display_name':'Synthetic T11 '+role,'roles':[role],'contact_details':{},'archived':False}) for role in ['OWNER','CUSTOMER','BROKER']]
     vehicle=master('VEHICLE',{'registration':'T11-SYNTHETIC','current_owner_id':owner['id'],'default_driver_id':None,'archived':False});category=master('CATEGORY',{'name':'Synthetic T11 costs','archived':False})
@@ -49,7 +49,7 @@ def verify(env):
     ep.update(effective_date='2026-04-10',amount='11000.00');correct(expense['event_id'],ep)
     feb=success('AT19 corrected February expense',report('02'));apr=success('AT19 corrected April expense',report('04'));life=success('AT19 corrected lifetime',report('04','TRIP_PROFIT',extra={'trip_id':target}))
     ok('AT19 effective expense dates and no duplicated cost',feb['totals']['vehicle_cost']=='2000.00' and apr['totals']['vehicle_cost']=='11000.00' and life['totals']['owner_profit']=='84000.00')
-    ok('AT22 scoped completeness labels',not jan['complete'] and 'not a complete' in jan['scope'] and jan['offices']==['Test Office 0'] and success('T11 admin complete report',report('01',token=at))['complete'])
+    ok('AT22 scoped completeness labels',not jan['complete'] and 'not a complete' in jan['scope'] and jan['offices']==[env.get('expected_office_name','Test Office 0')] and success('T11 admin complete report',report('01',token=at))['complete'])
     ok('AT22 forbidden office filter',report('01',extra={'office_id':off[2]})[0]==403)
     ok('AT22 unrelated trip direct report',report('01','TRIP_PROFIT',xt,{'trip_id':target})[0]==403)
     outside=success('AT22 unrelated empty scoped report',report('01',token=xt));ok('AT22 totals cannot reveal hidden trip',outside['totals']['customer_fare']=='0.00' and outside['rows']==[])

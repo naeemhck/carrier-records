@@ -25,4 +25,11 @@ class LocalBoundaryTests(unittest.TestCase):
             with self.subTest(key=key,identity=identity,business=business),patch.object(local,'status',return_value={'ANON_KEY':key}),patch.object(local,'sql',return_value=business),patch.object(local.urllib.request,'urlopen',return_value=io.StringIO(json.dumps(identity))):
                 with self.assertRaises(RuntimeError):local.validate_defines(self.valid())
 
+    def test_sql_uses_utf8_and_pinned_container(self):
+        with patch.object(local.subprocess,'run') as run:
+            run.return_value.stdout='Karachi â€” synthetic\n'
+            self.assertEqual(local.sql('select name;'),'Karachi â€” synthetic')
+            self.assertEqual(run.call_args.kwargs['encoding'],'utf-8')
+            self.assertIn('supabase_db_'+local.PROJECT,run.call_args.args[0])
+
 if __name__=='__main__':unittest.main()

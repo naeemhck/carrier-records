@@ -179,16 +179,20 @@ class BilingualListTile extends StatelessWidget {
     this.dense,
     this.contentPadding,
     this.selected = false,
+    this.trailingBelow = false,
   });
   final Widget? title, subtitle, leading, trailing;
   final VoidCallback? onTap;
   final bool? dense;
   final EdgeInsetsGeometry? contentPadding;
   final bool selected;
+  // Two-line actions can exceed ListTile's 40px trailing limit even when wide.
+  final bool trailingBelow;
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final below = trailing != null && constraints.maxWidth < 600;
+      final below =
+          trailing != null && (trailingBelow || constraints.maxWidth < 600);
       return ListTile(
         title: title,
         leading: leading,

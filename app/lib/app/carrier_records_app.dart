@@ -59,7 +59,7 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
                     padding: const EdgeInsets.all(24),
                     child: BilingualText(
                       (widget.setupError != null
-                          ? Bilingual.data(widget.setupError)
+                          ? ownedMessage(widget.setupError)
                           : L10n.askYourAdministratorToConfigureThisInstallationForStaff),
                       textAlign: TextAlign.center,
                     ),
@@ -714,6 +714,32 @@ class _PasswordDialogState extends State<PasswordDialog> {
   );
 }
 
+Bilingual accountStatusPresentation(Map<String, dynamic> account) =>
+    L10n.labelValues.withValues([
+      ownedMessage(account['role']),
+      account['active'] ? L10n.accountStatusActive : L10n.accountStatusDisabled,
+      account['must_change_password']
+          ? L10n.passwordChangeRequiredSuffix
+          : Bilingual.data(''),
+    ]);
+
+class AccountRow extends StatelessWidget {
+  const AccountRow({super.key, required this.account, required this.onManage});
+  final Map<String, dynamic> account;
+  final VoidCallback onManage;
+
+  @override
+  Widget build(BuildContext context) => BilingualListTile(
+    trailingBelow: true,
+    title: Text('${account['display_name']} (${account['username']})'),
+    subtitle: BilingualText(accountStatusPresentation(account)),
+    trailing: TextButton(
+      onPressed: onManage,
+      child: const BilingualCaption(L10n.manage),
+    ),
+  );
+}
+
 class AccountsPanel extends StatefulWidget {
   const AccountsPanel({super.key, required this.session});
   final StaffSession session;
@@ -770,24 +796,7 @@ class _AccountsPanelState extends State<AccountsPanel> {
           if (!snapshot.hasData) return const LinearProgressIndicator();
           return Column(
             children: snapshot.data!
-                .map(
-                  (a) => BilingualListTile(
-                    title: Text('${a['display_name']} (${a['username']})'),
-                    subtitle: BilingualText(
-                      L10n.labelValues.withValues([
-                        a['role'],
-                        a['active'] ? 'Active' : 'Disabled',
-                        a['must_change_password']
-                            ? ' · Password change required'
-                            : '',
-                      ]),
-                    ),
-                    trailing: TextButton(
-                      onPressed: () => edit(a),
-                      child: const BilingualCaption(L10n.manage),
-                    ),
-                  ),
-                )
+                .map((a) => AccountRow(account: a, onManage: () => edit(a)))
                 .toList(),
           );
         },

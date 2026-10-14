@@ -19,7 +19,7 @@ def boundary():
     require(CLI.is_file(),'Verified official CLI absent.')
 
 def sql(query):
-    r=subprocess.run(['docker','exec','-i','supabase_db_'+PROJECT,'psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,capture_output=True,text=True,check=True)
+    r=subprocess.run(['docker','exec','-i','supabase_db_'+PROJECT,'psql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=query,capture_output=True,text=True,encoding="utf-8",check=True)
     return r.stdout.strip()
 
 def status():
