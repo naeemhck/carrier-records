@@ -27,8 +27,8 @@ class LocalBoundaryTests(unittest.TestCase):
 
     def test_sql_uses_utf8_and_pinned_container(self):
         with patch.object(local.subprocess,'run') as run:
-            run.return_value.stdout='Karachi â€” synthetic\n'
-            self.assertEqual(local.sql('select name;'),'Karachi â€” synthetic')
+            run.return_value.stdout='Karachi \u2014 synthetic\n'
+            self.assertEqual(local.sql('select name;'),'Karachi \u2014 synthetic')
             self.assertEqual(run.call_args.kwargs['encoding'],'utf-8')
             self.assertIn('supabase_db_'+local.PROJECT,run.call_args.args[0])
 

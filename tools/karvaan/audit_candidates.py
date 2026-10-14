@@ -50,11 +50,23 @@ def files():
     with zipfile.ZipFile(p) as z:
      for n in z.namelist():scan(name+'!'+n,z.read(n))
 files()
+if '--review-pack' in sys.argv:
+ pack=root/'review-pack';require(pack.is_dir(),'Review pack absent.')
+ for p in pack.rglob('*'):
+  if not p.is_file():continue
+  require(p.suffix.lower() in {'.json','.md','.png','.pdf','.xlsx'},'Unexpected review file type.')
+  name='review-pack/'+p.relative_to(pack).as_posix();data=p.read_bytes();scan(name,data)
+  if p.suffix=='.xlsx':
+   with zipfile.ZipFile(p) as z:
+    for n in z.namelist():scan(name+'!'+n,z.read(n))
+ review_manifest=json.loads((pack/'review-manifest.json').read_text(encoding='utf-8'))
+ for item in review_manifest['files']:
+  p=pack/item['path'];require(p.is_file() and hashlib.sha256(p.read_bytes()).hexdigest()==item['sha256'],'Review manifest mismatch.')
 manifest_path=root/'artifact-manifest.json'
 if not manifest_path.exists():manifest_path=root/'manifest.json'
 manifest=json.loads(manifest_path.read_text())
 for item in manifest['files']:
  p=root/item['path'];require(p.is_file() and hashlib.sha256(p.read_bytes()).hexdigest()==item['sha256'],'Manifest mismatch: '+item['path'])
 report={'source_commit':manifest['source_commit'],'version':manifest['version'],'manifest':manifest_path.name,'scanned_entries':count,'findings':findings,'header_literals_without_key_material':header_literals,'passed':not findings,'installer':'compiled but not installed; Windows payload audited before compression','android':'debug-signed test candidate, not T20 release'}
-(root/'audit.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+(root/('review-audit.json' if '--review-pack' in sys.argv else 'audit.json')).write_text(json.dumps(report,indent=2),encoding='utf-8')
 print(json.dumps(report));require(not findings,'Candidate audit failed.')

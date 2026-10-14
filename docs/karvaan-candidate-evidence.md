@@ -1,6 +1,6 @@
-# Karvaan candidate verification â€” local only
+# Karvaan candidate verification — local only
 
-Worktree: `update/karvaan-bilingual`, based on main `a0bd553b6de18352f587cb1cc6fc662443f9178b`. Document checkpoint: `884fe0f7f872b909d20dcf37d3032c7a2f80061e`. Candidate source version is now `0.2.0+9`; paths and hashes will be recorded only after successful builds. No candidate installer has been installed, and no hosted backend, deployment, main merge or push is authorized.
+Worktree: `update/karvaan-bilingual`, based on main `a0bd553b6de18352f587cb1cc6fc662443f9178b`. Document checkpoint: `884fe0f7f872b909d20dcf37d3032c7a2f80061e`. Current compiled candidate: `0.2.0+10`, source `5cd2e4168b4d12afb359c3068449b6fa410a9540`. Builds and hashes below are actual; browser performance/native-input gates remain unresolved. Earlier checkpoint sections retain their original chronology. No candidate installer has been installed, and no hosted backend, deployment, main merge or push is authorized.
 
 ## Current-source checks
 
@@ -12,7 +12,7 @@ Native template-2 export generation itself passed (Windows build 120.9 seconds; 
 
 The web artifact auditor previously treated `.local` in the directory containing an artifact as packaged private content. It now checks only paths relative to the artifact root. Two regressions pass: a clean artifact beneath an ignored parent is permitted, a nested private file remains denied, and a synthetic privileged key is rejected without printing its value. This changes the inspector, not client authorization.
 
-## Annual performance recheck â€” outstanding gate
+## Annual performance recheck — outstanding gate
 
 Isolated synthetic dataset: 12,000 trips, 1,000/month for twelve months, twenty vehicles and five genuinely authenticated restricted users. Fifty summary and fifty ordinary paginated-screen requests. HTTP loopback to API 60321, active dedicated Docker backend; both pre-existing and isolated local stacks remained running. Windows 10 build 19045; Intel i5-6200U 2.30GHz, four logical CPUs; Docker four CPUs and 8,262,008,832 bytes memory. No hosted records or services were used. Dataset size is benchmark volume, not a business forecast.
 
@@ -30,7 +30,7 @@ T19's recorded owner acceptance, exceptions and waivers remain intact, without r
 
 Source/history audit before staging:342 tracked files,14 intended untracked files,689 historical blobs,2195 ignored local files; no findings (karvaan-candidate-source-audit.log). Generated exports, fixtures, credentials, configurations and build artifacts remain ignored.
 
-## Preserved partial build8 and packaging fix â€” 2026-10-14
+## Preserved partial build8 and packaging fix — 2026-10-14
 
 Build8 source91e5b6aee174536b27ccab0e6dc0c359cd7ecf3f produced an actual Windows release binary (exit0). Recorded wall time40,864.084s includes long execution/clock gaps; it is not a usable active-build duration estimate. The copied payload and partial manifest remain preserved in tools/.local/candidates/0.2.0+8. No installer, web or Android output was produced by that attempt. Its manifest precedes the subsequent packaging removal of candidate-copy PDB files; do not treat the partial manifest as a completed package audit.
 
@@ -38,7 +38,7 @@ Packaging failed because nested Windows PowerShell could find Get-AuthenticodeSi
 
 Fresh source/history audit356 tracked/two untracked/712 historical blobs reports no findings. Catalogue/app behavior and financial schema are unchanged by this packaging fix; prior current-source111 Flutter/1466 backend checks remain applicable. Another unrelated Flutter development window was observed on the shared PC; no interaction or process changes were made. Performance results retain the shared-machine limitation and the failing summary gate.
 
-## Current-source UI and report checkpoint â€” 2026-10-14
+## Current-source UI and report checkpoint — 2026-10-14
 
 Candidate9 (source a39ec8a3a0405138607b91c7f73aec39f77c7feb) actually built Windows release, installer, web release and Android debug; preserved in tools/.local/candidates/0.2.0+9. Installer NOT installed, Android NOT device-tested. Candidate9 artifact audit639 entries and independent49-file web audit passed. APK SDK PEM parser headers contained no complete private key bodies; actual armored material remains rejected. Original build manifest included mutable QA files: preserved unchanged; derived artifact-manifest.json excludes those review files without recalculating compiled bytes. Candidate10 builder now excludes review-pack. Browser9 three synthetic accounts passed login/role navigation, brand and narrow captures with no console errors/nonlocal requests. These are build9 results, not verification of newer fixes.
 
@@ -73,3 +73,55 @@ Regression helpers: four isolation/UTF-8 tests, two percentile tests, three real
 Next unused version0.2.0+10. Current-source commit/build, ordinary candidate smoke, UI readiness decomposition, actual artifact hashes and final review pack remain pending. Preserve8/9 artifacts and installed config. U06 remains IN PROGRESS until all required available checks pass; no fully review-ready claim. T19 owner dispositions retained/T20 TODO. No push/main merge/installation/deployment or production scheduling change.
 
 Local db advisors --local --type all --fail-on error exits0. One existing receipt_files multiple permissive INSERT policies warning (receipt_append/trusted_security), no ERROR. These report changes did not alter receipt RLS. CLI update notice retained; existing2.120.0 used. Final source/history358 tracked/9 intended untracked/720 historical blobs no findings before staging. Whitespace check clean after removing an extra test EOF line.
+
+
+## Candidate10 execution and remaining gates - 2026-10-14
+
+Compiled source commit **5cd2e4168b4d12afb359c3068449b6fa410a9540**, version **0.2.0+10**. Subsequent intended changes affect QA/evidence helpers only; app, fonts, renderers and migrations are unchanged. No rebuild/reinstall was needed for those QA fixes. Prior build8/build9 artifacts are preserved.
+
+Candidate root: `C:/Users/Naeem/.codex/worktrees/karvaan-bilingual/transport_project/tools/.local/candidates/0.2.0+10`. Immutable `manifest.json` records all compiled file hashes and successful build exit codes. Windows release211.927s (Flutter207.3s); web8746.821s recorded wall duration includes execution gaps and is not an active-build ETA; Android debug600.008s. Existing Android SDK used. Java native-access/SDK XML-version warnings retained; Android device execution NOT RUN (ADB lists no devices/emulators). Installer compiled with verified existing Inno compiler but NOT installed. No main merge/push/deployment/hosted test or scheduling change.
+
+| Artifact | Bytes | SHA-256 |
+|---|---:|---|
+| windows/Karvaan-0.2.0+10-windows-x64-setup.exe | 14653111 | ecc722626e87eff6212197e81150a2a6df7aedfbfaa167304945287f29d28d93 |
+| windows/payload/carrier_records.exe | 93184 | f42ba3dc96ac1650752fd7d82b7f03f97de6a2c53fc60b55e7bea47d77460db0 |
+| windows-candidate.zip | 17757374 | a8a78ed20c66359b00f4017e2a89217eeaebf6b96c52096e97879bf0cfbcd9bf |
+| web-candidate.zip | 15799115 | ad039f01a3b81fdb48d6efcbdffa02840689e8bc30dd3c92c88afd656187f27d |
+| android/Karvaan-0.2.0+10-android-debug.apk | 185066832 | f3805ae3a881718e8325d9d1e24684a87ff3ac069466209de3e6d63301db53b5 |
+
+### Executed candidate checks
+
+- C10-WEB-01 PASS: served main.dart.js matches immutable candidate manifest; fresh local synthetic admin/Karachi/Islamabad accounts sign in, bilingual brand/navigation and appropriate office labels/admin controls verified. Browser basic smoke has no console errors or blocked nonlocal requests. Current `review-pack/web-smoke.json` pins source5cd. Local8767/60321 allowlist; all other requests aborted, no hosted testing.
+- C10-WEB-02 PASS: actual320px narrow captures and1280px report capture visually inspected; joined Urdu/mixed English text and Latin dates/amounts retained. Staff report explicitly labels assigned-office scope and exact owner earnings95000000.00/20rows. These are representative screenshots, not exhaustive screen coverage.
+- C10-WEB-03 PASS: aborting the local report RPC shows bilingual Report unavailable, normal retry recovers exact totals. This read failure does not prove a write rollback.
+- C10-WEB-04 PASS: normal admin category form with a uniquely labelled synthetic name; save request deliberately aborted before backend commit. Visible bilingual failure, original input retained and no Saved by the server confirmation. Retry uses identical request/record identity, confirms HTTP200 and visible server success. Normal authenticated list returns exactly one matching record; normal versioned archive retains it. `web-write-smoke.json`, failure/recovery PNGs and `karvaan-web-write10-confirmation.log`. No financial posting or operational records changed. Post-commit lost-response behavior remains covered by earlier backend regressions, not this specific browser case.
+- C10-DOC-01 PASS: current-source inspector rechecked eight PDF/eight XLSX pairs (61 PDF pages), embedded fonts, selected order/required identity, exact authoritative amounts, recipient markers, metadata and workbook hidden/formula checks. Actual `inspection.json` hashes copied into pack. Rendered unit_wide pages1/10/21, issued_v2 page7, owner_v2 page3 visually inspected; long/wide multipage layouts join Urdu and preserve Latin values. Unit stress-fixture generic metadata/row labels are deliberately synthetic fallback terms, not approved office vocabulary. Actual version2 server labels are separate. All legacy renderers/assets remain unchanged.
+- C10-AUDIT-01 PASS: fresh639 packaged entries, manifests equal, no credential/private-data findings; SDK kernel PEM-parser headers contain no complete key material. Independent49-file web audit:46445150 bytes, main.js SHAe51ddc53cabf6ece177d5e6190fcd2f30f0b28d052562d7eaa69c4b187e31dc1, no findings. Source/history367 tracked/one intended new file/746 blobs/no findings before final evidence staging; final post-change scan recorded below.
+- C10-NATIVE-01 PARTIAL: exact returned process-prefixed candidate10 window1772444 shows Karvaan and restores the isolated protected administrator session; bilingual account role/status labels observed. Installed Carrier Records window7932076 was not targeted. Screenshot capture failures from prior attempt retained.
+- C10-NATIVE-02 UNRESOLVED: after explicit Resume candidate10 input testing authorization, fresh dashboard observation focus7 Sign out. Tab returns focus0 window root, not next control. Fresh master button48 rejected with `element48 is not available in cached app state for carrier_records.exe`. No Company form, edit/save/document/connection flow established through native input. No alternate UI-automation bypass. Owner says cannot manually check now. Tool failures do not establish an app defect or a passed native gate.
+
+### Five-user browser performance failure retained
+
+Same annual12,000-trip/20-vehicle data and five real restricted users; 10 measured reports/user intended, one December warm-up each, existing OS/Postgres caches retained. Fresh contexts initialized sequentially because simultaneous font/WASM bootstrap previously timed out; startup excluded from measured operations. No builds/audits during timing. No target/security/workload relaxation.
+
+Earlier basic five-request readiness samples are not a controlled five-user benchmark. The first timing attempts failed waiting for responses. Added per-user stage/request diagnostics; second diagnosed run warmed all five, then every first measured response wait timed out at30s, with loading screens and zero completed measured samples. It does NOT produce a valid p95. Further diagnostic run waited two animation frames after warm-up and retained request-start/failure events; fifth-user warm-up failed HTTP500. Actual isolated PostgREST logs show57014 statement timeout at22:08:01UTC and22:22:42UTC; latter corresponds to failed warm-up. Database was active, not a disconnected/offline backend.
+
+After-run resource snapshot is not a during-run cause measurement: DB0.44%CPU/285.3MiB, host total16643356KiB/free5344320KiB after owned browser closed. Shared CPU/browser scheduling and query variance remain possible contributors, not proven root causes. Earlier nested-query optimizations and two passing HTTP runs remain real, but do not override these failed browser attempts. Client JSON/rendering/network decomposition cannot be reported as passing50-sample evidence without completed requests. Required browser/native gates remain unresolved; candidate is NOT fully review-ready.
+
+### QA failures and correction evidence
+
+Windows-default Python cp1252 decoding corrupted expected Urdu/emdash strings in QA helpers and the evidence prefix, causing false comparisons. All new read/write operations use explicit UTF-8 / Python-Xutf8; original evidence prefix restored from Git, no app/catalogue translation change. Proper Unicode SQL regression four tests PASS0.040s. Browser brand expectation uses Unicode escapes; readiness includes actual rendered text plus unique generated_at and exact totals rather than aria-only text. Initial master smoke incorrectly awaited New record on Company; source shows that button only on non-company tabs. Corrected navigation uses observed Expense categories checkbox; actual failed-save/retry check then passes. Initial source audit invocation omitted existing --karvaan-local flag and correctly failed its54321 guard; documented local mode passes pinned60321 identity, no validation weakened.
+
+Review pack is prepared under candidate root/review-pack, with representative screenshots, inspected synthetic samples, glossary, numeric measurements, immutable build manifest and separate review manifest. Unresolved office terminology remains provisional; original554 catalogue entries/English fingerprint retained. U06 IN PROGRESS; U07 prepared but incomplete. T19 acceptance/waivers remain intact without skipped checks becoming PASS; T20 TODO. Production backup scheduling unchanged.
+
+
+### Fresh post-browser HTTP recheck - latest performance gate FAIL
+
+`karvaan-current10-http-recheck.log`, numeric `karvaan-report-profile-20261014-153052.json`; sourceHEAD5cd with QA-only dirty changes, same report-function hash01ac76189d6a4cf1a73c9cb8a43434435d0775c07c9b1a0a8f2442a919a07930. Owned browser was closed; no build/audit during this measurement. Five real restricted users, same12k annual dataset,50 summaries/50 paginated screens, warm-ups/cache policy unchanged. Full samples retained:29 summaryHTTP200,21 summaryHTTP500, all50 screenHTTP200. Attempted-response summaryp95 **8.395284s** and screenp95 **3.239297s** both FAIL; failed responses are included and these are not successful-summary latency claims. No false success or discarded errors.
+
+Matching pg_stat_statements records29 successful summary calls, mean6268.037689ms; failed executions do not appear in that successful-call delta. Transferp95.3423ms/PythonJSONparse1.0991ms versus headerwait8395.0722ms locates the dominant delay before payload processing. Current single-call restricted nested plan total3566.201ms; fact projection3032.032ms versus1177.329ms in the earlier passing1302/1336ms plan. All57 fact-query structural nodes, estimated costs, actual rows and loop counts match after removing only timing values. Thus a newly changed query plan/cardinality was not demonstrated; the same fact execution is slower. Shared resource/scheduling variance is a possible deeper cause but has not been measured during the failing interval. Do not add speculative indexes or relax timeout/security/target to claim success.
+
+Latest required performance gate remains FAILED despite historical passing runs. No candidate10 full readiness/U06 completion claim. Native input and Android-device limitations remain as recorded. Review pack includes all four raw numeric profiles, preserving failed and successful history.
+
+
+Final QA checkpoint: candidate plus review-pack/workbook ZIP-content audit **768 entries/no findings**, all64 review-manifest file hashes match; logs karvaan-final10-review-audit.log and candidate review-audit.json. Fresh source/history **367 tracked/one intended new helper/746 historical blobs/no findings** (karvaan-final10-precommit-audit.log). Proper UTF-8/local-boundary regressions4PASS0.040s; actual/private-key-material regressions3PASS0.001s; node --check smoke_web.cjs exit0. git diff --check passes; no app/supabase changes since compiled5cd. Main remains clean at a0bd553b6de18352f587cb1cc6fc662443f9178b. Final local QA/evidence commit includes the improved browser diagnostics/save-retry smoke, synthetic pack assembler, pack audit option, corrected Unicode regression and these recorded failures. Generated artifacts/samples/configurations/session material remain ignored.
