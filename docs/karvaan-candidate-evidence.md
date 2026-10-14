@@ -1,6 +1,6 @@
 # Karvaan candidate verification — local only
 
-Worktree: `update/karvaan-bilingual`, based on main `a0bd553b6de18352f587cb1cc6fc662443f9178b`. Document checkpoint: `884fe0f7f872b909d20dcf37d3032c7a2f80061e`. Candidate source version is provisionally `0.2.0+8`; paths and hashes will be recorded only after successful builds. No candidate installer has been installed, and no hosted backend, deployment, main merge or push is authorized.
+Worktree: `update/karvaan-bilingual`, based on main `a0bd553b6de18352f587cb1cc6fc662443f9178b`. Document checkpoint: `884fe0f7f872b909d20dcf37d3032c7a2f80061e`. Candidate source version is now `0.2.0+9`; paths and hashes will be recorded only after successful builds. No candidate installer has been installed, and no hosted backend, deployment, main merge or push is authorized.
 
 ## Current-source checks
 
@@ -29,3 +29,11 @@ Source/history audit and local source commit; Windows/web/Android candidate buil
 T19's recorded owner acceptance, exceptions and waivers remain intact, without relabeling skipped checks PASS. T20 remains TODO. Production backup scheduling is unchanged.
 
 Source/history audit before staging:342 tracked files,14 intended untracked files,689 historical blobs,2195 ignored local files; no findings (karvaan-candidate-source-audit.log). Generated exports, fixtures, credentials, configurations and build artifacts remain ignored.
+
+## Preserved partial build8 and packaging fix — 2026-10-14
+
+Build8 source91e5b6aee174536b27ccab0e6dc0c359cd7ecf3f produced an actual Windows release binary (exit0). Recorded wall time40,864.084s includes long execution/clock gaps; it is not a usable active-build duration estimate. The copied payload and partial manifest remain preserved in tools/.local/candidates/0.2.0+8. No installer, web or Android output was produced by that attempt. Its manifest precedes the subsequent packaging removal of candidate-copy PDB files; do not treat the partial manifest as a completed package audit.
+
+Packaging failed because nested Windows PowerShell could find Get-AuthenticodeSignature but could not autoload Microsoft.PowerShell.Security. Direct verification in the current PowerShell host confirms the existing ISCC.exe signature is Valid. The new helper selects available PowerShell and imports the security module explicitly from that host's PSHOME, retaining mandatory Valid status and nonzero-exit rejection. Actual regression: signed existing compiler accepted; missing and unsigned synthetic files denied (two tests5.447s). No signature bypass, downloaded replacement or installation occurred. Use unused version0.2.0+9 for the next complete artifact set; preserve build8.
+
+Fresh source/history audit356 tracked/two untracked/712 historical blobs reports no findings. Catalogue/app behavior and financial schema are unchanged by this packaging fix; prior current-source111 Flutter/1466 backend checks remain applicable. Another unrelated Flutter development window was observed on the shared PC; no interaction or process changes were made. Performance results retain the shared-machine limitation and the failing summary gate.

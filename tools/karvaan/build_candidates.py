@@ -2,13 +2,14 @@
 import hashlib,json,shutil,subprocess,time,zipfile
 from pathlib import Path
 from local_environment import ROOT,boundary,validate_defines,require
+from verify_compiler import verify_compiler
 
 boundary()
 defines=ROOT/'tools/.local/karvaan-test-defines.json'
 config=json.loads(defines.read_text(encoding='utf-8'))
 validate_defines(config)
 version=(ROOT/'app/pubspec.yaml').read_text().split('version: ',1)[1].splitlines()[0].strip()
-require(version=='0.2.0+8','This unused candidate version must be explicit.')
+require(version=='0.2.0+9','This unused candidate version must be explicit.')
 out=ROOT/'tools/.local/candidates'/version
 require(not out.exists(),'Preserve existing candidate artifacts; use a new version.')
 out.mkdir(parents=True)
@@ -32,18 +33,17 @@ def build(platform,source,target):
  require(result.returncode==0,platform+' build failed; see candidate log.')
 
  if platform=='apk':
-  target.mkdir(parents=True);shutil.copy2(source/'app-debug.apk',target/'Karvaan-0.2.0+8-android-debug.apk')
+  target.mkdir(parents=True);shutil.copy2(source/'app-debug.apk',target/('Karvaan-'+version+'-android-debug.apk'))
  else:shutil.copytree(source,target)
  record();print('PASS '+platform+' candidate build '+str(manifest['builds'][platform]['seconds'])+'s',flush=True)
 build('windows',ROOT/'app/build/windows/x64/runner/Release',out/'windows/payload')
 payload=out/'windows/payload'
-(payload/'LOCAL-CANDIDATE.txt').write_text('Karvaan 0.2.0+8 — ISOLATED LOCAL SYNTHETIC REVIEW ONLY.\nDo not install over Carrier Records or deploy. Run the copied payload directly for local review.\nOnly verified karvaan_bilingual_u20261013 backend port60321 is permitted. Production configuration and sessions are not read.\nNo production backup helper or scheduling is included. See the source docs/karvaan-candidate-evidence.md.\n',encoding='utf-8')
+(payload/'LOCAL-CANDIDATE.txt').write_text('Karvaan '+version+' — ISOLATED LOCAL SYNTHETIC REVIEW ONLY.\nDo not install over Carrier Records or deploy. Run the copied payload directly for local review.\nOnly verified karvaan_bilingual_u20261013 backend port60321 is permitted. Production configuration and sessions are not read.\nNo production backup helper or scheduling is included. See the source docs/karvaan-candidate-evidence.md.\n',encoding='utf-8')
 for p in payload.rglob('*.pdb'):p.unlink() # Candidate copy only; preserve original build symbols.
 compiler=Path('D:/portfolio/transport_project/tools/.local/inno/compiler/ISCC.exe')
-sig=subprocess.run(['powershell','-NoProfile','-Command',"(Get-AuthenticodeSignature -LiteralPath 'D:/portfolio/transport_project/tools/.local/inno/compiler/ISCC.exe').Status"],capture_output=True,text=True,check=True).stdout.strip()
-require(sig=='Valid','Installer compiler signature must be valid.')
+verify_compiler(compiler)
 with (out/'installer-build.log').open('w',encoding='utf-8') as log:
- result=subprocess.run([str(compiler),'/DPayloadDir='+str(payload),'/DOutputDir='+str(out/'windows'),'/DAppVersion=0.2.0','/DBuildNumber=8',str(ROOT/'tools/windows/carrier-records.iss')],stdout=log,stderr=subprocess.STDOUT)
+ result=subprocess.run([str(compiler),'/DPayloadDir='+str(payload),'/DOutputDir='+str(out/'windows'),'/DAppVersion=0.2.0','/DBuildNumber=9',str(ROOT/'tools/windows/carrier-records.iss')],stdout=log,stderr=subprocess.STDOUT)
 require(result.returncode==0,'Installer compilation failed.')
 print('PASS candidate installer compiled; NOT installed.',flush=True);record()
 build('web',ROOT/'app/build/web',out/'web')

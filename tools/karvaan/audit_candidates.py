@@ -3,7 +3,8 @@ import base64,hashlib,json,re,sys,zipfile
 from pathlib import Path
 from local_environment import ROOT,boundary,status,require
 boundary();cfg=status()
-root=ROOT/'tools/.local/candidates/0.2.0+8'
+version=(ROOT/'app/pubspec.yaml').read_text(encoding='utf-8').split('version: ',1)[1].splitlines()[0].strip()
+root=ROOT/'tools/.local/candidates'/version
 require(root.exists(),'Candidates absent.')
 secrets=[v for k,v in cfg.items() if isinstance(v,str) and len(v)>16 and any(x in k for x in ['SECRET','SERVICE_ROLE','DB_URL'])]
 auth=ROOT/'tools/.local/karvaan-review-auth.json'

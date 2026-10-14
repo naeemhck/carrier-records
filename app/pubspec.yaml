@@ -1,7 +1,7 @@
 name: carrier_records
 description: Karvaan bilingual internal transport records, reports and bills.
 publish_to: none
-version: 0.2.0+8
+version: 0.2.0+9
 
 environment:
   sdk: ^3.13.3
