@@ -10,6 +10,8 @@ import '../features/imports/import_workspace.dart';
 import '../features/masters/master_repository.dart';
 import '../features/masters/master_workspace.dart';
 import '../features/reports/document_repository.dart';
+import '../features/reports/document_workspace.dart';
+import '../features/reports/output_file_actions.dart';
 import '../features/reports/output_export_service.dart';
 import '../features/reports/output_repository.dart';
 import '../features/reports/output_workspace.dart';
@@ -64,7 +66,7 @@ enum WorkspaceDestination {
   reports(Icons.assessment_outlined, L10n.reports, L10n.outputsGroup),
   documents(
     Icons.description_outlined,
-    L10n.issuedDocuments,
+    L10n.documentsNavigation,
     L10n.outputsGroup,
   ),
   masters(
@@ -132,7 +134,11 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
     final masters = SupabaseMasterRepository(client),
         trips = SupabaseTripRepository(client);
     final documents = DocumentRepository(client);
-    final outputs = OutputWorkspace(
+    final exporter = OutputExportService(ExportRepository(client), documents);
+    Widget outputPage({
+      Map<String, dynamic>? initialCommand,
+      String? supersedesId,
+    }) => OutputWorkspace(
       commands: OutputRepository(client),
       masters: masters,
       trips: trips,
@@ -140,8 +146,20 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       administrator: p['role'] == 'ADMIN',
       guard: guard,
       documents: documents,
-      exporter: OutputExportService(ExportRepository(client), documents),
+      exporter: exporter,
+      initialCommand: initialCommand,
+      supersedesId: supersedesId,
     );
+    void configure({Map<String, dynamic>? command, String? supersedesId}) {
+      widget.navigatorKey.currentState!.push<void>(
+        MaterialPageRoute(
+          builder: (_) => guard(
+            outputPage(initialCommand: command, supersedesId: supersedesId),
+          ),
+        ),
+      );
+    }
+
     Widget expensesPage() => ExpenseWorkspace(
       expenses: ExpenseRepository(client),
       finance: FinancialRepository(client),
@@ -174,9 +192,19 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         offices: offices,
         dashboard: destination == WorkspaceDestination.dashboard,
         guard: guard,
-        outputs: outputs,
+        outputs: outputPage(),
       ),
-      WorkspaceDestination.documents => outputs,
+      WorkspaceDestination.documents => DocumentWorkspace(
+        commands: documents,
+        guard: guard,
+        onConfigure: () => configure(),
+        onSupersede: (command, id) =>
+            configure(command: command, supersedesId: id),
+        fileActions: (doc) => OutputFileActions(
+          service: exporter,
+          load: () => exporter.issued(doc['id'] as String),
+        ),
+      ),
       WorkspaceDestination.masters => MasterWorkspace(repository: masters),
       WorkspaceDestination.imports => ImportWorkspace(
         client: client,

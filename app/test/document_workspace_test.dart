@@ -1,3 +1,6 @@
+import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/app/karvaan_design.dart';
+
 import 'dart:async';
 
 import 'package:carrier_records/features/reports/document_repository.dart';
@@ -30,6 +33,39 @@ class DocumentFake implements DocumentCommands {
 }
 
 void main() {
+  testWidgets('document list keeps configuration reachable at320px and200%', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var configured = false;
+    final commands = DocumentFake();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: KarvaanDesign.theme(),
+        home: MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: DocumentWorkspace(
+            commands: commands,
+            onSupersede: (_, _) {},
+            guard: (w) => w,
+            onConfigure: () => configured = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(L10n.issuedDocuments.en), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.text(L10n.outputsAndPresets.en));
+    await tester.pumpAndSettle();
+    expect(configured, isTrue);
+    expect(commands.requests, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'Issuance waits for commit and ambiguous retry preserves UUID and reason',
     (t) async {

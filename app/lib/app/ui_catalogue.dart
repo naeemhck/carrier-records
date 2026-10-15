@@ -5138,6 +5138,12 @@ abstract final class L10n {
   );
   static const tripExpensesScopeNoticeAccessibility =
       "Trip-scoped expenses are not provided by this view. Open the authorized office expense list and locate the trip. No trip expense total is inferred.. اس منظر میں ٹرپ کے اخراجات دستیاب نہیں۔ اجازت یافتہ دفتر کی اخراجات کی فہرست میں ٹرپ تلاش کریں۔ یہاں ٹرپ کے اخراجات کا مجموعہ اخذ نہیں کیا جاتا۔";
+  static const documentsNavigation = Bilingual(
+    "ui.documentsNavigation",
+    "Documents",
+    "دستاویزات",
+  );
+  static const documentsNavigationAccessibility = "Documents. دستاویزات";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5958,5 +5964,6 @@ abstract final class L10n {
     expandNavigation,
     expensesTab,
     tripExpensesScopeNotice,
+    documentsNavigation,
   ];
 }

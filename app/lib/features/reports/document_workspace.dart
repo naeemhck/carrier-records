@@ -12,7 +12,9 @@ class DocumentWorkspace extends StatefulWidget {
     required this.onSupersede,
     required this.guard,
     this.fileActions,
+    this.onConfigure,
   });
+  final VoidCallback? onConfigure;
   final DocumentCommands commands;
   final void Function(Map<String, dynamic>, String) onSupersede;
   final Widget Function(Widget) guard;
@@ -89,6 +91,15 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
     ),
     body: Column(
       children: [
+        if (widget.onConfigure != null)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: OutlinedButton.icon(
+              onPressed: widget.onConfigure,
+              icon: const Icon(Icons.tune),
+              label: const BilingualCaption(L10n.outputsAndPresets),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.all(16),
           child: TextField(

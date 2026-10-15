@@ -1,11 +1,12 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const version=process.argv[2],performanceMode=process.argv.includes('--performance'),writeMode=process.argv.includes('--write-smoke'),traceMode=process.argv.includes('--trace-rendering');if(!/^0\.2\.0\+\d+$/.test(version||''))throw Error('Explicit local candidate version required');
+const portIndex=process.argv.indexOf('--port'),port=portIndex<0?'8767':process.argv[portIndex+1];if(!['8767','8768','8769'].includes(port))throw Error('Pinned local artifact port required');const base='http://127.0.0.1:'+port;
 const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 (async()=>{
  const root=process.cwd(),auth=JSON.parse(fs.readFileSync('tools/.local/karvaan-review-auth.json','utf8'));
  const artifact=path.join(root,'tools/.local/candidates',version),outputIndex=process.argv.indexOf('--output');if(traceMode&&outputIndex<0)throw Error('Diagnostic output must be outside preserved candidate');const out=outputIndex>=0?path.resolve(root,process.argv[outputIndex+1]):path.join(artifact,'review-pack');if(!out.startsWith(path.join(root,'tools/.local')+path.sep)||(outputIndex>=0&&out.startsWith(path.join(root,'tools/.local/candidates')+path.sep)))throw Error('Only separate ignored diagnostic output allowed');fs.mkdirSync(out,{recursive:true});
  const manifest=JSON.parse(fs.readFileSync(path.join(artifact,'manifest.json')));const main=manifest.files.find(x=>x.path==='web/main.dart.js');if(!main||crypto.createHash('sha256').update(fs.readFileSync(path.join(artifact,main.path))).digest('hex')!==main.sha256)throw Error('Candidate source manifest mismatch');
- const served=Buffer.from(await(await fetch('http://127.0.0.1:8767/main.dart.js')).arrayBuffer());if(crypto.createHash('sha256').update(served).digest('hex')!==main.sha256)throw Error('Served artifact differs from candidate manifest');
+ const served=Buffer.from(await(await fetch(base+'/main.dart.js')).arrayBuffer());if(crypto.createHash('sha256').update(served).digest('hex')!==main.sha256)throw Error('Served artifact differs from candidate manifest');
  if(performanceMode)auth.usernames=JSON.parse(fs.readFileSync('tools/.local/karvaan-performance-auth.json','utf8'));
  const accounts=performanceMode?Object.keys(auth.usernames):(writeMode?['review_admin']:(traceMode?['review_khi']:['review_admin','review_khi','review_isb']));if(performanceMode&&accounts.length!==5)throw Error('Five users required');
  const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,chromiumSandbox:true});
@@ -16,7 +17,7 @@ const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-run
   const context=await browser.newContext({viewport:{width:1280,height:900},acceptDownloads:true});
   await context.route('**/*',async route=>{
    const u=new URL(route.request().url());
-   if(['data:','blob:'].includes(u.protocol)||(['127.0.0.1','localhost'].includes(u.hostname)&&['8767','60321'].includes(u.port)))await route.continue();
+   if(['data:','blob:'].includes(u.protocol)||(['127.0.0.1','localhost'].includes(u.hostname)&&[port,'60321'].includes(u.port)))await route.continue();
    else {blocked.push(u.hostname);await route.abort();}
   });
   const page=await context.newPage();
@@ -27,7 +28,7 @@ const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-run
   const requests=[];page.on('requestfailed',request=>{if(request.url().includes(':60321/'))requests.push({stage:'request_failed',path:new URL(request.url()).pathname,error:request.failure()?.errorText});}); page.on('request',request=>{if(new URL(request.url()).pathname==='/rest/v1/rpc/get_scoped_report')requests.push({stage:'report_request',filters:request.postDataJSON().filters,at_ms:performance.now()});if(request.url().includes('/auth/v1/token')){let body=request.postDataJSON();requests.push({stage:'login_request',password_matches:body.password===auth.usernames[username],email_is_synthetic:body.email.startsWith(username+'.')&&body.email.endsWith('@staff.invalid')});}}); page.on('response',response=>{if(response.url().includes(':60321/'))requests.push({path:new URL(response.url()).pathname,status:response.status()});});
   page.on('pageerror',e=>errors.push(e.name));
   page.on('console',m=>{if(m.type()==='error'&&!intentionalFault)errors.push(m.text().replace(/eyJ[A-Za-z0-9_.-]+/g,'[withheld]'));});
-  await page.goto('http://127.0.0.1:8767',{waitUntil:'networkidle'});
+  await page.goto(base,{waitUntil:'networkidle'});
   await page.waitForFunction(()=>document.querySelector('flt-semantics-placeholder')||document.querySelector('input')||document.querySelector('[role=textbox]'),null,{timeout:120000});
   if(await page.locator('flt-semantics-placeholder').count())await page.locator('flt-semantics-placeholder').evaluate(el=>el.click());
   await page.getByRole('textbox').first().waitFor({timeout:120000});

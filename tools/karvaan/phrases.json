@@ -7458,5 +7458,14 @@
     "origins": [
       "GUI; provisional office review"
     ]
+  },
+  {
+    "key": "documentsNavigation",
+    "semantic_key": "ui.documentsNavigation",
+    "en": "Documents",
+    "ur": "دستاویزات",
+    "origins": [
+      "GUI navigation; provisional office review"
+    ]
   }
 ]

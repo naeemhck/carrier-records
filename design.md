@@ -197,3 +197,5 @@ Persistent grouped navigation lives outside the existing child navigator. Narrow
 Only the trip-step transition may animate (250ms; reduced-motion immediate). Keep server review, overlap acknowledgements, version/idempotency and busy-dismissal guards unchanged. Existing output v1/v2 renderers and snapshot infrastructure are immutable; a new issued template requiring backend registration is a documented dependency, not authorization to change backend contracts in this presentation task.
 
 The prior monthly-summary gate remains unresolved (p95 5.871856s); GUI changes must be measured separately and must not be presented as fixing it. T19 owner acceptance/waivers remain recorded as such. T20 remains TODO.
+
+Documents navigation opens the existing authorized issued-document list directly, with an Outputs/presets configuration action and unchanged supersession/export callbacks. All use the same guarded child navigator and existing repositories. Native navigation may scroll in short Windows viewports; keyboard/test input must bring the control into view rather than clicking through the footer.
