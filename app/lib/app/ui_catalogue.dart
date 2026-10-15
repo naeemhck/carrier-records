@@ -5144,6 +5144,13 @@ abstract final class L10n {
     "دستاویزات",
   );
   static const documentsNavigationAccessibility = "Documents. دستاویزات";
+  static const syntheticTestingPreview = Bilingual(
+    "qa.syntheticTestingPreview",
+    "Testing — synthetic data only",
+    "آزمائش — صرف مصنوعی ڈیٹا",
+  );
+  static const syntheticTestingPreviewAccessibility =
+      "Testing — synthetic data only. آزمائش — صرف مصنوعی ڈیٹا";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5965,5 +5972,6 @@ abstract final class L10n {
     expensesTab,
     tripExpensesScopeNotice,
     documentsNavigation,
+    syntheticTestingPreview,
   ];
 }

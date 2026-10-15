@@ -10,6 +10,8 @@ import '../features/auth/account_error.dart';
 import 'strings.dart';
 import 'karvaan_design.dart';
 import 'workspace_shell.dart';
+import '../features/auth/qa_preview_policy.dart';
+import 'qa_preview_frame.dart';
 
 String tripScope(Map<String, dynamic>? profile) {
   final ids =
@@ -80,6 +82,9 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
   Widget build(BuildContext context) => MaterialApp.router(
     title: AppStrings.title,
     theme: KarvaanDesign.theme(),
+    builder: (context, child) => karvaanQaPreview
+        ? QaPreviewFrame(child: child ?? const SizedBox.shrink())
+        : child ?? const SizedBox.shrink(),
     routerConfig: _router,
   );
 }

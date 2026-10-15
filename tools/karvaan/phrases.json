@@ -7467,5 +7467,11 @@
     "origins": [
       "GUI navigation; provisional office review"
     ]
+  },
+  {
+    "key": "syntheticTestingPreview",
+    "semantic_key": "qa.syntheticTestingPreview",
+    "en": "Testing — synthetic data only",
+    "ur": "آزمائش — صرف مصنوعی ڈیٹا"
   }
 ]

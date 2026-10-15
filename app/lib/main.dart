@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,22 +9,30 @@ import 'features/auth/installed_config.dart';
 import 'features/auth/secure_session_storage.dart';
 import 'features/auth/staff_session.dart';
 import 'features/auth/local_candidate_policy.dart';
+import 'features/auth/qa_preview_policy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     final compiled = PublicConfig.fromEnvironment();
-    final config = karvaanLocalOnly
+    final config = (karvaanQaPreview || karvaanLocalOnly)
         ? compiled
         : await InstalledConfig.load(compiled: compiled);
-    if (karvaanLocalOnly) await LocalCandidatePolicy.verify(config);
+    if (karvaanQaPreview) {
+      if (!kIsWeb) throw const FormatException('QA preview is web-only.');
+      await QaPreviewPolicy.verify(config);
+    } else if (karvaanLocalOnly) {
+      await LocalCandidatePolicy.verify(config);
+    }
     if (!config.configured) {
       _launch(const CarrierRecordsApp());
       return;
     }
     config.validate();
     final storage = SecureSessionStorage(
-      keyPrefix: karvaanLocalOnly
+      keyPrefix: karvaanQaPreview
+          ? QaPreviewPolicy.sessionPrefix
+          : karvaanLocalOnly
           ? LocalCandidatePolicy.sessionPrefix
           : 'carrier.session',
       namespace:
