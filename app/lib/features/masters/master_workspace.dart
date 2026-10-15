@@ -74,6 +74,7 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
   });
   Future<void> edit([MasterRecord? record]) async {
     final saved = await showDialog<bool>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       barrierDismissible: false,
       builder: (_) => MasterDialog(
@@ -299,6 +300,7 @@ class _MasterDialogState extends State<MasterDialog> {
 
   Future<void> chooseParty(bool forOwner) async {
     final selected = await showDialog<MasterRecord>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => PartyChoiceDialog(
         repository: widget.repository,

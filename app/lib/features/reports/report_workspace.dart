@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
@@ -96,6 +97,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
 
   Future<void> pick(String target) async {
     final result = await showDialog<Map<String, dynamic>>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => widget.guard(
         _ReportChoice(
@@ -195,9 +197,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               children: [
                 SizedBox(
                   width: 220,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    isExpanded: true,
+                  child: KarvaanChoiceField<String>(
                     initialValue: kind,
                     decoration: bilingualDecoration(
                       context,
@@ -245,9 +245,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   ),
                 SizedBox(
                   width: 230,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    isExpanded: true,
+                  child: KarvaanChoiceField<String>(
                     initialValue: office,
                     decoration: bilingualDecoration(
                       context,
@@ -406,6 +404,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   ),
                   for (final row in rows)
                     ExpansionTile(
+                      expansionAnimationStyle: AnimationStyle.noAnimation,
                       title: Text(row['name'] as String),
                       children: [
                         for (final key in reportLabels.keys)

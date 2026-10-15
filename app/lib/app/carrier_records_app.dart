@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
 import 'package:flutter/material.dart';
@@ -29,13 +30,16 @@ class CarrierRecordsApp extends StatefulWidget {
 
 class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
   final _workspaceNavigator = GlobalKey<NavigatorState>();
+  final _workspaceObserver = WorkspaceRouteObserver();
   late final GoRouter _router = GoRouter(
     routes: [
       ShellRoute(
         navigatorKey: _workspaceNavigator,
+        observers: [_workspaceObserver],
         builder: (context, state, child) => WorkspaceShell(
           session: widget.session,
           navigatorKey: _workspaceNavigator,
+          canReturnHome: () => _workspaceObserver.canReturnHome,
           child: child,
         ),
         routes: [
@@ -282,6 +286,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                           ? null
                           : () => run(() async {
                               await showDialog<void>(
+                                animationStyle: AnimationStyle.noAnimation,
                                 context: context,
                                 builder: (context) =>
                                     PasswordDialog(session: widget.session),
@@ -443,6 +448,7 @@ class _AccountsPanelState extends State<AccountsPanel> {
 
   Future<void> edit([Map<String, dynamic>? account]) async {
     await showDialog<void>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (context) =>
           AccountDialog(session: widget.session, account: account),
@@ -606,10 +612,7 @@ class _AccountDialogState extends State<AccountDialog> {
                 InputDecoration(label: BilingualCaption(L10n.displayName)),
               ),
             ),
-            DropdownButtonFormField<String>(
-              isDense: false,
-              isExpanded: true,
-              itemHeight: null,
+            KarvaanChoiceField<String>(
               initialValue: role,
               items: ['STAFF', 'ADMIN']
                   .map(

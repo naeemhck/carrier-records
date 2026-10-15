@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
@@ -221,10 +222,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           ),
           onSubmitted: (_) => reload(start: 0),
         ),
-        DropdownButtonFormField<String>(
-          isDense: false,
-          isExpanded: true,
-          itemHeight: null,
+        KarvaanChoiceField<String>(
           initialValue: office,
           decoration: bilingualDecoration(
             context,
@@ -280,10 +278,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             ],
           ),
         ),
-        DropdownButtonFormField<String>(
-          isDense: false,
-          isExpanded: true,
-          itemHeight: null,
+        KarvaanChoiceField<String>(
           initialValue: status,
           decoration: bilingualDecoration(
             context,
@@ -399,6 +394,7 @@ Future<MasterRecord?> chooseMaster(
   MasterKind kind, {
   String? role,
 }) => showDialog<MasterRecord>(
+  animationStyle: AnimationStyle.noAnimation,
   context: context,
   builder: (_) => _MasterChoice(repository: repository, kind: kind, role: role),
 );
@@ -700,10 +696,7 @@ class _TripEditorState extends State<TripEditor> {
     String? label,
   }) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
-    child: DropdownButtonFormField<String>(
-      isDense: false,
-      isExpanded: true,
-      itemHeight: null,
+    child: KarvaanChoiceField<String>(
       key: ValueKey('$key:$value:${choices.join(',')}'),
       initialValue: choices.contains(value) ? value : null,
       decoration: bilingualDecoration(
@@ -757,9 +750,7 @@ class _TripEditorState extends State<TripEditor> {
     ValueChanged<String?> update,
   ) {
     final rows = d.stops.where((s) => s.kind == kind).toList();
-    return DropdownButtonFormField<String>(
-      isDense: false,
-      itemHeight: null,
+    return KarvaanChoiceField<String>(
       key: ValueKey('$key:$id:${rows.map((s) => s.id).join(',')}'),
       initialValue: rows.any((s) => s.id == id) ? id : null,
       decoration: bilingualDecoration(
@@ -783,7 +774,6 @@ class _TripEditorState extends State<TripEditor> {
             ),
           ),
       ],
-      isExpanded: true,
       onChanged: busy ? null : (v) => setState(() => update(v)),
     );
   }
@@ -989,6 +979,7 @@ class _TripEditorState extends State<TripEditor> {
         final warning = await widget.repository.overlap(d);
         if (!mounted) return;
         final confirmation = await showDialog<Map<String, dynamic>>(
+          animationStyle: AnimationStyle.noAnimation,
           context: context,
           builder: (_) =>
               _DraftReview(warning: warning, totals: d.previewTotals()),
@@ -1112,10 +1103,7 @@ class _TripEditorState extends State<TripEditor> {
                             d.driverName = null;
                           },
                         ),
-                        DropdownButtonFormField<String>(
-                          isDense: false,
-                          isExpanded: true,
-                          itemHeight: null,
+                        KarvaanChoiceField<String>(
                           key: ValueKey('origin:${d.origin}'),
                           initialValue:
                               widget.offices.any((o) => o['id'] == d.origin)
@@ -1479,6 +1467,7 @@ class _TripDetailState extends State<TripDetail> {
     String? consignment,
   }) async {
     final committed = await showDialog<Map<String, dynamic>>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       barrierDismissible: false,
       builder: (_) => widget.guard(
@@ -1656,6 +1645,7 @@ class _TripDetailState extends State<TripDetail> {
                                       r[a.permission] == true,
                                 ))
                               PopupMenuButton<String>(
+                                popUpAnimationStyle: AnimationStyle.noAnimation,
                                 tooltip: L10n
                                     .correctionsAndCancellationAccessibility,
                                 onSelected: (key) {

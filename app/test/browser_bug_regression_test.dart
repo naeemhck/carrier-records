@@ -86,6 +86,13 @@ void main() {
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.ensureVisible(
+        find.descendant(
+          of: find.widgetWithText(ListTile, 'Destination office: None'),
+          matching: find.text('Choose'),
+        ),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.descendant(
           of: find.widgetWithText(ListTile, 'Destination office: None'),

@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
@@ -228,6 +229,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
 
   Future<void> confirm() async {
     final accepted = await showDialog<bool>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => AlertDialog(
         scrollable: true,
@@ -320,10 +322,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<String>(
-                isDense: false,
-                isExpanded: true,
-                itemHeight: null,
+              KarvaanChoiceField<String>(
                 initialValue: office,
                 decoration: bilingualDecoration(
                   context,
@@ -384,6 +383,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
             Text('${e['kind']} ${e['row_key']}: ${e['code']}'),
           for (final r in preview!['rows'] as List)
             ExpansionTile(
+              expansionAnimationStyle: AnimationStyle.noAnimation,
               title: BilingualText(
                 L10n.labelValues10866a.withValues([r['kind'], r['row_key']]),
               ),
@@ -417,6 +417,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
             L10n.importCommittedUseTripsToReviewDispatchTripDrafts,
           ),
         ExpansionTile(
+          expansionAnimationStyle: AnimationStyle.noAnimation,
           title: const BilingualText(L10n.expenseCategoryCodes),
           children: [
             for (final c in categories)

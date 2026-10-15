@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,7 @@ Future<MasterRecord?> chooseExpenseMaster(
   ExpenseGuard guard,
 ) async {
   return showDialog<MasterRecord>(
+    animationStyle: AnimationStyle.noAnimation,
     context: context,
     builder: (_) => guard(_MasterPicker(repo: repo, kind: kind)),
   );
@@ -213,6 +215,7 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
         }
       } else {
         await showDialog<void>(
+          animationStyle: AnimationStyle.noAnimation,
           context: context,
           builder: (_) => widget.guard(
             AlertDialog(
@@ -529,6 +532,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
 
   Future<void> chooseTrip() async {
     final selected = await showDialog<Map<String, dynamic>>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) =>
           widget.guard(_TripPicker(repo: widget.trips, vehicle: vehicle!.id)),
@@ -810,10 +814,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                           ])
                         : L10n.confirmTheVehicleOwnerAsCostBearerWhenApplicable),
                   ),
-                  DropdownButtonFormField<ExpenseFunding>(
-                    isDense: false,
-                    isExpanded: true,
-                    itemHeight: null,
+                  KarvaanChoiceField<ExpenseFunding>(
                     initialValue: funding,
                     decoration: bilingualDecoration(
                       context,
@@ -903,10 +904,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         L10n.keepAsStandaloneMaintenance,
                       ),
                     ),
-                  DropdownButtonFormField<String>(
-                    isDense: false,
-                    isExpanded: true,
-                    itemHeight: null,
+                  KarvaanChoiceField<String>(
                     initialValue: office,
                     decoration: bilingualDecoration(
                       context,
@@ -1427,10 +1425,7 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                 ),
               ),
               if (!recovery || offset)
-                DropdownButtonFormField<String>(
-                  isDense: false,
-                  isExpanded: true,
-                  itemHeight: null,
+                KarvaanChoiceField<String>(
                   initialValue: selected[c['line_id']],
                   decoration: bilingualDecoration(
                     context,

@@ -20,6 +20,34 @@ import '../features/trips/trip_workspace.dart';
 import 'bilingual.dart';
 import 'karvaan_design.dart';
 
+/// Account/root navigation must not circumvent any pending child PopScope.
+class WorkspaceRouteObserver extends NavigatorObserver {
+  final _routes = <Route<dynamic>>[];
+  bool get canReturnHome => !_routes.any(
+    (route) => route.popDisposition == RoutePopDisposition.doNotPop,
+  );
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _routes.add(route);
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _routes.remove(route);
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _routes.remove(route);
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    final index = oldRoute == null ? -1 : _routes.indexOf(oldRoute);
+    if (index >= 0) {
+      if (newRoute == null) {
+        _routes.removeAt(index);
+      } else {
+        _routes[index] = newRoute;
+      }
+    }
+  }
+}
+
 enum WorkspaceDestination {
   dashboard(Icons.dashboard_outlined, L10n.dashboard, L10n.workspaceGroup),
   trips(Icons.local_shipping_outlined, L10n.trips, L10n.workspaceGroup),
@@ -61,10 +89,12 @@ class WorkspaceShell extends StatefulWidget {
     required this.session,
     required this.navigatorKey,
     required this.child,
+    this.canReturnHome,
   });
   final StaffSession? session;
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget child;
+  final bool Function()? canReturnHome;
   @override
   State<WorkspaceShell> createState() => _WorkspaceShellState();
 }
@@ -166,7 +196,14 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         builder: (_) => guard(page),
       ),
     );
-    if (mounted) setState(() => selected = previous);
+    if (mounted) {
+      setState(
+        () => selected = widget.navigatorKey.currentState?.canPop() == true
+            ? previous
+            : null,
+      );
+      await session.refresh();
+    }
   }
 
   @override
@@ -275,9 +312,11 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
           ),
         );
         final account = PopupMenuButton<String>(
+          popUpAnimationStyle: AnimationStyle.noAnimation,
           tooltip: L10n.accountNavigation.inline,
           icon: const Icon(Icons.account_circle_outlined),
           onSelected: (value) async {
+            if (widget.canReturnHome?.call() == false) return;
             if (value == 'account') {
               widget.navigatorKey.currentState!.popUntil((r) => r.isFirst);
               setState(() => selected = null);
@@ -320,9 +359,9 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                         tooltip: L10n.expandNavigation.inline,
                                         icon: const Icon(Icons.menu),
                                         onPressed: () => showDialog<void>(
-                                          context: context,
                                           animationStyle:
                                               AnimationStyle.noAnimation,
+                                          context: context,
                                           builder: (overlay) => Dialog(
                                             child: navigation(
                                               false,

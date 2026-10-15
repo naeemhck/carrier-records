@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
@@ -151,6 +152,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
 
   Future<void> chooseParty(bool isPayer) async {
     final result = await showDialog<MasterRecord>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => widget.guard(_PartyPicker(widget.masters)),
     );
@@ -174,6 +176,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
 
   Future<void> addTrip() async {
     final trip = await showDialog<String>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => widget.guard(_TripPicker(widget.trips)),
     );
@@ -463,10 +466,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             L10n.collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate,
           ),
           if (busy) const LinearProgressIndicator(),
-          DropdownButtonFormField<PaymentAction>(
-            isDense: false,
-            isExpanded: true,
-            itemHeight: null,
+          KarvaanChoiceField<PaymentAction>(
             initialValue: action,
             decoration: bilingualDecoration(
               context,
@@ -513,10 +513,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
               ),
             ],
           ),
-          DropdownButtonFormField<String>(
-            isDense: false,
-            isExpanded: true,
-            itemHeight: null,
+          KarvaanChoiceField<String>(
             initialValue: office,
             decoration: bilingualDecoration(
               context,
@@ -599,10 +596,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                               }),
                       ),
                     if (action == PaymentAction.advance || row.credit)
-                      DropdownButtonFormField<String>(
-                        isDense: false,
-                        isExpanded: true,
-                        itemHeight: null,
+                      KarvaanChoiceField<String>(
                         key: ValueKey(
                           '${rows.indexOf(row)}-consignment-$payer',
                         ),
@@ -774,17 +768,11 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     }
   }
 
-  Widget claimPicker(
-    PaymentRow row,
-    bool source,
-  ) => DropdownButtonFormField<String>(
-    isDense: false,
-    itemHeight: null,
+  Widget claimPicker(PaymentRow row, bool source) => KarvaanChoiceField<String>(
     key: ValueKey(
       '${rows.indexOf(row)}-$source-${action.key}-$payer-$payee-${row.credit}-${row.claims.hashCode}-${source ? row.source : row.target}',
     ),
     initialValue: source ? row.source : row.target,
-    isExpanded: true,
     decoration: bilingualDecoration(
       context,
       InputDecoration(

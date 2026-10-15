@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
@@ -187,6 +188,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
 
   Future<void> pick(String kind) async {
     final rows = await showDialog<Map<String, dynamic>>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => widget.guard(
         _OutputChoice(
@@ -296,6 +298,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
 
   Future<void> issueDocument() async {
     final committed = await showDialog<Map<String, dynamic>>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       barrierDismissible: false,
       builder: (_) => widget.guard(
@@ -401,6 +404,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
     bool deleting = false,
   }) async {
     final done = await showDialog<bool>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       barrierDismissible: false,
       builder: (_) => widget.guard(
@@ -466,9 +470,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               children: [
                 SizedBox(
                   width: 260,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    isExpanded: true,
+                  child: KarvaanChoiceField<String>(
                     initialValue: report,
                     decoration: bilingualDecoration(
                       context,
@@ -497,11 +499,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 ),
                 SizedBox(
                   width: 200,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    itemHeight: null,
+                  child: KarvaanChoiceField<String>(
                     key: ValueKey('recipient-$report'),
-                    isExpanded: true,
                     initialValue: recipient,
                     decoration: bilingualDecoration(
                       context,
@@ -555,9 +554,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   ),
                 SizedBox(
                   width: 220,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    isExpanded: true,
+                  child: KarvaanChoiceField<String>(
                     initialValue: office,
                     decoration: bilingualDecoration(
                       context,
@@ -643,11 +640,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 ),
                 SizedBox(
                   width: 280,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    itemHeight: null,
+                  child: KarvaanChoiceField<String>(
                     key: ValueKey('preset-$presetId-${presets.length}'),
-                    isExpanded: true,
                     initialValue: presetId,
                     decoration: bilingualDecoration(
                       context,
@@ -711,11 +705,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 ],
                 SizedBox(
                   width: 190,
-                  child: DropdownButtonFormField<String>(
-                    isDense: false,
-                    itemHeight: null,
+                  child: KarvaanChoiceField<String>(
                     key: ValueKey(orientation),
-                    isExpanded: true,
                     initialValue: orientation,
                     decoration: bilingualDecoration(
                       context,
@@ -765,6 +756,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
             for (final group
                 in s.fields.map((f) => f['field_group'] as String).toSet())
               ExpansionTile(
+                expansionAnimationStyle: AnimationStyle.noAnimation,
                 initiallyExpanded: true,
                 title: BilingualOwnedText(group),
                 children: [

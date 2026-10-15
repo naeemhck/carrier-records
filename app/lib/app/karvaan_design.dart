@@ -21,6 +21,7 @@ abstract final class KarvaanDesign {
     );
     return ThemeData(
       useMaterial3: true,
+      splashFactory: NoSplash.splashFactory,
       fontFamily: 'NotoSans',
       fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
       scaffoldBackgroundColor: background,
@@ -63,12 +64,35 @@ abstract final class KarvaanDesign {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          minimumSize: const Size(48, 56),
-          shape: shape,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          animationDuration: Duration.zero,
-        ),
+        style:
+            FilledButton.styleFrom(
+              minimumSize: const Size(48, 56),
+              shape: shape,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              animationDuration: Duration.zero,
+            ).copyWith(
+              backgroundBuilder: (context, states, child) =>
+                  states.contains(WidgetState.disabled)
+                  ? child ?? const SizedBox()
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: DecoratedBox(
+                        decoration: const BoxDecoration(
+                          gradient: primaryGradient,
+                        ),
+                        // Contrast overlay keeps both languages readable on the bright end.
+                        child: ColoredBox(
+                          color: const Color(0x33000000),
+                          child: child,
+                        ),
+                      ),
+                    ),
+              side: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.focused)
+                    ? const BorderSide(color: ink, width: 2)
+                    : BorderSide.none,
+              ),
+            ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(

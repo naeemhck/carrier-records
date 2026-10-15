@@ -61,6 +61,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
 
   Future<void> pick() async {
     final selected = await showDialog<String>(
+      animationStyle: AnimationStyle.noAnimation,
       context: context,
       builder: (_) => widget.guard(_CorrectionTripPicker(widget.trips)),
     );
