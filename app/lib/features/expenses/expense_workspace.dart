@@ -780,8 +780,9 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                 child: const BilingualCaption(L10n.keepAsStandaloneMaintenance),
               ),
             DropdownButtonFormField<String>(
+              isDense: false,
               isExpanded: true,
-              itemHeight: 80,
+              itemHeight: null,
               initialValue: office,
               decoration: bilingualDecoration(
                 context,
@@ -843,8 +844,9 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
             field(amount, 'Expense amount (PKR)'),
             field(notes, 'Notes / reason'),
             DropdownButtonFormField<ExpenseFunding>(
+              isDense: false,
               isExpanded: true,
-              itemHeight: 80,
+              itemHeight: null,
               initialValue: funding,
               decoration: bilingualDecoration(
                 context,
@@ -1379,8 +1381,9 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
               ),
               if (!recovery || offset)
                 DropdownButtonFormField<String>(
+                  isDense: false,
                   isExpanded: true,
-                  itemHeight: 80,
+                  itemHeight: null,
                   initialValue: selected[c['line_id']],
                   decoration: bilingualDecoration(
                     context,

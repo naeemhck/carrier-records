@@ -5059,6 +5059,76 @@ abstract final class L10n {
   );
   static const secureSignInStartupFailedAccessibility =
       "Secure sign-in could not start. Ask your administrator to check this installation.. محفوظ سائن اِن شروع نہیں ہو سکا۔ اپنے منتظم سے اس تنصیب کی جانچ کروائیں۔";
+  static const workspaceGroup = Bilingual(
+    "ui.workspaceGroup",
+    "Workspace",
+    "کام کی جگہ",
+  );
+  static const workspaceGroupAccessibility = "Workspace. کام کی جگہ";
+  static const outputsGroup = Bilingual(
+    "ui.outputsGroup",
+    "Outputs",
+    "دستاویزات اور رپورٹیں",
+  );
+  static const outputsGroupAccessibility = "Outputs. دستاویزات اور رپورٹیں";
+  static const manageGroup = Bilingual("ui.manageGroup", "Manage", "انتظام");
+  static const manageGroupAccessibility = "Manage. انتظام";
+  static const journeyStep = Bilingual("ui.journeyStep", "Journey", "سفر");
+  static const journeyStepAccessibility = "Journey. سفر";
+  static const consignmentsStep = Bilingual(
+    "ui.consignmentsStep",
+    "Consignments",
+    "کنسائنمنٹ",
+  );
+  static const consignmentsStepAccessibility = "Consignments. کنسائنمنٹ";
+  static const reviewStep = Bilingual("ui.reviewStep", "Review", "جائزہ");
+  static const reviewStepAccessibility = "Review. جائزہ";
+  static const whatSection = Bilingual(
+    "ui.whatSection",
+    "What",
+    "خرچ کی تفصیل",
+  );
+  static const whatSectionAccessibility = "What. خرچ کی تفصیل";
+  static const whoseMoneySection = Bilingual(
+    "ui.whoseMoneySection",
+    "Whose money",
+    "کس کی رقم",
+  );
+  static const whoseMoneySectionAccessibility = "Whose money. کس کی رقم";
+  static const whereSection = Bilingual(
+    "ui.whereSection",
+    "Where",
+    "گاڑی اور ٹرپ",
+  );
+  static const whereSectionAccessibility = "Where. گاڑی اور ٹرپ";
+  static const proofSection = Bilingual("ui.proofSection", "Proof", "ثبوت");
+  static const proofSectionAccessibility = "Proof. ثبوت";
+  static const moneyNavigation = Bilingual(
+    "ui.moneyNavigation",
+    "Money",
+    "رقم",
+  );
+  static const moneyNavigationAccessibility = "Money. رقم";
+  static const accountNavigation = Bilingual(
+    "ui.accountNavigation",
+    "Account",
+    "اکاؤنٹ",
+  );
+  static const accountNavigationAccessibility = "Account. اکاؤنٹ";
+  static const collapseNavigation = Bilingual(
+    "ui.collapseNavigation",
+    "Collapse navigation",
+    "نیویگیشن سمیٹیں",
+  );
+  static const collapseNavigationAccessibility =
+      "Collapse navigation. نیویگیشن سمیٹیں";
+  static const expandNavigation = Bilingual(
+    "ui.expandNavigation",
+    "Expand navigation",
+    "نیویگیشن کھولیں",
+  );
+  static const expandNavigationAccessibility =
+      "Expand navigation. نیویگیشن کھولیں";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5863,5 +5933,19 @@ abstract final class L10n {
     accountStatusDisabled,
     passwordChangeRequiredSuffix,
     secureSignInStartupFailed,
+    workspaceGroup,
+    outputsGroup,
+    manageGroup,
+    journeyStep,
+    consignmentsStep,
+    reviewStep,
+    whatSection,
+    whoseMoneySection,
+    whereSection,
+    proofSection,
+    moneyNavigation,
+    accountNavigation,
+    collapseNavigation,
+    expandNavigation,
   ];
 }

@@ -43,3 +43,5 @@ Additional unresolved review items: catalogue uses رپورٹس where the initia
 Dynamic report review: the existing catalogue uses آمدن for earnings; آمدنی is another proposed wording. The original entry is retained pending office review. Controlled lifetime/date-basis descriptors now have paired labels while preserving the English source and numeric/date values.
 
 2026-10-14 provisional account-state additions: Active → فعال; Disabled → غیر فعال; Password change required → پاس ورڈ بدلنا ضروری ہے. Secure startup failure uses the new Urdu administrator-guidance message. These four entries are appended; original catalogue English and keys remain unchanged. Office terminology review is still pending.
+
+GUI terminology pending office review: Workspace, Outputs, Manage, Journey, Review, What, Whose money, Where, Proof and navigation/accessibility labels are appended to the existing catalogue. Original entries/English wording are unchanged.

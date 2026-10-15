@@ -462,6 +462,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               SizedBox(
                 width: 260,
                 child: DropdownButtonFormField<String>(
+                  isDense: false,
                   isExpanded: true,
                   initialValue: report,
                   decoration: bilingualDecoration(
@@ -492,7 +493,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               SizedBox(
                 width: 200,
                 child: DropdownButtonFormField<String>(
-                  itemHeight: 80,
+                  isDense: false,
+                  itemHeight: null,
                   key: ValueKey('recipient-$report'),
                   isExpanded: true,
                   initialValue: recipient,
@@ -546,6 +548,7 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               SizedBox(
                 width: 220,
                 child: DropdownButtonFormField<String>(
+                  isDense: false,
                   isExpanded: true,
                   initialValue: office,
                   decoration: bilingualDecoration(
@@ -630,7 +633,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 SizedBox(
                   width: 280,
                   child: DropdownButtonFormField<String>(
-                    itemHeight: 80,
+                    isDense: false,
+                    itemHeight: null,
                     key: ValueKey('preset-$presetId-${presets.length}'),
                     isExpanded: true,
                     initialValue: presetId,
@@ -697,7 +701,8 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                 SizedBox(
                   width: 190,
                   child: DropdownButtonFormField<String>(
-                    itemHeight: 80,
+                    isDense: false,
+                    itemHeight: null,
                     key: ValueKey(orientation),
                     isExpanded: true,
                     initialValue: orientation,

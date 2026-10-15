@@ -192,6 +192,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               SizedBox(
                 width: 220,
                 child: DropdownButtonFormField<String>(
+                  isDense: false,
                   isExpanded: true,
                   initialValue: kind,
                   decoration: bilingualDecoration(
@@ -241,6 +242,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               SizedBox(
                 width: 230,
                 child: DropdownButtonFormField<String>(
+                  isDense: false,
                   isExpanded: true,
                   initialValue: office,
                   decoration: bilingualDecoration(

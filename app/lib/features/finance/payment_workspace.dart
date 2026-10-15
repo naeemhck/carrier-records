@@ -462,8 +462,9 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
           ),
           if (busy) const LinearProgressIndicator(),
           DropdownButtonFormField<PaymentAction>(
+            isDense: false,
             isExpanded: true,
-            itemHeight: 80,
+            itemHeight: null,
             initialValue: action,
             decoration: bilingualDecoration(
               context,
@@ -511,8 +512,9 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             ],
           ),
           DropdownButtonFormField<String>(
+            isDense: false,
             isExpanded: true,
-            itemHeight: 80,
+            itemHeight: null,
             initialValue: office,
             decoration: bilingualDecoration(
               context,
@@ -589,8 +591,9 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                       ),
                     if (action == PaymentAction.advance || row.credit)
                       DropdownButtonFormField<String>(
+                        isDense: false,
                         isExpanded: true,
-                        itemHeight: 80,
+                        itemHeight: null,
                         key: ValueKey(
                           '${rows.indexOf(row)}-consignment-$payer',
                         ),
@@ -766,7 +769,8 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     PaymentRow row,
     bool source,
   ) => DropdownButtonFormField<String>(
-    itemHeight: 80,
+    isDense: false,
+    itemHeight: null,
     key: ValueKey(
       '${rows.indexOf(row)}-$source-${action.key}-$payer-$payee-${row.credit}-${row.claims.hashCode}-${source ? row.source : row.target}',
     ),

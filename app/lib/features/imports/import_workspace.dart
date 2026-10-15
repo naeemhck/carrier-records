@@ -313,8 +313,9 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
         if (busy) const LinearProgressIndicator(),
         if (error != null) BilingualOwnedText(error!),
         DropdownButtonFormField<String>(
+          isDense: false,
           isExpanded: true,
-          itemHeight: 80,
+          itemHeight: null,
           initialValue: office,
           decoration: bilingualDecoration(
             context,

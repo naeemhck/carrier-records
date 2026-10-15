@@ -1,30 +1,14 @@
 import 'package:carrier_records/app/bilingual.dart';
 
-import '../features/backup/backup_workspace.dart';
-import '../features/imports/import_workspace.dart';
-import '../features/expenses/expense_workspace.dart';
-import '../features/expenses/expense_repository.dart';
-
 import 'package:flutter/material.dart';
-
-import '../features/finance/financial_repository.dart';
-import '../features/finance/correction_repository.dart';
-import '../features/reports/report_repository.dart';
-import '../features/reports/report_workspace.dart';
-import '../features/reports/output_repository.dart';
-import '../features/reports/output_workspace.dart';
-import '../features/reports/document_repository.dart';
-import '../features/reports/output_export_service.dart';
 
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/staff_session.dart';
 import '../features/auth/account_error.dart';
-import '../features/masters/master_repository.dart';
-import '../features/masters/master_workspace.dart';
-import '../features/trips/trip_repository.dart';
-import '../features/trips/trip_workspace.dart';
 import 'strings.dart';
+import 'karvaan_design.dart';
+import 'workspace_shell.dart';
 
 String tripScope(Map<String, dynamic>? profile) {
   final ids =
@@ -44,29 +28,41 @@ class CarrierRecordsApp extends StatefulWidget {
 }
 
 class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
+  final _workspaceNavigator = GlobalKey<NavigatorState>();
   late final GoRouter _router = GoRouter(
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => widget.session == null
-            ? Scaffold(
-                appBar: AppBar(
-                  toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-                  title: const BilingualText(L10n.brand),
-                ),
-                body: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: BilingualText(
-                      (widget.setupError != null
-                          ? ownedMessage(widget.setupError)
-                          : L10n.askYourAdministratorToConfigureThisInstallationForStaff),
-                      textAlign: TextAlign.center,
+      ShellRoute(
+        navigatorKey: _workspaceNavigator,
+        builder: (context, state, child) => WorkspaceShell(
+          session: widget.session,
+          navigatorKey: _workspaceNavigator,
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => widget.session == null
+                ? Scaffold(
+                    appBar: AppBar(
+                      toolbarHeight:
+                          88 * MediaQuery.textScalerOf(context).scale(1),
+                      title: const BilingualText(L10n.brand),
                     ),
-                  ),
-                ),
-              )
-            : StaffHome(session: widget.session!),
+                    body: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: BilingualText(
+                          (widget.setupError != null
+                              ? ownedMessage(widget.setupError)
+                              : L10n.askYourAdministratorToConfigureThisInstallationForStaff),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  )
+                : StaffHome(session: widget.session!),
+          ),
+        ],
       ),
     ],
   );
@@ -79,13 +75,7 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
   @override
   Widget build(BuildContext context) => MaterialApp.router(
     title: AppStrings.title,
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00695C)),
-      useMaterial3: true,
-      fontFamily: 'NotoSans',
-      fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
-      appBarTheme: const AppBarTheme(toolbarHeight: 88),
-    ),
+    theme: KarvaanDesign.theme(),
     routerConfig: _router,
   );
 }
@@ -152,7 +142,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
           toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
           title: const BilingualText(L10n.brand),
           actions: [
-            if (p != null)
+            if (p != null && p['must_change_password'] == true)
               TextButton(
                 onPressed: busy ? null : () => run(widget.session.signOut),
                 child: const BilingualCaption(L10n.signOut),
@@ -285,317 +275,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   if (p['role'] == 'ADMIN')
-                    FilledButton.icon(
-                      icon: const Icon(Icons.settings),
-                      label: const BilingualText(L10n.companyAndMasterRecords),
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => ListenableBuilder(
-                              listenable: widget.session,
-                              builder: (context, _) =>
-                                  widget.session.profile?['role'] == 'ADMIN' &&
-                                      widget
-                                              .session
-                                              .profile?['must_change_password'] ==
-                                          false
-                                  ? MasterWorkspace(
-                                      repository: SupabaseMasterRepository(
-                                        widget.session.client,
-                                      ),
-                                    )
-                                  : const Scaffold(
-                                      body: Center(
-                                        child: BilingualText(
-                                          L10n.administratorAccessRequired,
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        );
-                        await widget.session.refresh();
-                      },
-                    ),
-                  if (p['role'] == 'ADMIN')
-                    FilledButton.icon(
-                      icon: const Icon(Icons.backup),
-                      label: const BilingualText(L10n.administratorBackups),
-                      onPressed: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (_) => ListenableBuilder(
-                              listenable: widget.session,
-                              builder: (_, _) =>
-                                  widget.session.profile?['role'] == 'ADMIN' &&
-                                      widget
-                                              .session
-                                              .profile?['must_change_password'] ==
-                                          false
-                                  ? BackupWorkspace(
-                                      commands: BackupRepository(
-                                        widget.session.client,
-                                      ),
-                                    )
-                                  : const Scaffold(
-                                      body: Center(
-                                        child: BilingualText(
-                                          L10n.administratorAccessRequired,
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        );
-                        await widget.session.refresh();
-                      },
-                    ),
-                  if (p['role'] == 'ADMIN')
                     AccountsPanel(session: widget.session),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.upload_file),
-                    label: const BilingualText(L10n.excelImports),
-                    onPressed: () async {
-                      final scope = tripScope(p);
-                      Widget guard(Widget child) => ListenableBuilder(
-                        listenable: widget.session,
-                        builder: (_, _) =>
-                            tripScope(widget.session.profile) == scope &&
-                                widget
-                                        .session
-                                        .profile?['must_change_password'] ==
-                                    false
-                            ? child
-                            : const Scaffold(
-                                body: Center(
-                                  child: BilingualText(
-                                    L10n.currentOfficeAccessRequired,
-                                  ),
-                                ),
-                              ),
-                      );
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => guard(
-                            ImportWorkspace(
-                              client: widget.session.client,
-                              offices: (p['offices'] as List)
-                                  .map(
-                                    (o) => Map<String, dynamic>.from(o as Map),
-                                  )
-                                  .toList(),
-                              guard: guard,
-                            ),
-                          ),
-                        ),
-                      );
-                      await widget.session.refresh();
-                    },
-                  ),
-                  for (final dashboard in [true, false])
-                    FilledButton.icon(
-                      icon: Icon(
-                        dashboard ? Icons.dashboard : Icons.assessment,
-                      ),
-                      label: BilingualText(
-                        (dashboard ? L10n.dashboard : L10n.reports),
-                      ),
-                      onPressed: () async {
-                        final scope = tripScope(p);
-                        Widget guard(Widget child) => ListenableBuilder(
-                          listenable: widget.session,
-                          builder: (_, _) =>
-                              tripScope(widget.session.profile) == scope &&
-                                  widget
-                                          .session
-                                          .profile?['must_change_password'] ==
-                                      false
-                              ? child
-                              : const Scaffold(
-                                  body: Center(
-                                    child: BilingualText(
-                                      L10n.currentOfficeAccessRequired,
-                                    ),
-                                  ),
-                                ),
-                        );
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (_) => guard(
-                              ReportWorkspace(
-                                reports: ReportRepository(
-                                  widget.session.client,
-                                ),
-                                trips: SupabaseTripRepository(
-                                  widget.session.client,
-                                ),
-                                masters: SupabaseMasterRepository(
-                                  widget.session.client,
-                                ),
-                                offices: (p['offices'] as List)
-                                    .map(
-                                      (o) =>
-                                          Map<String, dynamic>.from(o as Map),
-                                    )
-                                    .toList(),
-                                dashboard: dashboard,
-                                backupStatus: p['role'] == 'ADMIN'
-                                    ? BackupStatusPanel(
-                                        commands: BackupRepository(
-                                          widget.session.client,
-                                        ),
-                                      )
-                                    : null,
-                                guard: guard,
-                                outputs: OutputWorkspace(
-                                  exporter: OutputExportService(
-                                    ExportRepository(widget.session.client),
-                                    DocumentRepository(widget.session.client),
-                                  ),
-                                  documents: DocumentRepository(
-                                    widget.session.client,
-                                  ),
-                                  commands: OutputRepository(
-                                    widget.session.client,
-                                  ),
-                                  masters: SupabaseMasterRepository(
-                                    widget.session.client,
-                                  ),
-                                  trips: SupabaseTripRepository(
-                                    widget.session.client,
-                                  ),
-                                  offices: (p['offices'] as List)
-                                      .map(
-                                        (o) =>
-                                            Map<String, dynamic>.from(o as Map),
-                                      )
-                                      .toList(),
-                                  administrator: p['role'] == 'ADMIN',
-                                  guard: guard,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                        await widget.session.refresh();
-                      },
-                    ),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.local_shipping),
-                    label: const BilingualText(L10n.trips),
-                    onPressed: () async {
-                      final grantedScope = tripScope(p);
-                      Widget guard(Widget child) => ListenableBuilder(
-                        listenable: widget.session,
-                        builder: (context, _) =>
-                            tripScope(widget.session.profile) == grantedScope &&
-                                widget
-                                        .session
-                                        .profile?['must_change_password'] ==
-                                    false
-                            ? child
-                            : Scaffold(
-                                appBar: AppBar(
-                                  toolbarHeight:
-                                      88 *
-                                      MediaQuery.textScalerOf(context).scale(1),
-                                  title: const BilingualText(L10n.trips),
-                                ),
-                                body: const Center(
-                                  child: BilingualText(
-                                    L10n.requestFailedYourEntriesRemainHereCheckYourConnection,
-                                  ),
-                                ),
-                              ),
-                      );
-                      await Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => guard(
-                            TripWorkspace(
-                              corrections: CorrectionRepository(
-                                widget.session.client,
-                              ),
-                              finance: FinancialRepository(
-                                widget.session.client,
-                              ),
-                              guard: guard,
-                              repository: SupabaseTripRepository(
-                                widget.session.client,
-                              ),
-                              masters: SupabaseMasterRepository(
-                                widget.session.client,
-                              ),
-                              offices: (p['offices'] as List)
-                                  .map(
-                                    (o) => Map<String, dynamic>.from(o as Map),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                        ),
-                      );
-                      await widget.session.refresh();
-                    },
-                  ),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.receipt_long),
-                    label: const BilingualText(L10n.expensesAndReimbursements),
-                    onPressed: () async {
-                      final scope = tripScope(p);
-                      Widget guard(Widget child) => ListenableBuilder(
-                        listenable: widget.session,
-                        builder: (_, _) =>
-                            tripScope(widget.session.profile) == scope &&
-                                widget
-                                        .session
-                                        .profile?['must_change_password'] ==
-                                    false
-                            ? child
-                            : const Scaffold(
-                                body: Center(
-                                  child: BilingualText(
-                                    L10n.currentOfficeAccessRequired,
-                                  ),
-                                ),
-                              ),
-                      );
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => guard(
-                            ExpenseWorkspace(
-                              corrections: CorrectionRepository(
-                                widget.session.client,
-                              ),
-                              administrator: p['role'] == 'ADMIN',
-                              expenses: ExpenseRepository(
-                                widget.session.client,
-                              ),
-                              finance: FinancialRepository(
-                                widget.session.client,
-                              ),
-                              trips: SupabaseTripRepository(
-                                widget.session.client,
-                              ),
-                              masters: SupabaseMasterRepository(
-                                widget.session.client,
-                              ),
-                              offices: (p['offices'] as List)
-                                  .map(
-                                    (o) => Map<String, dynamic>.from(o as Map),
-                                  )
-                                  .toList(),
-                              guard: guard,
-                            ),
-                          ),
-                        ),
-                      );
-                      await widget.session.refresh();
-                    },
-                  ),
                   OutlinedButton(
                     onPressed: busy
                         ? null
@@ -925,8 +605,9 @@ class _AccountDialogState extends State<AccountDialog> {
               ),
             ),
             DropdownButtonFormField<String>(
+              isDense: false,
               isExpanded: true,
-              itemHeight: 80,
+              itemHeight: null,
               initialValue: role,
               items: ['STAFF', 'ADMIN']
                   .map(

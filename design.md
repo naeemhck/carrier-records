@@ -185,3 +185,15 @@ Import uses Download template → Choose XLSX → Validate → Preview rows and 
 ## 9. Design verification
 
 Check keyboard-only desktop entry, Android touch entry, field-picker ordering, required-field explanation, mixed cash/offset review, long names, multiple stops, wide exports and multi-page car lists. Verify PDFs visually using rendered pages during implementation. Confirm selected-field parity and privacy in actual XLSX/PDF files, not just screenshots.
+
+## Local GUI restructure (2026-10-14)
+
+Written specification is authoritative for this work. The six glass/standard mockup PNGs are not present in the repository, the two latest attachment folders, or the relevant Downloads inventory; exact filenames were not supplied. No mockup matching is claimed. User explicitly removed the apple-look/apple-motion/archive prerequisite; no skill installation is needed.
+
+Use KarvaanDesign shared tokens: background F4F5F7, white content, ink1D1D1F, secondary646469 (contrast-adjusted), accent0E7A3D; 8px spacing, panel22/card18/control12 radii. Glass is bounded and limited to navigation/action layers, with opaque high-contrast/accessibility/reduced-motion fallback. Forms and financial values stay opaque. Stacked English semibold/Urdu regular uses existing fonts/catalogue, global LTR, Urdu-only RTL, minimum12px Urdu before scaling, Latin identifiers/digits.
+
+Persistent grouped navigation lives outside the existing child navigator. Narrow layout exposes the same permitted destinations in an immediate overlay. Existing account/home and route targets remain available; role changes invalidate guarded workspace contents. Money starts with the existing scoped paginated trip selection, then the existing trip allocation workflow; it does not fabricate global totals or a new API.
+
+Only the trip-step transition may animate (250ms; reduced-motion immediate). Keep server review, overlap acknowledgements, version/idempotency and busy-dismissal guards unchanged. Existing output v1/v2 renderers and snapshot infrastructure are immutable; a new issued template requiring backend registration is a documented dependency, not authorization to change backend contracts in this presentation task.
+
+The prior monthly-summary gate remains unresolved (p95 5.871856s); GUI changes must be measured separately and must not be presented as fixing it. T19 owner acceptance/waivers remain recorded as such. T20 remains TODO.

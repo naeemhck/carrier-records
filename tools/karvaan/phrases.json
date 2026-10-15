@@ -7314,5 +7314,131 @@
     "origins": [
       "main.dart controlled startup failure; provisional"
     ]
+  },
+  {
+    "key": "workspaceGroup",
+    "semantic_key": "ui.workspaceGroup",
+    "en": "Workspace",
+    "ur": "کام کی جگہ",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "outputsGroup",
+    "semantic_key": "ui.outputsGroup",
+    "en": "Outputs",
+    "ur": "دستاویزات اور رپورٹیں",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "manageGroup",
+    "semantic_key": "ui.manageGroup",
+    "en": "Manage",
+    "ur": "انتظام",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "journeyStep",
+    "semantic_key": "ui.journeyStep",
+    "en": "Journey",
+    "ur": "سفر",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "consignmentsStep",
+    "semantic_key": "ui.consignmentsStep",
+    "en": "Consignments",
+    "ur": "کنسائنمنٹ",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "reviewStep",
+    "semantic_key": "ui.reviewStep",
+    "en": "Review",
+    "ur": "جائزہ",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "whatSection",
+    "semantic_key": "ui.whatSection",
+    "en": "What",
+    "ur": "خرچ کی تفصیل",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "whoseMoneySection",
+    "semantic_key": "ui.whoseMoneySection",
+    "en": "Whose money",
+    "ur": "کس کی رقم",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "whereSection",
+    "semantic_key": "ui.whereSection",
+    "en": "Where",
+    "ur": "گاڑی اور ٹرپ",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "proofSection",
+    "semantic_key": "ui.proofSection",
+    "en": "Proof",
+    "ur": "ثبوت",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "moneyNavigation",
+    "semantic_key": "ui.moneyNavigation",
+    "en": "Money",
+    "ur": "رقم",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "accountNavigation",
+    "semantic_key": "ui.accountNavigation",
+    "en": "Account",
+    "ur": "اکاؤنٹ",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "collapseNavigation",
+    "semantic_key": "ui.collapseNavigation",
+    "en": "Collapse navigation",
+    "ur": "نیویگیشن سمیٹیں",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
+  },
+  {
+    "key": "expandNavigation",
+    "semantic_key": "ui.expandNavigation",
+    "en": "Expand navigation",
+    "ur": "نیویگیشن کھولیں",
+    "origins": [
+      "GUI restructure; provisional office review"
+    ]
   }
 ]

@@ -418,3 +418,22 @@ After Windows and Android stability: Urdu UI/documents with reviewed translation
 2026-10-11 T09: AT-05/19/20 expense-boundary checks PASS, migration 20261011001100. Both diesel remittances/profit, standalone costs, original-expense claims, private evidence and financial-versus-upload failure separation verified. See docs/expenses-evidence.md. Local commit only; no GitHub push.
 
 Latest recovery: user manually opens Company and master records; actual installed accessibility observation confirms the page/configured company. Keyboard focus briefly reaches Back/Offices, later returns to root; latest indexed Parties click rejected as unavailable in cached app state. CU26-20 through CU26-27 recorded separately in docs/t19-installed-continuation.md; no party editor, new record or save. T19 IN PROGRESS; T20 TODO.
+
+## Karvaan local GUI restructure (G-series; separate from summary performance)
+
+Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, initially clean. Existing candidate0.2.0+10 preserved. No unavailable Apple skills required; six mockups unavailable, no visual matching claim.
+
+| Phase | Work | Status |
+|---|---|---|
+| G01 | Shared tokens, stacked labels, persistent permitted navigation/account | DONE —119 Flutter checks and clean app analyzer; native integration remains G10 |
+| G02 | Scoped trips list hierarchy and lifecycle badges | DONE — existing filters/pagination/scope regressions pass; no absent authoritative amounts fabricated |
+| G03 | Journey/Consignments/Review editor, retained inputs and guards | TODO |
+| G04 | Trip summary and separate operational/financial tabs | TODO |
+| G05 | Expense entry grouping | TODO |
+| G06 | Money/expense list presentation | TODO |
+| G07 | Reports/documents/export presentation and legacy preservation | TODO |
+| G08 | Masters/imports/backups/auth consistency | TODO |
+| G09 | Keyboard/overlay/picker interaction verification | TODO |
+| G10 | Full regressions, actual visual/export/performance evidence and review candidate | TODO |
+
+Existing monthly summary5.871856s FAIL is separately tracked; T19 acceptance/exceptions unchanged; T20 TODO. No push/merge/install/deploy/hosted access.

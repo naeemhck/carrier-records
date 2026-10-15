@@ -2,6 +2,8 @@ import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
 
+import '../../app/karvaan_design.dart';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,7 +36,9 @@ class TripWorkspace extends StatefulWidget {
     this.guard = unguardedTrip,
     this.finance,
     this.corrections,
+    this.moneyMode = false,
   });
+  final bool moneyMode;
   final TripRepository repository;
   final MasterRepository masters;
   final List<Map<String, dynamic>> offices;
@@ -102,6 +106,25 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   }
 
   Future<void> detail(String id, {bool saved = false}) async {
+    if (widget.moneyMode && widget.finance != null) {
+      await Navigator.push<void>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => widget.guard(
+            PaymentWorkspace(
+              finance: widget.finance!,
+              trips: widget.repository,
+              masters: widget.masters,
+              offices: widget.offices,
+              initialTrip: id,
+              guard: widget.guard,
+            ),
+          ),
+        ),
+      );
+      if (mounted) reload();
+      return;
+    }
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
@@ -156,16 +179,31 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.trips),
+      title: BilingualText(
+        widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
+      ),
     ),
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        FilledButton.icon(
-          onPressed: () => edit(TripDraft()),
-          icon: const Icon(Icons.add),
-          label: const BilingualText(L10n.newDraft),
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          spacing: 24,
+          runSpacing: 16,
+          children: [
+            BilingualText(
+              widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            if (!widget.moneyMode)
+              FilledButton.icon(
+                onPressed: () => edit(TripDraft()),
+                icon: const Icon(Icons.add),
+                label: const BilingualText(L10n.newDraft),
+              ),
+          ],
         ),
+        const SizedBox(height: 24),
         TextField(
           controller: search,
           decoration: bilingualDecoration(
@@ -177,8 +215,9 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           onSubmitted: (_) => reload(start: 0),
         ),
         DropdownButtonFormField<String>(
+          isDense: false,
           isExpanded: true,
-          itemHeight: 80,
+          itemHeight: null,
           initialValue: office,
           decoration: bilingualDecoration(
             context,
@@ -235,8 +274,9 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           ),
         ),
         DropdownButtonFormField<String>(
+          isDense: false,
           isExpanded: true,
-          itemHeight: 80,
+          itemHeight: null,
           initialValue: status,
           decoration: bilingualDecoration(
             context,
@@ -315,6 +355,8 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                               '',
                         ]),
                       ),
+                      trailingBelow: true,
+                      trailing: TripStatusBadge(r['state'] as String),
                       onTap: () => detail(r['id'] as String),
                     ),
                   ),
@@ -592,8 +634,9 @@ class _TripEditorState extends State<TripEditor> {
   }) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: DropdownButtonFormField<String>(
+      isDense: false,
       isExpanded: true,
-      itemHeight: 80,
+      itemHeight: null,
       key: ValueKey('$key:$value:${choices.join(',')}'),
       initialValue: choices.contains(value) ? value : null,
       decoration: bilingualDecoration(
@@ -648,7 +691,8 @@ class _TripEditorState extends State<TripEditor> {
   ) {
     final rows = d.stops.where((s) => s.kind == kind).toList();
     return DropdownButtonFormField<String>(
-      itemHeight: 80,
+      isDense: false,
+      itemHeight: null,
       key: ValueKey('$key:$id:${rows.map((s) => s.id).join(',')}'),
       initialValue: rows.any((s) => s.id == id) ? id : null,
       decoration: bilingualDecoration(
@@ -957,8 +1001,9 @@ class _TripEditorState extends State<TripEditor> {
                 },
               ),
               DropdownButtonFormField<String>(
+                isDense: false,
                 isExpanded: true,
-                itemHeight: 80,
+                itemHeight: null,
                 key: ValueKey('origin:${d.origin}'),
                 initialValue: widget.offices.any((o) => o['id'] == d.origin)
                     ? d.origin

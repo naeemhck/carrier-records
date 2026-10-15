@@ -25,7 +25,7 @@ class BilingualText extends StatelessWidget {
   Widget build(BuildContext context) {
     final english = Text(
       text.en,
-      style: style,
+      style: (style ?? const TextStyle()).copyWith(fontWeight: FontWeight.w600),
       textAlign: textAlign ?? TextAlign.left,
       textDirection: TextDirection.ltr,
       maxLines: maxLines,
@@ -36,10 +36,9 @@ class BilingualText extends StatelessWidget {
     return Semantics(
       label: '${text.en}. ${text.ur}',
       excludeSemantics: true,
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        spacing: 12,
-        runSpacing: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           english,
           Text(
@@ -48,6 +47,14 @@ class BilingualText extends StatelessWidget {
               fontFamily: 'NotoSansArabic',
               fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
               height: 1.6,
+              fontSize:
+                  ((urStyle?.fontSize ??
+                              style?.fontSize ??
+                              DefaultTextStyle.of(context).style.fontSize ??
+                              14) *
+                          .85)
+                      .clamp(12, double.infinity),
+              fontWeight: FontWeight.w400,
             ),
             textAlign: textAlign ?? TextAlign.right,
             textDirection: TextDirection.rtl,
@@ -73,7 +80,13 @@ class BilingualCaption extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(text.en, style: style, textDirection: TextDirection.ltr),
+        Text(
+          text.en,
+          style: (style ?? const TextStyle()).copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+          textDirection: TextDirection.ltr,
+        ),
         if (text.ur.isNotEmpty)
           Text(
             text.ur,
@@ -81,6 +94,13 @@ class BilingualCaption extends StatelessWidget {
               fontFamily: 'NotoSansArabic',
               fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
               height: 1.6,
+              fontSize:
+                  ((style?.fontSize ??
+                              DefaultTextStyle.of(context).style.fontSize ??
+                              14) *
+                          .85)
+                      .clamp(12, double.infinity),
+              fontWeight: FontWeight.w400,
             ),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
