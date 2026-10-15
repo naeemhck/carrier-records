@@ -102,9 +102,14 @@ void main() {
       await tester.pumpAndSettle();
       Future<void> tap(String text, {double direction = 250}) async {
         final f = find.text(text);
+        tester
+            .state<ScrollableState>(find.byType(Scrollable).first)
+            .position
+            .jumpTo(0);
+        await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
           f,
-          direction,
+          direction.abs(),
           scrollable: find.byType(Scrollable).first,
         );
         await tester.ensureVisible(f);
@@ -127,6 +132,11 @@ void main() {
         final f = find.byWidgetPredicate(
           (w) => w is TextField && hasEnglishLabel(w.decoration, label),
         );
+        tester
+            .state<ScrollableState>(find.byType(Scrollable).first)
+            .position
+            .jumpTo(0);
+        await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
           f,
           250,
@@ -216,6 +226,12 @@ void main() {
             ),
           ),
         ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Choose vehicle'),
+        250,
+        scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Choose vehicle'));

@@ -1,5 +1,8 @@
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
+
+import '../../app/karvaan_design.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/domain/record_context.dart';
@@ -749,157 +752,196 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                 child: const BilingualCaption(L10n.retryReceiptOnly),
               ),
           ] else ...[
-            OutlinedButton(
-              onPressed: locked
-                  ? null
-                  : () => choose(MasterKind.vehicle, 'vehicle'),
-              child: BilingualCaption(
-                (vehicle?.label != null
-                    ? Bilingual.data(vehicle?.label)
-                    : L10n.chooseVehicle),
-              ),
-            ),
-            OutlinedButton(
-              onPressed: locked || vehicle == null ? null : chooseTrip,
-              child: BilingualCaption(
-                (trip == null
-                    ? L10n.optionalTrip
-                    : L10n.trip3c1efc.withValues([trip!['trip_number']])),
-              ),
-            ),
-            if (trip != null)
-              TextButton(
-                onPressed: locked
-                    ? null
-                    : () => setState(() {
-                        trip = null;
-                        reviewed = null;
-                        owner = vehicle!.data['current_owner_id'] as String?;
-                        clearClaims();
-                      }),
-                child: const BilingualCaption(L10n.keepAsStandaloneMaintenance),
-              ),
-            DropdownButtonFormField<String>(
-              isDense: false,
-              isExpanded: true,
-              itemHeight: null,
-              initialValue: office,
-              decoration: bilingualDecoration(
-                context,
-                InputDecoration(label: BilingualCaption(L10n.expenseOffice)),
-              ),
-              items: widget.offices
-                  .map(
-                    (o) => DropdownMenuItem(
-                      value: o['id'] as String,
-                      child: Text(o['name'] as String),
+            KarvaanSection(
+              title: L10n.whatSection,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton(
+                    onPressed: locked
+                        ? null
+                        : () => choose(MasterKind.category, 'category'),
+                    child: BilingualCaption(
+                      (category?.label != null
+                          ? Bilingual.data(category?.label)
+                          : L10n.chooseCategory),
                     ),
-                  )
-                  .toList(),
-              onChanged: locked
-                  ? null
-                  : (v) => setState(() {
-                      office = v;
-                      reviewed = null;
-                    }),
-            ),
-            OutlinedButton(
-              onPressed: locked
-                  ? null
-                  : () => choose(MasterKind.category, 'category'),
-              child: BilingualCaption(
-                (category?.label != null
-                    ? Bilingual.data(category?.label)
-                    : L10n.chooseCategory),
+                  ),
+                  field(date, 'Expense date (YYYY-MM-DD)'),
+                  field(amount, 'Expense amount (PKR)'),
+                  field(notes, 'Notes / reason'),
+                ],
               ),
             ),
-            OutlinedButton(
-              onPressed: locked
-                  ? null
-                  : () => choose(MasterKind.party, 'payer'),
-              child: BilingualCaption(
-                (payer == null
-                    ? L10n.choosePayer
-                    : L10n.payer.withValues([payer!.label])),
-              ),
-            ),
-            OutlinedButton(
-              onPressed: locked
-                  ? null
-                  : () => choose(MasterKind.party, 'bearer'),
-              child: BilingualCaption(
-                (bearer == null
-                    ? L10n.chooseCostBearer
-                    : L10n.costBearerf2e025.withValues([bearer!.label])),
-              ),
-            ),
-            BilingualText(
-              (trip != null
-                  ? L10n.historicalOwner.withValues([
-                      (trip!['owner_snapshot'] as Map)['display_name'],
-                    ])
-                  : L10n.confirmTheVehicleOwnerAsCostBearerWhenApplicable),
-            ),
-            field(date, 'Expense date (YYYY-MM-DD)'),
-            field(amount, 'Expense amount (PKR)'),
-            field(notes, 'Notes / reason'),
-            DropdownButtonFormField<ExpenseFunding>(
-              isDense: false,
-              isExpanded: true,
-              itemHeight: null,
-              initialValue: funding,
-              decoration: bilingualDecoration(
-                context,
-                InputDecoration(label: BilingualCaption(L10n.fundingSource)),
-              ),
-              items: ExpenseFunding.values
-                  .map(
-                    (f) => DropdownMenuItem(
-                      value: f,
-                      child: BilingualOwnedText(f.label),
+            KarvaanSection(
+              title: L10n.whoseMoneySection,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton(
+                    onPressed: locked
+                        ? null
+                        : () => choose(MasterKind.party, 'payer'),
+                    child: BilingualCaption(
+                      (payer == null
+                          ? L10n.choosePayer
+                          : L10n.payer.withValues([payer!.label])),
                     ),
-                  )
-                  .toList(),
-              onChanged: locked
-                  ? null
-                  : (v) => setState(() {
-                      funding = v!;
-                      reviewed = null;
-                    }),
-            ),
-            if (payer?.id == owner &&
-                bearer?.id == owner &&
-                funding == ExpenseFunding.self)
-              const BilingualText(
-                L10n.ownerHasAlreadyPaidThisPersonallyOwnerSettlementIs,
+                  ),
+                  OutlinedButton(
+                    onPressed: locked
+                        ? null
+                        : () => choose(MasterKind.party, 'bearer'),
+                    child: BilingualCaption(
+                      (bearer == null
+                          ? L10n.chooseCostBearer
+                          : L10n.costBearerf2e025.withValues([bearer!.label])),
+                    ),
+                  ),
+                  BilingualText(
+                    (trip != null
+                        ? L10n.historicalOwner.withValues([
+                            (trip!['owner_snapshot'] as Map)['display_name'],
+                          ])
+                        : L10n.confirmTheVehicleOwnerAsCostBearerWhenApplicable),
+                  ),
+                  DropdownButtonFormField<ExpenseFunding>(
+                    isDense: false,
+                    isExpanded: true,
+                    itemHeight: null,
+                    initialValue: funding,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.fundingSource),
+                      ),
+                    ),
+                    items: ExpenseFunding.values
+                        .map(
+                          (f) => DropdownMenuItem(
+                            value: f,
+                            child: BilingualOwnedText(f.label),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: locked
+                        ? null
+                        : (v) => setState(() {
+                            funding = v!;
+                            reviewed = null;
+                          }),
+                  ),
+                  if (payer?.id == owner &&
+                      bearer?.id == owner &&
+                      funding == ExpenseFunding.self)
+                    const BilingualText(
+                      L10n.ownerHasAlreadyPaidThisPersonallyOwnerSettlementIs,
+                    ),
+                  CheckboxListTile(
+                    value: agreed,
+                    onChanged: locked
+                        ? null
+                        : (v) => setState(() {
+                            agreed = v!;
+                            reviewed = null;
+                          }),
+                    title: const BilingualText(
+                      L10n.confirmAgreedOwnerSettlementOffsetWhenApplicable,
+                    ),
+                  ),
+                  const BilingualText(
+                    L10n.allocateCashSpentFromCustodyAndNonCashOwner,
+                  ),
+                  for (final c in eligible)
+                    field(
+                      inputs[c['line_id']]!,
+                      '${c['account_purpose'] == 'OWNER_PAYABLE' ? 'Owner offset' : 'Held cash source'} | remaining PKR ${c['remaining']}',
+                    ),
+                ],
               ),
-            CheckboxListTile(
-              value: agreed,
-              onChanged: locked
-                  ? null
-                  : (v) => setState(() {
-                      agreed = v!;
-                      reviewed = null;
-                    }),
-              title: const BilingualText(
-                L10n.confirmAgreedOwnerSettlementOffsetWhenApplicable,
+            ),
+            KarvaanSection(
+              title: L10n.whereSection,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton(
+                    onPressed: locked
+                        ? null
+                        : () => choose(MasterKind.vehicle, 'vehicle'),
+                    child: BilingualCaption(
+                      (vehicle?.label != null
+                          ? Bilingual.data(vehicle?.label)
+                          : L10n.chooseVehicle),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: locked || vehicle == null ? null : chooseTrip,
+                    child: BilingualCaption(
+                      (trip == null
+                          ? L10n.optionalTrip
+                          : L10n.trip3c1efc.withValues([trip!['trip_number']])),
+                    ),
+                  ),
+                  if (trip != null)
+                    TextButton(
+                      onPressed: locked
+                          ? null
+                          : () => setState(() {
+                              trip = null;
+                              reviewed = null;
+                              owner =
+                                  vehicle!.data['current_owner_id'] as String?;
+                              clearClaims();
+                            }),
+                      child: const BilingualCaption(
+                        L10n.keepAsStandaloneMaintenance,
+                      ),
+                    ),
+                  DropdownButtonFormField<String>(
+                    isDense: false,
+                    isExpanded: true,
+                    itemHeight: null,
+                    initialValue: office,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.expenseOffice),
+                      ),
+                    ),
+                    items: widget.offices
+                        .map(
+                          (o) => DropdownMenuItem(
+                            value: o['id'] as String,
+                            child: Text(o['name'] as String),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: locked
+                        ? null
+                        : (v) => setState(() {
+                            office = v;
+                            reviewed = null;
+                          }),
+                  ),
+                ],
               ),
             ),
-            const BilingualText(
-              L10n.allocateCashSpentFromCustodyAndNonCashOwner,
-            ),
-            for (final c in eligible)
-              field(
-                inputs[c['line_id']]!,
-                '${c['account_purpose'] == 'OWNER_PAYABLE' ? 'Owner offset' : 'Held cash source'} | remaining PKR ${c['remaining']}',
+            KarvaanSection(
+              title: L10n.proofSection,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton(
+                    onPressed: locked ? null : pick,
+                    child: const BilingualCaption(
+                      L10n.optionalPrivateReceiptPNGJPEGPDFMB,
+                    ),
+                  ),
+                  BilingualOwnedText(receiptStatus),
+                ],
               ),
-            OutlinedButton(
-              onPressed: locked ? null : pick,
-              child: const BilingualCaption(
-                L10n.optionalPrivateReceiptPNGJPEGPDFMB,
-              ),
             ),
-            BilingualOwnedText(receiptStatus),
             if (conflict)
               TextButton(
                 onPressed: busy ? null : reload,
