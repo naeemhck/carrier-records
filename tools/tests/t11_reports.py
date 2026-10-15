@@ -54,7 +54,7 @@ def verify(env):
     ok('AT22 unrelated trip direct report',report('01','TRIP_PROFIT',xt,{'trip_id':target})[0]==403)
     outside=success('AT22 unrelated empty scoped report',report('01',token=xt));ok('AT22 totals cannot reveal hidden trip',outside['totals']['customer_fare']=='0.00' and outside['rows']==[])
     ok('AT22 unknown fields do not broaden scope',report('01',extra={'business_id':b})[0]==400)
-    archived=uid();sql(f"insert into public.offices(id,business_id,code,name,archived_at) values('{archived}','{b}','T11-ARCHIVE','Synthetic archived office',now());")
+    archived=uid();archive_code='T11-ARCH-'+archived[:8];sql(f"insert into public.offices(id,business_id,code,name,archived_at) values('{archived}','{b}','{archive_code}','Synthetic archived office',now());")
     archived_report=success('AT22 admin archived-office history filter',report('01',token=at,extra={'office_id':archived}));ok('AT22 selected-office label and archived staff denial',not archived_report['complete'] and 'Selected-office' in archived_report['scope'] and report('01',extra={'office_id':archived})[0]==403)
     ok('T11 raw facts not callable',rpc('report_facts',{'filters':{'from':'2026-01-01','to':'2026-01-31'}},st)[0] in(403,404))
     changed=uid();newp=copy.deepcopy(payload);newp['consignments'][0]['id']=uid()
