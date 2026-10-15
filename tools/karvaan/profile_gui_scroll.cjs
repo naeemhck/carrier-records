@@ -23,19 +23,19 @@ const escaped=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  await page.waitForFunction(()=>document.querySelector('flt-semantics-placeholder')||document.querySelector('[role=textbox]'),null,{timeout:120000});
  if(await page.locator('flt-semantics-placeholder').count())await page.locator('flt-semantics-placeholder').evaluate(e=>e.click());
  await page.getByRole('textbox').first().waitFor({timeout:120000});
- await page.getByRole('textbox').nth(0).click();await page.keyboard.type('review_admin');
- await page.getByRole('textbox').nth(1).click();await page.keyboard.type(auth.usernames.review_admin);
+ await page.getByRole('textbox').nth(0).click();await page.keyboard.type('review_khi');
+ await page.getByRole('textbox').nth(1).click();await page.keyboard.type(auth.usernames.review_khi);
  await page.getByRole('button',{name:/^Sign in/}).click();
  await page.getByRole('button',{name:/^Trips\./}).waitFor({timeout:60000});
- if(!await page.getByRole('button',{name:/Company and master records/}).count())throw Error('Administrator navigation absent');
- const listPromise=page.waitForResponse(r=>new URL(r.url()).pathname==='/rest/v1/rpc/list_trips');
- await page.getByRole('button',{name:/^Trips\./}).click();const listResponse=await listPromise;if(listResponse.status()!==200)throw Error('Scoped trip list rejected');const listPayload=await listResponse.json();if(!Array.isArray(listPayload.rows)||listPayload.rows.length!==50)throw Error('Expected full50-row page');
+ if(await page.getByRole('button',{name:/Company and master records/}).count())throw Error('Restricted staff received administrator navigation');
+ const [listResponse]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/rest/v1/rpc/list_trips'),page.getByRole('button',{name:/^Trips\./}).click()]);if(listResponse.status()!==200)throw Error('Scoped trip list rejected');const listPayload=await listResponse.json();if(!Array.isArray(listPayload.rows)||listPayload.rows.length!==50)throw Error('Expected full50-row page');
 
+ await page.waitForFunction(id=>(document.body.textContent+' '+Array.from(document.querySelectorAll('[aria-label]')).map(e=>e.getAttribute('aria-label')||'').join(' ')).includes(id),listPayload.rows[0].trip_number);await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
  await page.evaluate(()=>{window.guiFrames=[];window.guiLast=null;window.guiSampling=true;const sample=t=>{if(!window.guiSampling)return;if(window.guiLast!==null)window.guiFrames.push(t-window.guiLast);window.guiLast=t;requestAnimationFrame(sample);};requestAnimationFrame(sample);});
  await page.mouse.move(1000,700);for(let i=0;i<20;i++){await page.mouse.wheel(0,i<10?280:-280);await page.waitForTimeout(50);}
  const frames=await page.evaluate(()=>{window.guiSampling=false;return window.guiFrames;});
  const sorted=[...frames].sort((a,b)=>a-b),pct=q=>sorted[Math.max(0,Math.ceil(sorted.length*q)-1)];
  await snapshot('trips-scroll');
- const result={version,source_commit:manifest.source_commit,page_rows:listPayload.rows.length,method:'Desktop Chromium requestAnimationFrame intervals during20 wheel events; one user; fresh context; retained OS/backend caches; not five-user gate',frames:frames.length,interval_ms:{p50:pct(.5),p95:pct(.95),max:sorted.at(-1)},over_50ms:frames.filter(x=>x>50).length,errors,blocked,writes};
+ const result={version,source_commit:manifest.source_commit,page_rows:listPayload.rows.length,account:'review_khi',method:'Desktop Chromium requestAnimationFrame intervals during20 wheel events; one user; fresh context; retained OS/backend caches; not five-user gate',frames:frames.length,interval_ms:{p50:pct(.5),p95:pct(.95),max:sorted.at(-1)},over_50ms:frames.filter(x=>x>50).length,errors,blocked,writes};
  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));if(errors.length||blocked.length||writes.length||frames.length<20)throw Error('Scroll diagnostic incomplete');
-})().catch(e=>{let message=e.name+': '+e.message;for(const secret of Object.values(auth.usernames))message=message.split(secret).join('[withheld]');console.error(message);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});
+})().catch(async e=>{try{const page=browser?.contexts()[0]?.pages()[0];if(page)await page.screenshot({path:path.join(output,'failure.png'),fullPage:true});}catch{}let message=e.name+': '+e.message;for(const secret of Object.values(auth.usernames))message=message.split(secret).join('[withheld]');fs.writeFileSync(path.join(output,'failure.json'),JSON.stringify({version,message,errors,blocked,writes},null,2));console.error(message);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});

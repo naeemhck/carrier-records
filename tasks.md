@@ -434,6 +434,6 @@ Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, ini
 | G07 | Reports/documents/export presentation and legacy preservation | IN PROGRESS — screens/23 checks/8PDF+8XLSX audit pass; existing v2 continuation-only last-page issue and any new-template registration documented, frozen renderers preserved |
 | G08 | Masters/imports/backups/auth consistency | DONE —24 checks/analyzer clean; Masters142px overflow reproduced then fixed at320/200% |
 | G09 | Keyboard/overlay/picker interaction verification | DONE —131 full Flutter checks/analyzer clean; immediate choices/dialogs, guarded account navigation; native input remains G10 |
-| G10 | Full regressions, actual visual/export/performance evidence and review candidate | IN PROGRESS — candidate11 builds/audits/browser checks pass; candidate12 Documents navigation correction and native framework verification in progress; OS input/device/template/performance limits remain |
+| G10 | Full regressions, actual visual/export/performance evidence and review candidate | IN PROGRESS — candidate12 built/audited639 entries;132 Flutter +native framework check pass; local trip/retry/role checks pass;2 initial report timeouts retained, later n5 trace/recovery passes; local review pack91 hashed files/audit803 entries zero findings, actual browser PDF/XLSX verified; OS input/device/template/performance limits remain |
 
 Existing monthly summary5.871856s FAIL is separately tracked; T19 acceptance/exceptions unchanged; T20 TODO. No push/merge/install/deploy/hosted access.

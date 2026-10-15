@@ -1,5 +1,6 @@
 """New GUI review pack only; immutable existing candidates and synthetic audited samples."""
 import hashlib,json,re,shutil,sys
+from pathlib import Path
 from local_environment import ROOT,boundary,require
 boundary()
 version=sys.argv[1]
@@ -28,8 +29,14 @@ for folder in sys.argv[2:]:
     require(re.fullmatch(r'gui[0-9]+-[a-z0-9-]+',folder) is not None,'Invalid evidence folder.')
     source=ROOT/'tools/.local'/folder
     require(source.is_dir(),'Evidence directory missing.')
+    extra = json.loads((source/'inspection.json').read_text(encoding='utf-8')) if (source/'inspection.json').exists() else []
+    for item in extra:
+        name=item['file'];sample=source/name
+        require(sample.name==name and sample.suffix in {'.pdf','.xlsx'} and hashlib.sha256(sample.read_bytes()).hexdigest()==item['sha256'],'Uninspected or changed browser export.')
+        copy(sample,pack/'verification'/folder/name)
+    if extra:copy(source/'inspection.json',pack/'verification'/folder/'inspection.json')
     for p in source.iterdir():
-        if p.suffix=='.png' or p.name in {'result.json','web-smoke.json','web-write-smoke.json'}:
+        if p.suffix=='.png' or p.name in {'result.json','failure.json','web-smoke.json','web-write-smoke.json'}:
             copy(p,pack/'verification'/folder/p.name)
 artifacts=[x for x in manifest['files'] if x['path'].endswith(('.apk','setup.exe','.zip')) or x['path']=='windows/payload/carrier_records.exe']
 (pack/'artifact-summary.json').write_text(json.dumps({'version':version,'compiled_source_commit':manifest['source_commit'],'artifacts':artifacts},indent=2),encoding='utf-8')
@@ -43,9 +50,9 @@ verification/: actual release-web screenshots/results; native integration captur
 
 ## Remaining gates and dependencies
 
-- Separate monthly five-user performance p955.871856s exceeds5s. No GUI diagnostic clears it.
+- Separate monthly five-user performance p955.871856s exceeds5s. Candidate12 default monthly report also returned HTTP500/57014 after successful authentication; baseline comparison is recorded in verification. No GUI diagnostic clears the performance gate.
 - G07 remains IN PROGRESS: existing frozen v2 broker/wide PDFs can have an explanatory-text-only last page. Fixing issued layout needs a newly registered template version; backend contracts are outside this presentation task. Existing issued renderers unchanged.
-- Windows Computer Use capture/input failed; framework-driven/native and browser tests are labelled separately. Physical keyboard/touch/device checks are not inferred.
+- Windows launcher plain-path attempt returned the installed executable; no input was sent to it, and startup network activity is unverified. Explicit process identifier correctly launched the local candidate. Computer Use capture/input failed; framework-driven/native and browser tests are labelled separately. Physical keyboard/touch/device checks are not inferred.
 - No connected Android device/emulator. Narrow desktop/browser/widget layouts do not establish Android-device validation.
 - Six supplied mockups not available; glossary GUI/accounting wording still needs office review.
 - T19 owner acceptance, exceptions and waivers remain intact; T20 unstarted.

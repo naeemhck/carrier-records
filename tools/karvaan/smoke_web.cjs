@@ -1,6 +1,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const version=process.argv[2],performanceMode=process.argv.includes('--performance'),writeMode=process.argv.includes('--write-smoke'),traceMode=process.argv.includes('--trace-rendering');if(!/^0\.2\.0\+\d+$/.test(version||''))throw Error('Explicit local candidate version required');
 const portIndex=process.argv.indexOf('--port'),port=portIndex<0?'8767':process.argv[portIndex+1];if(!['8767','8768','8769'].includes(port))throw Error('Pinned local artifact port required');const base='http://127.0.0.1:'+port;
+const accountIndex=process.argv.indexOf('--account'),selectedAccount=accountIndex<0?null:process.argv[accountIndex+1];if(selectedAccount&&(!['review_admin','review_khi','review_isb'].includes(selectedAccount)||performanceMode))throw Error('Only independent synthetic role checks may select an account; five-user workload unchanged');
 const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 (async()=>{
  const root=process.cwd(),auth=JSON.parse(fs.readFileSync('tools/.local/karvaan-review-auth.json','utf8'));
@@ -8,7 +9,7 @@ const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-run
  const manifest=JSON.parse(fs.readFileSync(path.join(artifact,'manifest.json')));const main=manifest.files.find(x=>x.path==='web/main.dart.js');if(!main||crypto.createHash('sha256').update(fs.readFileSync(path.join(artifact,main.path))).digest('hex')!==main.sha256)throw Error('Candidate source manifest mismatch');
  const served=Buffer.from(await(await fetch(base+'/main.dart.js')).arrayBuffer());if(crypto.createHash('sha256').update(served).digest('hex')!==main.sha256)throw Error('Served artifact differs from candidate manifest');
  if(performanceMode)auth.usernames=JSON.parse(fs.readFileSync('tools/.local/karvaan-performance-auth.json','utf8'));
- const accounts=performanceMode?Object.keys(auth.usernames):(writeMode?['review_admin']:(traceMode?['review_khi']:['review_admin','review_khi','review_isb']));if(performanceMode&&accounts.length!==5)throw Error('Five users required');
+ const accounts=performanceMode?Object.keys(auth.usernames):(selectedAccount?[selectedAccount]:writeMode?['review_admin']:(traceMode?['review_khi']:['review_admin','review_khi','review_isb']));if(performanceMode&&accounts.length!==5)throw Error('Five users required');
  const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,chromiumSandbox:true});
  const results=[],errors=[],blocked=[];let intentionalFault=false,warmed=0,releaseWarm;const warmBarrier=new Promise(resolve=>releaseWarm=resolve);let startup=Promise.resolve();
  try {
@@ -52,7 +53,7 @@ const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-run
    console.log(JSON.stringify({stage:'master_controls',controls:await page.locator('[role]').evaluateAll(els=>els.map(el=>({role:el.getAttribute('role'),label:el.getAttribute('aria-label'),text:el.innerText})).filter(x=>x.role==='button'||x.role==='checkbox'||x.role==='radio'))}));
    await page.screenshot({path:path.join(out,'admin-master-controls.png')});
    await page.getByRole('checkbox',{name:/^Expense categories/}).click();await page.getByRole('button',{name:/^New record/}).click();
-   const name='SYNTHETIC QA candidate10 retry '+Date.now();const field=page.getByRole('textbox',{name:/^Name/});await field.click();await page.keyboard.type(name);
+   const name='SYNTHETIC QA '+version+' retry '+Date.now();const field=page.getByRole('textbox',{name:/^Name/});await field.click();await page.keyboard.type(name);
    let failedBody;intentionalFault=true;await page.route('**/rest/v1/rpc/save_master_record',async route=>{failedBody=route.request().postDataJSON();await route.abort('connectionfailed');});
    await page.getByRole('button',{name:/^Save\./}).click();await page.waitForFunction(()=>document.body.textContent.includes('Save failed. Your entries are retained'));
    if(await field.inputValue()!==name)throw Error('Failed save lost input');if((await page.evaluate(()=>document.body.textContent)).includes('Saved by the server'))throw Error('False save confirmation');
@@ -70,7 +71,7 @@ const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-run
   if(username==='review_khi'||performanceMode){
    await page.setViewportSize({width:1280,height:900});await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    console.log(JSON.stringify({account:username,stage:'open_reports'}));
-   const firstReport=page.waitForResponse(r=>new URL(r.url()).pathname==='/rest/v1/rpc/get_scoped_report');await page.getByRole('button',{name:/^Reports\./}).click();let initial;try{initial=await firstReport;}catch(error){console.log(JSON.stringify({account:username,stage:'initial_report_timeout',requests,labels:await page.locator('[aria-label]').evaluateAll(elements=>elements.map(el=>el.getAttribute('aria-label')))}));await page.screenshot({path:path.join(out,username+'-initial-report-timeout.png')});throw error;}if(initial.status()!==200)throw Error('Initial report failed');await initial.body();
+   const firstReport=page.waitForResponse(r=>new URL(r.url()).pathname==='/rest/v1/rpc/get_scoped_report');await page.getByRole('button',{name:/^Reports\./}).click();let initial;try{initial=await firstReport;}catch(error){console.log(JSON.stringify({account:username,stage:'initial_report_timeout',requests,labels:await page.locator('[aria-label]').evaluateAll(elements=>elements.map(el=>el.getAttribute('aria-label')))}));await page.screenshot({path:path.join(out,username+'-initial-report-timeout.png')});throw error;}if(initial.status()!==200){let failure;try{failure=await initial.json();}catch{}const evidence={version,source_commit:manifest.source_commit,account:username,stage:'initial_report',status:initial.status(),error_code:failure?.code||null,completed_results:results,requests,console_errors:errors,blocked_nonlocal_requests:blocked};fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify(evidence,null,2));throw Error('Initial report failed HTTP '+initial.status()+' code '+(failure?.code||'unavailable'));}await initial.body();
    await page.getByRole('button',{name:/^Run report/}).waitFor();
    for(const [label,value] of [[/^From /,'2026-12-01'],[/^To /,'2026-12-31'],[/^Trip \/ vehicle search/,'BENCH']]){
     const field=page.getByRole('textbox',{name:label});await field.click();await page.keyboard.press('Control+A');await page.keyboard.type(value);

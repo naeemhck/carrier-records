@@ -104,3 +104,78 @@ Final app-source full Flutter suite132 PASS168s (gui12-current-full-tests.log). 
 Native attempt gui12-native-20261015-145730 failed the test helper before interaction: FutureBuilder is lazily built below the filters, so querying it before scrolling found no element. Corrected helper ordering: scroll to the actual result row, then await its mounted list future and center it. This is a test-harness failure; no app or backend change. All attempts/logs retained; final pass still required.
 
 Final hardened native run gui12-native-20261015-150140: Windows Debug build118.1s; integration1PASS29s,164.003s total. Seven native Flutter-engine captures; list future completion/centered targeting, all three steps/input retention, unchanged authorized draft/version/notes/totals, Documents/config route pass with fatal missed taps. Local-only signout; both temporary auth/defines files absent after run. Current-source full analyzer clean22.4s (gui12-commit-analyze.log). Full app132PASS168s; no lib changes afterward. Browser/helper syntax and source/history audit387tracked+6new/851historical/5516ignored zero findings. Candidate12 source may now be committed and built; actual packaging/smoke still pending. Native OS input/device/legacy-template/performance gates remain unresolved as documented.
+
+
+## Final candidate12 build, actual browser verification and limits
+
+Compiled app source c976b9732c2e030b67cf23e262990a5ebc59467e, version0.2.0+12. Windows release235.224s, web release458.630s, Android debug318.987s: exit0. Inno compiler signature verified and installer compiled30.719s, never installed. Warnings retained: Wasm dry-run compatibility notice/icon tree shaking; future Gradle native-access restriction; existing SDK XMLv4/reader3 mismatch. No SDK upgrade. Build manifest: tools/.local/candidates/0.2.0+12/manifest.json. Ordinary-client artifact audit639 entries/zero findings, manifest hashes match. Debug kernel has a private-key-header library literal without key material (scanner distinguishes actual PEM material); no privileged/test credentials or hosted configuration. ADB devices -l returns no devices/emulators; no Android-device pass or T20 readiness claim.
+
+| Artifact relative to candidate root | Bytes | SHA256 |
+|---|---:|---|
+| android/Karvaan-0.2.0+12-android-debug.apk | 185091452 | 8c94905bcb44a18253ec854c5a5065cade42869ca286410e32d72d1fa4b1efab |
+| web-candidate.zip | 15808590 | 6b3e88c8feef2cdbdacd31311c7e4d40c44ec69d5552d1d95a0052f351ff539e |
+| windows/Karvaan-0.2.0+12-windows-x64-setup.exe | 14691386 | 4e5e1a6eb793480a4187f2195438be1e2fe3f1327ba00d3ce23040607979fcd5 |
+| windows-candidate.zip | 17815091 | b58940e303b3b06f6deb7c30232b28cad16813c975237cf9bf6f834ff6e57968 |
+
+Candidate10 compiled84/review64 and candidate11 compiled84 manifest entries rehashed: zero mismatches; nothing in earlier candidate folders rewritten by these checks.
+
+### Actual native release observation and Computer Use exception
+
+Plain-path sky.launch_app timed out; fresh inventory/process path showed the installed Carrier Records executable started. No input/activation/configuration action was sent to that installed window. Startup network activity was not measured and cannot be ruled out; do not claim verified zero hosted traffic for that launcher attempt. Explicit process:<full candidate12 path> then launched exactly the copied candidate payload; unique returned window11144156/titleKarvaan, distinct installed window7866328. Candidate accessibility confirms restored Synthetic review administrator, ADMIN/all offices and paired bilingual destinations. One fresh indexed Trips action failed cached-element availability. Refreshed selected window capture failed FrameArrived timed out; fresh-selection retry failed window capture timed out. Stopped native inputs; no OS keyboard/form/overlay success inferred. No installer execution, app configuration edit or hosted-service command. Native framework integration evidence remains separately labelled, not a replacement for OS input.
+
+### Browser trip, role, retry and output checks
+
+Manifest-verified release web served only on127.0.0.1:8769 (PID33752; earlier8767/8768 servers preserved). Context network allowlist permits only this port and60321. gui12-trip-smoke first run failed an immediate DOM count after Escape; helper now waits two rendered frames for the opened modal and observes hidden state after input. Same unchanged app passes gui12-trip-smoke-2: all steps, retained39-character mixed punctuation/Latin marker, exact95000.00 owner preview, correct destination, invalid date rejection, review/ack required, Cancel/Escape, fresh unchanged DRAFT/version/notes and Documents/configuration navigation. Zero draft/financial requests, console errors or nonlocal requests. Test synchronization correction, no app delay/overlay workaround. Wide/narrow screenshots are desktop Chromium, not Android-device evidence.
+
+gui12-write-smoke: abort before commit retains inputs and shows failure without success; retry retains request identity, commits exactly one labelled synthetic category, then ordinary versioned archive. No deletion. Administrator and Karachi scope/brand/narrow checks completed before report errors; independent gui12-isb-scope verifies Islamabad-only home with administrator controls absent, zero errors/nonlocal requests. Do not call the two failed full report runs a complete pass.
+
+First report run while Android compiling failed initial current-month report; original helper lacked response-code evidence. Isolated database log summary correlates one statement timeout, no permission-denied/deadlock error in interval. Second same full check after builds returned explicit HTTP500/57014 for2026-10-01..31, empty search, null filters after successful Auth/profile/identity. Both failed logs retained. Added safe HTTP/code/partial-results evidence rather than suppressing errors. No demonstrated query/security root fix and no backend change in this GUI phase.
+
+Later fresh one-user trace runs for preserved candidate10 and candidate12 both pass initial report, five December BENCH requests (exact95000000.00/20 rows), deliberate read abort showing Report unavailable, and recovery. Each trace has7 successful backend summary requests plus1 intentional aborted request; earlier2 candidate12 initial failures remain separate and are not included in the five-sample latency quantiles. All raw numeric samples retained; no raw trace arguments or credentials. Source report repository and default MONTHLY_VEHICLE contract unchanged. Results establish intermittent backend failure, not proof of a GUI cause or a resolved backend gate.
+
+### GUI responsiveness diagnostics, not the five-user gate
+
+Local Windows/Docker synthetic annual dataset; Chrome fresh contexts, retained OS/database caches, baseline then candidate, no cache eviction/randomization. File timestamps establish the baseline trace completed before the independent Islamabad scope run. All compilers/audits finished before these trace/scroll measurements. Five measured December summaries per version after initial current-month report; p95 is nearest-rank maximum for n5. Exact report totals retained.
+
+| Metric ms, p50 / p95 | Preserved10 | Candidate12 |
+|---|---:|---:|
+| Total report ready |1768.355 /2358.391|2858.378 /3039.454|
+| Network headers wait |1430.268 /1848.049|2515.480 /2611.628|
+| Body received to visible +two frames |360.567 /440.846|292.427 /366.925|
+| JSON parse |.200 /.200|.100 /.300|
+
+No added report-client delay demonstrated in this small diagnostic; total time increased with headers wait. Body-to-visible includes Flutter/semantics/driver polling and is not pure GPU time. Individual CDP script/layout/paint durations can nest; do not add them. Raw gui10-current-report-baseline/web-smoke.json and gui12-current-rendering/web-smoke.json.
+
+Initial admin scrolling harness produced zero samples because baseline navigation did not reach the trip endpoint; unhandled waiter timeout retained in gui10-scroll-baseline.log. Corrected harness uses identical restricted review_khi account, full50 returned rows, waits rendered first row, same20 wheel events (280px,10down/10up) on both versions; fail-safe Promise.all and failure capture. No workload reduction or changes to five-user mode. Old10 n106 frames p50/p9516.834/50.200ms max99.800,6 over50ms; new12 n115 p50/p9516.700/49.300ms max66.700,3 over50ms. Zero errors/writes/nonlocal. Short browser RAF interval diagnostic, no physical-device/GPU/long-session claim; no added scrolling delay observed here.
+
+The required five-user monthly p955.871856s>5s and intermittent HTTP timeouts remain OPEN. These one-user samples do not clear that gate. G07/G10/U06/U07 remain IN PROGRESS; T19 dispositions preserved/T20 TODO.
+
+### Local coherent commits
+
+| Phase | Local commit |
+|---|---|
+| Foundation/navigation/trip list |97b17a1|
+| Three-step draft editor |d75e7b8|
+| Trip detail/lifecycle versus money |c9b3bc3|
+| Grouped expense entry |1e2b906|
+| Canonical money/expense lists |f9e5e5d|
+| Report/scope controls and frozen outputs |0482340|
+| Management/auth/import/backup accessibility |8341b4d|
+| Immediate overlays/keyboard/pending-route guards |ab2a13d|
+| Backend verification/transactional SQL harness |a551c42|
+| Native UI/document navigation/candidate12 source |c976b97|
+
+No mockup matching claimed: all six reference PNGs unavailable. Map written-spec screens to candidate12 trip-list/detail/Journey/Consignments/Review screenshots and native engine captures in the review pack. Existing8PDF+8XLSX and additional actual browser exports are labelled by provenance; original v1/v2 issued renderers/assets untouched. Existing v2 continuation-only final-page concern still needs a new registered template/backend dependency outside presentation scope. Office review of glossary and missing native/device checks remains explicit.
+
+
+Actual candidate12 release-browser document smoke: gui12-export-smoke prepares authorized INTERNAL December BENCH monthly preview and downloads PDF49712bytes / XLSX6647bytes. No issuance, trip/financial posting, console error or nonlocal request. Independent actual-byte inspection: PDF10pages/embedded Latin+Urdu fonts, workbook57rows/10columns/one visible sheet; frozenA38,185numericcells, zero formulas/hidden rows/columns/sheets, creatorKarvaan/lastModifiedBynull. Visually inspected freshly rendered pages1/5/10: joined Urdu, mixed Latin amounts/identifiers, scope/date basis, repeated headings, selected field bands, explicit settlement labels and readable last-page rows/notes. This fresh output does not reproduce the retained broker/wide v2 orphan-text-page cases; those remain open rather than silently changing frozen renderers. Actual files/hashes and three rendered pages are included in the new review pack. Original catalogue includes some provisional punctuation/wording (e.g. preview-only question-mark separator); preserved pending review, no silent catalogue rewrite.
+
+
+Review-pack first assembly correctly stopped Sample changed after inspection: final full Flutter suite regenerated unit_hidden/unit_owner/unit_wide PDF/XLSX after the previous byte inspection (six hash mismatches, no other sample mismatches). The following audit failed because no complete review-manifest existed; neither stage was passed. Preserved that incomplete own pack under tools/.local/preserved-artifacts/gui12-incomplete-review-20261015-154246, and preserved first failed audit log. Re-ran current8PDF+8XLSX inspection after all Flutter generation finished; refreshed current unit renders1/10/21 and compact/hidden pages. Current wide page10 wraps car IDs; page21 still has only explanatory text, retaining the documented G07 limitation. No hash guard weakened, sample edited or legacy renderer changed. Current Dart/lib/test/integration diff from c976b97 is empty; later changes are diagnostic helpers/evidence only, so full132/native1/analyzer results correspond to built app source.
+
+Second review-pack execution exposed missing pathlib.Path import in the new assembly helper; fixed import, preserved its incomplete own folder, rerun required. Pipeline now stops immediately when assembly exits nonzero, so no incomplete pack is accepted or audited as successful. No application source/artifact change.
+
+
+Final complete review assembly:91 hashed files; candidate+review/expanded-workbook audit803 entries/zero findings (gui12-review-audit-final.log). Current9 PDF/XLSX pairs represented:8 independently re-inspected fixture pairs plus1 actual browser download pair. Screenshots/results, numeric comparisons, failed500/57014 evidence, glossary and exact artifact hashes included. Incomplete packs remain only in ignored preserved-artifacts. Available for LOCAL GUI review with the open gates above; not fully release/review-ready. No Dart source change after the executed132Flutter/native1/analyzer verification; app bytes compiled from c976b97. Final diagnostic helper/evidence commit separate from compiled source. Candidate installer never executed; no push/merge/deployment/scheduling. Test requests stayed pinned to local60321, with the separately documented installed-launcher startup uncertainty.
+
+Final helper checks: local-boundary4/material-scanner3/transactional-SQL-harness3 unit tests PASS; four browser helpers Node syntax clean; Python helpers compile. Source/history393tracked+1intended new helper/869historical blobs/5997ignored local files, zero findings. git diff --check clean; no app/lib/test/integration difference from compiled c976b97. Main verified separately, not merged or pushed.

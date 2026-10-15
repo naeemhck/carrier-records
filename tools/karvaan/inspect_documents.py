@@ -6,7 +6,8 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools/.local/python_packages'))
 from pypdf import PdfReader
 from openpyxl import load_workbook
-folder=ROOT/'tools/.local/karvaan-documents'
+folder=(ROOT/sys.argv[1]).resolve() if len(sys.argv)>1 else ROOT/'tools/.local/karvaan-documents'
+if not folder.is_relative_to((ROOT/'tools/.local').resolve()) or folder.is_relative_to((ROOT/'tools/.local/candidates').resolve()) or not folder.is_dir():raise RuntimeError('Only existing ignored synthetic evidence folders allowed')
 poppler=Path('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin/pdftoppm.exe')
 report=[]
 for path in sorted(folder.glob('*.pdf')):
