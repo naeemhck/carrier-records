@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/reports/report_repository.dart';
 import 'package:carrier_records/features/trips/trip_draft.dart';
 import 'package:carrier_records/features/trips/trip_lifecycle.dart';
@@ -16,12 +17,7 @@ import 'bilingual_finders.dart';
 import 'trip_workspace_test.dart' show FakeMasters, FakeTrips;
 import 'trip_lifecycle_test.dart' show LifecycleFake, journey;
 
-ThemeData candidateTheme() => ThemeData(
-  useMaterial3: true,
-  fontFamily: 'NotoSans',
-  fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
-  appBarTheme: const AppBarTheme(toolbarHeight: 88),
-);
+ThemeData candidateTheme() => KarvaanDesign.theme();
 
 void karvaanScreenTests({bool native = false}) {
   void strictHits() {
@@ -144,6 +140,8 @@ void karvaanScreenTests({bool native = false}) {
           await tester.sendKeyEvent(LogicalKeyboardKey.escape);
           await tester.pumpAndSettle();
           expect(find.text(ownedMessage('LOADED').ur), findsNothing);
+          await tester.tap(find.byKey(const ValueKey('trip-step-2')));
+          await tester.pumpAndSettle();
           final review = find.text(TripStrings.save);
           await tester.scrollUntilVisible(
             review,

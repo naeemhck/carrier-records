@@ -543,6 +543,66 @@ class TripEditor extends StatefulWidget {
 
 class _TripEditorState extends State<TripEditor> {
   TripDraft get d => widget.draft;
+  int step = 0;
+  void moveStep(int value) {
+    if (busy) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => step = value);
+  }
+
+  Widget reviewSummary() {
+    Widget totals;
+    try {
+      final values = d.previewTotals();
+      totals = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final key in [
+            'customer_charge',
+            'commission',
+            'owner_entitlement',
+          ])
+            BilingualText(
+              L10n.pkr274c89.withValues([
+                ownedMessage(TripStrings.labels[key]),
+                values[key],
+              ]),
+            ),
+        ],
+      );
+    } catch (e) {
+      totals = BilingualOwnedText(tripError(e));
+    }
+    return KarvaanSection(
+      title: L10n.reviewStep,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(d.registration ?? TripStrings.none),
+          Text(
+            '${widget.offices.where((o) => o['id'] == d.origin).firstOrNull?['name'] ?? TripStrings.none} → ${widget.offices.where((o) => o['id'] == d.destination).firstOrNull?['name'] ?? d.destinationName ?? TripStrings.none}',
+          ),
+          Text(d.driverName ?? TripStrings.none),
+          Text(d.planned),
+          BilingualOwnedText(d.kind),
+          Text(d.notes),
+          for (final c in d.consignments) ...[
+            const Divider(),
+            Text(c.customerName ?? TripStrings.none),
+            BilingualText(L10n.carCount04a594.withValues([c.count])),
+            Text(c.notes),
+            for (final car in c.cars) Text(car.identifier),
+          ],
+          const Divider(),
+          totals,
+          const BilingualText(
+            L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+          ),
+        ],
+      ),
+    );
+  }
+
   bool busy = false, conflicted = false;
   String? error, pendingBase, pendingRequest;
   Map<String, dynamic>? pendingPayload;
@@ -963,195 +1023,311 @@ class _TripEditorState extends State<TripEditor> {
       appBar: AppBar(
         toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
         title: BilingualText(
-          (d.number != null ? Bilingual.data(d.number) : L10n.newDraft),
+          d.number != null ? Bilingual.data(d.number) : L10n.newDraft,
         ),
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Column(
             children: [
-              const BilingualText(
-                L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
-              ),
-              if (d.parent != null)
-                BilingualText(
-                  L10n.linkedReturnOf.withValues([d.parentNumber ?? d.parent]),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  spacing: 8,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < 3; i++)
+                      Expanded(
+                        child: OutlinedButton(
+                          key: ValueKey('trip-step-$i'),
+                          onPressed: busy ? null : () => moveStep(i),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.all(8),
+                            backgroundColor: step == i
+                                ? const Color(0xFFEAF4ED)
+                                : Colors.white,
+                          ),
+                          child: BilingualText(
+                            [
+                              L10n.journeyStep,
+                              L10n.consignmentsStep,
+                              L10n.reviewStep,
+                            ][i],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              picker(
-                'vehicle',
-                d.registration,
-                () => pick('vehicle', MasterKind.vehicle),
               ),
-              BilingualText(
-                L10n.labelValuesfb62fe.withValues([
-                  ownedMessage(TripStrings.labels['owner']),
-                  d.ownerName ?? L10n.reconciledOnSave,
-                ]),
-              ),
-              picker(
-                'driver',
-                d.driverName ??
-                    (d.driver == null ? null : TripStrings.defaultDriver),
-                () => pick('driver', MasterKind.party, role: 'DRIVER'),
-                clear: () {
-                  d.driver = null;
-                  d.driverName = null;
-                },
-              ),
-              DropdownButtonFormField<String>(
-                isDense: false,
-                isExpanded: true,
-                itemHeight: null,
-                key: ValueKey('origin:${d.origin}'),
-                initialValue: widget.offices.any((o) => o['id'] == d.origin)
-                    ? d.origin
-                    : null,
-                decoration: bilingualDecoration(
-                  context,
-                  InputDecoration(
-                    label: BilingualOwnedCaption(TripStrings.labels['origin']),
-                  ),
-                ),
-                items: [
-                  for (final o in widget.offices)
-                    DropdownMenuItem(
-                      value: o['id'] as String,
-                      child: Text(o['name'] as String),
-                    ),
-                ],
-                onChanged: busy
-                    ? null
-                    : (v) async {
-                        setState(() => d.origin = v);
-                        if (d.version == 0) await defaults();
-                      },
-              ),
-              picker(
-                'destination',
-                widget.offices
-                        .where((o) => o['id'] == d.destination)
-                        .map((o) => o['name'])
-                        .firstOrNull
-                        ?.toString() ??
-                    d.destinationName ??
-                    (d.destination == null ? null : 'Selected office'),
-                () => pick('destination', MasterKind.office),
-              ),
-              picker(
-                'route',
-                d.routeName,
-                () => pick('route', MasterKind.route),
-                clear: () {
-                  d.route = null;
-                  d.routeName = null;
-                  d.suggestedFare = null;
-                },
-              ),
-              field('planned', d.planned, (v) => d.planned = v),
-              choice('load', d.kind, ['LOADED', 'EMPTY'], (v) {
-                if (v == 'EMPTY' && d.consignments.isNotEmpty) {
-                  error = TripStrings.emptySwitch;
-                } else if (v != null) {
-                  d.kind = v;
-                }
-              }),
-              field('notes', d.notes, (v) => d.notes = v),
-              const Divider(),
-              const BilingualText(L10n.pickupDropStops),
-              for (final s in d.stops)
-                Card(
-                  key: ValueKey(s.id),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      children: [
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration:
+                      MediaQuery.disableAnimationsOf(context) ||
+                          MediaQuery.accessibleNavigationOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 250),
+                  child: ListView(
+                    key: ValueKey('trip-step-content-$step'),
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      if (step == 0) ...[
+                        const BilingualText(
+                          L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+                        ),
+                        if (d.parent != null)
+                          BilingualText(
+                            L10n.linkedReturnOf.withValues([
+                              d.parentNumber ?? d.parent,
+                            ]),
+                          ),
+                        picker(
+                          'vehicle',
+                          d.registration,
+                          () => pick('vehicle', MasterKind.vehicle),
+                        ),
                         BilingualText(
-                          L10n.stop.withValues([d.stops.indexOf(s) + 1]),
+                          L10n.labelValuesfb62fe.withValues([
+                            ownedMessage(TripStrings.labels['owner']),
+                            d.ownerName ?? L10n.reconciledOnSave,
+                          ]),
                         ),
-                        choice(
-                          '${s.id}:kind',
-                          s.kind,
-                          ['PICKUP', 'DROP', 'OTHER'],
-                          (v) {
-                            if (v != null) s.kind = v;
+                        picker(
+                          'driver',
+                          d.driverName ??
+                              (d.driver == null
+                                  ? null
+                                  : TripStrings.defaultDriver),
+                          () =>
+                              pick('driver', MasterKind.party, role: 'DRIVER'),
+                          clear: () {
+                            d.driver = null;
+                            d.driverName = null;
                           },
-                          label: 'Stop kind',
                         ),
-                        field(
-                          '${s.id}:address',
-                          s.address,
-                          (v) => s.address = v,
-                          label: TripStrings.address,
-                        ),
-                        Wrap(
-                          children: [
-                            TextButton(
-                              onPressed: busy || d.stops.indexOf(s) == 0
-                                  ? null
-                                  : () => setState(() {
-                                      final i = d.stops.indexOf(s);
-                                      d.stops.removeAt(i);
-                                      d.stops.insert(i - 1, s);
-                                    }),
-                              child: const BilingualCaption(L10n.moveUp),
+                        DropdownButtonFormField<String>(
+                          isDense: false,
+                          isExpanded: true,
+                          itemHeight: null,
+                          key: ValueKey('origin:${d.origin}'),
+                          initialValue:
+                              widget.offices.any((o) => o['id'] == d.origin)
+                              ? d.origin
+                              : null,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualOwnedCaption(
+                                TripStrings.labels['origin'],
+                              ),
                             ),
-                            TextButton(
-                              onPressed:
-                                  busy ||
-                                      d.stops.indexOf(s) == d.stops.length - 1
-                                  ? null
-                                  : () => setState(() {
-                                      final i = d.stops.indexOf(s);
-                                      d.stops.removeAt(i);
-                                      d.stops.insert(i + 1, s);
-                                    }),
-                              child: const BilingualCaption(L10n.moveDown),
-                            ),
-                            TextButton(
-                              onPressed: busy
-                                  ? null
-                                  : () => setState(() {
-                                      if (d.stopUsed(s.id)) {
-                                        error = TripStrings.stopInUse;
-                                      } else {
-                                        d.stops.remove(s);
-                                      }
-                                    }),
-                              child: const BilingualCaption(L10n.remove),
-                            ),
+                          ),
+                          items: [
+                            for (final o in widget.offices)
+                              DropdownMenuItem(
+                                value: o['id'] as String,
+                                child: Text(o['name'] as String),
+                              ),
                           ],
+                          onChanged: busy
+                              ? null
+                              : (v) async {
+                                  setState(() => d.origin = v);
+                                  if (d.version == 0) await defaults();
+                                },
                         ),
+                        picker(
+                          'destination',
+                          widget.offices
+                                  .where((o) => o['id'] == d.destination)
+                                  .map((o) => o['name'])
+                                  .firstOrNull
+                                  ?.toString() ??
+                              d.destinationName ??
+                              (d.destination == null
+                                  ? null
+                                  : 'Selected office'),
+                          () => pick('destination', MasterKind.office),
+                        ),
+                        picker(
+                          'route',
+                          d.routeName,
+                          () => pick('route', MasterKind.route),
+                          clear: () {
+                            d.route = null;
+                            d.routeName = null;
+                            d.suggestedFare = null;
+                          },
+                        ),
+                        field('planned', d.planned, (v) => d.planned = v),
+                        choice('load', d.kind, ['LOADED', 'EMPTY'], (v) {
+                          if (v == 'EMPTY' && d.consignments.isNotEmpty) {
+                            error = TripStrings.emptySwitch;
+                          } else if (v != null) {
+                            d.kind = v;
+                          }
+                        }),
+                        field('notes', d.notes, (v) => d.notes = v),
+
+                        if (d.version > 0)
+                          field('reason', d.reason, (v) => d.reason = v),
                       ],
-                    ),
+                      if (step == 1) ...[
+                        const BilingualText(L10n.pickupDropStops),
+                        for (final s in d.stops)
+                          Card(
+                            key: ValueKey(s.id),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                children: [
+                                  BilingualText(
+                                    L10n.stop.withValues([
+                                      d.stops.indexOf(s) + 1,
+                                    ]),
+                                  ),
+                                  choice(
+                                    '${s.id}:kind',
+                                    s.kind,
+                                    ['PICKUP', 'DROP', 'OTHER'],
+                                    (v) {
+                                      if (v != null) s.kind = v;
+                                    },
+                                    label: 'Stop kind',
+                                  ),
+                                  field(
+                                    '${s.id}:address',
+                                    s.address,
+                                    (v) => s.address = v,
+                                    label: TripStrings.address,
+                                  ),
+                                  Wrap(
+                                    children: [
+                                      TextButton(
+                                        onPressed:
+                                            busy || d.stops.indexOf(s) == 0
+                                            ? null
+                                            : () => setState(() {
+                                                final i = d.stops.indexOf(s);
+                                                d.stops.removeAt(i);
+                                                d.stops.insert(i - 1, s);
+                                              }),
+                                        child: const BilingualCaption(
+                                          L10n.moveUp,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed:
+                                            busy ||
+                                                d.stops.indexOf(s) ==
+                                                    d.stops.length - 1
+                                            ? null
+                                            : () => setState(() {
+                                                final i = d.stops.indexOf(s);
+                                                d.stops.removeAt(i);
+                                                d.stops.insert(i + 1, s);
+                                              }),
+                                        child: const BilingualCaption(
+                                          L10n.moveDown,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: busy
+                                            ? null
+                                            : () => setState(() {
+                                                if (d.stopUsed(s.id)) {
+                                                  error = TripStrings.stopInUse;
+                                                } else {
+                                                  d.stops.remove(s);
+                                                }
+                                              }),
+                                        child: const BilingualCaption(
+                                          L10n.remove,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        TextButton(
+                          onPressed: busy
+                              ? null
+                              : () => setState(() => d.stops.add(DraftStop())),
+                          child: const BilingualCaption(L10n.addStop),
+                        ),
+                        for (final c in d.consignments) consignment(c),
+                        if (d.kind == 'LOADED')
+                          TextButton(
+                            onPressed: busy
+                                ? null
+                                : () => setState(
+                                    () =>
+                                        d.consignments.add(DraftConsignment()),
+                                  ),
+                            child: const BilingualCaption(L10n.addConsignment),
+                          ),
+                      ],
+                      if (step == 2) reviewSummary(),
+                      if (busy) const LinearProgressIndicator(),
+                    ],
                   ),
                 ),
-              TextButton(
-                onPressed: busy
-                    ? null
-                    : () => setState(() => d.stops.add(DraftStop())),
-                child: const BilingualCaption(L10n.addStop),
-              ),
-              for (final c in d.consignments) consignment(c),
-              if (d.kind == 'LOADED')
-                TextButton(
-                  onPressed: busy
-                      ? null
-                      : () => setState(
-                          () => d.consignments.add(DraftConsignment()),
-                        ),
-                  child: const BilingualCaption(L10n.addConsignment),
-                ),
-              if (d.version > 0) field('reason', d.reason, (v) => d.reason = v),
-              if (error != null)
-                BilingualOwnedText(error!, key: const Key('trip-error')),
-              if (busy) const LinearProgressIndicator(),
-              FilledButton(
-                onPressed: busy || conflicted ? null : save,
-                child: const BilingualCaption(L10n.reviewAndSaveDraft),
               ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: KarvaanGlass(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (error != null)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 160),
+                      child: SingleChildScrollView(
+                        child: BilingualOwnedText(
+                          error!,
+                          key: const Key('trip-error'),
+                        ),
+                      ),
+                    ),
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    spacing: 16,
+                    runSpacing: 8,
+                    children: [
+                      if (step > 0)
+                        OutlinedButton(
+                          key: const Key('trip-previous'),
+                          onPressed: busy ? null : () => moveStep(step - 1),
+                          child: const BilingualCaption(L10n.previous),
+                        ),
+                      if (step < 2)
+                        FilledButton(
+                          key: const Key('trip-next'),
+                          onPressed: busy ? null : () => moveStep(step + 1),
+                          child: const BilingualCaption(L10n.next),
+                        )
+                      else
+                        FilledButton(
+                          onPressed: busy || conflicted ? null : save,
+                          child: const BilingualCaption(
+                            L10n.reviewAndSaveDraft,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

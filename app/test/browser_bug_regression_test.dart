@@ -81,6 +81,11 @@ void main() {
           ),
         ),
       );
+      await tester.scrollUntilVisible(
+        find.widgetWithText(ListTile, 'Destination office: None'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(
         find.descendant(
           of: find.widgetWithText(ListTile, 'Destination office: None'),

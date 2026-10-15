@@ -427,7 +427,7 @@ Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, ini
 |---|---|---|
 | G01 | Shared tokens, stacked labels, persistent permitted navigation/account | DONE —119 Flutter checks and clean app analyzer; native integration remains G10 |
 | G02 | Scoped trips list hierarchy and lifecycle badges | DONE — existing filters/pagination/scope regressions pass; no absent authoritative amounts fabricated |
-| G03 | Journey/Consignments/Review editor, retained inputs and guards | TODO |
+| G03 | Journey/Consignments/Review editor, retained inputs and guards | DONE —24 affected Flutter checks, clean analyzer; widget visual inspection at320/1280, native evidence remains G10 |
 | G04 | Trip summary and separate operational/financial tabs | TODO |
 | G05 | Expense entry grouping | TODO |
 | G06 | Money/expense list presentation | TODO |

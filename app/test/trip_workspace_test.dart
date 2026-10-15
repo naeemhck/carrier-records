@@ -165,6 +165,8 @@ void main() {
         ),
       );
       Future<void> save({bool review = true}) async {
+        await tester.tap(find.byKey(const ValueKey('trip-step-2')));
+        await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
           find.text(TripStrings.save),
           400,
@@ -188,10 +190,17 @@ void main() {
       expect(repository.requests[0], repository.requests[1]);
       expect(repository.bodies[0], repository.bodies[1]);
       expect(repository.reviews, 1);
+      await tester.tap(find.byKey(const ValueKey('trip-step-0')));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('notes:')),
-        -400,
-        scrollable: find.byType(Scrollable).first,
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('trip-step-content-0')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       await tester.enterText(
         find.byKey(const ValueKey('notes:')),
@@ -218,6 +227,8 @@ void main() {
           ),
         ),
       );
+      await tester.tap(find.byKey(const ValueKey('trip-step-2')));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.text(TripStrings.save),
         400,
@@ -245,10 +256,17 @@ void main() {
             .onPressed,
         isNull,
       );
+      await tester.tap(find.byKey(const ValueKey('trip-step-0')));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('notes:')),
-        -400,
-        scrollable: find.byType(Scrollable).first,
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('trip-step-content-0')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       expect(find.text('Keep this entry'), findsOneWidget);
     },
