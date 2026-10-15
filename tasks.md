@@ -437,3 +437,6 @@ Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, ini
 | G10 | Full regressions, actual visual/export/performance evidence and review candidate | IN PROGRESS — candidate12 built/audited639 entries;132 Flutter +native framework check pass; local trip/retry/role checks pass;2 initial report timeouts retained, later n5 trace/recovery passes; local review pack91 hashed files/audit803 entries zero findings, actual browser PDF/XLSX verified; OS input/device/template/performance limits remain |
 
 Existing monthly summary5.871856s FAIL is separately tracked; T19 acceptance/exceptions unchanged; T20 TODO. No push/merge/install/deploy/hosted access.
+
+
+Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner; remaining groups pending (docs/karvaan-guided-review.md). G07/G10/U06/U07 remain IN PROGRESS. Fresh five-user50+50 run: two summary57014 failures, summaryp957.453s and screenp953.977s; zero-error/5s/2s gates unresolved. Frozenv2 orphan-page defect reproduced, unchanged. T19 dispositions preserved; T20 TODO.
