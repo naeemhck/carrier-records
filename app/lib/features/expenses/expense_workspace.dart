@@ -323,6 +323,8 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                   },
             child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
           ),
+        if (!busy && error == null && rows.isEmpty)
+          const BilingualText(L10n.noRecordsFound),
         for (final row in rows)
           Card(
             child: Padding(
@@ -331,13 +333,16 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BilingualText(
-                    L10n.expenseListIdentity.withValues([
+                    L10n.labelValuesfb62fe.withValues([
                       row['expense_date'],
-                      row['amount'],
                       row['trip_id'] == null
                           ? L10n.standaloneMaintenance
                           : L10n.tripCost,
                     ]),
+                  ),
+                  KarvaanAmount(
+                    label: ownedMessage('Expense amount (PKR)'),
+                    value: row['amount'] as String,
                   ),
                   Text((row['notes']).toString()),
                   BilingualOwnedText(row['funding_source']),

@@ -148,6 +148,38 @@ class KarvaanSection extends StatelessWidget {
   );
 }
 
+/// Displays an existing canonical amount; deliberately performs no arithmetic.
+class KarvaanAmount extends StatelessWidget {
+  const KarvaanAmount({super.key, required this.label, required this.value});
+  final Bilingual label;
+  final String value;
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFFEAF4ED),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        BilingualText(label),
+        const SizedBox(height: 8),
+        Text(
+          'PKR $value',
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.right,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontFeatures: [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 class TripStatusBadge extends StatelessWidget {
   const TripStatusBadge(this.state, {super.key});
   final String state;

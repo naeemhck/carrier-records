@@ -39,3 +39,9 @@ Initial header used intrinsic child height71px with declared96px sliver extent, 
 Reordered original widgets/controllers/callbacks into four opaque sections: What(category/date/amount/notes), Whose money(payer/cost bearer/funding/explicit cash-offset claims), Where(vehicle/optional trip/office), Proof(private receipt/status). Review, request UUID, posting, conflict and independent attachment retry code are unchanged. No success before commit; personal owner funding remains distinct from settlement.
 
 First12 PASS/2 failures were old viewport assumptions: tests scrolled backwards from0 searching for vehicle, formerly first. Updated selectors to reset scroll and locate the same fields in their new groups; retained all original money/request/upload/scope assertions. Final **16 PASS**,24s, including explicit new320/1280-at200% group coverage and existing lost response, receipt-only retry, claim/accounting and revoked-scope checks. Analyzer No issues found (gui-expense-analyze.log). No native/device claim.
+
+## G06 money and expense lists
+
+Added an opaque labelled amount component with Latin PKR text, right-aligned tabular digits and exact original string values. Expense rows distinguish standalone/trip costs and retained historical replacements; empty scope has a useful message. Money allocations group each authorized trip's existing backend purpose/party balances; existing accountLabel/displayBalance meaning and signs unchanged. Customer debt, custody, owner settlement, brokerage and reimbursement remain separate rows. No accounting calculations in the new component and no totals derived from paginated lists. Money entry explicitly retains its incomplete scoped-trip warning.
+
+18 affected Flutter checks PASS27s (gui-lists-tests.log); analyzer No issues found (gui-lists-analyze.log). Financial, owner-funding, exact allocation, retry/claim, scope and trip-edit checks retained. No new query/repository/model/backend/export change.

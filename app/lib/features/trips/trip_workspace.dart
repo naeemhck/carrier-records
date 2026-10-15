@@ -207,6 +207,10 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           ],
         ),
         const SizedBox(height: 24),
+        if (widget.moneyMode)
+          const BilingualText(
+            L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
+          ),
         TextField(
           controller: search,
           decoration: bilingualDecoration(

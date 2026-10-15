@@ -2,6 +2,8 @@ import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
 
+import '../../app/karvaan_design.dart';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -552,23 +554,30 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
               }),
             ),
           BilingualOwnedText(totals()),
-          for (final entry in balances.entries) ...[
-            Text(
-              rows.firstWhere((r) => r.trip == entry.key).number,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            for (final b in entry.value['balances'] as List)
-              BilingualText(
-                L10n.pkr8fe30e.withValues([
-                  ownedMessage(accountLabel(b['account_purpose'] as String)),
-                  partyLabel(b['party_id'] as String),
-                  displayBalance(
-                    b['account_purpose'] as String,
-                    b['balance'] as String,
-                  ),
-                ]),
+          for (final entry in balances.entries)
+            KarvaanSection(
+              title: Bilingual.data(
+                rows.firstWhere((r) => r.trip == entry.key).number,
               ),
-          ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final b in entry.value['balances'] as List)
+                    KarvaanAmount(
+                      label: L10n.labelValuesfb62fe.withValues([
+                        ownedMessage(
+                          accountLabel(b['account_purpose'] as String),
+                        ),
+                        Bilingual.data(partyLabel(b['party_id'] as String)),
+                      ]),
+                      value: displayBalance(
+                        b['account_purpose'] as String,
+                        b['balance'] as String,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           for (final row in rows)
             Card(
               child: Padding(

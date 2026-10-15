@@ -430,7 +430,7 @@ Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, ini
 | G03 | Journey/Consignments/Review editor, retained inputs and guards | DONE —24 affected Flutter checks, clean analyzer; widget visual inspection at320/1280, native evidence remains G10 |
 | G04 | Trip summary and separate operational/financial tabs | DONE presentation —20 checks/analyzer clean; trip-scoped expense feed documented as backend dependency, no global decorative query |
 | G05 | Expense entry grouping | DONE —16 affected checks, clean analyzer; What/Whose money/Where/Proof at320/1280 and200% |
-| G06 | Money/expense list presentation | TODO |
+| G06 | Money/expense list presentation | DONE —18 checks/analyzer clean; labelled canonical balances/tabular amounts, no row-derived totals |
 | G07 | Reports/documents/export presentation and legacy preservation | TODO |
 | G08 | Masters/imports/backups/auth consistency | TODO |
 | G09 | Keyboard/overlay/picker interaction verification | TODO |
