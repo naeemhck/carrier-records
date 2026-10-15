@@ -152,150 +152,152 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680),
-            child: ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                if (p == null) ...[
-                  const BilingualText(
-                    L10n.staffSignIn,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  const BilingualText(L10n.accountInstruction),
-                  TextField(
-                    controller: username,
-                    enabled: !busy,
-                    autocorrect: false,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(label: BilingualCaption(L10n.username)),
+            child: Card(
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  if (p == null) ...[
+                    const BilingualText(
+                      L10n.staffSignIn,
+                      style: TextStyle(fontSize: 24),
                     ),
-                  ),
-                  TextField(
-                    controller: password,
-                    enabled: !busy,
-                    obscureText: true,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(label: BilingualCaption(L10n.password)),
+                    const BilingualText(L10n.accountInstruction),
+                    TextField(
+                      controller: username,
+                      enabled: !busy,
+                      autocorrect: false,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(label: BilingualCaption(L10n.username)),
+                      ),
                     ),
-                    onSubmitted: (_) {
-                      if (!busy) {
-                        run(
-                          () => widget.session.signIn(
-                            username.text,
-                            password.text,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: busy
-                        ? null
-                        : () => run(
+                    TextField(
+                      controller: password,
+                      enabled: !busy,
+                      obscureText: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(label: BilingualCaption(L10n.password)),
+                      ),
+                      onSubmitted: (_) {
+                        if (!busy) {
+                          run(
                             () => widget.session.signIn(
                               username.text,
                               password.text,
                             ),
-                          ),
-                    child: const BilingualCaption(L10n.signIn),
-                  ),
-                ] else if (p['must_change_password'] == true) ...[
-                  const BilingualText(
-                    L10n.changeYourTemporaryPassword,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  const BilingualText(
-                    L10n.chooseANewPasswordOfToCharactersSignIn,
-                  ),
-                  TextField(
-                    controller: password,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.currentPassword),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: busy
+                          ? null
+                          : () => run(
+                              () => widget.session.signIn(
+                                username.text,
+                                password.text,
+                              ),
+                            ),
+                      child: const BilingualCaption(L10n.signIn),
+                    ),
+                  ] else if (p['must_change_password'] == true) ...[
+                    const BilingualText(
+                      L10n.changeYourTemporaryPassword,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    const BilingualText(
+                      L10n.chooseANewPasswordOfToCharactersSignIn,
+                    ),
+                    TextField(
+                      controller: password,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(L10n.currentPassword),
+                        ),
                       ),
                     ),
-                  ),
-                  TextField(
-                    controller: next,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.newPassword),
+                    TextField(
+                      controller: next,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(L10n.newPassword),
+                        ),
                       ),
                     ),
-                  ),
-                  TextField(
-                    controller: confirm,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.confirmNewPassword),
+                    TextField(
+                      controller: confirm,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(L10n.confirmNewPassword),
+                        ),
                       ),
                     ),
-                  ),
-                  FilledButton(
-                    onPressed: busy
-                        ? null
-                        : () => run(() async {
-                            if (next.text != confirm.text ||
-                                next.text.length < 12) {
-                              throw const FormatException();
-                            }
-                            await widget.session.changePassword(
-                              password.text,
-                              next.text,
-                            );
-                          }),
-                    child: const BilingualCaption(L10n.changePassword),
-                  ),
-                ] else ...[
-                  BilingualText(
-                    L10n.signedInAs.withValues([p['display_name']]),
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  BilingualText(
-                    (p['role'] == 'ADMIN'
-                        ? L10n.administratorAllOffices
-                        : L10n.assignedOffices.withValues([
-                            (p['offices'] as List)
-                                .map((o) => o['name'])
-                                .join(', '),
-                          ])),
-                  ),
-                  const SizedBox(height: 16),
-                  if (p['role'] == 'ADMIN')
-                    AccountsPanel(session: widget.session),
-                  OutlinedButton(
-                    onPressed: busy
-                        ? null
-                        : () => run(() async {
-                            await showDialog<void>(
-                              context: context,
-                              builder: (context) =>
-                                  PasswordDialog(session: widget.session),
-                            );
-                          }),
-                    child: const BilingualCaption(L10n.changeMyPassword),
-                  ),
+                    FilledButton(
+                      onPressed: busy
+                          ? null
+                          : () => run(() async {
+                              if (next.text != confirm.text ||
+                                  next.text.length < 12) {
+                                throw const FormatException();
+                              }
+                              await widget.session.changePassword(
+                                password.text,
+                                next.text,
+                              );
+                            }),
+                      child: const BilingualCaption(L10n.changePassword),
+                    ),
+                  ] else ...[
+                    BilingualText(
+                      L10n.signedInAs.withValues([p['display_name']]),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    BilingualText(
+                      (p['role'] == 'ADMIN'
+                          ? L10n.administratorAllOffices
+                          : L10n.assignedOffices.withValues([
+                              (p['offices'] as List)
+                                  .map((o) => o['name'])
+                                  .join(', '),
+                            ])),
+                    ),
+                    const SizedBox(height: 16),
+                    if (p['role'] == 'ADMIN')
+                      AccountsPanel(session: widget.session),
+                    OutlinedButton(
+                      onPressed: busy
+                          ? null
+                          : () => run(() async {
+                              await showDialog<void>(
+                                context: context,
+                                builder: (context) =>
+                                    PasswordDialog(session: widget.session),
+                              );
+                            }),
+                      child: const BilingualCaption(L10n.changeMyPassword),
+                    ),
+                  ],
+                  if (busy) const LinearProgressIndicator(),
+                  if (message ?? widget.session.error case final String error)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: BilingualOwnedText(error),
+                    ),
                 ],
-                if (busy) const LinearProgressIndicator(),
-                if (message ?? widget.session.error case final String error)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: BilingualOwnedText(error),
-                  ),
-              ],
+              ),
             ),
           ),
         ),

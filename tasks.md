@@ -432,7 +432,7 @@ Baseline: update/karvaan-bilingual de6be4e3ae6b146bdc8a96cf5198424b56b5bf8d, ini
 | G05 | Expense entry grouping | DONE —16 affected checks, clean analyzer; What/Whose money/Where/Proof at320/1280 and200% |
 | G06 | Money/expense list presentation | DONE —18 checks/analyzer clean; labelled canonical balances/tabular amounts, no row-derived totals |
 | G07 | Reports/documents/export presentation and legacy preservation | IN PROGRESS — screens/23 checks/8PDF+8XLSX audit pass; existing v2 continuation-only last-page issue and any new-template registration documented, frozen renderers preserved |
-| G08 | Masters/imports/backups/auth consistency | TODO |
+| G08 | Masters/imports/backups/auth consistency | DONE —24 checks/analyzer clean; Masters142px overflow reproduced then fixed at320/200% |
 | G09 | Keyboard/overlay/picker interaction verification | TODO |
 | G10 | Full regressions, actual visual/export/performance evidence and review candidate | TODO |
 

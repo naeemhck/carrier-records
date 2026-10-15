@@ -5,6 +5,9 @@ import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../app/karvaan_design.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../expenses/expense_repository.dart';
@@ -312,53 +315,63 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
         const BilingualText(L10n.templateVersionNewRecordsOnlyEnterDatesAsYYYY),
         if (busy) const LinearProgressIndicator(),
         if (error != null) BilingualOwnedText(error!),
-        DropdownButtonFormField<String>(
-          isDense: false,
-          isExpanded: true,
-          itemHeight: null,
-          initialValue: office,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(label: BilingualCaption(L10n.recordingOffice)),
-          ),
-          items: [
-            for (final o in importOffices)
-              DropdownMenuItem(
-                value: o['code'] as String,
-                child: Text('${o['name']} (${o['code']})'),
+        KarvaanSection(
+          title: L10n.excelImports,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DropdownButtonFormField<String>(
+                isDense: false,
+                isExpanded: true,
+                itemHeight: null,
+                initialValue: office,
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualCaption(L10n.recordingOffice),
+                  ),
+                ),
+                items: [
+                  for (final o in importOffices)
+                    DropdownMenuItem(
+                      value: o['code'] as String,
+                      child: Text('${o['name']} (${o['code']})'),
+                    ),
+                ],
+                onChanged: busy
+                    ? null
+                    : (v) => setState(() {
+                        office = v;
+                        command = null;
+                        preview = null;
+                        result = null;
+                      }),
               ),
-          ],
-          onChanged: busy
-              ? null
-              : (v) => setState(() {
-                  office = v;
-                  command = null;
-                  preview = null;
-                  result = null;
-                }),
-        ),
-        Wrap(
-          spacing: 8,
-          children: [
-            TextButton(
-              onPressed: busy || fields.isEmpty ? null : template,
-              child: const BilingualCaption(L10n.downloadTemplate),
-            ),
-            TextButton(
-              onPressed: busy || office == null ? null : choose,
-              child: const BilingualCaption(L10n.chooseXLSX),
-            ),
-            TextButton(
-              onPressed:
-                  busy ||
-                      command == null ||
-                      localErrors.isNotEmpty ||
-                      result != null
-                  ? null
-                  : validate,
-              child: const BilingualCaption(L10n.validateAndPreview),
-            ),
-          ],
+              Wrap(
+                spacing: 8,
+                children: [
+                  TextButton(
+                    onPressed: busy || fields.isEmpty ? null : template,
+                    child: const BilingualCaption(L10n.downloadTemplate),
+                  ),
+                  TextButton(
+                    onPressed: busy || office == null ? null : choose,
+                    child: const BilingualCaption(L10n.chooseXLSX),
+                  ),
+                  TextButton(
+                    onPressed:
+                        busy ||
+                            command == null ||
+                            localErrors.isNotEmpty ||
+                            result != null
+                        ? null
+                        : validate,
+                    child: const BilingualCaption(L10n.validateAndPreview),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         for (final e in localErrors)
           BilingualText(L10n.row.withValues([e['kind'], e['row'], e['code']])),

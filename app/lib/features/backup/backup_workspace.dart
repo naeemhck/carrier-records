@@ -8,6 +8,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+
+import '../../app/karvaan_design.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BackupCommands {
@@ -247,18 +250,21 @@ class _BackupWorkspaceState extends State<BackupWorkspace> {
         if (busy) const LinearProgressIndicator(),
         if (message != null) BilingualOwnedText(message!),
         if (status != null) BackupSummary(status: status!),
-        Wrap(
-          spacing: 8,
-          children: [
-            FilledButton(
-              onPressed: busy ? null : manual,
-              child: const BilingualCaption(L10n.runManualWindowsBackup),
-            ),
-            TextButton(
-              onPressed: busy ? null : load,
-              child: const BilingualCaption(L10n.refreshVerifiedStatus),
-            ),
-          ],
+        KarvaanSection(
+          title: L10n.administratorBackups,
+          child: Wrap(
+            spacing: 8,
+            children: [
+              FilledButton(
+                onPressed: busy ? null : manual,
+                child: const BilingualCaption(L10n.runManualWindowsBackup),
+              ),
+              TextButton(
+                onPressed: busy ? null : load,
+                child: const BilingualCaption(L10n.refreshVerifiedStatus),
+              ),
+            ],
+          ),
         ),
         const BilingualText(
           L10n.privilegedCredentialsAndEncryptionKeysAreConfiguredInThe,

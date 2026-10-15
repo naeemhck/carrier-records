@@ -97,116 +97,113 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
       toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
       title: const BilingualText(L10n.companyAndMasterRecords),
     ),
-    body: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
+    body: ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Wrap(
+          spacing: 8,
+          children: [
+            for (final item in MasterKind.values)
+              ChoiceChip(
+                label: BilingualOwnedText(item.label),
+                selected: item == kind,
+                onSelected: (_) {
+                  kind = item;
+                  offset = 0;
+                  search.clear();
+                  reload();
+                },
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (kind == MasterKind.company)
+          const BilingualText(
+            L10n.enterYourActualCompanyIdentitySaveItBeforeIssuing,
+          ),
+        if (kind == MasterKind.office)
+          const BilingualText(
+            L10n.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual,
+          ),
+        if (kind == MasterKind.category)
+          const BilingualText(
+            L10n.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres,
+          ),
+        if (kind == MasterKind.vehicle || kind == MasterKind.route)
+          const BilingualText(L10n.ownerChangesApplyToNewTripsSavedTripOwners),
+        if (kind != MasterKind.company) ...[
+          TextField(
+            controller: search,
+            maxLength: 100,
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.searchNamesCodes),
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
+            onSubmitted: (_) {
+              offset = 0;
+              reload();
+            },
+          ),
           Wrap(
-            spacing: 8,
+            spacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              for (final item in MasterKind.values)
-                ChoiceChip(
-                  label: BilingualOwnedText(item.label),
-                  selected: item == kind,
-                  onSelected: (_) {
-                    kind = item;
-                    offset = 0;
-                    search.clear();
-                    reload();
-                  },
-                ),
+              FilledButton(
+                onPressed: () => edit(),
+                child: const BilingualCaption(L10n.newRecord),
+              ),
+              TextButton(
+                onPressed: () {
+                  offset = 0;
+                  reload();
+                },
+                child: const BilingualCaption(L10n.searchRefresh),
+              ),
+              FilterChip(
+                label: const BilingualText(L10n.includeArchived),
+                selected: archived,
+                onSelected: (v) {
+                  archived = v;
+                  offset = 0;
+                  reload();
+                },
+              ),
             ],
           ),
-          const SizedBox(height: 12),
-          if (kind == MasterKind.company)
-            const BilingualText(
-              L10n.enterYourActualCompanyIdentitySaveItBeforeIssuing,
-            ),
-          if (kind == MasterKind.office)
-            const BilingualText(
-              L10n.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual,
-            ),
-          if (kind == MasterKind.category)
-            const BilingualText(
-              L10n.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres,
-            ),
-          if (kind == MasterKind.vehicle || kind == MasterKind.route)
-            const BilingualText(
-              L10n.ownerChangesApplyToNewTripsSavedTripOwners,
-            ),
-          if (kind != MasterKind.company) ...[
-            TextField(
-              controller: search,
-              maxLength: 100,
-              decoration: bilingualDecoration(
-                context,
-                InputDecoration(
-                  label: BilingualCaption(L10n.searchNamesCodes),
-                  suffixIcon: Icon(Icons.search),
-                ),
-              ),
-              onSubmitted: (_) {
-                offset = 0;
-                reload();
-              },
-            ),
-            Wrap(
-              spacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                FilledButton(
-                  onPressed: () => edit(),
-                  child: const BilingualCaption(L10n.newRecord),
-                ),
-                TextButton(
-                  onPressed: () {
-                    offset = 0;
-                    reload();
-                  },
-                  child: const BilingualCaption(L10n.searchRefresh),
-                ),
-                FilterChip(
-                  label: const BilingualText(L10n.includeArchived),
-                  selected: archived,
-                  onSelected: (v) {
-                    archived = v;
-                    offset = 0;
-                    reload();
-                  },
-                ),
-              ],
-            ),
-          ],
-          Expanded(
-            child: FutureBuilder<List<MasterRecord>>(
-              future: records,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: TextButton(
-                      onPressed: reload,
-                      child: const BilingualCaption(
-                        L10n.recordsUnavailableRetry,
-                      ),
-                    ),
-                  );
-                }
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final rows = snapshot.data!;
-                return Column(
-                  children: [
-                    Expanded(
-                      child: rows.isEmpty
-                          ? const Center(
-                              child: BilingualText(L10n.noRecordsFound),
-                            )
-                          : ListView.builder(
-                              itemCount: rows.length,
-                              itemBuilder: (context, i) {
-                                final row = rows[i];
-                                return BilingualListTile(
+        ],
+        SizedBox(
+          height: MediaQuery.sizeOf(context).height * .65,
+          child: FutureBuilder<List<MasterRecord>>(
+            future: records,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: TextButton(
+                    onPressed: reload,
+                    child: const BilingualCaption(L10n.recordsUnavailableRetry),
+                  ),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final rows = snapshot.data!;
+              return Column(
+                children: [
+                  Expanded(
+                    child: rows.isEmpty
+                        ? const Center(
+                            child: BilingualText(L10n.noRecordsFound),
+                          )
+                        : ListView.builder(
+                            itemCount: rows.length,
+                            itemBuilder: (context, i) {
+                              final row = rows[i];
+                              return Card(
+                                child: BilingualListTile(
                                   title: Text(row.label),
                                   subtitle: BilingualText(
                                     masterRecordSummary(kind, row),
@@ -215,42 +212,42 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
                                     onPressed: () => edit(row),
                                     child: const BilingualCaption(L10n.edit),
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                  if (kind != MasterKind.company)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: offset == 0
+                              ? null
+                              : () {
+                                  offset -= 50;
+                                  reload();
+                                },
+                          child: const BilingualCaption(L10n.previous),
+                        ),
+                        Text('${offset + 1}–${offset + rows.length}'),
+                        TextButton(
+                          onPressed: rows.length < 50
+                              ? null
+                              : () {
+                                  offset += 50;
+                                  reload();
+                                },
+                          child: const BilingualCaption(L10n.next),
+                        ),
+                      ],
                     ),
-                    if (kind != MasterKind.company)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: offset == 0
-                                ? null
-                                : () {
-                                    offset -= 50;
-                                    reload();
-                                  },
-                            child: const BilingualCaption(L10n.previous),
-                          ),
-                          Text('${offset + 1}–${offset + rows.length}'),
-                          TextButton(
-                            onPressed: rows.length < 50
-                                ? null
-                                : () {
-                                    offset += 50;
-                                    reload();
-                                  },
-                            child: const BilingualCaption(L10n.next),
-                          ),
-                        ],
-                      ),
-                  ],
-                );
-              },
-            ),
+                ],
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }
