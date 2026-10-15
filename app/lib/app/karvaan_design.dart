@@ -171,3 +171,59 @@ class TripStatusBadge extends StatelessWidget {
     );
   }
 }
+
+class KarvaanPinnedTabs extends SliverPersistentHeaderDelegate {
+  KarvaanPinnedTabs({
+    required this.labels,
+    required this.selected,
+    required this.onSelected,
+    required this.height,
+  });
+  final List<Bilingual> labels;
+  final int selected;
+  final ValueChanged<int> onSelected;
+  final double height;
+  @override
+  double get minExtent => height;
+  @override
+  double get maxExtent => height;
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => SizedBox(
+    height: height,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: KarvaanGlass(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (var i = 0; i < labels.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: TextButton(
+                    key: ValueKey('detail-tab-$i'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: selected == i
+                          ? const Color(0xFFEAF4ED)
+                          : Colors.transparent,
+                    ),
+                    onPressed: () => onSelected(i),
+                    child: BilingualText(labels[i]),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+  @override
+  bool shouldRebuild(KarvaanPinnedTabs oldDelegate) =>
+      oldDelegate.selected != selected ||
+      oldDelegate.height != height ||
+      oldDelegate.labels != labels;
+}

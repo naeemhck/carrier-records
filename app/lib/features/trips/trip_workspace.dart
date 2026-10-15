@@ -37,7 +37,9 @@ class TripWorkspace extends StatefulWidget {
     this.finance,
     this.corrections,
     this.moneyMode = false,
+    this.onExpenses,
   });
+  final Future<void> Function()? onExpenses;
   final bool moneyMode;
   final TripRepository repository;
   final MasterRepository masters;
@@ -135,6 +137,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             saved: saved,
             canReturn: (o) => widget.offices.any((a) => a['id'] == o),
             onEdit: edit,
+            onExpenses: widget.onExpenses,
             guard: widget.guard,
             onCorrections: widget.corrections == null
                 ? null
@@ -1438,9 +1441,10 @@ class TripDetail extends StatefulWidget {
     this.guard = unguardedTrip,
     this.onPayments,
     this.onCorrections,
+    this.onExpenses,
   });
   final TripRepository repository;
-  final Future<void> Function()? onPayments, onCorrections;
+  final Future<void> Function()? onPayments, onCorrections, onExpenses;
   final Widget Function(Widget) guard;
   final String id;
   final bool saved;
@@ -1451,6 +1455,7 @@ class TripDetail extends StatefulWidget {
 }
 
 class _TripDetailState extends State<TripDetail> {
+  int tab = 0;
   late Future<Map<String, dynamic>> data;
   @override
   void initState() {
@@ -1533,218 +1538,369 @@ class _TripDetailState extends State<TripDetail> {
                       .map((s) => '${s['position']}. ${s['address']}')
                       .firstOrNull ??
                   TripStrings.none;
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            if (widget.saved)
-              const BilingualText(
-                L10n.draftSavedServerCalculatedAmountsShownBelow,
-              ),
-            BilingualText(
-              L10n.labelValuescd55a9.withValues([
-                r['trip_number'],
-                r['registration'],
-              ]),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            Text('${r['origin_name']} → ${r['destination_name']}'),
-            BilingualText(
-              L10n.labelValuescd55a9.withValues([r['state'], r['load_kind']]),
-            ),
-            BilingualText(
-              L10n.recordedOwnere34286.withValues([
-                (r['owner_snapshot'] as Map)['display_name'],
-              ]),
-            ),
-            BilingualText(
-              L10n.recordedRoute.withValues([
-                (r['route_snapshot'] as Map)['code'] ??
-                    ownedMessage(TripStrings.none),
-              ]),
-            ),
-            BilingualText(
-              L10n.driver.withValues([
-                r['driver_name'] ?? ownedMessage(TripStrings.none),
-              ]),
-            ),
-            BilingualText(
-              L10n.plannedDate.withValues([
-                r['planned_dispatch_date'] ?? ownedMessage(TripStrings.none),
-              ]),
-            ),
-            BilingualText(
-              L10n.dispatchArrival.withValues([
-                r['dispatch_date'] ?? ownedMessage(TripStrings.none),
-                r['arrival_date'] ?? ownedMessage(TripStrings.none),
-              ]),
-            ),
-            if (r['state'] == 'DRAFT')
-              const BilingualText(
-                L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
-              ),
-            if (r['earnings_recognized'] == true)
-              const BilingualText(
-                L10n.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage,
-              ),
-            const BilingualText(
-              L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
-            ),
-            for (final k in [
-              'customer_charge',
-              'commission',
-              'owner_entitlement',
-            ])
-              BilingualText(
-                L10n.pkr274c89.withValues([
-                  ownedMessage(TripStrings.labels[k]),
-                  (r['totals'] as Map)[k],
-                ]),
-              ),
-            BilingualText(
-              L10n.carCount04a594.withValues([
-                (r['totals'] as Map)['car_count'],
-              ]),
-            ),
-            Text((r['notes']).toString()),
-            if (r['overlap_confirmed'] == true)
-              BilingualText(
-                L10n.overlapReviewed.withValues([r['overlap_reason']]),
-              ),
-            Wrap(
-              children: [
-                for (final action in TripAction.values.where(
-                  (a) => a != TripAction.cancelConsignment,
-                ))
-                  if (r[action.permission] == true)
-                    TextButton(
-                      onPressed: () => operate(action, r),
-                      child: BilingualOwnedCaption(action.label),
-                    ),
-                TextButton(
-                  onPressed: history,
-                  child: const BilingualCaption(L10n.history),
-                ),
-                if (widget.onCorrections != null)
-                  TextButton(
-                    onPressed: widget.onCorrections,
-                    child: const BilingualCaption(
-                      L10n.correctionsAndCancellation,
-                    ),
-                  ),
-                if (widget.onPayments != null)
-                  TextButton(
-                    onPressed: widget.onPayments,
-                    child: const BilingualCaption(L10n.paymentsAndAllocations),
-                  ),
-                if (r['can_edit'] == true)
-                  TextButton(
-                    onPressed: () async {
-                      await widget.onEdit(TripDraft.fromDetail(r));
-                      if (mounted) reload();
-                    },
-                    child: const BilingualCaption(L10n.editDraft),
-                  ),
-                if (r['state'] != 'CANCELLED' &&
-                    widget.canReturn(r['destination_office_id'] as String))
-                  TextButton(
-                    onPressed: () => widget.onEdit(TripDraft.returnFrom(r)),
-                    child: const BilingualCaption(L10n.createLinkedReturn),
-                  ),
-              ],
-            ),
-            if (r['return_of_trip_id'] != null)
-              TextButton(
-                onPressed: () => openLinked(r['return_of_trip_id'] as String),
-                child: const BilingualCaption(L10n.originalTrip),
-              ),
-            for (final t in r['linked_returns'] as List)
-              TextButton(
-                onPressed: () => openLinked(t['id'] as String),
-                child: BilingualCaption(
-                  L10n.returnMessage.withValues([
-                    t['trip_number'],
-                    t['load_kind'],
-                  ]),
-                ),
-              ),
-            const BilingualText(L10n.pickupDropStops),
-            for (final s in stops)
-              BilingualText(
-                L10n.stopRecordIdentity.withValues([
-                  s['position'],
-                  ownedMessage(s['kind']),
-                  s['address'],
-                ]),
-              ),
-            for (final c in r['consignments'] as List)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BilingualText(
-                        L10n.cars7b7a19.withValues([
-                          c['customer_name'],
-                          c['state'],
-                          c['car_count'],
-                        ]),
-                      ),
-                      if (r['can_cancel_consignment'] == true &&
-                          c['state'] == 'ACTIVE')
-                        TextButton(
-                          onPressed: () => operate(
-                            TripAction.cancelConsignment,
-                            r,
-                            consignment: c['id'] as String,
+        return CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (widget.saved)
+                          const BilingualText(
+                            L10n.draftSavedServerCalculatedAmountsShownBelow,
                           ),
-                          child: BilingualOwnedCaption(
-                            TripAction.cancelConsignment.label,
-                          ),
-                        ),
-                      BilingualText(
-                        L10n.broker.withValues([
-                          c['broker_name'] ?? ownedMessage(TripStrings.none),
-                        ]),
-                      ),
-                      BilingualText(
-                        L10n.quotedPKR.withValues([
-                          c['quoted_amount'],
-                          c['quote_mode'],
-                          c['commission_method'],
-                          c['commission_value'],
-                        ]),
-                      ),
-                      for (final k in [
-                        'customer_charge',
-                        'commission',
-                        'owner_entitlement',
-                      ])
                         BilingualText(
-                          L10n.pkr274c89.withValues([
-                            ownedMessage(TripStrings.labels[k]),
-                            c[k],
+                          L10n.labelValuescd55a9.withValues([
+                            r['trip_number'],
+                            r['registration'],
+                          ]),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        TripStatusBadge(r['state'] as String),
+                        const SizedBox(height: 16),
+                        Text('${r['origin_name']} → ${r['destination_name']}'),
+                        BilingualText(
+                          L10n.labelValuescd55a9.withValues([
+                            r['state'],
+                            r['load_kind'],
                           ]),
                         ),
-                      BilingualText(
-                        L10n.pickupDrop.withValues([
-                          stopLabel(c['pickup_stop_id']),
-                          stopLabel(c['drop_stop_id']),
-                        ]),
-                      ),
-                      Text((c['notes']).toString()),
-                      for (final a in c['cars'] as List)
                         BilingualText(
-                          L10n.pickupDrop68b36c.withValues([
-                            a['identifier'],
-                            stopLabel(a['pickup_stop_id']),
-                            stopLabel(a['drop_stop_id']),
+                          L10n.recordedOwnere34286.withValues([
+                            (r['owner_snapshot'] as Map)['display_name'],
                           ]),
+                        ),
+                        BilingualText(
+                          L10n.recordedRoute.withValues([
+                            (r['route_snapshot'] as Map)['code'] ??
+                                ownedMessage(TripStrings.none),
+                          ]),
+                        ),
+                        BilingualText(
+                          L10n.driver.withValues([
+                            r['driver_name'] ?? ownedMessage(TripStrings.none),
+                          ]),
+                        ),
+                        BilingualText(
+                          L10n.plannedDate.withValues([
+                            r['planned_dispatch_date'] ??
+                                ownedMessage(TripStrings.none),
+                          ]),
+                        ),
+                        BilingualText(
+                          L10n.dispatchArrival.withValues([
+                            r['dispatch_date'] ??
+                                ownedMessage(TripStrings.none),
+                            r['arrival_date'] ?? ownedMessage(TripStrings.none),
+                          ]),
+                        ),
+                        if (r['state'] == 'DRAFT')
+                          const BilingualText(
+                            L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+                          ),
+                        if (r['earnings_recognized'] == true)
+                          const BilingualText(
+                            L10n.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage,
+                          ),
+                        const BilingualText(
+                          L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
+                        ),
+                        for (final k in [
+                          'customer_charge',
+                          'commission',
+                          'owner_entitlement',
+                        ])
+                          BilingualText(
+                            L10n.pkr274c89.withValues([
+                              ownedMessage(TripStrings.labels[k]),
+                              (r['totals'] as Map)[k],
+                            ]),
+                          ),
+                        BilingualText(
+                          L10n.carCount04a594.withValues([
+                            (r['totals'] as Map)['car_count'],
+                          ]),
+                        ),
+                        Text((r['notes']).toString()),
+                        if (r['overlap_confirmed'] == true)
+                          BilingualText(
+                            L10n.overlapReviewed.withValues([
+                              r['overlap_reason'],
+                            ]),
+                          ),
+                        Wrap(
+                          children: [
+                            for (final action in [
+                              TripAction.dispatch,
+                              TripAction.arrive,
+                            ])
+                              if (r[action.permission] == true)
+                                FilledButton(
+                                  onPressed: () => operate(action, r),
+                                  child: BilingualOwnedCaption(action.label),
+                                ),
+                            if (widget.onCorrections != null ||
+                                TripAction.values.any(
+                                  (a) =>
+                                      a != TripAction.dispatch &&
+                                      a != TripAction.arrive &&
+                                      a != TripAction.cancelConsignment &&
+                                      r[a.permission] == true,
+                                ))
+                              PopupMenuButton<String>(
+                                tooltip: L10n
+                                    .correctionsAndCancellationAccessibility,
+                                onSelected: (key) {
+                                  if (key == 'financial') {
+                                    widget.onCorrections?.call();
+                                  } else {
+                                    operate(
+                                      TripAction.values.firstWhere(
+                                        (a) => a.key == key,
+                                      ),
+                                      r,
+                                    );
+                                  }
+                                },
+                                itemBuilder: (_) => [
+                                  if (widget.onCorrections != null)
+                                    const PopupMenuItem(
+                                      value: 'financial',
+                                      child: BilingualText(
+                                        L10n.correctionsAndCancellation,
+                                      ),
+                                    ),
+                                  for (final action in TripAction.values.where(
+                                    (a) =>
+                                        a != TripAction.dispatch &&
+                                        a != TripAction.arrive &&
+                                        a != TripAction.cancelConsignment,
+                                  ))
+                                    if (r[action.permission] == true)
+                                      PopupMenuItem(
+                                        value: action.key,
+                                        child: BilingualOwnedText(action.label),
+                                      ),
+                                ],
+                              ),
+                            TextButton(
+                              onPressed: history,
+                              child: const BilingualCaption(L10n.history),
+                            ),
+                            if (widget.onPayments != null)
+                              TextButton(
+                                onPressed: widget.onPayments,
+                                child: const BilingualCaption(
+                                  L10n.paymentsAndAllocations,
+                                ),
+                              ),
+                            if (r['can_edit'] == true)
+                              TextButton(
+                                onPressed: () async {
+                                  await widget.onEdit(TripDraft.fromDetail(r));
+                                  if (mounted) reload();
+                                },
+                                child: const BilingualCaption(L10n.editDraft),
+                              ),
+                            if (r['state'] != 'CANCELLED' &&
+                                widget.canReturn(
+                                  r['destination_office_id'] as String,
+                                ))
+                              TextButton(
+                                onPressed: () =>
+                                    widget.onEdit(TripDraft.returnFrom(r)),
+                                child: const BilingualCaption(
+                                  L10n.createLinkedReturn,
+                                ),
+                              ),
+                          ],
+                        ),
+                        if (r['return_of_trip_id'] != null)
+                          TextButton(
+                            onPressed: () =>
+                                openLinked(r['return_of_trip_id'] as String),
+                            child: const BilingualCaption(L10n.originalTrip),
+                          ),
+                        for (final t in r['linked_returns'] as List)
+                          TextButton(
+                            onPressed: () => openLinked(t['id'] as String),
+                            child: BilingualCaption(
+                              L10n.returnMessage.withValues([
+                                t['trip_number'],
+                                t['load_kind'],
+                              ]),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: KarvaanPinnedTabs(
+                labels: const [
+                  L10n.consignmentsStep,
+                  L10n.moneyNavigation,
+                  L10n.expensesTab,
+                  L10n.history,
+                ],
+                selected: tab,
+                onSelected: (value) => setState(() => tab = value),
+                height: 80 * MediaQuery.textScalerOf(context).scale(1) + 16,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (tab == 0) ...[
+                      const BilingualText(L10n.pickupDropStops),
+                      for (final s in stops)
+                        BilingualText(
+                          L10n.stopRecordIdentity.withValues([
+                            s['position'],
+                            ownedMessage(s['kind']),
+                            s['address'],
+                          ]),
+                        ),
+                      for (final c in r['consignments'] as List)
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BilingualText(
+                                  L10n.cars7b7a19.withValues([
+                                    c['customer_name'],
+                                    c['state'],
+                                    c['car_count'],
+                                  ]),
+                                ),
+                                if (r['can_cancel_consignment'] == true &&
+                                    c['state'] == 'ACTIVE')
+                                  TextButton(
+                                    onPressed: () => operate(
+                                      TripAction.cancelConsignment,
+                                      r,
+                                      consignment: c['id'] as String,
+                                    ),
+                                    child: BilingualOwnedCaption(
+                                      TripAction.cancelConsignment.label,
+                                    ),
+                                  ),
+                                BilingualText(
+                                  L10n.broker.withValues([
+                                    c['broker_name'] ??
+                                        ownedMessage(TripStrings.none),
+                                  ]),
+                                ),
+                                BilingualText(
+                                  L10n.quotedPKR.withValues([
+                                    c['quoted_amount'],
+                                    c['quote_mode'],
+                                    c['commission_method'],
+                                    c['commission_value'],
+                                  ]),
+                                ),
+                                for (final k in [
+                                  'customer_charge',
+                                  'commission',
+                                  'owner_entitlement',
+                                ])
+                                  BilingualText(
+                                    L10n.pkr274c89.withValues([
+                                      ownedMessage(TripStrings.labels[k]),
+                                      c[k],
+                                    ]),
+                                  ),
+                                BilingualText(
+                                  L10n.pickupDrop.withValues([
+                                    stopLabel(c['pickup_stop_id']),
+                                    stopLabel(c['drop_stop_id']),
+                                  ]),
+                                ),
+                                Text((c['notes']).toString()),
+                                for (final a in c['cars'] as List)
+                                  BilingualText(
+                                    L10n.pickupDrop68b36c.withValues([
+                                      a['identifier'],
+                                      stopLabel(a['pickup_stop_id']),
+                                      stopLabel(a['drop_stop_id']),
+                                    ]),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                     ],
-                  ),
+                    if (tab == 1)
+                      KarvaanSection(
+                        title: L10n.moneyNavigation,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const BilingualText(
+                              L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
+                            ),
+                            for (final key in [
+                              'customer_charge',
+                              'commission',
+                              'owner_entitlement',
+                            ])
+                              BilingualText(
+                                L10n.pkr274c89.withValues([
+                                  ownedMessage(TripStrings.labels[key]),
+                                  (r['totals'] as Map)[key],
+                                ]),
+                              ),
+                            if (widget.onPayments != null)
+                              OutlinedButton(
+                                onPressed: widget.onPayments,
+                                child: const BilingualCaption(
+                                  L10n.paymentsAndAllocations,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    if (tab == 2)
+                      KarvaanSection(
+                        title: L10n.expensesTab,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const BilingualText(L10n.tripExpensesScopeNotice),
+                            if (widget.onExpenses != null)
+                              OutlinedButton(
+                                onPressed: widget.onExpenses,
+                                child: const BilingualCaption(
+                                  L10n.expensesAndReimbursements,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    if (tab == 3)
+                      SizedBox(
+                        height: 600 * MediaQuery.textScalerOf(context).scale(1),
+                        child: TripHistory(
+                          repository: widget.repository,
+                          id: widget.id,
+                        ),
+                      ),
+                  ],
                 ),
               ),
+            ),
           ],
         );
       },
@@ -1759,6 +1915,7 @@ class _TripDetailState extends State<TripDetail> {
           id: id,
           canReturn: widget.canReturn,
           onEdit: widget.onEdit,
+          onExpenses: widget.onExpenses,
           guard: widget.guard,
         ),
       ),

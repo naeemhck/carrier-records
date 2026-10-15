@@ -112,6 +112,16 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       documents: documents,
       exporter: OutputExportService(ExportRepository(client), documents),
     );
+    Widget expensesPage() => ExpenseWorkspace(
+      expenses: ExpenseRepository(client),
+      finance: FinancialRepository(client),
+      corrections: CorrectionRepository(client),
+      administrator: p['role'] == 'ADMIN',
+      trips: trips,
+      masters: masters,
+      offices: offices,
+      guard: guard,
+    );
     final page = switch (destination) {
       WorkspaceDestination.trips || WorkspaceDestination.money => TripWorkspace(
         repository: trips,
@@ -121,17 +131,11 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         corrections: CorrectionRepository(client),
         finance: FinancialRepository(client),
         moneyMode: destination == WorkspaceDestination.money,
+        onExpenses: () => widget.navigatorKey.currentState!.push<void>(
+          MaterialPageRoute(builder: (_) => guard(expensesPage())),
+        ),
       ),
-      WorkspaceDestination.expenses => ExpenseWorkspace(
-        expenses: ExpenseRepository(client),
-        finance: FinancialRepository(client),
-        corrections: CorrectionRepository(client),
-        administrator: p['role'] == 'ADMIN',
-        trips: trips,
-        masters: masters,
-        offices: offices,
-        guard: guard,
-      ),
+      WorkspaceDestination.expenses => expensesPage(),
       WorkspaceDestination.dashboard ||
       WorkspaceDestination.reports => ReportWorkspace(
         reports: ReportRepository(client),

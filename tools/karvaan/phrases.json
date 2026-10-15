@@ -7440,5 +7440,23 @@
     "origins": [
       "GUI restructure; provisional office review"
     ]
+  },
+  {
+    "key": "expensesTab",
+    "semantic_key": "ui.expensesTab",
+    "en": "Expenses",
+    "ur": "اخراجات",
+    "origins": [
+      "GUI; provisional office review"
+    ]
+  },
+  {
+    "key": "tripExpensesScopeNotice",
+    "semantic_key": "ui.tripExpensesScopeNotice",
+    "en": "Trip-scoped expenses are not provided by this view. Open the authorized office expense list and locate the trip. No trip expense total is inferred.",
+    "ur": "اس منظر میں ٹرپ کے اخراجات دستیاب نہیں۔ اجازت یافتہ دفتر کی اخراجات کی فہرست میں ٹرپ تلاش کریں۔ یہاں ٹرپ کے اخراجات کا مجموعہ اخذ نہیں کیا جاتا۔",
+    "origins": [
+      "GUI; provisional office review"
+    ]
   }
 ]

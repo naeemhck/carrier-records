@@ -5129,6 +5129,15 @@ abstract final class L10n {
   );
   static const expandNavigationAccessibility =
       "Expand navigation. نیویگیشن کھولیں";
+  static const expensesTab = Bilingual("ui.expensesTab", "Expenses", "اخراجات");
+  static const expensesTabAccessibility = "Expenses. اخراجات";
+  static const tripExpensesScopeNotice = Bilingual(
+    "ui.tripExpensesScopeNotice",
+    "Trip-scoped expenses are not provided by this view. Open the authorized office expense list and locate the trip. No trip expense total is inferred.",
+    "اس منظر میں ٹرپ کے اخراجات دستیاب نہیں۔ اجازت یافتہ دفتر کی اخراجات کی فہرست میں ٹرپ تلاش کریں۔ یہاں ٹرپ کے اخراجات کا مجموعہ اخذ نہیں کیا جاتا۔",
+  );
+  static const tripExpensesScopeNoticeAccessibility =
+      "Trip-scoped expenses are not provided by this view. Open the authorized office expense list and locate the trip. No trip expense total is inferred.. اس منظر میں ٹرپ کے اخراجات دستیاب نہیں۔ اجازت یافتہ دفتر کی اخراجات کی فہرست میں ٹرپ تلاش کریں۔ یہاں ٹرپ کے اخراجات کا مجموعہ اخذ نہیں کیا جاتا۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5947,5 +5956,7 @@ abstract final class L10n {
     accountNavigation,
     collapseNavigation,
     expandNavigation,
+    expensesTab,
+    tripExpensesScopeNotice,
   ];
 }
