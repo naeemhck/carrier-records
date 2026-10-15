@@ -1,5 +1,8 @@
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
+
+import '../../app/karvaan_design.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../masters/master_repository.dart';
@@ -455,170 +458,178 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               error!,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 260,
-                child: DropdownButtonFormField<String>(
-                  isDense: false,
-                  isExpanded: true,
-                  initialValue: report,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(
-                      label: BilingualCaption(L10n.reportOutputType),
-                    ),
-                  ),
-                  items: [
-                    for (final e in outputReports.entries)
-                      DropdownMenuItem(
-                        value: e.key,
-                        child: BilingualOwnedText(e.value),
-                      ),
-                  ],
-                  onChanged: busy
-                      ? null
-                      : (v) {
-                          setState(() {
-                            report = v!;
-                            recipient = recipients.first;
-                            party = partyName = event = eventName = null;
-                          });
-                          load();
-                        },
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: DropdownButtonFormField<String>(
-                  isDense: false,
-                  itemHeight: null,
-                  key: ValueKey('recipient-$report'),
-                  isExpanded: true,
-                  initialValue: recipient,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(
-                      label: BilingualCaption(L10n.recipientTemplate),
-                    ),
-                  ),
-                  items: [
-                    for (final r in recipients)
-                      DropdownMenuItem(value: r, child: BilingualOwnedText(r)),
-                  ],
-                  onChanged: busy
-                      ? null
-                      : (v) {
-                          setState(() {
-                            recipient = v!;
-                            party = partyName = event = eventName = null;
-                          });
-                          load();
-                        },
-                ),
-              ),
-              if (recipient != 'INTERNAL')
-                OutlinedButton(
-                  onPressed: busy ? null : () => pick('RECIPIENT'),
-                  child: BilingualCaption(
-                    (partyName != null
-                        ? Bilingual.data(partyName)
-                        : L10n.selectRecipient),
-                  ),
-                ),
-              for (final entry in [
-                ('From (YYYY-MM-DD)', from),
-                ('To (YYYY-MM-DD)', to),
-                ('Trip / vehicle search', search),
-              ])
+          KarvaanSection(
+            title: L10n.reportOutputType,
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
                 SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: entry.$2,
-                    enabled: !busy,
+                  width: 260,
+                  child: DropdownButtonFormField<String>(
+                    isDense: false,
+                    isExpanded: true,
+                    initialValue: report,
                     decoration: bilingualDecoration(
                       context,
-                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                      InputDecoration(
+                        label: BilingualCaption(L10n.reportOutputType),
+                      ),
                     ),
-                    onChanged: (_) => changed(),
+                    items: [
+                      for (final e in outputReports.entries)
+                        DropdownMenuItem(
+                          value: e.key,
+                          child: BilingualOwnedText(e.value),
+                        ),
+                    ],
+                    onChanged: busy
+                        ? null
+                        : (v) {
+                            setState(() {
+                              report = v!;
+                              recipient = recipients.first;
+                              party = partyName = event = eventName = null;
+                            });
+                            load();
+                          },
                   ),
                 ),
-              SizedBox(
-                width: 220,
-                child: DropdownButtonFormField<String>(
-                  isDense: false,
-                  isExpanded: true,
-                  initialValue: office,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
-                  ),
-                  items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: BilingualText(L10n.allPermittedOffices),
-                    ),
-                    for (final o in widget.offices)
-                      DropdownMenuItem(
-                        value: o['id'] as String,
-                        child: Text(o['name'] as String),
+                SizedBox(
+                  width: 200,
+                  child: DropdownButtonFormField<String>(
+                    isDense: false,
+                    itemHeight: null,
+                    key: ValueKey('recipient-$report'),
+                    isExpanded: true,
+                    initialValue: recipient,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.recipientTemplate),
                       ),
-                  ],
-                  onChanged: busy
+                    ),
+                    items: [
+                      for (final r in recipients)
+                        DropdownMenuItem(
+                          value: r,
+                          child: BilingualOwnedText(r),
+                        ),
+                    ],
+                    onChanged: busy
+                        ? null
+                        : (v) {
+                            setState(() {
+                              recipient = v!;
+                              party = partyName = event = eventName = null;
+                            });
+                            load();
+                          },
+                  ),
+                ),
+                if (recipient != 'INTERNAL')
+                  OutlinedButton(
+                    onPressed: busy ? null : () => pick('RECIPIENT'),
+                    child: BilingualCaption(
+                      (partyName != null
+                          ? Bilingual.data(partyName)
+                          : L10n.selectRecipient),
+                    ),
+                  ),
+                for (final entry in [
+                  ('From (YYYY-MM-DD)', from),
+                  ('To (YYYY-MM-DD)', to),
+                  ('Trip / vehicle search', search),
+                ])
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: entry.$2,
+                      enabled: !busy,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                      ),
+                      onChanged: (_) => changed(),
+                    ),
+                  ),
+                SizedBox(
+                  width: 220,
+                  child: DropdownButtonFormField<String>(
+                    isDense: false,
+                    isExpanded: true,
+                    initialValue: office,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.officeScope),
+                      ),
+                    ),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: BilingualText(L10n.allPermittedOffices),
+                      ),
+                      for (final o in widget.offices)
+                        DropdownMenuItem(
+                          value: o['id'] as String,
+                          child: Text(o['name'] as String),
+                        ),
+                    ],
+                    onChanged: busy
+                        ? null
+                        : (v) => setState(() {
+                            office = v;
+                            preview = null;
+                          }),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: busy ? null : () => pick('VEHICLE'),
+                  child: BilingualCaption(
+                    (vehicleName != null
+                        ? Bilingual.data(vehicleName)
+                        : L10n.selectVehicle),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: busy ? null : () => pick('OWNER'),
+                  child: BilingualCaption(
+                    (ownerName != null
+                        ? Bilingual.data(ownerName)
+                        : L10n.selectHistoricalOwner),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: busy ? null : () => pick('TRIP'),
+                  child: BilingualCaption(
+                    (tripName != null
+                        ? Bilingual.data(tripName)
+                        : L10n.selectTrip),
+                  ),
+                ),
+                if (report == 'PAYMENT_RECEIPT')
+                  OutlinedButton(
+                    onPressed: busy ? null : () => pick('RECEIPT'),
+                    child: BilingualCaption(
+                      (eventName != null
+                          ? Bilingual.data(eventName)
+                          : L10n.selectActualPaymentReceipt),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: busy
                       ? null
-                      : (v) => setState(() {
-                          office = v;
+                      : () => setState(() {
+                          vehicle = vehicleName = owner = ownerName = trip =
+                              tripName = event = eventName = null;
+                          search.clear();
                           preview = null;
                         }),
+                  child: const BilingualCaption(L10n.clearRecordFilters),
                 ),
-              ),
-              OutlinedButton(
-                onPressed: busy ? null : () => pick('VEHICLE'),
-                child: BilingualCaption(
-                  (vehicleName != null
-                      ? Bilingual.data(vehicleName)
-                      : L10n.selectVehicle),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: busy ? null : () => pick('OWNER'),
-                child: BilingualCaption(
-                  (ownerName != null
-                      ? Bilingual.data(ownerName)
-                      : L10n.selectHistoricalOwner),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: busy ? null : () => pick('TRIP'),
-                child: BilingualCaption(
-                  (tripName != null
-                      ? Bilingual.data(tripName)
-                      : L10n.selectTrip),
-                ),
-              ),
-              if (report == 'PAYMENT_RECEIPT')
-                OutlinedButton(
-                  onPressed: busy ? null : () => pick('RECEIPT'),
-                  child: BilingualCaption(
-                    (eventName != null
-                        ? Bilingual.data(eventName)
-                        : L10n.selectActualPaymentReceipt),
-                  ),
-                ),
-              TextButton(
-                onPressed: busy
-                    ? null
-                    : () => setState(() {
-                        vehicle = vehicleName = owner = ownerName = trip =
-                            tripName = event = eventName = null;
-                        search.clear();
-                        preview = null;
-                      }),
-                child: const BilingualCaption(L10n.clearRecordFilters),
-              ),
-            ],
+              ],
+            ),
           ),
           if (s != null) ...[
             const SizedBox(height: 16),
@@ -917,98 +928,107 @@ class OutputPreview extends StatelessWidget {
     final columns = fields.where((f) => f['header'] != true).toList();
     final meta = data['metadata'] as Map;
     final offset = data['page_offset'] as int;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(),
-        const BilingualText(
-          L10n.authorizedPreview,
-          style: TextStyle(fontSize: 20),
-        ),
-        for (final f in fields.where((f) => f['header'] == true))
-          BilingualText(
-            L10n.labelValuesfb62fe.withValues([
-              ownedMessage(f['label']),
-              meta[f['field_key']] ?? '',
-            ]),
-          ),
-        BilingualText(
-          L10n.dateBases.withValues([ownedDateBases(meta['date_bases'])]),
-        ),
-        const BilingualText(
-          L10n.currentEffectiveRecordsEarlierPeriodsCanChangeAfterAudited,
-        ),
-        Wrap(
-          spacing: 12,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (final e in (data['totals'] as Map).entries)
+            const Divider(),
+            const BilingualText(
+              L10n.authorizedPreview,
+              style: TextStyle(fontSize: 20),
+            ),
+            for (final f in fields.where((f) => f['header'] == true))
               BilingualText(
                 L10n.labelValuesfb62fe.withValues([
-                  summaries
-                          .where((f) => f['field_key'] == e.key)
-                          .firstOrNull?['label'] ??
-                      e.key,
-                  e.value,
+                  ownedMessage(f['label']),
+                  meta[f['field_key']] ?? '',
                 ]),
               ),
-          ],
-        ),
-        if ((data['rows'] as List).isEmpty)
-          const BilingualText(L10n.noRecordsInThisPeriodScope),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 100,
-            dataRowMinHeight: 56,
-            dataRowMaxHeight: double.infinity,
-            columns: [
-              for (final f in columns)
-                DataColumn(
-                  label: SizedBox(
-                    width: 220,
-                    child: BilingualOwnedCaption(f['label'] as String),
-                  ),
-                ),
-            ],
-            rows: [
-              for (final row in data['rows'] as List)
-                DataRow(
-                  cells: [
-                    for (final f in columns)
-                      DataCell(
-                        SizedBox(
-                          width: 220,
-                          child: Text((row[f['field_key']] ?? '').toString()),
-                        ),
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-        Wrap(
-          spacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            TextButton(
-              onPressed: busy || offset == 0 ? null : () => onPage(offset - 50),
-              child: const BilingualCaption(L10n.previousPreviewPage),
-            ),
             BilingualText(
-              L10n.recordsPage.withValues([
-                data['row_count'],
-                offset ~/ 50 + 1,
-              ]),
+              L10n.dateBases.withValues([ownedDateBases(meta['date_bases'])]),
             ),
-            TextButton(
-              onPressed: busy || data['has_more'] != true
-                  ? null
-                  : () => onPage(offset + 50),
-              child: const BilingualCaption(L10n.nextPreviewPage),
+            const BilingualText(
+              L10n.currentEffectiveRecordsEarlierPeriodsCanChangeAfterAudited,
+            ),
+            Wrap(
+              spacing: 12,
+              children: [
+                for (final e in (data['totals'] as Map).entries)
+                  BilingualText(
+                    L10n.labelValuesfb62fe.withValues([
+                      summaries
+                              .where((f) => f['field_key'] == e.key)
+                              .firstOrNull?['label'] ??
+                          e.key,
+                      e.value,
+                    ]),
+                  ),
+              ],
+            ),
+            if ((data['rows'] as List).isEmpty)
+              const BilingualText(L10n.noRecordsInThisPeriodScope),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowHeight: 100 * MediaQuery.textScalerOf(c).scale(1),
+                dataRowMinHeight: 56,
+                dataRowMaxHeight: double.infinity,
+                columns: [
+                  for (final f in columns)
+                    DataColumn(
+                      label: SizedBox(
+                        width: 220,
+                        child: BilingualOwnedCaption(f['label'] as String),
+                      ),
+                    ),
+                ],
+                rows: [
+                  for (final row in data['rows'] as List)
+                    DataRow(
+                      cells: [
+                        for (final f in columns)
+                          DataCell(
+                            SizedBox(
+                              width: 220,
+                              child: Text(
+                                (row[f['field_key']] ?? '').toString(),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            Wrap(
+              spacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: busy || offset == 0
+                      ? null
+                      : () => onPage(offset - 50),
+                  child: const BilingualCaption(L10n.previousPreviewPage),
+                ),
+                BilingualText(
+                  L10n.recordsPage.withValues([
+                    data['row_count'],
+                    offset ~/ 50 + 1,
+                  ]),
+                ),
+                TextButton(
+                  onPressed: busy || data['has_more'] != true
+                      ? null
+                      : () => onPage(offset + 50),
+                  child: const BilingualCaption(L10n.nextPreviewPage),
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }

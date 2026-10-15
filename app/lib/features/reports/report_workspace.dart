@@ -1,6 +1,8 @@
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/karvaan_design.dart';
+
 import '../finance/financial_repository.dart';
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
@@ -185,122 +187,127 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
         children: [
           if (widget.dashboard && widget.backupStatus != null)
             widget.backupStatus!,
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 220,
-                child: DropdownButtonFormField<String>(
-                  isDense: false,
-                  isExpanded: true,
-                  initialValue: kind,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(label: BilingualCaption(L10n.report)),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'MONTHLY_VEHICLE',
-                      child: BilingualText(L10n.vehicleMonthly),
-                    ),
-                    DropdownMenuItem(
-                      value: 'MONTHLY_OWNER',
-                      child: BilingualText(L10n.ownerMonthly),
-                    ),
-                    DropdownMenuItem(
-                      value: 'CLAIMS',
-                      child: BilingualText(L10n.partyClaimsAndHeldMoney),
-                    ),
-                    DropdownMenuItem(
-                      value: 'TRIP_PROFIT',
-                      child: BilingualText(L10n.lifetimeTripProfit),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    setState(() {
-                      kind = v!;
-                    });
-                  },
-                ),
-              ),
-              for (final entry in [
-                ('From (YYYY-MM-DD)', from),
-                ('To (YYYY-MM-DD)', to),
-                ('Trip / vehicle search', search),
-              ])
+          KarvaanSection(
+            title: L10n.reportPeriod,
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
                 SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: entry.$2,
+                  width: 220,
+                  child: DropdownButtonFormField<String>(
+                    isDense: false,
+                    isExpanded: true,
+                    initialValue: kind,
                     decoration: bilingualDecoration(
                       context,
-                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                      InputDecoration(label: BilingualCaption(L10n.report)),
                     ),
-                  ),
-                ),
-              SizedBox(
-                width: 230,
-                child: DropdownButtonFormField<String>(
-                  isDense: false,
-                  isExpanded: true,
-                  initialValue: office,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
-                  ),
-                  items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: BilingualText(L10n.allPermittedOffices),
-                    ),
-                    for (final o in widget.offices)
+                    items: const [
                       DropdownMenuItem(
-                        value: o['id'] as String,
-                        child: Text(o['name'] as String),
+                        value: 'MONTHLY_VEHICLE',
+                        child: BilingualText(L10n.vehicleMonthly),
                       ),
-                  ],
-                  onChanged: (v) => setState(() => office = v),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () => pick('VEHICLE'),
-                child: BilingualCaption(
-                  (vehicleName != null
-                      ? Bilingual.data(vehicleName)
-                      : L10n.selectVehicle),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () => pick('OWNER'),
-                child: BilingualCaption(
-                  (ownerName != null
-                      ? Bilingual.data(ownerName)
-                      : L10n.selectHistoricalOwner),
-                ),
-              ),
-              if (kind == 'TRIP_PROFIT')
-                OutlinedButton(
-                  onPressed: () => pick('TRIP'),
-                  child: BilingualCaption(
-                    (tripName != null
-                        ? Bilingual.data(tripName)
-                        : L10n.selectTrip),
+                      DropdownMenuItem(
+                        value: 'MONTHLY_OWNER',
+                        child: BilingualText(L10n.ownerMonthly),
+                      ),
+                      DropdownMenuItem(
+                        value: 'CLAIMS',
+                        child: BilingualText(L10n.partyClaimsAndHeldMoney),
+                      ),
+                      DropdownMenuItem(
+                        value: 'TRIP_PROFIT',
+                        child: BilingualText(L10n.lifetimeTripProfit),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      setState(() {
+                        kind = v!;
+                      });
+                    },
                   ),
                 ),
-              TextButton(
-                onPressed: () => setState(() {
-                  vehicle = owner = trip = null;
-                  vehicleName = ownerName = tripName = null;
-                  search.clear();
-                }),
-                child: const BilingualCaption(L10n.clearRecordFilters),
-              ),
-              FilledButton(
-                onPressed: () => reload(),
-                child: const BilingualCaption(L10n.runReport),
-              ),
-            ],
+                for (final entry in [
+                  ('From (YYYY-MM-DD)', from),
+                  ('To (YYYY-MM-DD)', to),
+                  ('Trip / vehicle search', search),
+                ])
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: entry.$2,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                      ),
+                    ),
+                  ),
+                SizedBox(
+                  width: 230,
+                  child: DropdownButtonFormField<String>(
+                    isDense: false,
+                    isExpanded: true,
+                    initialValue: office,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.officeScope),
+                      ),
+                    ),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: BilingualText(L10n.allPermittedOffices),
+                      ),
+                      for (final o in widget.offices)
+                        DropdownMenuItem(
+                          value: o['id'] as String,
+                          child: Text(o['name'] as String),
+                        ),
+                    ],
+                    onChanged: (v) => setState(() => office = v),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () => pick('VEHICLE'),
+                  child: BilingualCaption(
+                    (vehicleName != null
+                        ? Bilingual.data(vehicleName)
+                        : L10n.selectVehicle),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () => pick('OWNER'),
+                  child: BilingualCaption(
+                    (ownerName != null
+                        ? Bilingual.data(ownerName)
+                        : L10n.selectHistoricalOwner),
+                  ),
+                ),
+                if (kind == 'TRIP_PROFIT')
+                  OutlinedButton(
+                    onPressed: () => pick('TRIP'),
+                    child: BilingualCaption(
+                      (tripName != null
+                          ? Bilingual.data(tripName)
+                          : L10n.selectTrip),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () => setState(() {
+                    vehicle = owner = trip = null;
+                    vehicleName = ownerName = tripName = null;
+                    search.clear();
+                  }),
+                  child: const BilingualCaption(L10n.clearRecordFilters),
+                ),
+                FilledButton(
+                  onPressed: () => reload(),
+                  child: const BilingualCaption(L10n.runReport),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           FutureBuilder<Map<String, dynamic>>(
