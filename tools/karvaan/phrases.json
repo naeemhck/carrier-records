@@ -4226,8 +4226,8 @@
   {
     "key": "previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
     "semantic_key": "ui.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
-    "en": "Preview only ? not an issued document. Filters determine records; checkboxes determine presentation.",
-    "ur": "صرف پیش منظر ؟ جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
+    "en": "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.",
+    "ur": "صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
     "origins": [
       "app/lib/features/reports/output_workspace.dart:448"
     ]

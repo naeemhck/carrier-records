@@ -355,3 +355,6 @@ Candidate12 local GUI review pack assembled91hashedfiles/audit803entries zero fi
 
 
 2026-10-16 text-QA group4: reproduced5px document overflow and offscreen selected trip tabs; natural scroll-flow/footer regions and measured summary reveal fix them. Wrapping nav/button layout plus measured complete expense toolbar; signed-in heading current bounds pass.26 affected testsPASS/current analyzer clean9.7s; failed first reveal/harness attempts preserved. Group5–7/full suite/build/smoke pending; docs/karvaan-text-qa-evidence.md. No push/merge/install/deploy/hosted access; T19 dispositions/T20TODO unchanged.
+
+
+2026-10-16 text-QA group5: safe login/change-password feedback near heading, accessible live region and immediate reveal. One explicit central preview em-dash correction with narrow preservation-test exception.23 affected testsPASS/analyzer clean10.3s. Synthetic password renders show bullets; black-bar report unconfirmed for release web/native; fontTools metadata probes unavailable, no pass claimed. Groups6–7/full suite/build/smoke pending. docs/karvaan-text-qa-evidence.md; both hosted environments unchanged/T20TODO.

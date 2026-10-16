@@ -1,15 +1,36 @@
 import 'package:carrier_records/app/bilingual.dart';
+
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('original 554 semantic keys and English wording remain stable', () {
-    final baseline = L10n.values.take(554)
-        .map((entry) => '${entry.key}\u0000${entry.en}').join('\n');
-    expect(sha256.convert(utf8.encode(baseline)).toString(),
-        '1097229ad60e19dea0873f36dc35f8dc5ff74e73846c54be6a20776c7bc7cb33');
+    const corrected =
+        'Preview only — not an issued document. Filters determine records; checkboxes determine presentation.';
+    expect(
+      L10n.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords.en,
+      corrected,
+    );
+    // One explicitly authorized punctuation correction; every original key and
+    // all other English wording remain protected by the original digest.
+    final baseline = L10n.values
+        .take(554)
+        .map((entry) {
+          final english =
+              entry.key ==
+                  L10n.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords.key
+              ? entry.en.replaceFirst('Preview only —', 'Preview only ?')
+              : entry.en;
+          return '${entry.key}\u0000$english';
+        })
+        .join('\n');
+    expect(
+      sha256.convert(utf8.encode(baseline)).toString(),
+      '1097229ad60e19dea0873f36dc35f8dc5ff74e73846c54be6a20776c7bc7cb33',
+    );
   });
   test('owned catalogue preserves placeholders and Latin digits', () {
     expect(L10n.values.length, greaterThanOrEqualTo(554));

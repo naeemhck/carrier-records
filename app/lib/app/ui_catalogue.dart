@@ -2990,11 +2990,11 @@ abstract final class L10n {
   static const previewOnlyNotAnIssuedDocumentFiltersDetermineRecords =
       Bilingual(
         "ui.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
-        "Preview only ? not an issued document. Filters determine records; checkboxes determine presentation.",
-        "صرف پیش منظر ؟ جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
+        "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.",
+        "صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
       );
   static const previewOnlyNotAnIssuedDocumentFiltersDetermineRecordsAccessibility =
-      "Preview only ? not an issued document. Filters determine records; checkboxes determine presentation.. صرف پیش منظر ؟ جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔";
+      "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.. صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔";
   static const reportOutputType = Bilingual(
     "ui.reportOutputType",
     "Report / output type",

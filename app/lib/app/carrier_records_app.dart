@@ -101,6 +101,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
       password = TextEditingController(),
       next = TextEditingController(),
       confirm = TextEditingController();
+  final feedbackKey = GlobalKey();
   bool busy = false;
   String? message;
   @override
@@ -137,7 +138,21 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
     } catch (error) {
       if (mounted) message = accountErrorMessage(error);
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) {
+        setState(() => busy = false);
+        if (message != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final target = feedbackKey.currentContext;
+            if (mounted && target != null) {
+              Scrollable.ensureVisible(
+                target,
+                alignment: .1,
+                duration: Duration.zero,
+              );
+            }
+          });
+        }
+      }
     }
   }
 
@@ -146,6 +161,21 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
     listenable: widget.session,
     builder: (context, _) {
       final p = widget.session.profile;
+      final error = message ?? widget.session.error;
+      Widget feedback() => error == null
+          ? const SizedBox.shrink()
+          : Semantics(
+              key: feedbackKey,
+              container: true,
+              liveRegion: true,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: BilingualOwnedText(
+                  error,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            );
       return Scaffold(
         appBar: AppBar(
           toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
@@ -170,6 +200,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       L10n.staffSignIn,
                       style: TextStyle(fontSize: 24),
                     ),
+                    feedback(),
                     const SizedBox(height: 8),
                     const BilingualText(L10n.accountInstruction),
                     const SizedBox(height: 16),
@@ -220,6 +251,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       L10n.changeYourTemporaryPassword,
                       style: TextStyle(fontSize: 24),
                     ),
+                    feedback(),
                     const SizedBox(height: 8),
                     const BilingualText(
                       L10n.chooseANewPasswordOfToCharactersSignIn,
@@ -305,11 +337,8 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   ],
                   if (busy) const LinearProgressIndicator(),
-                  if (message ?? widget.session.error case final String error)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: BilingualOwnedText(error),
-                    ),
+                  if (p != null && p['must_change_password'] != true)
+                    feedback(),
                 ],
               ),
             ),
