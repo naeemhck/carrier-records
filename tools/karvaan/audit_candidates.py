@@ -67,6 +67,6 @@ if not manifest_path.exists():manifest_path=root/'manifest.json'
 manifest=json.loads(manifest_path.read_text())
 for item in manifest['files']:
  p=root/item['path'];require(p.is_file() and hashlib.sha256(p.read_bytes()).hexdigest()==item['sha256'],'Manifest mismatch: '+item['path'])
-report={'source_commit':manifest['source_commit'],'version':manifest['version'],'manifest':manifest_path.name,'scanned_entries':count,'findings':findings,'header_literals_without_key_material':header_literals,'passed':not findings,'installer':'compiled but not installed; Windows payload audited before compression','android':'debug-signed test candidate, not T20 release'}
+report={'source_commit':manifest['source_commit'],'version':manifest['version'],'manifest':manifest_path.name,'scanned_entries':count,'findings':findings,'header_literals_without_key_material':header_literals,'passed':not findings,'installer':'compiled but not installed; Windows payload audited before compression','android':'test-signed local candidate; build mode in manifest; not T20 release'}
 (root/('review-audit.json' if '--review-pack' in sys.argv else 'audit.json')).write_text(json.dumps(report,indent=2),encoding='utf-8')
 print(json.dumps(report));require(not findings,'Candidate audit failed.')

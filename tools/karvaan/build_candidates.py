@@ -9,7 +9,8 @@ defines=ROOT/'tools/.local/karvaan-test-defines.json'
 config=json.loads(defines.read_text(encoding='utf-8'))
 validate_defines(config)
 version=(ROOT/'app/pubspec.yaml').read_text().split('version: ',1)[1].splitlines()[0].strip()
-require(version=='0.2.0+15','This unused candidate version must be explicit.')
+require(version=='0.2.0+16','This unused candidate version must be explicit.')
+require('signingConfig = signingConfigs.getByName("debug")' in (ROOT/'app/android/app/build.gradle.kts').read_text(), 'Android candidate requires existing test signing; no production signing.')
 out=ROOT/'tools/.local/candidates'/version
 require(not out.exists(),'Preserve existing candidate artifacts; use a new version.')
 commit=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,check=True).stdout.strip()
@@ -22,18 +23,18 @@ def record():
 def build(platform,source,target):
  if source.exists():shutil.copytree(source,ROOT/'tools/.local/preserved-artifacts'/version/platform)
  start=time.perf_counter()
- args=['powershell','-NoProfile','-File',str(ROOT/'tools/flutter.ps1'),'build',platform,'--no-pub','--release' if platform!='apk' else '--debug','--dart-define-from-file='+str(defines),'--dart-define=KARVAAN_LOCAL_ONLY=true','--dart-define=use_arabic=true']
+ args=['powershell','-NoProfile','-File',str(ROOT/'tools/flutter.ps1'),'build',platform,'--no-pub','--release','--dart-define-from-file='+str(defines),'--dart-define=KARVAAN_LOCAL_ONLY=true','--dart-define=use_arabic=true']
  if platform=='web':args.append('--no-web-resources-cdn')
  if platform=='apk':
   mobile=config|{'SUPABASE_URL':'http://10.0.2.2:60321'}
   mobile_path=ROOT/'tools/.local/karvaan-android-defines.json';mobile_path.write_text(json.dumps(mobile),encoding='utf-8')
   args[args.index('--dart-define-from-file='+str(defines))]='--dart-define-from-file='+str(mobile_path)
  with (out/(platform+'-build.log')).open('w',encoding='utf-8') as log:result=subprocess.run(args,cwd=ROOT/'app',stdout=log,stderr=subprocess.STDOUT)
- manifest['builds'][platform]={'exit_code':result.returncode,'seconds':round(time.perf_counter()-start,3)};record()
+ manifest['builds'][platform]={'exit_code':result.returncode,'seconds':round(time.perf_counter()-start,3),'mode':'release','android_signing':'existing debug/test signer' if platform=='apk' else None};record()
  require(result.returncode==0,platform+' build failed; see candidate log.')
 
  if platform=='apk':
-  target.mkdir(parents=True);shutil.copy2(source/'app-debug.apk',target/('Karvaan-'+version+'-android-debug.apk'))
+  target.mkdir(parents=True);shutil.copy2(source/'app-release.apk',target/('Karvaan-'+version+'-android-test.apk'))
  else:shutil.copytree(source,target)
  record();print('PASS '+platform+' candidate build '+str(manifest['builds'][platform]['seconds'])+'s',flush=True)
 build('windows',ROOT/'app/build/windows/x64/runner/Release',out/'windows/payload')
