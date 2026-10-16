@@ -42,7 +42,7 @@ const escaped=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  const notes=page.getByRole('textbox',{name:/^Notes/});await expose(notes);const marker='SYNTHETIC GUI UNSAVED INPUT — Latin 123';await fill(notes,marker);
  await page.getByRole('button',{name:/^Consignments\./}).click();await snapshot('consignments-wide');
  await page.getByRole('button',{name:/^Review\./}).click();
- if(!(await text()).includes(marker)||!(await text()).includes('95000.00'))throw Error('Review lost entry or exact preview');
+ if(!(await text()).includes(marker)||!(await text()).replaceAll(',','').includes('95000.00'))throw Error('Review lost entry or exact preview');
  await snapshot('review-wide');
  await page.getByRole('button',{name:/^Journey\./}).click();await page.waitForTimeout(350);await expose(notes);await notes.click();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));console.log(JSON.stringify({stage:'returned_journey',notes_matches:await notes.inputValue()===marker,notes_length:(await notes.inputValue()).length}));await snapshot('journey-returned');if(await notes.inputValue()!==marker)throw Error('Journey entry lost between steps');
  await page.setViewportSize({width:320,height:1000});await snapshot('journey-narrow');

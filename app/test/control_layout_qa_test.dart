@@ -72,6 +72,17 @@ void main() {
             final label = find.text(L10n.expensesAndReimbursements.en);
             await tester.ensureVisible(label);
             await tester.pumpAndSettle();
+            final semantics = tester.ensureSemantics();
+            expect(
+              tester
+                  .getSemantics(find.byKey(const ValueKey('nav:expenses')))
+                  .getSemanticsData()
+                  .flagsCollection
+                  .isButton,
+              isTrue,
+              reason: 'Navigation retains an announced button role',
+            );
+            semantics.dispose();
             expect(
               tester.renderObject<RenderParagraph>(label).didExceedMaxLines,
               isFalse,

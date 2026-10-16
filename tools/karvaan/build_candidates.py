@@ -9,7 +9,7 @@ defines=ROOT/'tools/.local/karvaan-test-defines.json'
 config=json.loads(defines.read_text(encoding='utf-8'))
 validate_defines(config)
 version=(ROOT/'app/pubspec.yaml').read_text().split('version: ',1)[1].splitlines()[0].strip()
-require(version=='0.2.0+14','This unused candidate version must be explicit.')
+require(version=='0.2.0+15','This unused candidate version must be explicit.')
 out=ROOT/'tools/.local/candidates'/version
 require(not out.exists(),'Preserve existing candidate artifacts; use a new version.')
 commit=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,check=True).stdout.strip()

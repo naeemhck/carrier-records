@@ -319,6 +319,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                           open(destinations[i]);
                                         },
                                         child: Semantics(
+                                          button: true,
                                           selected: selected == destinations[i],
                                           child: Padding(
                                             padding: const EdgeInsets.all(12),

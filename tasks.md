@@ -479,3 +479,6 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 | 7 full suite/compatibility/candidate handoff | IN PROGRESS —171Flutter/analyzer,23Python,223SQL,74backend and8PDF/8XLSX pass; candidate14 build/audit/smoke pending |
 
 See docs/karvaan-text-qa-evidence.md for failures/fixes and unavailable checks. Performance/timeouts and frozen pagination remain unresolved separately. No T19 disposition changed; T20 remains TODO. No push/merge/install/deploy/hosted access or scheduling change.
+
+
+2026-10-16 final role regression: actual navigation node lost button semantics in4layouts; restored explicitbutton:true. Candidate14 interrupted afterWindows165.984s/installer, preservedmarkednotready; noinstall. Candidate15unusedreserved. Current171Flutter PASS29m32s/analyzer46.4s clean; slowearlydelay unproven/notappbenchmark. Group7stillINPROGRESS; builds/audit/releasesmoke pending. Existing223SQL/74backend/23Python applicable unchanged backend/exporters; regenerateunitfileinspectionafterfullsuite. T19dispositions/T20TODO unchanged; nohosted/push/merge/deploy/install/schedule.
