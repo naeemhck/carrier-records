@@ -222,7 +222,10 @@ class TripStatusBadge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: BilingualOwnedText(state, style: TextStyle(color: foreground)),
+        child: BilingualText(
+          tripStateLabel(state),
+          style: TextStyle(color: foreground),
+        ),
       ),
     );
   }

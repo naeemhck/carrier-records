@@ -355,8 +355,8 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                           ),
                           BilingualText(
                             L10n.labelValues10866a.withValues([
-                              ownedMessage(r['state']),
-                              ownedMessage(r['load_kind']),
+                              tripStateLabel(r['state']),
+                              loadKindLabel(r['load_kind']),
                             ]),
                           ),
                           Text(
@@ -1584,8 +1584,8 @@ class _TripDetailState extends State<TripDetail> {
                         ),
                         BilingualText(
                           L10n.labelValuescd55a9.withValues([
-                            r['state'],
-                            r['load_kind'],
+                            tripStateLabel(r['state']),
+                            loadKindLabel(r['load_kind']),
                           ]),
                         ),
                         BilingualText(
@@ -1801,7 +1801,7 @@ class _TripDetailState extends State<TripDetail> {
                                 BilingualText(
                                   L10n.cars7b7a19.withValues([
                                     c['customer_name'],
-                                    c['state'],
+                                    consignmentStateLabel(c['state']),
                                     c['car_count'],
                                   ]),
                                 ),

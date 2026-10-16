@@ -76,15 +76,24 @@ class BackupSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         BilingualText(
-          L10n.lastVerifiedBackupSuccessUTC.withValues([
-            status['last_verified_success_at'] ?? 'Never',
+          L10n.backupRunState.withValues([
+            backupOutcomeLabel(status['outcome']),
           ]),
         ),
         BilingualText(
-          L10n.lastAttempt.withValues([
-            status['last_attempt_at'] ?? 'Never',
-            status['outcome'],
-          ]),
+          status['last_verified_success_at'] == null
+              ? L10n.noVerifiedBackupYet
+              : L10n.lastVerifiedBackupSuccessUTC.withValues([
+                  status['last_verified_success_at'],
+                ]),
+        ),
+        BilingualText(
+          status['last_attempt_at'] == null
+              ? L10n.noBackupAttemptYet
+              : L10n.lastAttempt.withValues([
+                  status['last_attempt_at'],
+                  backupOutcomeLabel(status['outcome']),
+                ]),
         ),
         if (status['stale'] == true)
           const BilingualText(L10n.backupIsStaleOrHasNeverSucceededRunThe),
@@ -250,13 +259,24 @@ class _BackupWorkspaceState extends State<BackupWorkspace> {
         if (busy) const LinearProgressIndicator(),
         if (message != null) BilingualOwnedText(message!),
         if (status != null) BackupSummary(status: status!),
+        if (karvaanLocalOnly)
+          const BilingualText(
+            L10n.administratorHelperIsDisabledInThisIsolatedCandidate,
+          )
+        else if (kIsWeb || !Platform.isWindows)
+          const BilingualText(
+            L10n.runBackupsOnTheConfiguredAdministratorWindowsPC,
+          ),
         KarvaanSection(
           title: L10n.administratorBackups,
           child: Wrap(
             spacing: 8,
             children: [
               FilledButton(
-                onPressed: busy ? null : manual,
+                onPressed:
+                    busy || karvaanLocalOnly || kIsWeb || !Platform.isWindows
+                    ? null
+                    : manual,
                 child: const BilingualCaption(L10n.runManualWindowsBackup),
               ),
               TextButton(

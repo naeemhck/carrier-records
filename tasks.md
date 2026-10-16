@@ -452,3 +452,6 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 
 
 2026-10-16 text-QA group2: structured LTR origin→destination in trip list/review/detail; rendering-only mixed-run/Excel/audit/payment isolation and date-basis interpolation.4real-font bidi layouts plus related regressions21PASS; analyzer clean11.6s; original554 keys/English hash preserved. Initial12 Unicode literal warnings fixed in generator, not suppressed. Evidence docs/karvaan-text-qa-evidence.md. Groups3–7 remain pending; hosted preview/production frozen, T20TODO.
+
+
+2026-10-16 text-QA group3: explicit domain labels remove raw lifecycle/load/consignment/backup tokens from Urdu; absent backup timestamps explained without invented dates. Existing unavailable helper action visibly disabled/reason shown; import prerequisites explained without changing authorization/validation.12 appended catalogue entries;25 affected testsPASS/analyzer clean10.8s; synthetic renders inspected. Groups4–7/final smoke pending. docs/karvaan-text-qa-evidence.md. T19 dispositions/T20TODO unchanged; no hosted access/push/merge/install/deploy.

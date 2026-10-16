@@ -372,6 +372,14 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
             ],
           ),
         ),
+        if (!busy && office == null)
+          const BilingualText(L10n.importOfficeRequired)
+        else if (!busy && command == null)
+          const BilingualText(L10n.importFileRequired)
+        else if (!busy && localErrors.isNotEmpty)
+          const BilingualText(L10n.importErrorsRequired)
+        else if (!busy && result != null)
+          const BilingualText(L10n.importAlreadyCommitted),
         for (final e in localErrors)
           BilingualText(L10n.row.withValues([e['kind'], e['row'], e['code']])),
         if (command != null)

@@ -1,3 +1,5 @@
+import 'package:carrier_records/app/bilingual.dart';
+
 import 'bilingual_finders.dart';
 
 import 'package:carrier_records/features/backup/backup_workspace.dart';
@@ -8,8 +10,13 @@ import 'package:carrier_records/features/auth/local_candidate_policy.dart';
 
 class FakeBackup implements BackupCommands {
   bool success = false;
+  int manualCalls = 0;
   @override
-  Future<bool> manual() async => success;
+  Future<bool> manual() async {
+    manualCalls++;
+    return success;
+  }
+
   @override
   Future<Map<String, dynamic>> status() async => {
     'outcome': 'FAILED',
@@ -48,10 +55,11 @@ void main() {
     }
   });
   testWidgets(
-    'failed manual helper never claims backup success or active schedule',
+    'unavailable manual helper is visibly disabled without invoking it',
     (t) async {
+      final commands = FakeBackup();
       await t.pumpWidget(
-        MaterialApp(home: BackupWorkspace(commands: FakeBackup())),
+        MaterialApp(home: BackupWorkspace(commands: commands)),
       );
       await t.pumpAndSettle();
       expect(englishTextContaining('Backup is stale'), findsOneWidget);
@@ -63,17 +71,21 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       await t.ensureVisible(find.text('Run manual Windows backup'));
+      final button = t.widget<FilledButton>(
+        find.ancestor(
+          of: find.text('Run manual Windows backup'),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(button.onPressed, isNull);
       await t.tap(find.text('Run manual Windows backup'));
       await t.pumpAndSettle();
-      await t.scrollUntilVisible(
-        englishTextContaining('Helper did not report completion'),
-        -250,
-        scrollable: find.byType(Scrollable).first,
-      );
+      expect(commands.manualCalls, 0);
       expect(
-        englishTextContaining('Helper did not report completion'),
+        find.text(L10n.administratorHelperIsDisabledInThisIsolatedCandidate.en),
         findsOneWidget,
       );
+      expect(find.textContaining('Helper finished'), findsNothing);
       expect(englishTextContaining('2026-10-10T12:00:00Z'), findsOneWidget);
       expect(
         englishTextContaining('Archive creation does not verify restoration'),

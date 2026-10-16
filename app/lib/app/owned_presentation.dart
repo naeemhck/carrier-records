@@ -83,3 +83,30 @@ Bilingual ownedDateBases(Object? source) {
     }).join(', ')}}',
   );
 }
+
+/// Controlled domain enums only: never infer meaning from arbitrary record text.
+Bilingual tripStateLabel(Object? code) => switch (code) {
+  'DRAFT' => L10n.draft,
+  'DISPATCHED' => L10n.dispatched,
+  'ARRIVED' => L10n.arrived,
+  'CANCELLED' => L10n.cancelled,
+  _ => Bilingual.data(code),
+};
+Bilingual loadKindLabel(Object? code) => switch (code) {
+  'LOADED' => L10n.loaded,
+  'EMPTY' => L10n.empty,
+  _ => Bilingual.data(code),
+};
+Bilingual consignmentStateLabel(Object? code) => switch (code) {
+  'ACTIVE' => L10n.consignmentActive,
+  'DELIVERED' => L10n.delivered,
+  'CANCELLED' => L10n.cancelled,
+  _ => Bilingual.data(code),
+};
+Bilingual backupOutcomeLabel(Object? code) => switch (code) {
+  'NEVER_RUN' => L10n.backupNeverRun,
+  'RUNNING' => L10n.backupRunning,
+  'SUCCESS' => L10n.backupSucceeded,
+  'FAILED' => L10n.backupFailedState,
+  _ => Bilingual.data(code),
+};

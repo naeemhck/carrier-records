@@ -5152,6 +5152,86 @@ abstract final class L10n {
   );
   static const syntheticTestingPreviewAccessibility =
       "Testing — synthetic data only. آزمائش — صرف مصنوعی ڈیٹا";
+  static const consignmentActive = Bilingual(
+    "ui.consignmentActive",
+    "ACTIVE",
+    "فعال",
+  );
+  static const consignmentActiveAccessibility = "ACTIVE. فعال";
+  static const backupNeverRun = Bilingual(
+    "ui.backupNeverRun",
+    "Never run",
+    "ابھی تک نہیں چلایا گیا",
+  );
+  static const backupNeverRunAccessibility =
+      "Never run. ابھی تک نہیں چلایا گیا";
+  static const backupRunning = Bilingual(
+    "ui.backupRunning",
+    "Running",
+    "جاری ہے",
+  );
+  static const backupRunningAccessibility = "Running. جاری ہے";
+  static const backupSucceeded = Bilingual(
+    "ui.backupSucceeded",
+    "Succeeded",
+    "کامیاب",
+  );
+  static const backupSucceededAccessibility = "Succeeded. کامیاب";
+  static const backupFailedState = Bilingual(
+    "ui.backupFailedState",
+    "Failed",
+    "ناکام",
+  );
+  static const backupFailedStateAccessibility = "Failed. ناکام";
+  static const noVerifiedBackupYet = Bilingual(
+    "ui.noVerifiedBackupYet",
+    "No verified backup success recorded.",
+    "ابھی کسی بیک اپ کی تصدیق شدہ کامیابی درج نہیں ہے۔",
+  );
+  static const noVerifiedBackupYetAccessibility =
+      "No verified backup success recorded.. ابھی کسی بیک اپ کی تصدیق شدہ کامیابی درج نہیں ہے۔";
+  static const noBackupAttemptYet = Bilingual(
+    "ui.noBackupAttemptYet",
+    "No backup attempt recorded.",
+    "ابھی بیک اپ کی کوئی کوشش درج نہیں ہے۔",
+  );
+  static const noBackupAttemptYetAccessibility =
+      "No backup attempt recorded.. ابھی بیک اپ کی کوئی کوشش درج نہیں ہے۔";
+  static const backupRunState = Bilingual(
+    "ui.backupRunState",
+    "Backup state: {0}",
+    "بیک اپ کی حالت: {0}",
+  );
+  static const backupRunStateAccessibility =
+      "Backup state: {0}. بیک اپ کی حالت: {0}";
+  static const importOfficeRequired = Bilingual(
+    "ui.importOfficeRequired",
+    "Choose an authorized recording office before selecting a file.",
+    "فائل منتخب کرنے سے پہلے مجاز اندراجی دفتر منتخب کریں۔",
+  );
+  static const importOfficeRequiredAccessibility =
+      "Choose an authorized recording office before selecting a file.. فائل منتخب کرنے سے پہلے مجاز اندراجی دفتر منتخب کریں۔";
+  static const importFileRequired = Bilingual(
+    "ui.importFileRequired",
+    "Choose an XLSX file to enable validation and preview.",
+    "توثیق اور پیش منظر کے لیے XLSX فائل منتخب کریں۔",
+  );
+  static const importFileRequiredAccessibility =
+      "Choose an XLSX file to enable validation and preview.. توثیق اور پیش منظر کے لیے XLSX فائل منتخب کریں۔";
+  static const importErrorsRequired = Bilingual(
+    "ui.importErrorsRequired",
+    "Resolve the row errors before validation and preview.",
+    "توثیق اور پیش منظر سے پہلے قطاروں کی غلطیاں درست کریں۔",
+  );
+  static const importErrorsRequiredAccessibility =
+      "Resolve the row errors before validation and preview.. توثیق اور پیش منظر سے پہلے قطاروں کی غلطیاں درست کریں۔";
+  static const importAlreadyCommitted = Bilingual(
+    "ui.importAlreadyCommitted",
+    "This batch is already committed. Choose a new file for a new batch.",
+    "یہ بیچ درج ہو چکا ہے۔ نئے بیچ کے لیے نئی فائل منتخب کریں۔",
+  );
+  static const importAlreadyCommittedAccessibility =
+      "This batch is already committed. Choose a new file for a new batch.. یہ بیچ درج ہو چکا ہے۔ نئے بیچ کے لیے نئی فائل منتخب کریں۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -5974,5 +6054,17 @@ abstract final class L10n {
     tripExpensesScopeNotice,
     documentsNavigation,
     syntheticTestingPreview,
+    consignmentActive,
+    backupNeverRun,
+    backupRunning,
+    backupSucceeded,
+    backupFailedState,
+    noVerifiedBackupYet,
+    noBackupAttemptYet,
+    backupRunState,
+    importOfficeRequired,
+    importFileRequired,
+    importErrorsRequired,
+    importAlreadyCommitted,
   ];
 }

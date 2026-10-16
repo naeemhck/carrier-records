@@ -7473,5 +7473,113 @@
     "semantic_key": "qa.syntheticTestingPreview",
     "en": "Testing — synthetic data only",
     "ur": "آزمائش — صرف مصنوعی ڈیٹا"
+  },
+  {
+    "key": "consignmentActive",
+    "semantic_key": "ui.consignmentActive",
+    "en": "ACTIVE",
+    "ur": "فعال",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "backupNeverRun",
+    "semantic_key": "ui.backupNeverRun",
+    "en": "Never run",
+    "ur": "ابھی تک نہیں چلایا گیا",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "backupRunning",
+    "semantic_key": "ui.backupRunning",
+    "en": "Running",
+    "ur": "جاری ہے",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "backupSucceeded",
+    "semantic_key": "ui.backupSucceeded",
+    "en": "Succeeded",
+    "ur": "کامیاب",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "backupFailedState",
+    "semantic_key": "ui.backupFailedState",
+    "en": "Failed",
+    "ur": "ناکام",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "noVerifiedBackupYet",
+    "semantic_key": "ui.noVerifiedBackupYet",
+    "en": "No verified backup success recorded.",
+    "ur": "ابھی کسی بیک اپ کی تصدیق شدہ کامیابی درج نہیں ہے۔",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "noBackupAttemptYet",
+    "semantic_key": "ui.noBackupAttemptYet",
+    "en": "No backup attempt recorded.",
+    "ur": "ابھی بیک اپ کی کوئی کوشش درج نہیں ہے۔",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "backupRunState",
+    "semantic_key": "ui.backupRunState",
+    "en": "Backup state: {0}",
+    "ur": "بیک اپ کی حالت: {0}",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "importOfficeRequired",
+    "semantic_key": "ui.importOfficeRequired",
+    "en": "Choose an authorized recording office before selecting a file.",
+    "ur": "فائل منتخب کرنے سے پہلے مجاز اندراجی دفتر منتخب کریں۔",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "importFileRequired",
+    "semantic_key": "ui.importFileRequired",
+    "en": "Choose an XLSX file to enable validation and preview.",
+    "ur": "توثیق اور پیش منظر کے لیے XLSX فائل منتخب کریں۔",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "importErrorsRequired",
+    "semantic_key": "ui.importErrorsRequired",
+    "en": "Resolve the row errors before validation and preview.",
+    "ur": "توثیق اور پیش منظر سے پہلے قطاروں کی غلطیاں درست کریں۔",
+    "origins": [
+      "text-qa-group3"
+    ]
+  },
+  {
+    "key": "importAlreadyCommitted",
+    "semantic_key": "ui.importAlreadyCommitted",
+    "en": "This batch is already committed. Choose a new file for a new batch.",
+    "ur": "یہ بیچ درج ہو چکا ہے۔ نئے بیچ کے لیے نئی فائل منتخب کریں۔",
+    "origins": [
+      "text-qa-group3"
+    ]
   }
 ]
