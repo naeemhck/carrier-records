@@ -488,3 +488,7 @@ See docs/karvaan-text-qa-evidence.md for failures/fixes and unavailable checks. 
 
 
 2026-10-16 candidate17 source checkpoint: quote-mode labels provisionally appended/empty-stopNone localized without changing addresses or stored enums.4focused casesPASS6s/full173FlutterPASS16m18s/analyzer27.3s clean/font100glyphs+joiningPASS. Partial16preserved/interrupted;17unusedreserved. Core money/backend/frozenrenderers unchanged. Candidate17 build/audit/smoke pending; Group7INPROGRESS/T20TODO and oldreleasegates unchanged. docs/karvaan-text-qa-evidence.md/localreviewguide.
+
+Text-QA group7 remains IN PROGRESS: candidate17 Windows/web complete; Android initial disk-full failure preserved, generated-cache cleanup and same-source retry underway. Final artifact audit/browser smoke/review pack pending local runtime recovery. No release gate cleared. T19 dispositions unchanged; T20 TODO.
+
+Candidate17 all3builds PASS (Windows186.523s/web248.487s/Android attempt3 552.331s),88manifest hashes PASS; installer NOTinstalled/test-signedAPK only. Packaging --no-pub stale-plugin cause fixed. Group7 still IN PROGRESS: Docker CLI recovery failed; final full credential audits/browser smoke/review-pack blocked. Prior test results not substituted. Generated-cache cleanup ~6GB, source/artifacts/data preserved. T19 dispositions unchanged; T20 TODO.

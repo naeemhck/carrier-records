@@ -26,6 +26,8 @@ def build(platform,source,target):
  args=['powershell','-NoProfile','-File',str(ROOT/'tools/flutter.ps1'),'build',platform,'--no-pub','--release','--dart-define-from-file='+str(defines),'--dart-define=KARVAAN_LOCAL_ONLY=true','--dart-define=use_arabic=true']
  if platform=='web':args.append('--no-web-resources-cdn')
  if platform=='apk':
+  # --no-pub skips release plugin regeneration and retains debug-only plugins.
+  args.remove('--no-pub')
   mobile=config|{'SUPABASE_URL':'http://10.0.2.2:60321'}
   mobile_path=ROOT/'tools/.local/karvaan-android-defines.json';mobile_path.write_text(json.dumps(mobile),encoding='utf-8')
   args[args.index('--dart-define-from-file='+str(defines))]='--dart-define-from-file='+str(mobile_path)

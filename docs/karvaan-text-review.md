@@ -24,3 +24,7 @@ The final local browser artifact is served at http://127.0.0.1:8771/ after its h
 Record screen, viewport/text scale, observed result and exact wording/layout change. Screenshots must contain synthetic data only. Quote-mode wording is provisional: DEDUCTED → کرائے میں شامل کمیشن; ADDED → کرائے کے علاوہ کمیشن. Existing approved glossary terms retain priority. The prior raw quote code/empty-stop None observations were fixed in candidate17 source; they are retained in historical evidence.
 
 Monthly-summary latency/timeouts and frozen-template pagination remain separate unresolved release gates. Framework/browser resizing is not native OS-input or Android-device validation. Android output is a test-signed candidate, never T20 release acceptance. Broader rollout, installation, merge, push and deployment require separate authorization.
+
+## Candidate17 hold
+
+Builds and88manifest hashes pass, but final strict credential audit and release-browser smoke are blocked by unresponsive Docker CLI after disk recovery. Do not launch/distribute candidate17 as a verified review build yet. Restart Windows when safe, recover Docker without reset/purge, then follow the exact resume checks in karvaan-text-qa-evidence.md. Existing candidate12 review artifacts remain preserved.
