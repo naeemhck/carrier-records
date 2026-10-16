@@ -449,3 +449,6 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 
 
 2026-10-16 local text-QA group1 checkpoint: reproduced compressed Urdu metrics in8auth layouts (65px versus86px at200%); existing bilingual widgets now use natural Arabic metrics, auth boundary and expense-group spacing corrected.23 affected tests PASS; final expense screenshot timing rerun2PASS, final app analyzer clean8.3s. Before/after synthetic renders/evidence docs/karvaan-text-qa-evidence.md. Groups2–7 and full-suite/build/remaining visual gates still pending. Both hosted environments frozen, candidates12/13 preserved. T19 dispositions intact/T20TODO; no push/merge/install/deploy/hosted access or scheduling.
+
+
+2026-10-16 text-QA group2: structured LTR origin→destination in trip list/review/detail; rendering-only mixed-run/Excel/audit/payment isolation and date-basis interpolation.4real-font bidi layouts plus related regressions21PASS; analyzer clean11.6s; original554 keys/English hash preserved. Initial12 Unicode literal warnings fixed in generator, not suppressed. Evidence docs/karvaan-text-qa-evidence.md. Groups3–7 remain pending; hosted preview/production frozen, T20TODO.

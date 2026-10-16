@@ -1942,9 +1942,10 @@ abstract final class L10n {
   static const excelImports = Bilingual(
     "ui.excelImports",
     "Excel imports",
-    "Excel سے درآمد",
+    "درآمد بذریعہ \u2066Excel\u2069",
   );
-  static const excelImportsAccessibility = "Excel imports. Excel سے درآمد";
+  static const excelImportsAccessibility =
+      "Excel imports. درآمد بذریعہ \u2066Excel\u2069";
   static const currentOfficeAccessRequired = Bilingual(
     "ui.currentOfficeAccessRequired",
     "Current office access required.",
@@ -2698,10 +2699,10 @@ abstract final class L10n {
   static const reviewPKR = Bilingual(
     "ui.reviewPKR",
     "Review: {0} · {1} · {2} → {3} · PKR {4}",
-    "جانچ: {0} · {1} · {2} → {3} · PKR {4}",
+    "جانچ: {0} · {1} · \u2066{2} → {3}\u2069 · PKR {4}",
   );
   static const reviewPKRAccessibility =
-      "Review: {0} · {1} · {2} → {3} · PKR {4}. جانچ: {0} · {1} · {2} → {3} · PKR {4}";
+      "Review: {0} · {1} · {2} → {3} · PKR {4}. جانچ: {0} · {1} · \u2066{2} → {3}\u2069 · PKR {4}";
   static const confirmTheAllocationsAndResultingBalancesAboveArrivalAnd =
       Bilingual(
         "ui.confirmTheAllocationsAndResultingBalancesAboveArrivalAnd",
@@ -3327,10 +3328,10 @@ abstract final class L10n {
   static const labelValuesbeea2b = Bilingual(
     "ui.labelValuesbeea2b",
     "{0}: {1} {2} → {3} {4}",
-    "{0}: {1} {2} → {3} {4}",
+    "{0}: \u2066{1} {2} → {3} {4}\u2069",
   );
   static const labelValuesbeea2bAccessibility =
-      "{0}: {1} {2} → {3} {4}. {0}: {1} {2} → {3} {4}";
+      "{0}: {1} {2} → {3} {4}. {0}: \u2066{1} {2} → {3} {4}\u2069";
   static const officeFilter = Bilingual(
     "ui.officeFilter",
     "Office filter",

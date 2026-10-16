@@ -79,7 +79,7 @@ Bilingual ownedDateBases(Object? source) {
     source.toString(),
     '{${source.entries.map((e) {
       final key = ownedMessage(e.key), value = ownedMessage(e.value);
-      return '${key.ur.isEmpty ? key.en : key.ur}: ${value.ur.isEmpty ? value.en : value.ur}';
+      return L10n.labelValuesfb62fe.withValues([key, value]).ur;
     }).join(', ')}}',
   );
 }

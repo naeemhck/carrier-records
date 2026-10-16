@@ -18,7 +18,11 @@ def dart_identifier(key):
 
 def literal(value):
     # JSON quoting is Dart-compatible after preventing Dart interpolation.
-    return json.dumps(value, ensure_ascii=False).replace('$', r'\$')
+    text = json.dumps(value, ensure_ascii=False).replace('$', r'\$')
+    # Make intentional rendering isolates visible to code review and Dart lint.
+    for code in range(0x2066, 0x206A):
+        text = text.replace(chr(code), '\\u%04x' % code)
+    return text
 
 
 def main():

@@ -2778,7 +2778,7 @@
     "key": "excelImports",
     "semantic_key": "ui.excelImports",
     "en": "Excel imports",
-    "ur": "Excel سے درآمد",
+    "ur": "درآمد بذریعہ ⁦Excel⁩",
     "origins": [
       "app/lib/app/carrier_records_app.dart:329",
       "app/lib/features/imports/import_workspace.dart:300"
@@ -3827,7 +3827,7 @@
     "key": "reviewPKR",
     "semantic_key": "ui.reviewPKR",
     "en": "Review: {0} · {1} · {2} → {3} · PKR {4}",
-    "ur": "جانچ: {0} · {1} · {2} → {3} · PKR {4}",
+    "ur": "جانچ: {0} · {1} · ⁦{2} → {3}⁩ · PKR {4}",
     "origins": [
       "app/lib/features/finance/payment_workspace.dart:651"
     ]
@@ -4708,7 +4708,7 @@
     "key": "labelValuesbeea2b",
     "semantic_key": "ui.labelValuesbeea2b",
     "en": "{0}: {1} {2} → {3} {4}",
-    "ur": "{0}: {1} {2} → {3} {4}",
+    "ur": "{0}: ⁦{1} {2} → {3} {4}⁩",
     "origins": [
       "app/lib/features/trips/trip_operation_dialog.dart:397"
     ]

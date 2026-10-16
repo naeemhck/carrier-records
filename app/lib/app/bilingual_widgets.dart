@@ -234,3 +234,32 @@ class BilingualListTile extends StatelessWidget {
     },
   );
 }
+
+/// Spatial order is authoritative even when either office name is Urdu.
+/// Names remain opaque; direction controls never enter records or requests.
+class RouteLabel extends StatelessWidget {
+  const RouteLabel({
+    super.key,
+    required this.origin,
+    required this.destination,
+  });
+  final String origin, destination;
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: '$origin → $destination',
+    textDirection: TextDirection.ltr,
+    excludeSemantics: true,
+    child: Row(
+      textDirection: TextDirection.ltr,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(child: Text(origin, textDirection: TextDirection.ltr)),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Text('→', textDirection: TextDirection.ltr),
+        ),
+        Flexible(child: Text(destination, textDirection: TextDirection.ltr)),
+      ],
+    ),
+  );
+}

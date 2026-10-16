@@ -346,16 +346,27 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                           r['registration'],
                         ]),
                       ),
-                      subtitle: BilingualText(
-                        L10n.labelValues8a6c87.withValues([
-                          r['origin_name'],
-                          r['destination_name'],
-                          ownedMessage(r['state']),
-                          ownedMessage(r['load_kind']),
-                          r['dispatch_date'] ??
-                              r['planned_dispatch_date'] ??
-                              '',
-                        ]),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RouteLabel(
+                            origin: r['origin_name'] as String,
+                            destination: r['destination_name'] as String,
+                          ),
+                          BilingualText(
+                            L10n.labelValues10866a.withValues([
+                              ownedMessage(r['state']),
+                              ownedMessage(r['load_kind']),
+                            ]),
+                          ),
+                          Text(
+                            (r['dispatch_date'] ??
+                                    r['planned_dispatch_date'] ??
+                                    '')
+                                .toString(),
+                            textDirection: TextDirection.ltr,
+                          ),
+                        ],
                       ),
                       trailingBelow: true,
                       trailing: TripStatusBadge(r['state'] as String),
@@ -582,8 +593,20 @@ class _TripEditorState extends State<TripEditor> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(d.registration ?? TripStrings.none),
-          Text(
-            '${widget.offices.where((o) => o['id'] == d.origin).firstOrNull?['name'] ?? TripStrings.none} → ${widget.offices.where((o) => o['id'] == d.destination).firstOrNull?['name'] ?? d.destinationName ?? TripStrings.none}',
+          RouteLabel(
+            origin:
+                (widget.offices
+                            .where((o) => o['id'] == d.origin)
+                            .firstOrNull?['name'] ??
+                        TripStrings.none)
+                    .toString(),
+            destination:
+                (widget.offices
+                            .where((o) => o['id'] == d.destination)
+                            .firstOrNull?['name'] ??
+                        d.destinationName ??
+                        TripStrings.none)
+                    .toString(),
           ),
           Text(d.driverName ?? TripStrings.none),
           Text(d.planned),
@@ -1555,7 +1578,10 @@ class _TripDetailState extends State<TripDetail> {
                         ),
                         TripStatusBadge(r['state'] as String),
                         const SizedBox(height: 16),
-                        Text('${r['origin_name']} → ${r['destination_name']}'),
+                        RouteLabel(
+                          origin: r['origin_name'] as String,
+                          destination: r['destination_name'] as String,
+                        ),
                         BilingualText(
                           L10n.labelValuescd55a9.withValues([
                             r['state'],
