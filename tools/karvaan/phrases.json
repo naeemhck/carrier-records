@@ -7590,5 +7590,23 @@
     "origins": [
       "text-qa-group6"
     ]
+  },
+  {
+    "key": "quoteDeducted",
+    "semantic_key": "ui.quoteDeducted",
+    "en": "DEDUCTED",
+    "ur": "کرائے میں شامل کمیشن",
+    "origins": [
+      "text-qa-quote-mode-office-review"
+    ]
+  },
+  {
+    "key": "quoteAdded",
+    "semantic_key": "ui.quoteAdded",
+    "en": "ADDED",
+    "ur": "کرائے کے علاوہ کمیشن",
+    "origins": [
+      "text-qa-quote-mode-office-review"
+    ]
   }
 ]

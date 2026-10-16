@@ -5239,6 +5239,18 @@ abstract final class L10n {
   );
   static const invalidCountValueAccessibility =
       "Invalid count: {0}. غلط تعداد: {0}";
+  static const quoteDeducted = Bilingual(
+    "ui.quoteDeducted",
+    "DEDUCTED",
+    "کرائے میں شامل کمیشن",
+  );
+  static const quoteDeductedAccessibility = "DEDUCTED. کرائے میں شامل کمیشن";
+  static const quoteAdded = Bilingual(
+    "ui.quoteAdded",
+    "ADDED",
+    "کرائے کے علاوہ کمیشن",
+  );
+  static const quoteAddedAccessibility = "ADDED. کرائے کے علاوہ کمیشن";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6074,5 +6086,7 @@ abstract final class L10n {
     importErrorsRequired,
     importAlreadyCommitted,
     invalidCountValue,
+    quoteDeducted,
+    quoteAdded,
   ];
 }

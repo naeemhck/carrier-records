@@ -9,7 +9,7 @@ defines=ROOT/'tools/.local/karvaan-test-defines.json'
 config=json.loads(defines.read_text(encoding='utf-8'))
 validate_defines(config)
 version=(ROOT/'app/pubspec.yaml').read_text().split('version: ',1)[1].splitlines()[0].strip()
-require(version=='0.2.0+16','This unused candidate version must be explicit.')
+require(version=='0.2.0+17','This unused candidate version must be explicit.')
 require('signingConfig = signingConfigs.getByName("debug")' in (ROOT/'app/android/app/build.gradle.kts').read_text(), 'Android candidate requires existing test signing; no production signing.')
 out=ROOT/'tools/.local/candidates'/version
 require(not out.exists(),'Preserve existing candidate artifacts; use a new version.')

@@ -120,6 +120,15 @@ void main() {
               .map((w) => w.text.en)
               .join(' | '),
         );
+        final quote = tester
+            .widgetList<BilingualText>(find.byType(BilingualText))
+            .singleWhere((w) => w.text.key == L10n.quotedPKR.key);
+        expect(quote.text.ur, contains(L10n.quoteDeducted.ur));
+        expect(quote.text.ur, isNot(contains('DEDUCTED')));
+        final stopText = tester
+            .widgetList<BilingualText>(find.byType(BilingualText))
+            .singleWhere((w) => w.text.key == L10n.pickupDrop.key);
+        expect(stopText.text.ur, isNot(contains('None')));
         await tester.runAsync(
           () => captureTextQa(tester, captureKey, 'consignment-$width-$scale'),
         );

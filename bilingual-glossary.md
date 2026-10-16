@@ -52,3 +52,6 @@ Existing approved consignment/custody/cost-bearer/settlement/commission terminol
 
 
 Text-QA visual follow-up (2026-10-16): the consignment quote's DEDUCTED code has no existing catalogue entry; office wording review remains pending. Empty pickup/drop placeholders currently retain English “None” inside Urdu lines and need a focused presentation follow-up. These are not approved translations or financial changes. Existing approved glossary terms remain unchanged. Source-owned allocation-summary middle dots were confirmed correct by UTF-8 read; an earlier terminal displayed replacement glyphs, so no catalogue wording change was made.
+
+
+Resolved display follow-up (2026-10-16, candidate17 source): appended provisional quote labels DEDUCTED → کرائے میں شامل کمیشن; ADDED → کرائے کے علاوہ کمیشن. These describe inclusion of commission in, or addition to, the quoted fare; office wording review remains pending. Empty pickup/drop labels now reuse the existing None → کوئی نہیں message; actual addresses remain opaque and unchanged. The earlier raw-code/None observations are historical failures, not the current UI.

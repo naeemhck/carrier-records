@@ -1568,13 +1568,12 @@ class _TripDetailState extends State<TripDetail> {
         }
         final r = snapshot.data!;
         final stops = r['stops'] as List;
-        String stopLabel(dynamic id) => id == null
-            ? TripStrings.none
-            : stops
-                      .where((s) => s['id'] == id)
-                      .map((s) => '${s['position']}. ${s['address']}')
-                      .firstOrNull ??
-                  TripStrings.none;
+        Bilingual stopLabel(dynamic id) {
+          final stop = stops.where((s) => s['id'] == id).firstOrNull;
+          if (id == null || stop == null) return ownedMessage(TripStrings.none);
+          return Bilingual.data('${stop['position']}. ${stop['address']}');
+        }
+
         return CustomScrollView(
           controller: scroll,
           slivers: [
