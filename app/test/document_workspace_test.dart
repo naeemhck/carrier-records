@@ -129,7 +129,7 @@ void main() {
       );
       expect(find.text('INV-2026-000001'), findsOneWidget);
       expect(find.text('Superseded by INV-2026-000002'), findsOneWidget);
-      expect(find.text('Owner profit: 85000.00'), findsOneWidget);
+      expect(find.text('Owner profit: PKR 85,000.00'), findsOneWidget);
       expect(find.text('Prepare superseding document'), findsNothing);
       expect(t.takeException(), isNull);
     },

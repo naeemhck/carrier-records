@@ -765,9 +765,11 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
           if (error != null) BilingualOwnedText(error!),
           if (posted != null) ...[
             BilingualText(
-              L10n.expenseConfirmedPKRReceiptStatusIsSeparate.withValues([
-                posted!['amount'],
-              ]),
+              moneyMessage(
+                L10n.expenseConfirmedPKRReceiptStatusIsSeparate,
+                [posted!['amount']],
+                {0},
+              ),
             ),
             BilingualOwnedText(receiptStatus),
             if (evidence != null && receiptStatus != 'Receipt attached.')
@@ -976,30 +978,35 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               )
             else ...[
               BilingualText(
-                L10n.expensePKR.withValues([
-                  reviewed!['amount'],
-                  funding.label,
-                ]),
+                moneyMessage(
+                  L10n.expensePKR,
+                  [reviewed!['amount'], funding.label],
+                  {0},
+                ),
               ),
               BilingualText(
-                L10n.cashSpentPKROwnerOffsetPKR.withValues([
-                  AllocationTotals.decimal(
-                    AllocationTotals.sum(
-                      (reviewed!['allocations'] as List)
-                          .where((x) => x['component'] == 'CASH')
-                          .map((x) => x['amount'] as String)
-                          .toList(),
+                moneyMessage(
+                  L10n.cashSpentPKROwnerOffsetPKR,
+                  [
+                    AllocationTotals.decimal(
+                      AllocationTotals.sum(
+                        (reviewed!['allocations'] as List)
+                            .where((x) => x['component'] == 'CASH')
+                            .map((x) => x['amount'] as String)
+                            .toList(),
+                      ),
                     ),
-                  ),
-                  AllocationTotals.decimal(
-                    AllocationTotals.sum(
-                      (reviewed!['allocations'] as List)
-                          .where((x) => x['component'] == 'OFFSET')
-                          .map((x) => x['amount'] as String)
-                          .toList(),
+                    AllocationTotals.decimal(
+                      AllocationTotals.sum(
+                        (reviewed!['allocations'] as List)
+                            .where((x) => x['component'] == 'OFFSET')
+                            .map((x) => x['amount'] as String)
+                            .toList(),
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                  {0, 1},
+                ),
               ),
               FilledButton(
                 onPressed: busy || conflict ? null : confirm,
@@ -1317,8 +1324,11 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BilingualText(
-              L10n.expenseSettlementConfirmedPKRNoAdditionalExpenseOrBrokerage
-                  .withValues([total]),
+              moneyMessage(
+                L10n.expenseSettlementConfirmedPKRNoAdditionalExpenseOrBrokerage,
+                [total],
+                {0},
+              ),
             ),
           ),
         );
@@ -1356,8 +1366,10 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
           padding: const EdgeInsets.all(16),
           children: [
             BilingualText(
-              L10n.originalExpensePKRSettlementAddsNoCostOrBrokerage.withValues(
+              moneyMessage(
+                L10n.originalExpensePKRSettlementAddsNoCostOrBrokerage,
                 [widget.expense['expense_date'], widget.expense['amount']],
+                {1},
               ),
             ),
             if (busy) const LinearProgressIndicator(),
@@ -1436,9 +1448,11 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                   context,
                   InputDecoration(
                     label: BilingualCaption(
-                      L10n.cashAllocationClaimRemainingPKR.withValues([
-                        c['remaining'],
-                      ]),
+                      moneyMessage(
+                        L10n.cashAllocationClaimRemainingPKR,
+                        [c['remaining']],
+                        {0},
+                      ),
                     ),
                   ),
                 ),
@@ -1469,7 +1483,11 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
                         (s) => DropdownMenuItem(
                           value: s['line_id'] as String,
                           child: BilingualText(
-                            L10n.remainingPKR.withValues([s['remaining']]),
+                            moneyMessage(
+                              L10n.remainingPKR,
+                              [s['remaining']],
+                              {0},
+                            ),
                           ),
                         ),
                       )
@@ -1494,10 +1512,14 @@ class _ExpenseSettlementState extends State<ExpenseSettlement> {
               )
             else ...[
               BilingualText(
-                L10n.cashPKRNonCashOffsetPKROriginalExpenseIs.withValues([
-                  offset ? '0.00' : reviewed!['amount'],
-                  offset ? reviewed!['amount'] : '0.00',
-                ]),
+                moneyMessage(
+                  L10n.cashPKRNonCashOffsetPKROriginalExpenseIs,
+                  [
+                    offset ? '0.00' : reviewed!['amount'],
+                    offset ? reviewed!['amount'] : '0.00',
+                  ],
+                  {0, 1},
+                ),
               ),
               FilledButton(
                 onPressed: busy || conflict ? null : confirm,

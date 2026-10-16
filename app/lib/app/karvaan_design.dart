@@ -191,7 +191,7 @@ class KarvaanAmount extends StatelessWidget {
         BilingualText(label),
         const SizedBox(height: 8),
         Text(
-          'PKR $value',
+          displayMoney(value),
           textDirection: TextDirection.ltr,
           textAlign: TextAlign.right,
           style: const TextStyle(

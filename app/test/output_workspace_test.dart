@@ -187,7 +187,7 @@ void main() {
       await t.ensureVisible(find.text('Preview'));
       await t.tap(find.text('Preview'));
       await t.pumpAndSettle();
-      expect(find.text('Owner profit: 85000.00'), findsOneWidget);
+      expect(find.text('Owner profit: PKR 85,000.00'), findsOneWidget);
       await t.tap(find.text('Edit configuration'));
       await t.pumpAndSettle();
       await t.ensureVisible(find.byKey(const ValueKey('field-owner_cost')));
@@ -202,7 +202,7 @@ void main() {
         fake.preparations[1]['field_order'],
         isNot(contains('owner_cost')),
       );
-      expect(find.text('Owner profit: 85000.00'), findsOneWidget);
+      expect(find.text('Owner profit: PKR 85,000.00'), findsOneWidget);
       final table = t.widget<DataTable>(find.byType(DataTable));
       expect(
         table.columns.where(

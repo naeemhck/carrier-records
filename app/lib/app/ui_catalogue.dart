@@ -5232,6 +5232,13 @@ abstract final class L10n {
   );
   static const importAlreadyCommittedAccessibility =
       "This batch is already committed. Choose a new file for a new batch.. یہ بیچ درج ہو چکا ہے۔ نئے بیچ کے لیے نئی فائل منتخب کریں۔";
+  static const invalidCountValue = Bilingual(
+    "ui.invalidCountValue",
+    "Invalid count: {0}",
+    "غلط تعداد: {0}",
+  );
+  static const invalidCountValueAccessibility =
+      "Invalid count: {0}. غلط تعداد: {0}";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6066,5 +6073,6 @@ abstract final class L10n {
     importFileRequired,
     importErrorsRequired,
     importAlreadyCommitted,
+    invalidCountValue,
   ];
 }

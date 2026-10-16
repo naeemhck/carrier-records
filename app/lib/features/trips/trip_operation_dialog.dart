@@ -291,7 +291,7 @@ class _TripOperationDialogState extends State<TripOperationDialog> {
                       'owner_entitlement',
                     ])
                       BilingualText(
-                        L10n.pkr274c89.withValues([
+                        moneyLabel([
                           ownedMessage(TripStrings.labels[k]),
                           (widget.trip['totals'] as Map)[k],
                         ]),

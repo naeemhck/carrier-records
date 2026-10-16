@@ -657,10 +657,11 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                       row.source,
                     ].whereType<String>())
                       BilingualText(
-                        L10n.remainingPKRAfterAllocationPKR.withValues([
-                          row.find(id)?['remaining'],
-                          remaining(row, id),
-                        ]),
+                        moneyMessage(
+                          L10n.remainingPKRAfterAllocationPKR,
+                          [row.find(id)?['remaining'], remaining(row, id)],
+                          {0, 1},
+                        ),
                       ),
                     TextButton(
                       onPressed: busy || pendingRequest != null
@@ -707,13 +708,17 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
             ),
           if (reviewed != null) ...[
             BilingualText(
-              L10n.reviewPKR.withValues([
-                action.label,
-                date.text,
-                payerName,
-                payeeName,
-                reviewed!['amount'],
-              ]),
+              moneyMessage(
+                L10n.reviewPKR,
+                [
+                  action.label,
+                  date.text,
+                  payerName,
+                  payeeName,
+                  reviewed!['amount'],
+                ],
+                {4},
+              ),
             ),
             const BilingualText(
               L10n.confirmTheAllocationsAndResultingBalancesAboveArrivalAnd,

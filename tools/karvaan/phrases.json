@@ -7581,5 +7581,14 @@
     "origins": [
       "text-qa-group3"
     ]
+  },
+  {
+    "key": "invalidCountValue",
+    "semantic_key": "ui.invalidCountValue",
+    "en": "Invalid count: {0}",
+    "ur": "غلط تعداد: {0}",
+    "origins": [
+      "text-qa-group6"
+    ]
   }
 ]

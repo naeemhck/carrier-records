@@ -595,13 +595,17 @@ class _CorrectionFormState extends State<CorrectionForm> {
           ),
         if (!cancellation)
           BilingualText(
-            L10n.originalPKROnTo.withValues([
-              ownedMessage(eventLabel(widget.event!['kind'] as String)),
-              widget.event!['amount'],
-              widget.event!['effective_date'],
-              widget.event!['payer'] ?? '',
-              widget.event!['payee'] ?? '',
-            ]),
+            moneyMessage(
+              L10n.originalPKROnTo,
+              [
+                ownedMessage(eventLabel(widget.event!['kind'] as String)),
+                widget.event!['amount'],
+                widget.event!['effective_date'],
+                widget.event!['payer'] ?? '',
+                widget.event!['payee'] ?? '',
+              ],
+              {1},
+            ),
           ),
         if (!cancellation && !quoteCorrection)
           SwitchListTile(
@@ -687,11 +691,15 @@ class _CorrectionFormState extends State<CorrectionForm> {
         for (final e in dependents)
           CheckboxListTile(
             title: BilingualText(
-              L10n.reverseDependentPKROn.withValues([
-                ownedMessage(eventLabel(e['kind'] as String)),
-                e['amount'],
-                e['effective_date'],
-              ]),
+              moneyMessage(
+                L10n.reverseDependentPKROn,
+                [
+                  ownedMessage(eventLabel(e['kind'] as String)),
+                  e['amount'],
+                  e['effective_date'],
+                ],
+                {1},
+              ),
             ),
             value: unwind.contains(e['id']),
             onChanged: request != null || reviewed != null
@@ -705,10 +713,14 @@ class _CorrectionFormState extends State<CorrectionForm> {
           ),
         for (var n = 0; n < consignments.length; n++) ...[
           BilingualText(
-            L10n.originalChargePKR.withValues([
-              consignments[n]['customer_name'],
-              consignments[n]['customer_charge'],
-            ]),
+            moneyMessage(
+              L10n.originalChargePKR,
+              [
+                consignments[n]['customer_name'],
+                consignments[n]['customer_charge'],
+              ],
+              {1},
+            ),
           ),
           TextField(
             controller: fees[n],

@@ -63,8 +63,8 @@ void main() {
         findsOneWidget,
       );
       expect(englishTextContaining('Owner profit —'), findsOneWidget);
-      expect(englishTextContaining('85000.00'), findsOneWidget);
-      expect(englishTextContaining('95000.00'), findsOneWidget);
+      expect(englishTextContaining('PKR 85,000.00'), findsOneWidget);
+      expect(englishTextContaining('PKR 95,000.00'), findsOneWidget);
       await t.ensureVisible(find.text('Next'));
       await t.tap(find.text('Next'));
       await t.pumpAndSettle();

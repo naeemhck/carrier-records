@@ -577,10 +577,7 @@ class _TripEditorState extends State<TripEditor> {
             'owner_entitlement',
           ])
             BilingualText(
-              L10n.pkr274c89.withValues([
-                ownedMessage(TripStrings.labels[key]),
-                values[key],
-              ]),
+              moneyLabel([ownedMessage(TripStrings.labels[key]), values[key]]),
             ),
         ],
       );
@@ -807,10 +804,7 @@ class _TripEditorState extends State<TripEditor> {
     children: [
       for (final k in ['customer_charge', 'commission', 'owner_entitlement'])
         BilingualText(
-          L10n.pkr274c89.withValues([
-            ownedMessage(TripStrings.labels[k]),
-            values[k],
-          ]),
+          moneyLabel([ownedMessage(TripStrings.labels[k]), values[k]]),
         ),
     ],
   );
@@ -898,7 +892,7 @@ class _TripEditorState extends State<TripEditor> {
                       c.fareRevision++;
                     }),
               child: BilingualCaption(
-                L10n.pkr274c89.withValues([
+                moneyLabel([
                   ownedMessage(TripStrings.applySuggestion),
                   d.suggestedFare,
                 ]),
@@ -1386,7 +1380,7 @@ class _DraftReviewState extends State<_DraftReview> {
             ),
             for (final k in widget.totals.keys)
               BilingualText(
-                L10n.pkr274c89.withValues([
+                moneyLabel([
                   ownedMessage(TripStrings.labels[k]),
                   widget.totals[k],
                 ]),
@@ -1663,7 +1657,7 @@ class _TripDetailState extends State<TripDetail> {
                           'owner_entitlement',
                         ])
                           BilingualText(
-                            L10n.pkr274c89.withValues([
+                            moneyLabel([
                               ownedMessage(TripStrings.labels[k]),
                               (r['totals'] as Map)[k],
                             ]),
@@ -1853,12 +1847,16 @@ class _TripDetailState extends State<TripDetail> {
                                   ]),
                                 ),
                                 BilingualText(
-                                  L10n.quotedPKR.withValues([
-                                    c['quoted_amount'],
-                                    c['quote_mode'],
-                                    c['commission_method'],
-                                    c['commission_value'],
-                                  ]),
+                                  moneyMessage(
+                                    L10n.quotedPKR,
+                                    [
+                                      c['quoted_amount'],
+                                      c['quote_mode'],
+                                      c['commission_method'],
+                                      c['commission_value'],
+                                    ],
+                                    {0},
+                                  ),
                                 ),
                                 for (final k in [
                                   'customer_charge',
@@ -1866,7 +1864,7 @@ class _TripDetailState extends State<TripDetail> {
                                   'owner_entitlement',
                                 ])
                                   BilingualText(
-                                    L10n.pkr274c89.withValues([
+                                    moneyLabel([
                                       ownedMessage(TripStrings.labels[k]),
                                       c[k],
                                     ]),
@@ -1906,7 +1904,7 @@ class _TripDetailState extends State<TripDetail> {
                               'owner_entitlement',
                             ])
                               BilingualText(
-                                L10n.pkr274c89.withValues([
+                                moneyLabel([
                                   ownedMessage(TripStrings.labels[key]),
                                   (r['totals'] as Map)[key],
                                 ]),

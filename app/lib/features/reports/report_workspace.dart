@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
 
-import '../finance/financial_repository.dart';
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../trips/trip_workspace.dart';
@@ -134,9 +133,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                       .replaceAll('expense date', 'all linked expense dates')
                 : reportLabels[key],
           ),
-          ['dispatched', 'arrived'].contains(key)
-              ? amount
-              : 'PKR ${LedgerAmount.fromJson(amount)}',
+          displayField(
+            ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
+            amount,
+          ),
         ]),
       );
   Widget journeys(Future<TripPage>? future, String title) =>
@@ -157,7 +157,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 BilingualText(
                   L10n.labelValuescd55a9.withValues([
                     row['trip_number'],
-                    row['state'],
+                    tripStateLabel(row['state']),
                   ]),
                 ),
               if (s.data!.rows.isEmpty)

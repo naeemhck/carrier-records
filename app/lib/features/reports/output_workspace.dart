@@ -10,6 +10,7 @@ import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../trips/trip_workspace.dart';
 import 'output_repository.dart';
+import 'authorized_output.dart' show integerKeys;
 import 'document_repository.dart';
 import 'document_workspace.dart';
 import 'output_export_service.dart';
@@ -935,7 +936,10 @@ class OutputPreview extends StatelessWidget {
               BilingualText(
                 L10n.labelValuesfb62fe.withValues([
                   ownedMessage(f['label']),
-                  meta[f['field_key']] ?? '',
+                  displayField(
+                    (f['value_type'] ?? 'TEXT') as String,
+                    meta[f['field_key']],
+                  ),
                 ]),
               ),
             BilingualText(
@@ -954,7 +958,10 @@ class OutputPreview extends StatelessWidget {
                               .where((f) => f['field_key'] == e.key)
                               .firstOrNull?['label'] ??
                           e.key,
-                      e.value,
+                      displayField(
+                        integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY',
+                        e.value,
+                      ),
                     ]),
                   ),
               ],
@@ -985,7 +992,10 @@ class OutputPreview extends StatelessWidget {
                             SizedBox(
                               width: 220,
                               child: Text(
-                                (row[f['field_key']] ?? '').toString(),
+                                displayField(
+                                  (f['value_type'] ?? 'TEXT') as String,
+                                  row[f['field_key']],
+                                ),
                               ),
                             ),
                           ),

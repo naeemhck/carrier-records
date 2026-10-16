@@ -1,3 +1,6 @@
+import '../features/reports/authorized_output.dart';
+import '../features/finance/financial_repository.dart' show LedgerAmount;
+import '../core/domain/money.dart';
 import 'bilingual_message.dart';
 import 'ui_catalogue.dart';
 
@@ -110,3 +113,59 @@ Bilingual backupOutcomeLabel(Object? code) => switch (code) {
   'FAILED' => L10n.backupFailedState,
   _ => Bilingual.data(code),
 };
+
+/// UI presentation delegates grouping to the existing exact export formatter.
+/// Validation accepts exact balances (which may exceed single-payment limits).
+String displayMoney(Object? value) {
+  final canonical = value is Money || value is LedgerAmount
+      ? value.toString()
+      : value;
+  return displayValue('MONEY', LedgerAmount.fromJson(canonical).toString());
+}
+
+String displayCount(Object? value) {
+  if (value is! int && value is! String) {
+    throw const FormatException('Invalid count.');
+  }
+  final text = value.toString();
+  if (!RegExp(r'^-?[0-9]+(?:\.0+)?$').hasMatch(text)) {
+    throw const FormatException('Invalid count.');
+  }
+  return BigInt.parse(text.split('.').first).toString();
+}
+
+String displayField(String type, Object? value) {
+  if (value == null) return '';
+  if (type == 'MONEY') return displayMoney(value);
+  if (type == 'INTEGER') {
+    try {
+      return displayCount(value);
+    } on FormatException {
+      return L10n.invalidCountValue.withValues([value]).inline;
+    }
+  }
+  return displayValue(type, value);
+}
+
+Bilingual moneyLabel(List<Object?> values) =>
+    L10n.labelValuesfb62fe.withValues([values[0], displayMoney(values[1])]);
+
+/// Existing templates that already print PKR receive grouped digits only.
+/// Explicit indexes avoid treating percentages, dates or IDs as money.
+Bilingual moneyMessage(
+  Bilingual phrase,
+  List<Object?> values,
+  Set<int> amounts,
+) {
+  final formatted = List<Object?>.of(values);
+  for (final index in amounts) {
+    formatted[index] = displayMoney(values[index]).substring(4);
+  }
+  final urdu = phrase.ur.replaceAllMapped(
+    RegExp(r'PKR \{([0-9]+)\}'),
+    (match) => amounts.contains(int.parse(match[1]!))
+        ? '\u2066${match[0]}\u2069'
+        : match[0]!,
+  );
+  return Bilingual(phrase.key, phrase.en, urdu).withValues(formatted);
+}

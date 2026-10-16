@@ -461,3 +461,6 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 
 
 2026-10-16 text-QA group5: safe login/change-password feedback near heading, accessible live region and immediate reveal. One explicit central preview em-dash correction with narrow preservation-test exception.23 affected testsPASS/analyzer clean10.3s. Synthetic password renders show bullets; black-bar report unconfirmed for release web/native; fontTools metadata probes unavailable, no pass claimed. Groups6–7/full suite/build/smoke pending. docs/karvaan-text-qa-evidence.md; both hosted environments unchanged/T20TODO.
+
+
+2026-10-16 text-QA group6: existing exact money formatter reused for trip/report/financial UI; metadata/stable-key integer display rejects fractional counts visibly. Canonical fixtures/commands/arithmetic/Excel numeric cells/frozen renderers untouched.38 affected testsPASS/analyzer clean8.5s; stale UI expectations/nonexistent test filename retained then corrected. Existing fontTools accessible with elevated local read; three fonts have U+2022, no install. Group7/full suite/build/smoke remain; both hosts frozen/T20TODO. docs/karvaan-text-qa-evidence.md.
