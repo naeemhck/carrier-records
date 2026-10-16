@@ -3,7 +3,7 @@ import hashlib,json,socket,subprocess,sys,time,urllib.request
 from local_environment import ROOT,boundary,require
 boundary()
 version,port=sys.argv[1:3]
-require(__import__('re').fullmatch(r'0\.2\.0\+\d+',version) is not None and port in {'8767','8768','8769'},'Explicit candidate and pinned local port required.')
+require(__import__('re').fullmatch(r'0\.2\.0\+\d+',version) is not None and port in {'8767','8768','8769','8771'},'Explicit candidate and pinned local port required.')
 root=ROOT/'tools/.local/candidates'/version
 manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
 main=next(x for x in manifest['files'] if x['path']=='web/main.dart.js')

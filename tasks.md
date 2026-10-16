@@ -464,3 +464,18 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 
 
 2026-10-16 text-QA group6: existing exact money formatter reused for trip/report/financial UI; metadata/stable-key integer display rejects fractional counts visibly. Canonical fixtures/commands/arithmetic/Excel numeric cells/frozen renderers untouched.38 affected testsPASS/analyzer clean8.5s; stale UI expectations/nonexistent test filename retained then corrected. Existing fontTools accessible with elevated local read; three fonts have U+2022, no install. Group7/full suite/build/smoke remain; both hosts frozen/T20TODO. docs/karvaan-text-qa-evidence.md.
+
+
+### 2026-10-16 local text-QA follow-up
+
+| Group | Status/evidence |
+|---|---|
+| 1 natural Urdu height/spacing | Verified locally — e1f50be |
+| 2 routes/bidi/Excel wording | Verified locally — c544d89 |
+| 3 domain status/prerequisite reasons | Verified locally — fe8e7f4 |
+| 4 clipping/scroll/control layout | Verified locally — b044fb4 |
+| 5 safe auth feedback/punctuation/masking investigation | Verified framework behavior — dc389d1; black bar unconfirmed in release/native |
+| 6 grouped exact money/integer display | Verified locally —332e22b |
+| 7 full suite/compatibility/candidate handoff | IN PROGRESS —171Flutter/analyzer,23Python,223SQL,74backend and8PDF/8XLSX pass; candidate14 build/audit/smoke pending |
+
+See docs/karvaan-text-qa-evidence.md for failures/fixes and unavailable checks. Performance/timeouts and frozen pagination remain unresolved separately. No T19 disposition changed; T20 remains TODO. No push/merge/install/deploy/hosted access or scheduling change.

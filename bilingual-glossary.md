@@ -45,3 +45,7 @@ Dynamic report review: the existing catalogue uses آمدن for earnings; آمد
 2026-10-14 provisional account-state additions: Active → فعال; Disabled → غیر فعال; Password change required → پاس ورڈ بدلنا ضروری ہے. Secure startup failure uses the new Urdu administrator-guidance message. These four entries are appended; original catalogue English and keys remain unchanged. Office terminology review is still pending.
 
 GUI terminology pending office review: Workspace, Outputs, Manage, Journey, Review, What, Whose money, Where, Proof and navigation/accessibility labels are appended to the existing catalogue. Original entries/English wording are unchanged.
+
+
+## Text-QA additions — office review pending (2026-10-16)
+Existing approved consignment/custody/cost-bearer/settlement/commission terminology remains unchanged. New provisional UI wording: Excel imports → درآمد بذریعہ Excel; active consignment → فعال; never-run backup → ابھی تک نہیں چلایا گیا; running backup → جاری ہے; succeeded → کامیاب; failed → ناکام; invalid count → غلط تعداد. These are domain-specific display labels, not new stored states. Full prerequisite/error sentences are maintained in the existing catalogue; office wording review remains pending. Rendering isolates are not inserted into business records. Frozen issued wording remains in its snapshot.

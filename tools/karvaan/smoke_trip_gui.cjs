@@ -1,7 +1,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const root=process.cwd(),auth=JSON.parse(fs.readFileSync('tools/.local/karvaan-review-auth.json','utf8'));
-const version=process.argv[2],port=process.argv[3],suffix=process.argv[4];if(!/^0\.2\.0\+\d+$/.test(version||'')||!['8767','8768','8769'].includes(port)||!/^gui[0-9]+-[a-z0-9-]+$/.test(suffix||''))throw Error('Explicit candidate, pinned local port and new diagnostic folder required');
+const version=process.argv[2],port=process.argv[3],suffix=process.argv[4];if(!/^0\.2\.0\+\d+$/.test(version||'')||!['8767','8768','8769','8771'].includes(port)||!/^gui[0-9]+-[a-z0-9-]+$/.test(suffix||''))throw Error('Explicit candidate, pinned local port and new diagnostic folder required');
 const output=path.join(root,'tools/.local',suffix);fs.mkdirSync(output,{recursive:false});
 const base='http://127.0.0.1:'+port;
 const manifest=JSON.parse(fs.readFileSync('tools/.local/candidates/'+version+'/manifest.json','utf8'));

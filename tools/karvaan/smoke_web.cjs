@@ -1,6 +1,6 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const version=process.argv[2],performanceMode=process.argv.includes('--performance'),writeMode=process.argv.includes('--write-smoke'),traceMode=process.argv.includes('--trace-rendering');if(!/^0\.2\.0\+\d+$/.test(version||''))throw Error('Explicit local candidate version required');
-const portIndex=process.argv.indexOf('--port'),port=portIndex<0?'8767':process.argv[portIndex+1];if(!['8767','8768','8769'].includes(port))throw Error('Pinned local artifact port required');const base='http://127.0.0.1:'+port;
+const portIndex=process.argv.indexOf('--port'),port=portIndex<0?'8767':process.argv[portIndex+1];if(!['8767','8768','8769','8771'].includes(port))throw Error('Pinned local artifact port required');const base='http://127.0.0.1:'+port;
 const accountIndex=process.argv.indexOf('--account'),selectedAccount=accountIndex<0?null:process.argv[accountIndex+1];if(selectedAccount&&(!['review_admin','review_khi','review_isb'].includes(selectedAccount)||performanceMode))throw Error('Only independent synthetic role checks may select an account; five-user workload unchanged');
 const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 (async()=>{

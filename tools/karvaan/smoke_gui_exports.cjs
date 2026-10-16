@@ -1,7 +1,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const {chromium}=require('C:/Users/Naeem/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const root=process.cwd(),auth=JSON.parse(fs.readFileSync('tools/.local/karvaan-review-auth.json','utf8'));
-const version=process.argv[2],port=process.argv[3],suffix=process.argv[4];if(!/^0\.2\.0\+\d+$/.test(version||'')||!['8767','8768','8769'].includes(port)||!/^gui[0-9]+-[a-z0-9-]+$/.test(suffix||''))throw Error('Explicit candidate, pinned local port and new diagnostic folder required');
+const version=process.argv[2],port=process.argv[3],suffix=process.argv[4];if(!/^0\.2\.0\+\d+$/.test(version||'')||!['8767','8768','8769','8771'].includes(port)||!/^gui[0-9]+-[a-z0-9-]+$/.test(suffix||''))throw Error('Explicit candidate, pinned local port and new diagnostic folder required');
 const output=path.join(root,'tools/.local',suffix);fs.mkdirSync(output,{recursive:false});
 const base='http://127.0.0.1:'+port;
 const manifest=JSON.parse(fs.readFileSync('tools/.local/candidates/'+version+'/manifest.json','utf8'));
@@ -37,7 +37,7 @@ const escaped=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  const pdf=page.getByRole('button',{name:/^Save \/ share PDF/});await pdf.waitFor({timeout:60000});await snapshot('authorized-preview');
  const files=[];
  for(const [format,button] of [['pdf',pdf],['xlsx',page.getByRole('button',{name:/^Save \/ share Excel/})]]){
-  await expose(button);const [download]=await Promise.all([page.waitForEvent('download',{timeout:90000}),button.click()]);if(await download.failure())throw Error('Export download failed');const target=path.join(output,'candidate12-internal.'+format);await download.saveAs(target);const bytes=fs.readFileSync(target);if(bytes.length<100)throw Error('Empty export');files.push({file:path.basename(target),bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});
+  await expose(button);const [download]=await Promise.all([page.waitForEvent('download',{timeout:90000}),button.click()]);if(await download.failure())throw Error('Export download failed');const target=path.join(output,'candidate'+version.split('+')[1]+'-internal.'+format);await download.saveAs(target);const bytes=fs.readFileSync(target);if(bytes.length<100)throw Error('Empty export');files.push({file:path.basename(target),bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});
  }
  await snapshot('exports-saved');const result={version,source_commit:manifest.source_commit,method:'Actual local release-browser unissued INTERNAL monthly preview and download; December BENCH synthetic only',files,errors,blocked,writes};fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));if(errors.length||blocked.length||writes.length)throw Error('Export smoke failures');
 })().catch(async e=>{try{const page=browser?.contexts()[0]?.pages()[0];if(page)await page.screenshot({path:path.join(output,'failure.png'),fullPage:true});}catch{}let message=e.name+': '+e.message;for(const secret of Object.values(auth.usernames))message=message.split(secret).join('[withheld]');fs.writeFileSync(path.join(output,'failure.json'),JSON.stringify({version,message,errors,blocked,writes},null,2));console.error(message);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});
