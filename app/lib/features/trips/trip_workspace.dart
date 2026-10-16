@@ -1851,9 +1851,13 @@ class _TripDetailState extends State<TripDetail> {
                                     L10n.quotedPKR,
                                     [
                                       c['quoted_amount'],
-                                      c['quote_mode'],
-                                      c['commission_method'],
-                                      c['commission_value'],
+                                      ownedMessage(c['quote_mode']),
+                                      ownedMessage(c['commission_method']),
+                                      c['commission_method'] == 'FIXED'
+                                          ? displayMoneyDigits(
+                                              c['commission_value'],
+                                            )
+                                          : c['commission_value'],
                                     ],
                                     {0},
                                   ),

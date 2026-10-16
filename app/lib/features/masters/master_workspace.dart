@@ -21,7 +21,9 @@ Bilingual masterRecordSummary(MasterKind kind, MasterRecord row) {
         MasterStrings.routeSummary(
           row.value('origin_label'),
           row.value('destination_label'),
-          row.value('suggested_fare'),
+          row.value('suggested_fare').isEmpty
+              ? ''
+              : displayMoneyDigits(row.value('suggested_fare')),
         ),
       ),
     if (row.archived) ownedMessage(MasterStrings.archived),

@@ -422,7 +422,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     }
   }
 
-  String totals() {
+  Bilingual totals() {
     try {
       final values = rows
           .where((r) => r.amount.text.trim().isNotEmpty)
@@ -435,9 +435,17 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
         values.where((r) => action.offset).map((r) => r.amount.text).toList(),
         values.where((r) => r.credit).map((r) => r.amount.text).toList(),
       );
-      return 'Cash allocated: PKR ${AllocationTotals.decimal(t.cash)} · Non-cash credit offset: PKR ${AllocationTotals.decimal(t.offsets)} · Credit remainder: PKR ${AllocationTotals.decimal(t.credits)}';
+      return moneyMessage(
+        L10n.cashAllocatedPKRNonCashCreditOffsetPKRCredit,
+        [
+          AllocationTotals.decimal(t.cash),
+          AllocationTotals.decimal(t.offsets),
+          AllocationTotals.decimal(t.credits),
+        ],
+        {0, 1, 2},
+      );
     } catch (_) {
-      return 'Enter positive amounts with at most two decimal places.';
+      return L10n.enterPositiveAmountsWithAtMostTwoDecimalPlaces;
     }
   }
 
@@ -550,7 +558,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                 reviewed = null;
               }),
             ),
-          BilingualOwnedText(totals()),
+          BilingualText(totals()),
           for (final entry in balances.entries)
             KarvaanSection(
               title: Bilingual.data(
@@ -791,11 +799,15 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
           (c) => DropdownMenuItem(
             value: c['line_id'] as String,
             child: BilingualText(
-              L10n.pkrd24bdd.withValues([
-                ownedMessage(accountLabel(c['account_purpose'] as String)),
-                c['effective_date'],
-                c['remaining'],
-              ]),
+              moneyMessage(
+                L10n.pkrd24bdd,
+                [
+                  ownedMessage(accountLabel(c['account_purpose'] as String)),
+                  c['effective_date'],
+                  c['remaining'],
+                ],
+                {2},
+              ),
             ),
           ),
         )

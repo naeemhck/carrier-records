@@ -169,11 +169,15 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
                   Card(
                     child: BilingualListTile(
                       title: BilingualText(
-                        L10n.pkr.withValues([
-                          ownedMessage(eventLabel(row['kind'] as String)),
-                          row['amount'],
-                          row['effective_date'],
-                        ]),
+                        moneyMessage(
+                          L10n.pkr,
+                          [
+                            ownedMessage(eventLabel(row['kind'] as String)),
+                            row['amount'],
+                            row['effective_date'],
+                          ],
+                          {1},
+                        ),
                       ),
                       subtitle: BilingualText(
                         L10n.correctionTrace.withValues([
@@ -773,20 +777,24 @@ class _CorrectionFormState extends State<CorrectionForm> {
               reviewed!['reason'],
               cancellation
                   ? 'Cancellation effective date: ${reviewed!['effective_date']}'
-                  : 'Explicit dependent reversals: $unwind\n${replace ? 'Replacement PKR ${amount.text} on ${date.text}' : 'Void original entry; no replacement'}',
+                  : 'Explicit dependent reversals: $unwind\n${replace ? 'Replacement ${displayMoney(Money.parse(amount.text))} on ${date.text}' : 'Void original entry; no replacement'}',
             ]),
           ),
           if (cancellation)
             for (var n = 0; n < fees.length; n++)
               BilingualText(
-                L10n.chargePKRBrokerPKROwnerPKR.withValues([
-                  fees[n].text,
-                  brokerFees[n].text,
-                  AllocationTotals.decimal(
-                    Money.parse(fees[n].text).paisa -
-                        Money.parse(brokerFees[n].text).paisa,
-                  ),
-                ]),
+                moneyMessage(
+                  L10n.chargePKRBrokerPKROwnerPKR,
+                  [
+                    Money.parse(fees[n].text),
+                    Money.parse(brokerFees[n].text),
+                    AllocationTotals.decimal(
+                      Money.parse(fees[n].text).paisa -
+                          Money.parse(brokerFees[n].text).paisa,
+                    ),
+                  ],
+                  {0, 1, 2},
+                ),
               ),
           FilledButton(
             onPressed: busy || conflict ? null : confirm,

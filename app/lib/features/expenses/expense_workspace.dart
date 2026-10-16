@@ -880,7 +880,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                   for (final c in eligible)
                     field(
                       inputs[c['line_id']]!,
-                      '${c['account_purpose'] == 'OWNER_PAYABLE' ? 'Owner offset' : 'Held cash source'} | remaining PKR ${c['remaining']}',
+                      '${c['account_purpose'] == 'OWNER_PAYABLE' ? 'Owner offset' : 'Held cash source'} | remaining ${displayMoney(c['remaining'])}',
                     ),
                 ],
               ),

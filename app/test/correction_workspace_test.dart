@@ -160,11 +160,11 @@ void main() {
       await field(t, 'Broker share within cancellation charge', '1000.00');
       await tap(t, 'Review correction');
       await t.scrollUntilVisible(
-        englishTextContaining('owner PKR 9000.01'),
+        englishTextContaining('owner PKR 9,000.01'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(englishTextContaining('owner PKR 9000.01'), findsOneWidget);
+      expect(englishTextContaining('owner PKR 9,000.01'), findsOneWidget);
       await tap(t, 'Confirm reviewed correction');
       fake.pending.completeError(
         const PostgrestException(message: 'VERSION_CONFLICT', code: 'PT409'),

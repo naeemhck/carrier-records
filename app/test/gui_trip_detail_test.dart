@@ -23,6 +23,25 @@ class DetailFixture extends FakeTrips {
       'destination_office_id': 'isb',
       'owner_snapshot': {'display_name': 'Synthetic owner'},
       'linked_returns': [],
+      'consignments': [
+        {
+          'id': 'synthetic-consignment',
+          'customer_name': 'Synthetic customer',
+          'state': 'ACTIVE',
+          'car_count': 1,
+          'quoted_amount': '100000.00',
+          'quote_mode': 'DEDUCTED',
+          'commission_method': 'FIXED',
+          'commission_value': '5000.00',
+          'customer_charge': '100000.00',
+          'commission': '5000.00',
+          'owner_entitlement': '95000.00',
+          'pickup_stop_id': null,
+          'drop_stop_id': null,
+          'notes': 'Synthetic opaque note',
+          'cars': [],
+        },
+      ],
       'totals': {
         'customer_charge': '100000.00',
         'commission': '5000.00',
@@ -80,6 +99,31 @@ void main() {
         );
         expect(repo.details, 1);
         expect(repo.histories, 0);
+        await tester.scrollUntilVisible(
+          find.textContaining('Quoted:'),
+          250,
+          scrollable: find
+              .descendant(
+                of: find.byType(CustomScrollView),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+          maxScrolls: 60,
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Quoted: PKR 100,000.00 · DEDUCTED · FIXED 5,000.00'),
+          findsOneWidget,
+          reason: tester
+              .widgetList<BilingualText>(find.byType(BilingualText))
+              .where((w) => w.text.key == L10n.quotedPKR.key)
+              .map((w) => w.text.en)
+              .join(' | '),
+        );
+        await tester.runAsync(
+          () => captureTextQa(tester, captureKey, 'consignment-$width-$scale'),
+        );
+
         expect(find.text('Dispatch'), findsNothing);
         final scroller = find
             .descendant(

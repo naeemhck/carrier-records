@@ -437,7 +437,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
         for (final d in drafts)
           BilingualListTile(
             title: Text(
-              '${d['payload']['effective_date']} | PKR ${d['payload']['amount']} | ${d['payload']['reason']}',
+              '${d['payload']['effective_date']} | ${displayMoney(d['payload']['amount'])} | ${d['payload']['reason']}',
             ),
             trailing: TextButton(
               onPressed: busy ? null : () => expense(d),

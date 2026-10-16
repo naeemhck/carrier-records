@@ -123,6 +123,8 @@ String displayMoney(Object? value) {
   return displayValue('MONEY', LedgerAmount.fromJson(canonical).toString());
 }
 
+String displayMoneyDigits(Object? value) => displayMoney(value).substring(4);
+
 String displayCount(Object? value) {
   if (value is! int && value is! String) {
     throw const FormatException('Invalid count.');
@@ -159,7 +161,7 @@ Bilingual moneyMessage(
 ) {
   final formatted = List<Object?>.of(values);
   for (final index in amounts) {
-    formatted[index] = displayMoney(values[index]).substring(4);
+    formatted[index] = displayMoneyDigits(values[index]);
   }
   final urdu = phrase.ur.replaceAllMapped(
     RegExp(r'PKR \{([0-9]+)\}'),

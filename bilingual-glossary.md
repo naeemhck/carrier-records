@@ -49,3 +49,6 @@ GUI terminology pending office review: Workspace, Outputs, Manage, Journey, Revi
 
 ## Text-QA additions — office review pending (2026-10-16)
 Existing approved consignment/custody/cost-bearer/settlement/commission terminology remains unchanged. New provisional UI wording: Excel imports → درآمد بذریعہ Excel; active consignment → فعال; never-run backup → ابھی تک نہیں چلایا گیا; running backup → جاری ہے; succeeded → کامیاب; failed → ناکام; invalid count → غلط تعداد. These are domain-specific display labels, not new stored states. Full prerequisite/error sentences are maintained in the existing catalogue; office wording review remains pending. Rendering isolates are not inserted into business records. Frozen issued wording remains in its snapshot.
+
+
+Text-QA visual follow-up (2026-10-16): the consignment quote's DEDUCTED code has no existing catalogue entry; office wording review remains pending. Empty pickup/drop placeholders currently retain English “None” inside Urdu lines and need a focused presentation follow-up. These are not approved translations or financial changes. Existing approved glossary terms remain unchanged. Source-owned allocation-summary middle dots were confirmed correct by UTF-8 read; an earlier terminal displayed replacement glyphs, so no catalogue wording change was made.
