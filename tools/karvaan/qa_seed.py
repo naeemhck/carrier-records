@@ -12,6 +12,10 @@ def unprotect(path):
  r=subprocess.run([shutil.which('pwsh'),'-NoProfile','-Command',script],input=path.read_text(encoding='utf-8-sig'),capture_output=True,text=True,check=True)
  return json.loads(r.stdout)
 
+def safe_error_code(payload):
+ if not isinstance(payload,dict):return 'unknown'
+ return payload.get('error_code',payload.get('code','unknown'))
+
 class Backend:
  def __init__(self):
   guard()
@@ -27,7 +31,7 @@ class Backend:
     raw=response.read();status=response.status;result=json.loads(raw) if raw else None
   except urllib.error.HTTPError as error:
    status=error.code;raw=error.read()
-   try:code=json.loads(raw).get('code','unknown')
+   try:code=safe_error_code(json.loads(raw))
    except Exception:code='unknown'
    if expect and status in expect:return {'http_status':status,'code':code}
    raise RuntimeError('TEST request '+path.split('?')[0]+' HTTP '+str(status)+' code '+str(code)) from None

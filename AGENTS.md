@@ -2,6 +2,8 @@
 
 ## Current local-only Karvaan update
 
+2026-10-15 explicit exception: hosted synthetic QA preview is authorized ONLY for Supabase project `nxyjjjxvgibehovlyycx` (karvaan-test) and Cloudflare Pages `karvaan-test`. Use the separate explicit QA policy/helpers; do not weaken local guards or repurpose any existing backend. Production, main/push/merge, installation and scheduling restrictions remain. See docs/karvaan-testing-preview.md. This exception does not authorize further deployment or production acceptance.
+
 - Work only in update/karvaan-bilingual, separate worktree based on committed main. Earlier shipping authorization does not apply.
 - No push/merge/installation/hosted Supabase or Cloudflare contact/change for app/backend tests; do not change production scheduling. Official package/font downloads are permitted.
 - Before running the candidate, verify its distinct local backend identity/ports; APP_ENV=test alone is insufficient. Fail closed for hosted configuration; never load installed client.json or production sessions/defines.

@@ -28,14 +28,55 @@ CLI db query first required --linked together with explicit --project-ref; corre
 
 Cloudflare cachedWrangler4.149.0 first new-project delegation failed before creation (no static-directory detection). Explicit legacyPages fallback created only karvaan-test with production-branch qa-preview; no Git provider. This fallback selector was not a Git force-push, and is not needed for upload. Existing encrypted/keyring OAuth has pages:write; missing unrelated optional scopes were not added. Cached/offline package mode only; no package installation.
 
-## Pending build and live verification
+## Published testing preview and artifact
 
-Distinct web preview0.2.0+13 reserved, candidate12 and its91-file review pack preserved. Artifact/audit/deployment details will be appended after execution. No HTTP200-only acceptance: fresh browser role/office/workflow/export/network checks required.
+Verified shareable URL: https://karvaan-test.pages.dev/
+Immutable upload URL: https://4af214ed.karvaan-test.pages.dev/
+Cloudflare project karvaan-test, direct upload, default branch qa-preview, no Git provider. Existing carrier-records project not targeted. No Git push/merge, install or scheduling change.
 
-## Tester handoff (pending credential reset and live checks)
+Web-only build0.2.0+13; compiled application source11e8de115841fcfac15dc4f8f15b9c073587871e. Build command used existing SDK, --release --no-pub --build-name=0.2.0 --build-number=13 and ignored public-only QA defines, with distinct --output. Compiler346.9s/exit0. Initial PowerShell output-path expression failed before compilation; corrected to explicit absolute path. pubspec remains0.2.0+12; this preview's version override consumes build13. Do not reuse13 for future candidates. No Windows/Android build or installation in this task.
 
-Usernames qa_admin (synthetic all-office admin), qa_khi (Karachi staff), qa_isb (Islamabad staff). Share each password privately outside Git/evidence/chat; use the local protected-credential helper. Reset to fresh temporary passwords requiring the normal first-login password change before handoff. Do not add real business data. Preview is not production acceptance.
+Artifact: tools/.local/qa-preview/artifacts/0.2.0+13/web/; manifest in its parent.49 files/46305140bytes; main.dart.js4388262bytes SHA-256 bc43ff40f1f1b803327dc006a19bec0a3523a9b30afa817e06defbb4914cde2d. Audit finds no privileged keys, passwords, signing material, dumps or forbidden backend targets. Only compiled Supabase origin https://nxyjjjxvgibehovlyycx.supabase.co. Existing candidate12 compiled and91 review-pack file hashes rechecked unchanged. All820 original catalogue entries exact; one appended testing label. Repositories, database migrations/functions, local guards, financial code, fonts and frozen renderers unchanged from34ec2d1.
+
+Testing-specific static title/description, noindex/nofollow, no-referrer and nosniff headers, exact SPA fallback prepared only in this new artifact. Upload47assets plus headers/redirects succeeded. Manifest records each artifact hash and public-configuration hash, not the key value. Artifact source11e8de1 is distinct from later verification/documentation commits.
+
+## Fresh browser and API verification
+
+Local served release http://127.0.0.1:8770 local5 and actual HTTPS live1 both pass seven grouped browser checks in new Chromium contexts per account. Actual login for allthree users; administrator controls only forqa_admin, each staff home shows its assigned office only. Journey/Consignments/Review typed mixed text and exact95000.00 owner preview; mandatory edit reason supplied. Deliberately abort first save: no false success, retry retains identical request UUID and commits once. Dispatch invalid date blocks review; review/ack required before Confirm; Cancel/Escape dismiss without a dispatch request. Actual authorized INTERNAL October PDF/XLSX downloads, narrow desktop-browser screenshots, no unexpected console/network errors in final runs.
+
+Every observed Supabase request targets TEST. Additional asset origins https://www.gstatic.com and https://fonts.gstatic.com serve Flutter rendering/fallback fonts; these are not backend calls and received no app authentication headers from the test harness. They are explicitly permitted by the QA-only harness. Existing local harness allowlists unchanged.
+
+TEST API evidence:26 setup/security/workflow checks plus6 recipient/privacy checks. OWNER_STATEMENT server payload excludes internal-only keys; adding a known forbidden field rejected42501. Karachi staff altered office filter rejected42501. Both staff direct financial insert attempts rejected42501. Public Auth settings disable_signup=true and actual signup_disabled rejection confirmed. No test public account created. Owner earnings remain95000.00 after the single synthetic dispatch; customer payment/held/owner settlement distinctions retained.
+
+HTTPS Node probe: root/trips200text/html; flutter.js/main.dart.js200application/javascript; version.json200application/json, version0.2.0/build13; deployed main.js hash matches audited artifact; noindex header present. Independent Python-agent root probe returned403; retained as a failed/runtime-dependent probe, no server security change. Fresh Chrome and Node verification succeed. HTTP200 alone is not the acceptance evidence.
+
+Live files: PDF40319bytes/sixpages SHA9b5c73cfd782213169fbfeeb2298185dd00d404f1973acdfba91df9e04458353; XLSX5609bytes/38rows10columns SHA f415b1678c5161833930e6195180e1990b047bc912e24d966b11cc1b7c0ad5dc. Actual font/content/XML/metadata/hidden/formula inspection passes. Embedded NotoSans regular/bold and NotoSansArabic; one visible sheet, no hidden/formula content. Fresh local and live PDF pages1/6 visually inspected for joining, Latin amounts and labels. Live workbook creatorKarvaan/lastModifiedBynull, freezeA38,33numeric cells,0formulas/hiddenrows/hiddencolumns; actual metadata inspected. This sample does not resolve the earlier frozen wide/broker orphan-page defects.
+
+## Failed attempts and remaining preview limitations
+
+local1 blocked an official fallback-font origin and incorrectly treated missing route accessibility text as an absent visual banner. local2 permitted the official font origin but still failed this semantic assertion. Screenshots prove the bilingual banner is visible; Flutter's active-route semantics omit the outer banner. Banner announcement remains an accessibility limitation, explicitly not passed. No app change or new build concealed it.
+
+local3 omitted mandatory edit reason and was correctly blocked without operation. local4 attempted immediate simulated typing after focus change, but screenshot showed reason remained empty; again no operation posted. local5 waits two rendered frames on focus and asserts actual inputValue, then passes normal single-click workflows. No repeated-click/app-delay workaround. Save retry uses existing retained review/request without asking for a second review dialog. All earlier failure artifacts preserved.
+
+Ad-hoc catalogue check initially used scoped-report MONTHLY_OWNER instead of output contract OWNER_STATEMENT and received22023; corrected using source contract. First privacy run checked numeric GoTrue code422 instead of error_code; public settings already confirmed signup off. Diagnostic normalization fixed with3unit regressions and six actual checks rerun pass. Initial live verification command was not executed when automatic approval review hit its usage limit; user continuation retried through normal review, then live checks passed. No approval bypass.
+
+## Completed secure tester handoff
+
+Usernames qa_admin (synthetic all-office admin), qa_khi (Karachi staff), qa_isb (Islamabad staff). Share each password privately outside Git/evidence/chat; use the local protected-credential helper. Allthree existing TEST accounts reset after live verification to fresh temporary passwords. Each fresh login confirmed must_change_password=true and trip operations denied until changed. Old sessions revoked through the normal audited reset; only final temporary passwords retained, DPAPI encrypted. No duplicate accounts created. Do not add real business data. Preview is not production acceptance.
 
 Review checklist: bilingual navigation/forms/readability; Journey/Consignments/Review and back-navigation; explicit dispatch review/ack; Cancel/Escape; permitted save and retry; cross-office denial; report recipient/selected fields; PDF/Excel samples. Report screen, expected behavior, actual behavior, synthetic trip number and screenshot with credentials removed.
 
 Known unresolved: local five-user summaryp957.453s with2/50 summary57014 errors and screenp953.977s; frozenv2 orphan-note last pages; native OS-input and Android-device checks, missing supplied mockups and provisional glossary terms. Small hosted preview smoke cannot clear representative performance gates. T19 recorded acceptance/exceptions/waivers retained and skipped checks are not converted to passes. T20 TODO.
+
+
+### Exact password setup on this Windows PC
+
+Open a private local PowerShell terminal and run the already-present bundled PowerShell, not a chat tool or transcript. Example for the administrator:
+
+```powershell
+& "C:\Users\Naeem\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.exe" -NoProfile -File "C:\Users\Naeem\.codex\worktrees\karvaan-bilingual\transport_project\tools\karvaan\show_qa_password.ps1" -Username qa_admin
+```
+
+Replace qa_admin with qa_khi or qa_isb to retrieve only that tester's temporary password. Share individual credentials privately with the intended tester, never in Git/evidence/chat. Sign in only at https://karvaan-test.pages.dev/, complete the required12–128character password change, then sign in again. Do not reuse production passwords. The admin can subsequently manage/reset tester accounts in this TEST app. DPAPI retrieval works only under the creating Windows user; no administrative installation or new service sign-in is required.
+
+Sanitized raw evidence is under tools/.local/qa-preview/: backend-verification.json, privacy-verification.json, handoff-status.json, https-verification.json, artifact-audit.json, local1..local5 and live1. Secrets, public defines, samples and build artifacts remain ignored. Read-only main HEAD remainsa0bd553b6de18352f587cb1cc6fc662443f9178b. Prior accidental installed-app startup traffic uncertainty remains recorded; this task does not retroactively claim zero traffic for that earlier attempt.
