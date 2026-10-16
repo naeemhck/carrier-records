@@ -170,7 +170,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       L10n.staffSignIn,
                       style: TextStyle(fontSize: 24),
                     ),
+                    const SizedBox(height: 8),
                     const BilingualText(L10n.accountInstruction),
+                    const SizedBox(height: 16),
                     TextField(
                       controller: username,
                       enabled: !busy,
@@ -218,9 +220,11 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       L10n.changeYourTemporaryPassword,
                       style: TextStyle(fontSize: 24),
                     ),
+                    const SizedBox(height: 8),
                     const BilingualText(
                       L10n.chooseANewPasswordOfToCharactersSignIn,
                     ),
+                    const SizedBox(height: 16),
                     TextField(
                       controller: password,
                       obscureText: true,

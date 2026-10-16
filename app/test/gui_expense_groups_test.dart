@@ -1,3 +1,5 @@
+import 'text_layout_qa_test.dart' show captureTextQa;
+
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/expenses/expense_workspace.dart';
@@ -18,10 +20,13 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
+      final captureKey = GlobalKey();
       final commands = ExpensesFake();
       await tester.pumpWidget(
         MaterialApp(
           theme: KarvaanDesign.theme(),
+          builder: (_, child) =>
+              RepaintBoundary(key: captureKey, child: child!),
           home: MediaQuery(
             data: const MediaQueryData(textScaler: TextScaler.linear(2)),
             child: ExpenseEntry(
@@ -50,6 +55,14 @@ void main() {
           250,
           scrollable: find.byType(Scrollable).first,
           maxScrolls: 60,
+        );
+        await tester.pumpAndSettle();
+        await tester.runAsync(
+          () => captureTextQa(
+            tester,
+            captureKey,
+            'expense-${group.key}-$width-2.0',
+          ),
         );
         expect(find.text(group.ur), findsOneWidget);
         expect(tester.takeException(), isNull);

@@ -1,0 +1,15 @@
+# Karvaan text/layout QA — local only
+
+Baseline b550666a6761930fc28afbabe3ee28859fe29e48 on update/karvaan-bilingual, initially clean. User attachment contains instructions only, no screenshots. No supplied screenshot inspection claimed. Existing candidate12 and hosted-preview13 preserved. Both hosted apps/backends are frozen for this task; only local karvaan_bilingual_u20261013/API60321, independently preflighted. T19 dispositions preserved/T20 unstarted.
+
+Existing label convention: one native English floating field label plus one wrapping Urdu helper; catalogue-backed bilingual text elsewhere. Do not duplicate Urdu as an additional helper. Readable minimum12px Urdu, Latin digits/globalLTR and RTL Urdu runs. No separate label-economy file found; follow existing widgets and design.md.
+
+## Group1 — natural vertical metrics
+
+Bundled font hhea metrics read with fontTools: NotoSansArabic units1000/ascent1374/descent-738, natural line2.112em; widgets forced height1.6. Real-font reproduction: all eight auth layouts FAILED before correction (e.g. 200% heading 65px allocated versus natural 86px). Auth sign-in/change screens at360/1280 and scales1/2; before/after evidence under ignored tools/.local/text-qa/. Initial test-writing command used root-relative paths from app/ and failed before creating files/running tests; corrected path handling, no application change. Results pending.
+
+2026-10-16 implementation: existing BilingualText/BilingualCaption and field-helper styles now use the bundled Arabic font's natural line metrics, avoiding inherited Latin height. Urdu minimum12px retained, LTR layout/RTL Urdu unchanged. Auth heading/instruction boundaries use spacing tokens; existing expense group Columns use8px spacing. No account, posting, repository, schema or frozen-renderer change.
+
+Verification: `flutter test test/text_layout_qa_test.dart test/bilingual_widget_test.dart test/gui_expense_groups_test.dart test/gui_trip_detail_test.dart test/auth_test.dart --no-pub --dart-define=use_arabic=true` PASS23. After final screenshot-timing change: expense group rerun PASS2; app-directory analyzer clean (8.3s). Prior clean analyzer122.7s retained. One subsequent root-directory analyzer was launched in error; not used as verification (already exited before attempted targeted stop). Test screenshot capture initially stalled in fake async; corrected with tester.runAsync. Before/after eight auth PNGs plus expense-section and trip-detail screenshots retained in ignored tools/.local/text-qa/widgets. Inspected narrow sign-in before/after, narrow200% expense Where and wide trip detail; group1 text spacing improved. Not all named screens yet visually checked; existing unrelated bidi/raw-token/formatting issues remain visible. Framework renders are not native OS-input or Android-device evidence.
+
+Groups2–7 remain pending; no overall completion claim. Existing performance/timeouts and frozen pagination gates unchanged. No hosted access, deployment, installation, push or merge.

@@ -3,6 +3,25 @@ import 'package:flutter/material.dart';
 import 'bilingual_message.dart';
 import 'owned_presentation.dart';
 
+/// Use the bundled font's natural ascent/descent. Inheriting Material's Latin
+/// line height compresses Urdu ink into adjacent labels, especially at 200%.
+TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
+  final base = DefaultTextStyle.of(context).style.merge(requested);
+  return TextStyle(
+    inherit: false,
+    fontFamily: 'NotoSansArabic',
+    fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
+    fontSize: ((base.fontSize ?? 14) * .85).clamp(12, double.infinity),
+    fontWeight: FontWeight.w400,
+    color: base.color,
+    backgroundColor: base.backgroundColor,
+    decoration: base.decoration,
+    decorationColor: base.decorationColor,
+    decorationStyle: base.decorationStyle,
+    decorationThickness: base.decorationThickness,
+  );
+}
+
 /// Intrinsic-safe wrapping in dialogs/tables; RTL only for the Urdu run.
 class BilingualText extends StatelessWidget {
   const BilingualText(
@@ -43,19 +62,7 @@ class BilingualText extends StatelessWidget {
           english,
           Text(
             text.ur,
-            style: (urStyle ?? style ?? const TextStyle()).copyWith(
-              fontFamily: 'NotoSansArabic',
-              fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
-              height: 1.6,
-              fontSize:
-                  ((urStyle?.fontSize ??
-                              style?.fontSize ??
-                              DefaultTextStyle.of(context).style.fontSize ??
-                              14) *
-                          .85)
-                      .clamp(12, double.infinity),
-              fontWeight: FontWeight.w400,
-            ),
+            style: _urduStyle(context, urStyle ?? style),
             textAlign: textAlign ?? TextAlign.right,
             textDirection: TextDirection.rtl,
             maxLines: maxLines,
@@ -90,18 +97,7 @@ class BilingualCaption extends StatelessWidget {
         if (text.ur.isNotEmpty)
           Text(
             text.ur,
-            style: (style ?? const TextStyle()).copyWith(
-              fontFamily: 'NotoSansArabic',
-              fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
-              height: 1.6,
-              fontSize:
-                  ((style?.fontSize ??
-                              DefaultTextStyle.of(context).style.fontSize ??
-                              14) *
-                          .85)
-                      .clamp(12, double.infinity),
-              fontWeight: FontWeight.w400,
-            ),
+            style: _urduStyle(context, style),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
           ),
@@ -173,11 +169,7 @@ InputDecoration bilingualDecoration(
             message.ur,
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
-            style: const TextStyle(
-              fontFamily: 'NotoSansArabic',
-              fontFamilyFallback: ['NotoSans', 'NotoSansMath'],
-              height: 1.6,
-            ),
+            style: _urduStyle(context, Theme.of(context).textTheme.bodySmall),
           ),
         ),
         ?source.helper,

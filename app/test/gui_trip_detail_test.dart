@@ -1,3 +1,5 @@
+import 'text_layout_qa_test.dart' show captureTextQa;
+
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/trips/trip_workspace.dart';
@@ -50,11 +52,14 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
+        final captureKey = GlobalKey();
         final repo = DetailFixture();
         var expensesOpened = 0;
         await tester.pumpWidget(
           MaterialApp(
             theme: KarvaanDesign.theme(),
+            builder: (_, child) =>
+                RepaintBoundary(key: captureKey, child: child!),
             home: MediaQuery(
               data: MediaQueryData(textScaler: TextScaler.linear(scale)),
               child: TripDetail(
@@ -70,6 +75,9 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        await tester.runAsync(
+          () => captureTextQa(tester, captureKey, 'trip-detail-$width-$scale'),
+        );
         expect(repo.details, 1);
         expect(repo.histories, 0);
         expect(find.text('Dispatch'), findsNothing);
@@ -92,6 +100,9 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text(L10n.tripExpensesScopeNotice.en), findsOneWidget);
         expect(expensesOpened, 0);
+        await tester.runAsync(
+          () => captureTextQa(tester, captureKey, 'trip-detail-$width-$scale'),
+        );
         expect(repo.details, 1);
         expect(repo.histories, 0);
         await tester.ensureVisible(find.byKey(const ValueKey('detail-tab-3')));

@@ -765,6 +765,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               title: L10n.whatSection,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
                 children: [
                   OutlinedButton(
                     onPressed: locked
@@ -786,6 +787,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               title: L10n.whoseMoneySection,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
                 children: [
                   OutlinedButton(
                     onPressed: locked
@@ -870,6 +872,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               title: L10n.whereSection,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
                 children: [
                   OutlinedButton(
                     onPressed: locked
@@ -934,6 +937,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               title: L10n.proofSection,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
                 children: [
                   OutlinedButton(
                     onPressed: locked ? null : pick,
