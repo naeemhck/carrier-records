@@ -455,3 +455,6 @@ Candidate12 guided-review update 2026-10-15: navigation/Trips accepted by owner;
 
 
 2026-10-16 text-QA group3: explicit domain labels remove raw lifecycle/load/consignment/backup tokens from Urdu; absent backup timestamps explained without invented dates. Existing unavailable helper action visibly disabled/reason shown; import prerequisites explained without changing authorization/validation.12 appended catalogue entries;25 affected testsPASS/analyzer clean10.8s; synthetic renders inspected. Groups4–7/final smoke pending. docs/karvaan-text-qa-evidence.md. T19 dispositions/T20TODO unchanged; no hosted access/push/merge/install/deploy.
+
+
+2026-10-16 text-QA group4: reproduced5px document overflow and offscreen selected trip tabs; natural scroll-flow/footer regions and measured summary reveal fix them. Wrapping nav/button layout plus measured complete expense toolbar; signed-in heading current bounds pass.26 affected testsPASS/current analyzer clean9.7s; failed first reveal/harness attempts preserved. Group5–7/full suite/build/smoke pending; docs/karvaan-text-qa-evidence.md. No push/merge/install/deploy/hosted access; T19 dispositions/T20TODO unchanged.

@@ -253,165 +253,180 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.expensesAndReimbursements),
-      actions: [
-        IconButton(
-          onPressed: busy ? null : load,
-          icon: const Icon(Icons.refresh),
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => Scaffold(
+      appBar: AppBar(
+        toolbarHeight: bilingualToolbarHeight(
+          context,
+          L10n.expensesAndReimbursements,
+          constraints.maxWidth - kToolbarHeight - kMinInteractiveDimension - 32,
         ),
-      ],
-    ),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        const BilingualText(
-          L10n.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless,
+        title: DefaultTextStyle(
+          style: Theme.of(context).textTheme.titleLarge!,
+          child: const BilingualText(L10n.expensesAndReimbursements),
         ),
-        if (busy) const LinearProgressIndicator(),
-        if (error != null) BilingualOwnedText(error!),
-        FilledButton.icon(
-          onPressed: busy
-              ? null
-              : () => open(
-                  ExpenseEntry(
-                    expenses: widget.expenses,
-                    finance: widget.finance,
-                    trips: widget.trips,
-                    masters: widget.masters,
-                    offices: widget.offices,
-                    guard: widget.guard,
-                    picker: widget.picker,
-                  ),
-                ),
-          icon: const Icon(Icons.add),
-          label: const BilingualText(L10n.newExpense),
-        ),
-        if (widget.corrections != null)
-          TextButton(
-            onPressed: () => open(
-              CorrectionWorkspace(
-                commands: widget.corrections!,
-                trips: widget.trips,
-                guard: widget.guard,
-              ),
-            ),
-            child: const BilingualCaption(L10n.correctionsAndHistory),
+        actions: [
+          IconButton(
+            onPressed: busy ? null : load,
+            icon: const Icon(Icons.refresh),
           ),
-        if (widget.administrator)
-          TextButton(
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const BilingualText(
+            L10n.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless,
+          ),
+          if (busy) const LinearProgressIndicator(),
+          if (error != null) BilingualOwnedText(error!),
+          FilledButton(
             onPressed: busy
                 ? null
-                : () async {
-                    setState(() => busy = true);
-                    try {
-                      final n = await widget.expenses.cleanup();
-                      if (mounted) {
-                        setState(
-                          () => error =
-                              'Removed $n abandoned uploads older than 24 hours. Referenced receipts are retained.',
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        setState(
-                          () => error = 'Cleanup failed. Referenced receipts are retained.',
-                        );
-                      }
-                    } finally {
-                      if (mounted) setState(() => busy = false);
-                    }
-                  },
-            child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
-          ),
-        if (!busy && error == null && rows.isEmpty)
-          const BilingualText(L10n.noRecordsFound),
-        for (final row in rows)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BilingualText(
-                    L10n.labelValuesfb62fe.withValues([
-                      row['expense_date'],
-                      row['trip_id'] == null
-                          ? L10n.standaloneMaintenance
-                          : L10n.tripCost,
-                    ]),
-                  ),
-                  KarvaanAmount(
-                    label: ownedMessage('Expense amount (PKR)'),
-                    value: row['amount'] as String,
-                  ),
-                  Text((row['notes']).toString()),
-                  BilingualOwnedText(row['funding_source']),
-                  if (row['effective'] == false)
-                    const BilingualText(
-                      L10n.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts,
+                : () => open(
+                    ExpenseEntry(
+                      expenses: widget.expenses,
+                      finance: widget.finance,
+                      trips: widget.trips,
+                      masters: widget.masters,
+                      offices: widget.offices,
+                      guard: widget.guard,
+                      picker: widget.picker,
                     ),
-                  if (row['replaces_expense_id'] != null)
+                  ),
+            child: const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.add),
+                SizedBox(width: 16),
+                Expanded(child: BilingualText(L10n.newExpense)),
+              ],
+            ),
+          ),
+          if (widget.corrections != null)
+            TextButton(
+              onPressed: () => open(
+                CorrectionWorkspace(
+                  commands: widget.corrections!,
+                  trips: widget.trips,
+                  guard: widget.guard,
+                ),
+              ),
+              child: const BilingualCaption(L10n.correctionsAndHistory),
+            ),
+          if (widget.administrator)
+            TextButton(
+              onPressed: busy
+                  ? null
+                  : () async {
+                      setState(() => busy = true);
+                      try {
+                        final n = await widget.expenses.cleanup();
+                        if (mounted) {
+                          setState(
+                            () => error =
+                                'Removed $n abandoned uploads older than 24 hours. Referenced receipts are retained.',
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          setState(
+                            () => error = 'Cleanup failed. Referenced receipts are retained.',
+                          );
+                        }
+                      } finally {
+                        if (mounted) setState(() => busy = false);
+                      }
+                    },
+              child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
+            ),
+          if (!busy && error == null && rows.isEmpty)
+            const BilingualText(L10n.noRecordsFound),
+          for (final row in rows)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     BilingualText(
-                      L10n.replacesOriginalExpense.withValues([
-                        row['replaces_expense_id'],
-                        row['correction_reason'],
+                      L10n.labelValuesfb62fe.withValues([
+                        row['expense_date'],
+                        row['trip_id'] == null
+                            ? L10n.standaloneMaintenance
+                            : L10n.tripCost,
                       ]),
                     ),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      TextButton(
-                        onPressed: busy
-                            ? null
-                            : () => open(
-                                ExpenseSettlement(
-                                  expense: row,
-                                  expenses: widget.expenses,
-                                  finance: widget.finance,
-                                  masters: widget.masters,
-                                  guard: widget.guard,
+                    KarvaanAmount(
+                      label: ownedMessage('Expense amount (PKR)'),
+                      value: row['amount'] as String,
+                    ),
+                    Text((row['notes']).toString()),
+                    BilingualOwnedText(row['funding_source']),
+                    if (row['effective'] == false)
+                      const BilingualText(
+                        L10n.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts,
+                      ),
+                    if (row['replaces_expense_id'] != null)
+                      BilingualText(
+                        L10n.replacesOriginalExpense.withValues([
+                          row['replaces_expense_id'],
+                          row['correction_reason'],
+                        ]),
+                      ),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        TextButton(
+                          onPressed: busy
+                              ? null
+                              : () => open(
+                                  ExpenseSettlement(
+                                    expense: row,
+                                    expenses: widget.expenses,
+                                    finance: widget.finance,
+                                    masters: widget.masters,
+                                    guard: widget.guard,
+                                  ),
                                 ),
-                              ),
-                        child: const BilingualCaption(
-                          L10n.claimsReimburseRecover,
+                          child: const BilingualCaption(
+                            L10n.claimsReimburseRecover,
+                          ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: busy ? null : () => receipt(row),
-                        child: const BilingualCaption(L10n.privateReceipt),
-                      ),
-                    ],
-                  ),
-                ],
+                        TextButton(
+                          onPressed: busy ? null : () => receipt(row),
+                          child: const BilingualCaption(L10n.privateReceipt),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+          Row(
+            children: [
+              TextButton(
+                onPressed: busy || offset == 0
+                    ? null
+                    : () {
+                        offset -= 50;
+                        load();
+                      },
+                child: const BilingualCaption(L10n.previous),
+              ),
+              TextButton(
+                onPressed: busy || rows.length < 50
+                    ? null
+                    : () {
+                        offset += 50;
+                        load();
+                      },
+                child: const BilingualCaption(L10n.next),
+              ),
+            ],
           ),
-        Row(
-          children: [
-            TextButton(
-              onPressed: busy || offset == 0
-                  ? null
-                  : () {
-                      offset -= 50;
-                      load();
-                    },
-              child: const BilingualCaption(L10n.previous),
-            ),
-            TextButton(
-              onPressed: busy || rows.length < 50
-                  ? null
-                  : () {
-                      offset += 50;
-                      load();
-                    },
-              child: const BilingualCaption(L10n.next),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

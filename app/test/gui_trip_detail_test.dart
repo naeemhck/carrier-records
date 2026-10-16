@@ -100,6 +100,26 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text(L10n.tripExpensesScopeNotice.en), findsOneWidget);
         expect(expensesOpened, 0);
+        final notice = tester.getRect(
+          find.text(L10n.tripExpensesScopeNotice.en),
+        );
+        final tabs = tester.getRect(
+          find.descendant(
+            of: find.byType(SliverPersistentHeader),
+            matching: find.byType(KarvaanGlass),
+          ),
+        );
+        expect(
+          notice.top,
+          greaterThanOrEqualTo(tabs.bottom),
+          reason: 'Selected tab content stays below pinned tabs',
+        );
+        expect(
+          notice.top,
+          lessThan(1000),
+          reason: 'Selecting a tab reveals its content, not only its offscreen element',
+        );
+
         await tester.runAsync(
           () => captureTextQa(tester, captureKey, 'trip-detail-$width-$scale'),
         );

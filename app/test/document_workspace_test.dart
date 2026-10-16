@@ -62,6 +62,14 @@ void main() {
     await tester.tap(find.text(L10n.outputsAndPresets.en));
     await tester.pumpAndSettle();
     expect(configured, isTrue);
+    final empty = find.text(L10n.noIssuedDocumentsInYourCurrentScope.ur);
+    final previous = find.text(L10n.previousDocuments.en);
+    expect(
+      tester.getRect(empty).bottom,
+      lessThanOrEqualTo(tester.getRect(previous).top),
+      reason: 'Empty-state Urdu must not be painted under pagination',
+    );
+
     expect(commands.requests, isEmpty);
     expect(tester.takeException(), isNull);
   });

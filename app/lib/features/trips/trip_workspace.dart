@@ -1470,7 +1470,34 @@ class TripDetail extends StatefulWidget {
 }
 
 class _TripDetailState extends State<TripDetail> {
+  final scroll = ScrollController();
+  final summaryKey = GlobalKey();
   int tab = 0;
+
+  void selectTab(int value) {
+    setState(() => tab = value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !scroll.hasClients) return;
+      final summary = summaryKey.currentContext?.findRenderObject();
+      if (summary is! RenderBox || !summary.hasSize) return;
+      // The summary is the first sliver. Its actual laid-out height is exactly
+      // the scroll offset where the pinned tabs begin, at any text scale.
+      final offset = summary.size.height;
+      scroll.jumpTo(
+        offset.clamp(
+          scroll.position.minScrollExtent,
+          scroll.position.maxScrollExtent,
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    scroll.dispose();
+    super.dispose();
+  }
+
   late Future<Map<String, dynamic>> data;
   @override
   void initState() {
@@ -1555,9 +1582,11 @@ class _TripDetailState extends State<TripDetail> {
                       .firstOrNull ??
                   TripStrings.none;
         return CustomScrollView(
+          controller: scroll,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
+                key: summaryKey,
                 padding: const EdgeInsets.all(16),
                 child: Card(
                   child: Padding(
@@ -1771,7 +1800,7 @@ class _TripDetailState extends State<TripDetail> {
                   L10n.history,
                 ],
                 selected: tab,
-                onSelected: (value) => setState(() => tab = value),
+                onSelected: selectTab,
                 height: 80 * MediaQuery.textScalerOf(context).scale(1) + 16,
               ),
             ),

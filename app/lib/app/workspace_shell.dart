@@ -249,96 +249,116 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         final destinations = WorkspaceDestination.values
             .where((d) => d.allowed(admin))
             .toList();
-        Widget navigation(
-          bool compact, {
-          VoidCallback? dismiss,
-        }) => KarvaanGlass(
-          child: SizedBox(
-            width: compact ? 88 : 264,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: compact
-                      ? const Icon(Icons.route, color: KarvaanDesign.accent)
-                      : const BilingualText(
-                          L10n.brand,
-                          style: TextStyle(fontSize: 22),
-                        ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      for (var i = 0; i < destinations.length; i++) ...[
-                        if (!compact &&
-                            (i == 0 ||
-                                destinations[i].group !=
-                                    destinations[i - 1].group))
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: BilingualText(
-                              destinations[i].group,
-                              style: const TextStyle(
-                                color: KarvaanDesign.secondary,
+        Widget navigation(bool compact, {VoidCallback? dismiss}) =>
+            KarvaanGlass(
+              child: SizedBox(
+                width: compact ? 88 : 264,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: compact
+                          ? const Icon(Icons.route, color: KarvaanDesign.accent)
+                          : const BilingualText(
+                              L10n.brand,
+                              style: TextStyle(fontSize: 22),
+                            ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          for (var i = 0; i < destinations.length; i++) ...[
+                            if (!compact &&
+                                (i == 0 ||
+                                    destinations[i].group !=
+                                        destinations[i - 1].group))
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  8,
+                                ),
+                                child: BilingualText(
+                                  destinations[i].group,
+                                  style: const TextStyle(
+                                    color: KarvaanDesign.secondary,
+                                  ),
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              child: Material(
+                                color: selected == destinations[i]
+                                    ? const Color(0xFFEAF4ED)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                child: compact
+                                    ? IconButton(
+                                        key: ValueKey(
+                                          'nav:${destinations[i].name}',
+                                        ),
+                                        tooltip: destinations[i].label.inline,
+                                        icon: Icon(destinations[i].icon),
+                                        isSelected: selected == destinations[i],
+                                        onPressed: () {
+                                          dismiss?.call();
+                                          open(destinations[i]);
+                                        },
+                                      )
+                                    : InkWell(
+                                        key: ValueKey(
+                                          'nav:${destinations[i].name}',
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: () {
+                                          dismiss?.call();
+                                          open(destinations[i]);
+                                        },
+                                        child: Semantics(
+                                          selected: selected == destinations[i],
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Icon(destinations[i].icon),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: BilingualText(
+                                                    destinations[i].label,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                               ),
                             ),
-                          ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Material(
-                            color: selected == destinations[i]
-                                ? const Color(0xFFEAF4ED)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            child: compact
-                                ? IconButton(
-                                    key: ValueKey(
-                                      'nav:${destinations[i].name}',
-                                    ),
-                                    tooltip: destinations[i].label.inline,
-                                    icon: Icon(destinations[i].icon),
-                                    isSelected: selected == destinations[i],
-                                    onPressed: () {
-                                      dismiss?.call();
-                                      open(destinations[i]);
-                                    },
-                                  )
-                                : ListTile(
-                                    key: ValueKey(
-                                      'nav:${destinations[i].name}',
-                                    ),
-                                    selected: selected == destinations[i],
-                                    leading: Icon(destinations[i].icon),
-                                    title: BilingualText(destinations[i].label),
-                                    onTap: () {
-                                      dismiss?.call();
-                                      open(destinations[i]);
-                                    },
-                                  ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => setState(() => collapsed = !collapsed),
+                      tooltip:
+                          (compact
+                                  ? L10n.expandNavigation
+                                  : L10n.collapseNavigation)
+                              .inline,
+                      icon: Icon(
+                        compact ? Icons.chevron_right : Icons.chevron_left,
+                      ),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: () => setState(() => collapsed = !collapsed),
-                  tooltip:
-                      (compact
-                              ? L10n.expandNavigation
-                              : L10n.collapseNavigation)
-                          .inline,
-                  icon: Icon(
-                    compact ? Icons.chevron_right : Icons.chevron_left,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+              ),
+            );
         final account = PopupMenuButton<String>(
           popUpAnimationStyle: AnimationStyle.noAnimation,
           tooltip: L10n.accountNavigation.inline,

@@ -263,3 +263,32 @@ class RouteLabel extends StatelessWidget {
     ),
   );
 }
+
+/// Measure the same wrapping styles used by a complete stacked toolbar title.
+/// The caller supplies actual parent width after navigation/action reservations.
+double bilingualToolbarHeight(
+  BuildContext context,
+  Bilingual title,
+  double availableWidth,
+) {
+  final style = Theme.of(context).textTheme.titleLarge!;
+  double measure(String text, TextStyle textStyle, TextDirection direction) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: textStyle),
+      textDirection: direction,
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: availableWidth.clamp(1, double.infinity));
+    final height = painter.height;
+    painter.dispose();
+    return height;
+  }
+
+  return (measure(
+            title.en,
+            style.copyWith(fontWeight: FontWeight.w600),
+            TextDirection.ltr,
+          ) +
+          measure(title.ur, _urduStyle(context, style), TextDirection.rtl) +
+          16)
+      .clamp(88 * MediaQuery.textScalerOf(context).scale(1), double.infinity);
+}

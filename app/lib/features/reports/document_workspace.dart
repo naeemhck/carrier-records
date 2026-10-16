@@ -89,78 +89,77 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
       toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
       title: const BilingualText(L10n.issuedDocuments),
     ),
-    body: Column(
+    // One scroll flow gives large text its natural height; pagination cannot
+    // squeeze an empty-state viewport to zero or paint over its Urdu lines.
+    body: ListView(
+      padding: const EdgeInsets.all(16),
       children: [
         if (widget.onConfigure != null)
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(bottom: 16),
             child: OutlinedButton.icon(
               onPressed: widget.onConfigure,
               icon: const Icon(Icons.tune),
               label: const BilingualCaption(L10n.outputsAndPresets),
             ),
           ),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            controller: search,
-            decoration: bilingualDecoration(
-              context,
-              InputDecoration(
-                label: BilingualCaption(L10n.documentNumberRecipient),
-              ),
+        TextField(
+          controller: search,
+          decoration: bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualCaption(L10n.documentNumberRecipient),
             ),
-            onSubmitted: (_) => setState(() {
-              offset = 0;
-              reload();
-            }),
           ),
+          onSubmitted: (_) => setState(() {
+            offset = 0;
+            reload();
+          }),
         ),
-        Expanded(
-          child: FutureBuilder<Map<String, dynamic>>(
-            future: rows,
-            builder: (_, result) {
-              if (result.hasError) {
-                return const Center(
-                  child: BilingualText(L10n.unableToLoadAuthorizedDocuments),
-                );
-              }
-              if (!result.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final data = result.data!, list = data['rows'] as List;
-              return Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        if (list.isEmpty)
-                          const BilingualListTile(
-                            title: BilingualText(
-                              L10n.noIssuedDocumentsInYourCurrentScope,
-                            ),
-                          ),
-                        for (final d in list)
-                          BilingualListTile(
-                            title: Text(
-                              '${d['permanent_number']} - ${d['recipient']}',
-                            ),
-                            subtitle: BilingualText(
-                              L10n.issuedBy.withValues([
-                                d['issued_at'],
-                                d['issuer'],
-                                d['superseded'] == true
-                                    ? 'Superseded'
-                                    : 'Original / current',
-                              ]),
-                            ),
-                            trailing: const Icon(Icons.description_outlined),
-                            onTap: () => open(d['id'] as String),
-                          ),
-                      ],
+        const SizedBox(height: 16),
+        FutureBuilder<Map<String, dynamic>>(
+          future: rows,
+          builder: (_, result) {
+            if (result.hasError) {
+              return const BilingualText(L10n.unableToLoadAuthorizedDocuments);
+            }
+            if (!result.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final data = result.data!, list = data['rows'] as List;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (list.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: BilingualText(
+                      L10n.noIssuedDocumentsInYourCurrentScope,
                     ),
                   ),
-                  Wrap(
+                for (final d in list)
+                  BilingualListTile(
+                    title: Text('${d['permanent_number']} - ${d['recipient']}'),
+                    subtitle: BilingualText(
+                      L10n.issuedBy.withValues([
+                        d['issued_at'],
+                        d['issuer'],
+                        d['superseded'] == true
+                            ? 'Superseded'
+                            : 'Original / current',
+                      ]),
+                    ),
+                    trailing: const Icon(Icons.description_outlined),
+                    onTap: () => open(d['id'] as String),
+                  ),
+                const SizedBox(height: 16),
+                const Divider(),
+                SafeArea(
+                  top: false,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       TextButton(
                         onPressed: offset == 0
@@ -183,10 +182,10 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                       ),
                     ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ],
     ),
