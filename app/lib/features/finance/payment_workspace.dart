@@ -549,6 +549,12 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
           ])
             TextField(
               controller: field.$1,
+              style: identical(field.$1, amount)
+                  ? Theme.of(context).textTheme.displaySmall
+                  : Theme.of(context).textTheme.bodyMedium,
+              textDirection: identical(field.$1, amount)
+                  ? TextDirection.ltr
+                  : null,
               enabled: !busy && pendingRequest == null,
               decoration: bilingualDecoration(
                 context,

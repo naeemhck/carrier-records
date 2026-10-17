@@ -202,9 +202,8 @@ class KarvaanMetric extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
+        KarvaanFigure(
           formattedValue,
-          textDirection: TextDirection.ltr,
           style: hero
               ? type.displaySmall
               : compact
@@ -216,6 +215,42 @@ class KarvaanMetric extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Keep decimal digits on one line without reducing the user's text scale.
+/// A bounded horizontal scrollbar exposes long values at narrow/large scales.
+class KarvaanFigure extends StatefulWidget {
+  const KarvaanFigure(this.value, {super.key, required this.style});
+  final String value;
+  final TextStyle? style;
+  @override
+  State<KarvaanFigure> createState() => _KarvaanFigureState();
+}
+
+class _KarvaanFigureState extends State<KarvaanFigure> {
+  final scroll = ScrollController();
+  @override
+  void dispose() {
+    scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scrollbar(
+    controller: scroll,
+    thumbVisibility: true,
+    child: SingleChildScrollView(
+      controller: scroll,
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        widget.value,
+        style: widget.style,
+        textDirection: TextDirection.ltr,
+        softWrap: false,
+      ),
+    ),
+  );
 }
 
 /// Displays an existing canonical amount; deliberately performs no arithmetic.

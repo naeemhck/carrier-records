@@ -183,6 +183,7 @@ void main() {
       await prepare();
       final confirm = find.widgetWithText(FilledButton, 'Confirm payment');
       await tester.ensureVisible(confirm);
+      await tester.pump();
       await tester.tap(confirm);
       await tester.pump();
       expect(find.text('Payment confirmed. Balances reloaded.'), findsNothing);
@@ -191,6 +192,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Synthetic review'), findsOneWidget);
       fake.pending = Completer();
+      await tester.ensureVisible(confirm);
+      await tester.pump();
       await tester.tap(confirm);
       await tester.pump();
       expect(fake.requests.length, 2);
@@ -204,6 +207,8 @@ void main() {
       );
       await prepare();
       fake.pending = Completer();
+      await tester.ensureVisible(confirm);
+      await tester.pump();
       await tester.tap(confirm);
       await tester.pump();
       fake.pending.completeError(

@@ -1,3 +1,10 @@
+import 'package:carrier_records/features/trips/trip_workspace.dart';
+import 'package:carrier_records/features/finance/payment_workspace.dart';
+
+import 'gui_trip_detail_test.dart' show DetailFixture;
+import 'payment_workspace_test.dart'
+    show PaymentTrips, PaymentMasters, PaymentsFake, tripId;
+
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/app/karvaan_typography.dart';
 import 'package:carrier_records/features/reports/report_workspace.dart';
@@ -27,6 +34,149 @@ void main() {
   });
   for (final width in [360.0, 1280.0]) {
     for (final scale in [1.0, 2.0]) {
+      testWidgets('trip hero preserves separate quote amounts $width/$scale', (
+        t,
+      ) async {
+        t.view.physicalSize = Size(width, 1000);
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.resetPhysicalSize);
+        addTearDown(t.view.resetDevicePixelRatio);
+        final capture = GlobalKey();
+        final repo = DetailFixture();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: KarvaanDesign.theme(),
+            home: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: RepaintBoundary(
+                key: capture,
+                child: TripDetail(
+                  repository: repo,
+                  id: 'synthetic-trip',
+                  canReturn: (_) => false,
+                  onEdit: (_) async {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await t.pumpAndSettle();
+        final metrics = t
+            .widgetList<KarvaanMetric>(find.byType(KarvaanMetric))
+            .toList();
+        expect(metrics.where((m) => m.hero).length, 1);
+        final hero = metrics.singleWhere((m) => m.hero);
+        expect(hero.formattedValue, 'PKR 100,000.00');
+        expect(
+          metrics.any((m) => m.formattedValue == 'PKR 95,000.00' && !m.hero),
+          isTrue,
+        );
+        expect(
+          metrics.any((m) => m.formattedValue == 'PKR 5,000.00' && !m.hero),
+          isTrue,
+        );
+        final target = find.byKey(const ValueKey('trip-total-customer_charge'));
+        await t.ensureVisible(target);
+        await t.pumpAndSettle();
+        expect(find.text(hero.label.en), findsOneWidget);
+        expect(find.text(hero.label.ur), findsOneWidget);
+        final number = find.descendant(
+          of: target,
+          matching: find.text(hero.formattedValue),
+        );
+        expect(
+          t.widget<Text>(number).softWrap,
+          isFalse,
+          reason: 'A decimal amount must never wrap individual digits',
+        );
+        final horizontal = find.descendant(
+          of: target,
+          matching: find.byType(SingleChildScrollView),
+        );
+        final strip = t.widget<SingleChildScrollView>(horizontal);
+        if (width == 360 && scale == 2) {
+          expect(strip.controller!.position.maxScrollExtent, greaterThan(0));
+          await t.drag(horizontal, const Offset(-300, 0));
+          await t.pumpAndSettle();
+          expect(
+            strip.controller!.offset,
+            greaterThan(0),
+            reason: 'Full unshrunk amount remains reachable at 200%',
+          );
+        }
+        await t.runAsync(
+          () => captureTextQa(t, capture, 'trip-hierarchy-$width-$scale'),
+        );
+        expect(repo.details, 1);
+        expect(repo.requests, isEmpty);
+        expect(t.takeException(), isNull);
+      });
+      testWidgets('Money explicit total alone is display sized $width/$scale', (
+        t,
+      ) async {
+        t.view.physicalSize = Size(width, 1000);
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.resetPhysicalSize);
+        addTearDown(t.view.resetDevicePixelRatio);
+        final capture = GlobalKey();
+        final finance = PaymentsFake();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: KarvaanDesign.theme(),
+            home: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: RepaintBoundary(
+                key: capture,
+                child: PaymentWorkspace(
+                  finance: finance,
+                  trips: PaymentTrips(),
+                  masters: PaymentMasters(),
+                  offices: const [
+                    {'id': 'office', 'name': 'Synthetic Karachi'},
+                  ],
+                  initialTrip: tripId,
+                ),
+              ),
+            ),
+          ),
+        );
+        await t.pumpAndSettle();
+        final target = find.byWidgetPredicate(
+          (w) =>
+              w is TextField && w.style?.fontSize == KarvaanTypography.display,
+        );
+        // ListView builds lazily: at narrow 200% the total is below the fold.
+        await t.scrollUntilVisible(
+          target,
+          250,
+          scrollable: find.byType(Scrollable).first,
+          maxScrolls: 40,
+        );
+        final hero = t.widget<TextField>(target);
+        final fields = t.widgetList<TextField>(find.byType(TextField));
+        await t.ensureVisible(target);
+        await t.enterText(target, '12345.67');
+        await t.pumpAndSettle();
+        expect(hero.controller!.text, '12345.67');
+        expect(hero.textDirection, TextDirection.ltr);
+        expect(
+          fields
+              .where((f) => f.style?.fontSize == KarvaanTypography.display)
+              .length,
+          1,
+        );
+        expect(
+          t
+              .widgetList<KarvaanMetric>(find.byType(KarvaanMetric))
+              .where((m) => m.hero),
+          isEmpty,
+        );
+        await t.runAsync(
+          () => captureTextQa(t, capture, 'money-hierarchy-$width-$scale'),
+        );
+        expect(finance.requests, isEmpty);
+        expect(t.takeException(), isNull);
+      });
       testWidgets('monthly hierarchy paired labels $width/$scale', (t) async {
         t.view.physicalSize = Size(width, 1000);
         t.view.devicePixelRatio = 1;

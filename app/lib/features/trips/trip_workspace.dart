@@ -539,6 +539,30 @@ class _MasterChoiceState extends State<_MasterChoice> {
   );
 }
 
+/// Existing quote totals, with one optional primary customer figure.
+class TripTotalsStrip extends StatelessWidget {
+  const TripTotalsStrip({super.key, required this.values, this.hero = false});
+  final Map values;
+  final bool hero;
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: 24,
+    runSpacing: 12,
+    children: [
+      for (final key in ['customer_charge', 'commission', 'owner_entitlement'])
+        SizedBox(
+          width: 280,
+          child: KarvaanMetric(
+            key: ValueKey('trip-total-$key'),
+            label: ownedMessage(TripStrings.labels[key]),
+            formattedValue: displayMoney(values[key]),
+            hero: hero && key == 'customer_charge',
+          ),
+        ),
+    ],
+  );
+}
+
 class TripEditor extends StatefulWidget {
   const TripEditor({
     super.key,
@@ -568,19 +592,7 @@ class _TripEditorState extends State<TripEditor> {
     Widget totals;
     try {
       final values = d.previewTotals();
-      totals = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final key in [
-            'customer_charge',
-            'commission',
-            'owner_entitlement',
-          ])
-            BilingualText(
-              moneyLabel([ownedMessage(TripStrings.labels[key]), values[key]]),
-            ),
-        ],
-      );
+      totals = TripTotalsStrip(values: values, hero: true);
     } catch (e) {
       totals = BilingualOwnedText(tripError(e));
     }
@@ -798,16 +810,7 @@ class _TripEditorState extends State<TripEditor> {
     );
   }
 
-  Widget amounts(Map values) => Wrap(
-    spacing: 24,
-    runSpacing: 8,
-    children: [
-      for (final k in ['customer_charge', 'commission', 'owner_entitlement'])
-        BilingualText(
-          moneyLabel([ownedMessage(TripStrings.labels[k]), values[k]]),
-        ),
-    ],
-  );
+  Widget amounts(Map values) => TripTotalsStrip(values: values);
   Widget preview(DraftConsignment c) {
     try {
       final q = c.preview();
@@ -1378,13 +1381,7 @@ class _DraftReviewState extends State<_DraftReview> {
             const BilingualText(
               L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
             ),
-            for (final k in widget.totals.keys)
-              BilingualText(
-                moneyLabel([
-                  ownedMessage(TripStrings.labels[k]),
-                  widget.totals[k],
-                ]),
-              ),
+            TripTotalsStrip(values: widget.totals, hero: true),
             if (needed) ...[
               const BilingualText(
                 L10n.anotherDispatchedJourneyUsesThisVehicleReviewAndConfirm,
@@ -1600,6 +1597,8 @@ class _TripDetailState extends State<TripDetail> {
                         ),
                         TripStatusBadge(r['state'] as String),
                         const SizedBox(height: 16),
+                        TripTotalsStrip(values: r['totals'] as Map, hero: true),
+                        const SizedBox(height: 16),
                         RouteLabel(
                           origin: r['origin_name'] as String,
                           destination: r['destination_name'] as String,
@@ -1650,17 +1649,6 @@ class _TripDetailState extends State<TripDetail> {
                         const BilingualText(
                           L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
                         ),
-                        for (final k in [
-                          'customer_charge',
-                          'commission',
-                          'owner_entitlement',
-                        ])
-                          BilingualText(
-                            moneyLabel([
-                              ownedMessage(TripStrings.labels[k]),
-                              (r['totals'] as Map)[k],
-                            ]),
-                          ),
                         BilingualText(
                           L10n.carCount04a594.withValues([
                             (r['totals'] as Map)['car_count'],
@@ -1901,17 +1889,7 @@ class _TripDetailState extends State<TripDetail> {
                             const BilingualText(
                               L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
                             ),
-                            for (final key in [
-                              'customer_charge',
-                              'commission',
-                              'owner_entitlement',
-                            ])
-                              BilingualText(
-                                moneyLabel([
-                                  ownedMessage(TripStrings.labels[key]),
-                                  (r['totals'] as Map)[key],
-                                ]),
-                              ),
+                            TripTotalsStrip(values: r['totals'] as Map),
                             if (widget.onPayments != null)
                               OutlinedButton(
                                 onPressed: widget.onPayments,
