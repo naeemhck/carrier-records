@@ -32,6 +32,12 @@ for suffix in ['text-smoke','text-exports']:
  folder=ROOT/'tools/.local'/('gui'+version.split('+')[1]+'-'+suffix)
  for p in folder.iterdir():
   if p.suffix in {'.png','.pdf','.xlsx','.json'}:copy(p,pack/'browser'/suffix/p.name)
+# Preserve supplementary role/fault evidence, including a failed attempt when present.
+for suffix in ['role-khi','role-khi-retry1','role-isb','write-fault']:
+ folder=ROOT/'tools/.local'/('gui'+version.split('+')[1]+'-'+suffix)
+ if folder.is_dir():
+  for p in folder.iterdir():
+   if p.suffix in {'.png','.pdf','.xlsx','.json'}:copy(p,pack/'browser'/suffix/p.name)
 for name in ['bilingual-glossary.md','docs/karvaan-text-qa-evidence.md','docs/karvaan-text-review.md']:
  p=ROOT/name;copy(p,pack/p.name)
 copy(root/'manifest.json',pack/'build-manifest.json');copy(root/'audit.json',pack/'candidate-audit.json')

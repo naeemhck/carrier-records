@@ -25,6 +25,10 @@ Record screen, viewport/text scale, observed result and exact wording/layout cha
 
 Monthly-summary latency/timeouts and frozen-template pagination remain separate unresolved release gates. Framework/browser resizing is not native OS-input or Android-device validation. Android output is a test-signed candidate, never T20 release acceptance. Broader rollout, installation, merge, push and deployment require separate authorization.
 
-## Candidate17 hold
+## Candidate17 local review scope
 
-Builds and88manifest hashes pass, but final strict credential audit and release-browser smoke are blocked by unresponsive Docker CLI after disk recovery. Do not launch/distribute candidate17 as a verified review build yet. Restart Windows when safe, recover Docker without reset/purge, then follow the exact resume checks in karvaan-text-qa-evidence.md. Existing candidate12 review artifacts remain preserved.
+The earlier Docker/audit/browser hold is superseded by recorded recovery and actual candidate17 verification. Version0.2.0+17/sourcee39cf29d03d0527dbc49924a0008e6403320d052: builds/88hashes, strict candidate credential audit, fresh local trip/dispatch-dismissal, restricted-role, fault/retry and PDF/XLSX checks passed. Use only the pinned8771/60321 loopback environment and synthetic accounts. The Windows installer remains uninstalled; native OS-input and Android-device checks remain pending.
+
+Review pack preparation does not clear performance/timeouts, frozen-template pagination or terminology approval. U06/U07 remain IN PROGRESS. No production installation, push, merge, hosted access or deployment is authorized. Follow the screen checklist and give screen-specific feedback before further broad design changes.
+
+Local review pack: `tools/.local/candidates/0.2.0+17/review-pack/README.md` (131hashed files; strict664-entry review audit passed). Its compiled source remains e39cf29; later commits contain evidence/test-harness changes only. Use screenshots/samples for review and the pinned loopback browser for optional local interaction. This is not a full release or overall handoff acceptance.
