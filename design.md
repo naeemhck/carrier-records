@@ -199,3 +199,6 @@ Only the trip-step transition may animate (250ms; reduced-motion immediate). Kee
 The prior monthly-summary gate remains unresolved (p95 5.871856s); GUI changes must be measured separately and must not be presented as fixing it. T19 owner acceptance/waivers remain recorded as such. T20 remains TODO.
 
 Documents navigation opens the existing authorized issued-document list directly, with an Outputs/presets configuration action and unchanged supersession/export callbacks. All use the same guarded child navigator and existing repositories. Native navigation may scroll in short Windows viewports; keyboard/test input must bring the control into view rather than clicking through the footer.
+
+## Typography hierarchy clarification — 2026-10-17
+User selected typography-only with stacked labels retained; whole-page RTL/language toggle is not implemented by this task. KarvaanTypography owns UI logical-pixel roles: one hero figure30, screen22, section16/15, body13, caption12, micro11. Urdu floor44/3 logical pixels (11pt equivalent), natural bundled font metrics and normal accessibility scaling. Caption labels follow canonical figures; one hero per primary view, other totals headline20 maximum. Original catalogue/glossary and immutable document typography remain unchanged. Evidence: docs/karvaan-typography-evidence.md.

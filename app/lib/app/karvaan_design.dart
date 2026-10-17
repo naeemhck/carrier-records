@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'bilingual.dart';
+import 'karvaan_typography.dart';
 
 /// Presentation tokens only. No domain state or derived financial totals.
 abstract final class KarvaanDesign {
@@ -23,6 +24,7 @@ abstract final class KarvaanDesign {
       useMaterial3: true,
       splashFactory: NoSplash.splashFactory,
       fontFamily: 'NotoSans',
+      textTheme: KarvaanTypography.textTheme,
       fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
       scaffoldBackgroundColor: background,
       colorScheme: ColorScheme.fromSeed(seedColor: accent).copyWith(
@@ -41,8 +43,12 @@ abstract final class KarvaanDesign {
           TargetPlatform.iOS: _ImmediateTransition(),
         },
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         toolbarHeight: 88,
+        titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
+          color: ink,
+          fontFamily: 'NotoSans',
+        ),
         backgroundColor: background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
@@ -58,6 +64,11 @@ abstract final class KarvaanDesign {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        labelStyle: KarvaanTypography.textTheme.bodyMedium,
+        helperStyle: KarvaanTypography.textTheme.bodySmall,
+        errorStyle: KarvaanTypography.textTheme.bodySmall,
+        // Avoid Material shrinking Urdu floating labels below the readable floor.
+        floatingLabelStyle: KarvaanTypography.textTheme.bodyMedium,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(16),
@@ -172,11 +183,52 @@ class KarvaanSection extends StatelessWidget {
   );
 }
 
+/// One canonical figure, followed by its quiet label. Never computes a total.
+class KarvaanMetric extends StatelessWidget {
+  const KarvaanMetric({
+    super.key,
+    required this.label,
+    required this.formattedValue,
+    this.hero = false,
+    this.compact = false,
+  });
+  final Bilingual label;
+  final String formattedValue;
+  final bool hero, compact;
+  @override
+  Widget build(BuildContext context) {
+    final type = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          formattedValue,
+          textDirection: TextDirection.ltr,
+          style: hero
+              ? type.displaySmall
+              : compact
+              ? type.bodyMedium
+              : type.headlineSmall,
+        ),
+        const SizedBox(height: 4),
+        BilingualText(label, style: type.bodySmall),
+      ],
+    );
+  }
+}
+
 /// Displays an existing canonical amount; deliberately performs no arithmetic.
 class KarvaanAmount extends StatelessWidget {
-  const KarvaanAmount({super.key, required this.label, required this.value});
+  const KarvaanAmount({
+    super.key,
+    required this.label,
+    required this.value,
+    this.hero = false,
+  });
   final Bilingual label;
   final String value;
+  final bool hero;
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.symmetric(vertical: 8),
@@ -185,21 +237,10 @@ class KarvaanAmount extends StatelessWidget {
       color: const Color(0xFFEAF4ED),
       borderRadius: BorderRadius.circular(12),
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        BilingualText(label),
-        const SizedBox(height: 8),
-        Text(
-          displayMoney(value),
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.right,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-      ],
+    child: KarvaanMetric(
+      label: label,
+      formattedValue: displayMoney(value),
+      hero: hero,
     ),
   );
 }

@@ -122,23 +122,29 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     });
   }
 
-  Widget value(String key, Object? amount, {bool lifetime = false}) =>
-      BilingualText(
-        L10n.labelValuesfb62fe.withValues([
-          ownedMessage(
-            lifetime
-                ? reportLabels[key]
-                      ?.replaceAll('period end', 'current lifetime')
-                      .replaceAll('period costs', 'all linked costs')
-                      .replaceAll('expense date', 'all linked expense dates')
-                : reportLabels[key],
-          ),
-          displayField(
-            ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
-            amount,
-          ),
-        ]),
-      );
+  Widget value(
+    String key,
+    Object? amount, {
+    bool lifetime = false,
+    bool hero = false,
+    bool compact = false,
+  }) => KarvaanMetric(
+    key: hero ? ValueKey('report-hero-$key') : null,
+    hero: hero,
+    compact: compact,
+    label: ownedMessage(
+      lifetime
+          ? reportLabels[key]
+                ?.replaceAll('period end', 'current lifetime')
+                .replaceAll('period costs', 'all linked costs')
+                .replaceAll('expense date', 'all linked expense dates')
+          : reportLabels[key],
+    ),
+    formattedValue: displayField(
+      ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
+      amount,
+    ),
+  );
   Widget journeys(Future<TripPage>? future, String title) =>
       FutureBuilder<TripPage>(
         future: future,
@@ -323,12 +329,28 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               final totals = Map<String, dynamic>.from(data['totals'] as Map);
               final rows = data['rows'] as List;
               final lifetime = data['lifetime'] == true;
+              final primary = switch (kind) {
+                'MONTHLY_OWNER' || 'TRIP_PROFIT' => 'owner_profit',
+                'CLAIMS' => 'customer_outstanding',
+                _ => 'operating_profit',
+              };
+              final summaryKeys = widget.dashboard
+                  ? [
+                      'dispatched',
+                      'arrived',
+                      'owner_earnings',
+                      'vehicle_cost',
+                      'operating_profit',
+                      'customer_outstanding',
+                      'owner_due',
+                    ]
+                  : reportLabels.keys;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BilingualOwnedText(
                     data['scope'] as String,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   BilingualText(
                     L10n.offices024b84.withValues([
@@ -346,6 +368,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   BilingualText(
                     L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
                         .withValues([data['generated_at']]),
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
                   if (rows.isEmpty)
                     const Padding(
@@ -356,18 +379,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      for (final key
-                          in widget.dashboard
-                              ? [
-                                  'dispatched',
-                                  'arrived',
-                                  'owner_earnings',
-                                  'vehicle_cost',
-                                  'operating_profit',
-                                  'customer_outstanding',
-                                  'owner_due',
-                                ]
-                              : reportLabels.keys)
+                      for (final key in [
+                        primary,
+                        ...summaryKeys.where((key) => key != primary),
+                      ])
                         SizedBox(
                           width: 310,
                           child: Card(
@@ -392,6 +407,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                                   key,
                                   totals[key],
                                   lifetime: lifetime,
+                                  hero: key == primary,
                                 ),
                               ),
                             ),
@@ -414,6 +430,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                               key,
                               (row['values'] as Map)[key],
                               lifetime: lifetime,
+                              compact: true,
                             ),
                           ),
                       ],

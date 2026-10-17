@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'bilingual_message.dart';
 import 'owned_presentation.dart';
+import 'karvaan_typography.dart';
 
 /// Use the bundled font's natural ascent/descent. Inheriting Material's Latin
 /// line height compresses Urdu ink into adjacent labels, especially at 200%.
@@ -11,8 +12,12 @@ TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
     inherit: false,
     fontFamily: 'NotoSansArabic',
     fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
-    fontSize: ((base.fontSize ?? 14) * .85).clamp(12, double.infinity),
-    fontWeight: FontWeight.w400,
+    fontSize: (base.fontSize ?? KarvaanTypography.body).clamp(
+      KarvaanTypography.urduMinimum,
+      double.infinity,
+    ),
+    fontWeight: base.fontWeight ?? FontWeight.w400,
+    fontFeatures: KarvaanTypography.figureFeatures,
     color: base.color,
     backgroundColor: base.backgroundColor,
     decoration: base.decoration,
@@ -44,7 +49,7 @@ class BilingualText extends StatelessWidget {
   Widget build(BuildContext context) {
     final english = Text(
       text.en,
-      style: (style ?? const TextStyle()).copyWith(fontWeight: FontWeight.w600),
+      style: style,
       textAlign: textAlign ?? TextAlign.left,
       textDirection: TextDirection.ltr,
       maxLines: maxLines,
@@ -89,15 +94,16 @@ class BilingualCaption extends StatelessWidget {
       children: [
         Text(
           text.en,
-          style: (style ?? const TextStyle()).copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: style ?? Theme.of(context).textTheme.bodySmall,
           textDirection: TextDirection.ltr,
         ),
         if (text.ur.isNotEmpty)
           Text(
             text.ur,
-            style: _urduStyle(context, style),
+            style: _urduStyle(
+              context,
+              style ?? Theme.of(context).textTheme.bodySmall,
+            ),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
           ),
