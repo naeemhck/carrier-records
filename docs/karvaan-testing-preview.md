@@ -2,6 +2,14 @@
 
 Authorized 2026-10-15 for a separate synthetic-only hosted TEST environment. This narrowly overrides the previous local-only rule for this deployment only. Production remains prohibited: no target changes to carrier-records.pages.dev, tuasxnfwrepbcelnrlgb, zuoaxtjfylfuwsxfbgzl, main, installed applications or scheduling. T20 remains unstarted.
 
+## Current testing preview — 0.2.0+18 (2026-10-17)
+
+Updated ONLY existing karvaan-test/qa-preview. URL https://karvaan-test.pages.dev/; immutable https://7a706a39.karvaan-test.pages.dev; deployment7a706a39-9bb6-4148-a42a-078fdc709c1a. Compiled verified sourcef1f492639e931d799831e1e16e2c0315a73f6d29, app tree identical to local candidate17; distinct QA-configured build18, not the localhost artifact. Public configuration/identity/allowlist/session prefix and bilingual banner preserved. No migrations/functions/configuration/password resets/reseed/delete. Previous4af214ed QA13 remains for rollback.
+
+Analyzer/54affected regressions/artifact credential audit passed. Fresh live version/five asset hashes/TEST-only traffic, visible bilingual login/error screens and both staff login/assigned-office/first-password gates passed. Administrator current credential unavailable; staff require initial password setup. Ready-state permissions, authenticated trip formatting and new live PDF/Excel download/privacy checks remain PENDING, not inferred from deployment/local tests. Existing passwords were not changed/reset. Use only current known/saved credentials in the TEST app; if unavailable, recovery needs a separate authorization. Do not run the historical admin password-printing example below as part of this verification.
+
+Full actual evidence/failures/hashes/next steps: [preview18 evidence](karvaan-preview18-evidence.md). Artifact tools/.local/qa-preview/artifacts/0.2.0+18/web, mainJS SHA256c45b835c64067fa89d973676c18a7117a4e4785e5f2cf368c19ed4895a450a69. Prior sections below are retained initial13 history and must not be misread as completed18authenticated checks. Known performance/pagination/terminology/native/device gates remain unresolved; T19 dispositions preserved/T20TODO.
+
 ## Verified provisioning
 
 Created new Supabase karvaan-test project nxyjjjxvgibehovlyycx in the verified Free organization ninsjeitbhvymnaoqtcx, Singapore. Pre-migration Auth users0/public tables0. Existing active pilot and inactive project left unchanged. All28 tracked update-branch migrations applied transactionally with source hashes and migration history. Separate private qa_preview ledger marks this new environment. All28 application tables have RLS; receipts bucket private/5MB/PNG,JPEG,PDF. No production users, records, receipts, keys or recovery material copied.
@@ -28,7 +36,7 @@ CLI db query first required --linked together with explicit --project-ref; corre
 
 Cloudflare cachedWrangler4.149.0 first new-project delegation failed before creation (no static-directory detection). Explicit legacyPages fallback created only karvaan-test with production-branch qa-preview; no Git provider. This fallback selector was not a Git force-push, and is not needed for upload. Existing encrypted/keyring OAuth has pages:write; missing unrelated optional scopes were not added. Cached/offline package mode only; no package installation.
 
-## Published testing preview and artifact
+## Initial preview13 publication and artifact (retained history)
 
 Verified shareable URL: https://karvaan-test.pages.dev/
 Immutable upload URL: https://4af214ed.karvaan-test.pages.dev/
@@ -69,7 +77,7 @@ Review checklist: bilingual navigation/forms/readability; Journey/Consignments/R
 Known unresolved: local five-user summaryp957.453s with2/50 summary57014 errors and screenp953.977s; frozenv2 orphan-note last pages; native OS-input and Android-device checks, missing supplied mockups and provisional glossary terms. Small hosted preview smoke cannot clear representative performance gates. T19 recorded acceptance/exceptions/waivers retained and skipped checks are not converted to passes. T20 TODO.
 
 
-### Exact password setup on this Windows PC
+### Initial preview13 password handoff (historical; not a current administrator credential)
 
 Open a private local PowerShell terminal and run the already-present bundled PowerShell, not a chat tool or transcript. Example for the administrator:
 
