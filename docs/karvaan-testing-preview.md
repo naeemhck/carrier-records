@@ -6,7 +6,7 @@ Authorized 2026-10-15 for a separate synthetic-only hosted TEST environment. Thi
 
 Existing https://karvaan-test.pages.dev/ now serves typography source2994aaa6e59f9e0fcf835b089bdd6ed2948211e0 as distinct QA web0.2.0+19. Deployment e8b7ecf4-d2b5-4788-92f7-bf775e3692a2, immutable https://e8b7ecf4.karvaan-test.pages.dev/. Only existing synthetic TEST backend/configuration used; no backend/account changes. Source is the stacked-label typography update, not a language-toggle implementation. Artifact audit and local browser passed; live canonical/immutable version/five asset hashes match, but fresh Chrome startup checks failed with QUIC/reset/timeouts. Live login/permissions/exports remain unverified. Previous QA18 retained; no claim that known performance/pagination/account/device issues are resolved.
 
-GitHub push held: private repository/no workflows/hooks/direct uploads confirmed, but installed-app API403 and user cannot confirm Muse AI push automation is disabled. Local commits only. Full results and exact hashes: [preview19 evidence](karvaan-preview19-evidence.md). T19 dispositions retained/T20 unstarted.
+GitHub backup resumed after owner clarification that GitHub has never performed automation; fresh privacy/no-workflow/no-webhook/direct-upload checks confirmed. Installed-app API403 remains an API limitation, not an invented successful inspection. See preview19 evidence for the source-only backup sequence. Full results and exact hashes: [preview19 evidence](karvaan-preview19-evidence.md). T19 dispositions retained/T20 unstarted.
 
 ## Previous testing preview — 0.2.0+18 (2026-10-17)
 
