@@ -2,7 +2,13 @@
 
 Authorized 2026-10-15 for a separate synthetic-only hosted TEST environment. This narrowly overrides the previous local-only rule for this deployment only. Production remains prohibited: no target changes to carrier-records.pages.dev, tuasxnfwrepbcelnrlgb, zuoaxtjfylfuwsxfbgzl, main, installed applications or scheduling. T20 remains unstarted.
 
-## Current testing preview — 0.2.0+18 (2026-10-17)
+## Current testing preview — 0.2.0+19 (2026-10-19)
+
+Existing https://karvaan-test.pages.dev/ now serves typography source2994aaa6e59f9e0fcf835b089bdd6ed2948211e0 as distinct QA web0.2.0+19. Deployment e8b7ecf4-d2b5-4788-92f7-bf775e3692a2, immutable https://e8b7ecf4.karvaan-test.pages.dev/. Only existing synthetic TEST backend/configuration used; no backend/account changes. Source is the stacked-label typography update, not a language-toggle implementation. Artifact audit and local browser passed; live canonical/immutable version/five asset hashes match, but fresh Chrome startup checks failed with QUIC/reset/timeouts. Live login/permissions/exports remain unverified. Previous QA18 retained; no claim that known performance/pagination/account/device issues are resolved.
+
+GitHub push held: private repository/no workflows/hooks/direct uploads confirmed, but installed-app API403 and user cannot confirm Muse AI push automation is disabled. Local commits only. Full results and exact hashes: [preview19 evidence](karvaan-preview19-evidence.md). T19 dispositions retained/T20 unstarted.
+
+## Previous testing preview — 0.2.0+18 (2026-10-17)
 
 Updated ONLY existing karvaan-test/qa-preview. URL https://karvaan-test.pages.dev/; immutable https://7a706a39.karvaan-test.pages.dev; deployment7a706a39-9bb6-4148-a42a-078fdc709c1a. Compiled verified sourcef1f492639e931d799831e1e16e2c0315a73f6d29, app tree identical to local candidate17; distinct QA-configured build18, not the localhost artifact. Public configuration/identity/allowlist/session prefix and bilingual banner preserved. No migrations/functions/configuration/password resets/reseed/delete. Previous4af214ed QA13 remains for rollback.
 
