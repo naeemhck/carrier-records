@@ -7,6 +7,7 @@ import '../../app/karvaan_design.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/domain/record_context.dart';
+import '../../core/domain/money.dart';
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../finance/financial_repository.dart';
@@ -35,6 +36,94 @@ Future<MasterRecord?> chooseExpenseMaster(
   );
 }
 
+/// Client-side record of which master records and trips staff picked in this
+/// session, so the searchable pickers lead with the most-used items first.
+/// Presentation only: ids and pick counts live in memory for the app session;
+/// the server order is otherwise untouched and no extra request is made.
+abstract final class PickerUsage {
+  static const int promotedLimit = 5;
+  static final Map<String, int> _masters = {}; // '<kind-code>:<record-id>'
+  static final Map<String, int> _trips = {}; // trip id
+
+  static void pickedMaster(MasterKind kind, String id) {
+    final key = '${kind.code}:$id';
+    _masters[key] = (_masters[key] ?? 0) + 1;
+  }
+
+  static void pickedTrip(String id) {
+    _trips[id] = (_trips[id] ?? 0) + 1;
+  }
+
+  static int _count(Map<String, int> table, String key) => table[key] ?? 0;
+
+  /// Reorders [rows] in place-order: the most-used picks (count descending,
+  /// capped at [promotedLimit]) first, then everything else in server order.
+  /// Returns the reordered list and how many leading rows were promoted.
+  static ({List<MasterRecord> rows, int promoted}) promoteMasters(
+    MasterKind kind,
+    List<MasterRecord> rows,
+  ) {
+    final used = rows
+        .where((r) => _count(_masters, '${kind.code}:${r.id}') > 0)
+        .toList()
+      ..sort(
+        (a, b) => _count(_masters, '${kind.code}:${b.id}').compareTo(
+          _count(_masters, '${kind.code}:${a.id}'),
+        ),
+      );
+    final promoted = used.take(promotedLimit).toList();
+    final ids = promoted.map((r) => r.id).toSet();
+    return (
+      rows: [...promoted, ...rows.where((r) => !ids.contains(r.id))],
+      promoted: promoted.length,
+    );
+  }
+
+  static ({List<Map<String, dynamic>> rows, int promoted}) promoteTrips(
+    List<Map<String, dynamic>> rows,
+  ) {
+    final used = rows.where((t) => _count(_trips, '${t['id']}') > 0).toList()
+      ..sort(
+        (a, b) => _count(
+          _trips,
+          '${b['id']}',
+        ).compareTo(_count(_trips, '${a['id']}')),
+      );
+    final promoted = used.take(promotedLimit).toList();
+    final ids = promoted.map((t) => '${t['id']}').toSet();
+    return (
+      rows: [...promoted, ...rows.where((t) => !ids.contains('${t['id']}'))],
+      promoted: promoted.length,
+    );
+  }
+}
+
+/// Status chip for an expense list row. Active expenses use the money green;
+/// voided or replaced (historical) rows are neutral. Mirrors TripStatusBadge.
+class ExpenseStatusChip extends StatelessWidget {
+  const ExpenseStatusChip({super.key, required this.effective});
+  final bool effective;
+  @override
+  Widget build(BuildContext context) {
+    final (foreground, background) = effective
+        ? (const Color(0xFF0B5C2E), const Color(0xFFEAF4ED))
+        : (KarvaanDesign.secondary, KarvaanDesign.background);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: BilingualText(
+          effective ? L10n.expenseActive : L10n.expenseHistorical,
+          style: TextStyle(color: foreground),
+        ),
+      ),
+    );
+  }
+}
+
 class _MasterPicker extends StatefulWidget {
   const _MasterPicker({required this.repo, required this.kind});
   final MasterRepository repo;
@@ -47,6 +136,7 @@ class _MasterPickerState extends State<_MasterPicker> {
   final search = TextEditingController();
   List<MasterRecord> rows = [];
   int offset = 0;
+  int promoted = 0;
   String? error;
   bool busy = false;
   @override
@@ -69,13 +159,32 @@ class _MasterPickerState extends State<_MasterPicker> {
         search: search.text,
         offset: offset,
       );
-      if (mounted) setState(() => rows = r.where((x) => !x.archived).toList());
+      final promotedResult = PickerUsage.promoteMasters(
+        widget.kind,
+        r.where((x) => !x.archived).toList(),
+      );
+      if (mounted) {
+        setState(() {
+          rows = promotedResult.rows;
+          promoted = promotedResult.promoted;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => error = expenseError(e));
     } finally {
       if (mounted) setState(() => busy = false);
     }
   }
+
+  void select(MasterRecord row) {
+    PickerUsage.pickedMaster(widget.kind, row.id);
+    Navigator.pop(context, row);
+  }
+
+  Widget tile(MasterRecord row) => BilingualListTile(
+    title: Text(row.label),
+    onTap: () => select(row),
+  );
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -100,15 +209,31 @@ class _MasterPickerState extends State<_MasterPicker> {
           if (busy) const LinearProgressIndicator(),
           if (error != null) BilingualOwnedText(error!),
           Expanded(
-            child: ListView(
-              children: [
-                for (final row in rows)
-                  BilingualListTile(
-                    title: Text(row.label),
-                    onTap: () => Navigator.pop(context, row),
+            child: rows.isEmpty && !busy && error == null
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const BilingualText(L10n.noRecordsFound),
+                      TextButton(
+                        onPressed: () {
+                          search.clear();
+                          offset = 0;
+                          load();
+                        },
+                        child: const BilingualCaption(L10n.clearSearch),
+                      ),
+                    ],
+                  )
+                : ListView(
+                    children: [
+                      if (promoted > 0)
+                        const BilingualCaption(L10n.mostUsed),
+                      for (final row in rows.take(promoted)) tile(row),
+                      if (promoted > 0 && rows.length > promoted)
+                        const Divider(),
+                      for (final row in rows.skip(promoted)) tile(row),
+                    ],
                   ),
-              ],
-            ),
           ),
           Row(
             children: [
@@ -193,6 +318,66 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
       MaterialPageRoute<void>(builder: (_) => widget.guard(child)),
     );
     if (mounted) await load();
+  }
+
+  Widget newEntry() => ExpenseEntry(
+    expenses: widget.expenses,
+    finance: widget.finance,
+    trips: widget.trips,
+    masters: widget.masters,
+    offices: widget.offices,
+    guard: widget.guard,
+    picker: widget.picker,
+  );
+
+  /// Sum of the amounts shown on the current page, formatted for display.
+  /// A page subtotal, never an authoritative ledger total; hidden when any
+  /// shown row cannot be parsed.
+  String? pageTotal() {
+    try {
+      final paisa = AllocationTotals.sum([
+        for (final r in rows) r['amount'] as String,
+      ]);
+      return displayMoney(Money.fromExactPaisa(paisa));
+    } on FormatException {
+      return null;
+    } on RangeError {
+      return null;
+    }
+  }
+
+  /// Summary-first totals strip: the page subtotal figure leads with its
+  /// caption beneath, followed by the records/page count as metadata.
+  Widget totalsStrip() {
+    final total = pageTotal();
+    final page = offset ~/ 50 + 1;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Wrap(
+          spacing: 24,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (total != null)
+              KarvaanMetric(
+                label: L10n.pageExpensesTotal,
+                formattedValue: total,
+                hero: true,
+              ),
+            BilingualText(
+              L10n.recordsPage.withValues([
+                displayCount(rows.length),
+                displayCount(page),
+              ]),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: KarvaanDesign.secondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> receipt(Map<String, dynamic> row) async {
@@ -280,20 +465,9 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
           ),
           if (busy) const LinearProgressIndicator(),
           if (error != null) BilingualOwnedText(error!),
+          if (!busy && error == null && rows.isNotEmpty) totalsStrip(),
           FilledButton(
-            onPressed: busy
-                ? null
-                : () => open(
-                    ExpenseEntry(
-                      expenses: widget.expenses,
-                      finance: widget.finance,
-                      trips: widget.trips,
-                      masters: widget.masters,
-                      offices: widget.offices,
-                      guard: widget.guard,
-                      picker: widget.picker,
-                    ),
-                  ),
+            onPressed: busy ? null : () => open(newEntry()),
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -341,7 +515,16 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
               child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
             ),
           if (!busy && error == null && rows.isEmpty)
-            const BilingualText(L10n.noRecordsFound),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const BilingualText(L10n.noRecordsFound),
+                TextButton(
+                  onPressed: busy ? null : () => open(newEntry()),
+                  child: const BilingualCaption(L10n.recordExpense),
+                ),
+              ],
+            ),
           for (final row in rows)
             Card(
               child: Padding(
@@ -349,13 +532,22 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BilingualText(
-                      L10n.labelValuesfb62fe.withValues([
-                        row['expense_date'],
-                        row['trip_id'] == null
-                            ? L10n.standaloneMaintenance
-                            : L10n.tripCost,
-                      ]),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: BilingualText(
+                            L10n.labelValuesfb62fe.withValues([
+                              row['expense_date'],
+                              row['trip_id'] == null
+                                  ? L10n.standaloneMaintenance
+                                  : L10n.tripCost,
+                            ]),
+                          ),
+                        ),
+                        ExpenseStatusChip(
+                          effective: row['effective'] != false,
+                        ),
+                      ],
                     ),
                     KarvaanAmount(
                       label: ownedMessage('Expense amount (PKR)'),
@@ -754,6 +946,33 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
       InputDecoration(label: BilingualOwnedCaption(label)),
     ),
   );
+
+  /// The figure leads on money: a small caption beneath the large tabular
+  /// amount input, showing the same value with thousands separators.
+  /// Shown only while the typed text parses as money; invalid input shows
+  /// nothing here and is reported by review validation as before.
+  Widget amountFigure() {
+    final text = amount.text.trim();
+    if (text.isEmpty) return const SizedBox.shrink();
+    late final String formatted;
+    try {
+      formatted = displayMoney(Money.parse(text));
+    } on FormatException {
+      return const SizedBox.shrink();
+    } on RangeError {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Text(
+        formatted,
+        textDirection: TextDirection.ltr,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: KarvaanDesign.secondary,
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
@@ -800,6 +1019,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                   ),
                   field(date, 'Expense date (YYYY-MM-DD)'),
                   field(amount, 'Expense amount (PKR)'),
+                  amountFigure(),
                   field(notes, 'Notes / reason'),
                 ],
               ),
@@ -1040,6 +1260,7 @@ class _TripPickerState extends State<_TripPicker> {
   final search = TextEditingController();
   List<Map<String, dynamic>> rows = [];
   int offset = 0;
+  int promoted = 0;
   bool busy = false;
   String? error;
   @override
@@ -1062,13 +1283,30 @@ class _TripPickerState extends State<_TripPicker> {
         search: search.text,
         offset: offset,
       );
-      if (mounted) setState(() => rows = p.rows);
+      final promotedResult = PickerUsage.promoteTrips(p.rows);
+      if (mounted) {
+        setState(() {
+          rows = promotedResult.rows;
+          promoted = promotedResult.promoted;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => error = expenseError(e));
     } finally {
       if (mounted) setState(() => busy = false);
     }
   }
+
+  void select(Map<String, dynamic> trip) {
+    PickerUsage.pickedTrip('${trip['id']}');
+    Navigator.pop(context, trip);
+  }
+
+  Widget tile(Map<String, dynamic> t) => BilingualListTile(
+    title: Text((t['trip_number']).toString()),
+    subtitle: BilingualOwnedText(t['state']),
+    onTap: () => select(t),
+  );
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -1093,16 +1331,31 @@ class _TripPickerState extends State<_TripPicker> {
           if (busy) const LinearProgressIndicator(),
           if (error != null) BilingualOwnedText(error!),
           Expanded(
-            child: ListView(
-              children: [
-                for (final t in rows)
-                  BilingualListTile(
-                    title: Text((t['trip_number']).toString()),
-                    subtitle: BilingualOwnedText(t['state']),
-                    onTap: () => Navigator.pop(context, t),
+            child: rows.isEmpty && !busy && error == null
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const BilingualText(L10n.noRecordsFound),
+                      TextButton(
+                        onPressed: () {
+                          search.clear();
+                          offset = 0;
+                          load();
+                        },
+                        child: const BilingualCaption(L10n.clearSearch),
+                      ),
+                    ],
+                  )
+                : ListView(
+                    children: [
+                      if (promoted > 0)
+                        const BilingualCaption(L10n.mostUsed),
+                      for (final t in rows.take(promoted)) tile(t),
+                      if (promoted > 0 && rows.length > promoted)
+                        const Divider(),
+                      for (final t in rows.skip(promoted)) tile(t),
+                    ],
                   ),
-              ],
-            ),
           ),
           Row(
             children: [
