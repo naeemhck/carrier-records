@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/features/trips/trip_workspace.dart';
 import 'package:carrier_records/features/finance/payment_workspace.dart';
 
@@ -9,6 +10,7 @@ import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/app/karvaan_typography.dart';
 import 'package:carrier_records/features/reports/report_workspace.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'report_workspace_test.dart' show ReportsFake;
@@ -30,6 +32,55 @@ void main() {
       theme.bodyMedium,
     ]) {
       expect(style!.fontFeatures, contains(const FontFeature.tabularFigures()));
+    }
+  });
+  testWidgets('bilingual labels do not inherit toolbar no-wrap clipping', (
+    t,
+  ) async {
+    await t.pumpWidget(
+      MaterialApp(
+        theme: KarvaanDesign.theme(),
+        home: Scaffold(
+          body: DefaultTextStyle(
+            style: KarvaanTypography.screenTitle,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            child: const SizedBox(
+              width: 180,
+              child: BilingualText(L10n.outputsAndPresets),
+            ),
+          ),
+        ),
+      ),
+    );
+    for (final phrase in [
+      L10n.outputsAndPresets.en,
+      L10n.outputsAndPresets.ur,
+    ]) {
+      final text = t.widget<Text>(find.text(phrase));
+      expect(text.softWrap, isTrue);
+      expect(text.overflow, TextOverflow.clip);
+    }
+    expect(t.takeException(), isNull);
+  });
+  testWidgets('quiet action captions retain the action foreground contrast', (
+    t,
+  ) async {
+    final theme = KarvaanDesign.theme();
+    await t.pumpWidget(
+      MaterialApp(
+        theme: theme,
+        home: Scaffold(
+          body: FilledButton(
+            onPressed: () {},
+            child: const BilingualCaption(L10n.signIn),
+          ),
+        ),
+      ),
+    );
+    for (final phrase in [L10n.signIn.en, L10n.signIn.ur]) {
+      final paragraph = t.renderObject<RenderParagraph>(find.text(phrase));
+      expect(paragraph.text.style!.color, theme.colorScheme.onPrimary);
     }
   });
   for (final width in [360.0, 1280.0]) {

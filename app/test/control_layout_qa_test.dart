@@ -89,6 +89,12 @@ void main() {
             );
           } else if (page == 'expenses') {
             final label = find.text(L10n.newExpense.en);
+            await tester.scrollUntilVisible(
+              label,
+              250,
+              scrollable: find.byType(Scrollable).first,
+              maxScrolls: 40,
+            );
             await tester.ensureVisible(label);
             await tester.pumpAndSettle();
             final icon = find.byIcon(Icons.add);

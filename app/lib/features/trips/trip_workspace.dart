@@ -197,7 +197,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           children: [
             BilingualText(
               widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             if (!widget.moneyMode)
               FilledButton.icon(
@@ -1294,53 +1294,64 @@ class _TripEditorState extends State<TripEditor> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: KarvaanGlass(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (error != null)
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 160),
-                      child: SingleChildScrollView(
-                        child: BilingualOwnedText(
-                          error!,
-                          key: const Key('trip-error'),
-                        ),
-                      ),
-                    ),
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    spacing: 16,
-                    runSpacing: 8,
-                    children: [
-                      if (step > 0)
-                        OutlinedButton(
-                          key: const Key('trip-previous'),
-                          onPressed: busy ? null : () => moveStep(step - 1),
-                          child: const BilingualCaption(L10n.previous),
-                        ),
-                      if (step < 2)
-                        FilledButton(
-                          key: const Key('trip-next'),
-                          onPressed: busy ? null : () => moveStep(step + 1),
-                          child: const BilingualCaption(L10n.next),
-                        )
-                      else
-                        FilledButton(
-                          onPressed: busy || conflicted ? null : save,
-                          child: const BilingualCaption(
-                            L10n.reviewAndSaveDraft,
+      bottomNavigationBar: LayoutBuilder(
+        builder: (context, constraints) => ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: constraints.maxHeight * .4),
+          child: SingleChildScrollView(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: KarvaanGlass(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (error != null)
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 160),
+                            child: SingleChildScrollView(
+                              child: BilingualOwnedText(
+                                error!,
+                                key: const Key('trip-error'),
+                              ),
+                            ),
                           ),
+                        Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          spacing: 16,
+                          runSpacing: 8,
+                          children: [
+                            if (step > 0)
+                              OutlinedButton(
+                                key: const Key('trip-previous'),
+                                onPressed: busy
+                                    ? null
+                                    : () => moveStep(step - 1),
+                                child: const BilingualCaption(L10n.previous),
+                              ),
+                            if (step < 2)
+                              FilledButton(
+                                key: const Key('trip-next'),
+                                onPressed: busy
+                                    ? null
+                                    : () => moveStep(step + 1),
+                                child: const BilingualCaption(L10n.next),
+                              )
+                            else
+                              FilledButton(
+                                onPressed: busy || conflicted ? null : save,
+                                child: const BilingualCaption(
+                                  L10n.reviewAndSaveDraft,
+                                ),
+                              ),
+                          ],
                         ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

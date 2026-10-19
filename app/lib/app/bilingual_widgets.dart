@@ -53,8 +53,8 @@ class BilingualText extends StatelessWidget {
       textAlign: textAlign ?? TextAlign.left,
       textDirection: TextDirection.ltr,
       maxLines: maxLines,
-      overflow: overflow,
-      softWrap: softWrap,
+      overflow: overflow ?? TextOverflow.clip,
+      softWrap: softWrap ?? true,
     );
     if (text.ur.isEmpty) return english;
     return Semantics(
@@ -71,8 +71,8 @@ class BilingualText extends StatelessWidget {
             textAlign: textAlign ?? TextAlign.right,
             textDirection: TextDirection.rtl,
             maxLines: maxLines,
-            overflow: overflow,
-            softWrap: softWrap,
+            overflow: overflow ?? TextOverflow.clip,
+            softWrap: softWrap ?? true,
           ),
         ],
       ),
@@ -94,7 +94,7 @@ class BilingualCaption extends StatelessWidget {
       children: [
         Text(
           text.en,
-          style: style ?? Theme.of(context).textTheme.bodySmall,
+          style: style ?? KarvaanTypography.textTheme.bodySmall,
           textDirection: TextDirection.ltr,
         ),
         if (text.ur.isNotEmpty)
@@ -102,7 +102,7 @@ class BilingualCaption extends StatelessWidget {
             text.ur,
             style: _urduStyle(
               context,
-              style ?? Theme.of(context).textTheme.bodySmall,
+              style ?? KarvaanTypography.textTheme.bodySmall,
             ),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,

@@ -12,6 +12,15 @@ abstract final class KarvaanTypography {
   // to the Latin caption/micro size; accessibility scaling remains unrestricted.
   static const urduMinimum = 44.0 / 3;
 
+  static const screenTitle = TextStyle(
+    fontSize: headline,
+    fontWeight: FontWeight.w600,
+  );
+  static const sectionTitle = TextStyle(
+    fontSize: title,
+    fontWeight: FontWeight.w600,
+  );
+  static const bodyStyle = TextStyle(fontSize: body);
   static const figureFeatures = [FontFeature.tabularFigures()];
   static TextStyle role(double size, [FontWeight weight = FontWeight.w400]) =>
       TextStyle(

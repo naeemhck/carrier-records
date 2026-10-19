@@ -1,3 +1,5 @@
+import 'karvaan_typography.dart';
+
 import 'package:flutter/material.dart';
 
 import 'bilingual.dart';
@@ -19,7 +21,9 @@ class QaPreviewFrame extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: BilingualText(
                 L10n.syntheticTestingPreview,
-                style: const TextStyle(color: Color(0xFF713300), fontSize: 14),
+                style: KarvaanTypography.bodyStyle.copyWith(
+                  color: const Color(0xFF713300),
+                ),
               ),
             ),
           ),

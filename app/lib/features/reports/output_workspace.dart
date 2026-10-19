@@ -1,3 +1,5 @@
+import '../../app/karvaan_typography.dart';
+
 import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
@@ -930,7 +932,7 @@ class OutputPreview extends StatelessWidget {
             const Divider(),
             const BilingualText(
               L10n.authorizedPreview,
-              style: TextStyle(fontSize: 20),
+              style: KarvaanTypography.sectionTitle,
             ),
             for (final f in fields.where((f) => f['header'] == true))
               BilingualText(

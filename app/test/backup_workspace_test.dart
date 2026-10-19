@@ -71,6 +71,11 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       await t.ensureVisible(find.text('Run manual Windows backup'));
+      await t.pumpAndSettle();
+      expect(
+        t.getRect(find.text('Run manual Windows backup')).bottom,
+        lessThanOrEqualTo(600),
+      );
       final button = t.widget<FilledButton>(
         find.ancestor(
           of: find.text('Run manual Windows backup'),

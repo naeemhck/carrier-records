@@ -1,3 +1,5 @@
+import 'karvaan_typography.dart';
+
 import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
@@ -198,7 +200,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   if (p == null) ...[
                     const BilingualText(
                       L10n.staffSignIn,
-                      style: TextStyle(fontSize: 24),
+                      style: KarvaanTypography.screenTitle,
                     ),
                     feedback(),
                     const SizedBox(height: 8),
@@ -249,7 +251,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   ] else if (p['must_change_password'] == true) ...[
                     const BilingualText(
                       L10n.changeYourTemporaryPassword,
-                      style: TextStyle(fontSize: 24),
+                      style: KarvaanTypography.screenTitle,
                     ),
                     feedback(),
                     const SizedBox(height: 8),
@@ -308,7 +310,7 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                   ] else ...[
                     BilingualText(
                       L10n.signedInAs.withValues([p['display_name']]),
-                      style: const TextStyle(fontSize: 24),
+                      style: KarvaanTypography.screenTitle,
                     ),
                     BilingualText(
                       (p['role'] == 'ADMIN'

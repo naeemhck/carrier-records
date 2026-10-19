@@ -113,6 +113,38 @@ abstract final class KarvaanDesign {
           animationDuration: Duration.zero,
         ),
       ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
+          color: ink,
+          fontFamily: 'NotoSans',
+        ),
+        subtitleTextStyle: KarvaanTypography.textTheme.bodySmall?.copyWith(
+          color: secondary,
+          fontFamily: 'NotoSans',
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
+          color: ink,
+          fontFamily: 'NotoSans',
+        ),
+        contentTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
+          color: ink,
+          fontFamily: 'NotoSans',
+        ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        textStyle: KarvaanTypography.textTheme.bodyMedium,
+      ),
+      tooltipTheme: TooltipThemeData(
+        textStyle: KarvaanTypography.textTheme.bodySmall?.copyWith(
+          color: Colors.white,
+        ),
+      ),
+      dataTableTheme: DataTableThemeData(
+        headingTextStyle: KarvaanTypography.textTheme.labelLarge,
+        dataTextStyle: KarvaanTypography.textTheme.bodyMedium,
+      ),
       dividerTheme: const DividerThemeData(color: Color(0x0D000000)),
     );
   }

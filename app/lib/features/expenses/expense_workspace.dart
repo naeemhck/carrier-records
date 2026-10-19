@@ -743,6 +743,10 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
 
   Widget field(TextEditingController c, String label) => TextField(
     controller: c,
+    style: identical(c, amount)
+        ? Theme.of(context).textTheme.displaySmall
+        : Theme.of(context).textTheme.bodyMedium,
+    textDirection: identical(c, amount) ? TextDirection.ltr : null,
     enabled: !locked,
     onChanged: (_) => setState(() => reviewed = null),
     decoration: bilingualDecoration(
