@@ -5251,6 +5251,78 @@ abstract final class L10n {
     "کرائے کے علاوہ کمیشن",
   );
   static const quoteAddedAccessibility = "ADDED. کرائے کے علاوہ کمیشن";
+  static const readMore = Bilingual(
+    "ui.readMore",
+    "Read more",
+    "مزید پڑھیں",
+  );
+  static const readMoreAccessibility = "Read more. مزید پڑھیں";
+  static const dispatchedNow = Bilingual(
+    "ui.dispatchedNow",
+    "Dispatched now",
+    "اس وقت روانہ",
+  );
+  static const dispatchedNowAccessibility = "Dispatched now. اس وقت روانہ";
+  static const draftTrips = Bilingual(
+    "ui.draftTrips",
+    "Draft trips",
+    "مسودہ سفر",
+  );
+  static const draftTripsAccessibility = "Draft trips. مسودہ سفر";
+  static const settlementsDue = Bilingual(
+    "ui.settlementsDue",
+    "Settlements due",
+    "واجب الادا تصفیے",
+  );
+  static const settlementsDueAccessibility = "Settlements due. واجب الادا تصفیے";
+  static const agingNotYetDue = Bilingual(
+    "ui.agingNotYetDue",
+    "Not yet due",
+    "ابھی واجب الادا نہیں",
+  );
+  static const agingNotYetDueAccessibility = "Not yet due. ابھی واجب الادا نہیں";
+  static const agingUpTo30Days = Bilingual(
+    "ui.agingUpTo30Days",
+    "1-30 days",
+    "1-30 دن",
+  );
+  static const agingUpTo30DaysAccessibility = "1-30 days. 1-30 دن";
+  static const aging31To60Days = Bilingual(
+    "ui.aging31To60Days",
+    "31-60 days",
+    "31-60 دن",
+  );
+  static const aging31To60DaysAccessibility = "31-60 days. 31-60 دن";
+  static const aging61To90Days = Bilingual(
+    "ui.aging61To90Days",
+    "61-90 days",
+    "61-90 دن",
+  );
+  static const aging61To90DaysAccessibility = "61-90 days. 61-90 دن";
+  static const agingOver90Days = Bilingual(
+    "ui.agingOver90Days",
+    "Over 90 days",
+    "90 دن سے زیادہ",
+  );
+  static const agingOver90DaysAccessibility = "Over 90 days. 90 دن سے زیادہ";
+  static const createdOn = Bilingual(
+    "ui.createdOn",
+    "Created",
+    "بنایا گیا",
+  );
+  static const createdOnAccessibility = "Created. بنایا گیا";
+  static const updatedOn = Bilingual(
+    "ui.updatedOn",
+    "Updated",
+    "اپ ڈیٹ کیا گیا",
+  );
+  static const updatedOnAccessibility = "Updated. اپ ڈیٹ کیا گیا";
+  static const dispatchedOn = Bilingual(
+    "ui.dispatchedOn",
+    "Dispatched",
+    "روانہ کیا گیا",
+  );
+  static const dispatchedOnAccessibility = "Dispatched. روانہ کیا گیا";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6088,5 +6160,17 @@ abstract final class L10n {
     invalidCountValue,
     quoteDeducted,
     quoteAdded,
+    readMore,
+    dispatchedNow,
+    draftTrips,
+    settlementsDue,
+    agingNotYetDue,
+    agingUpTo30Days,
+    aging31To60Days,
+    aging61To90Days,
+    agingOver90Days,
+    createdOn,
+    updatedOn,
+    dispatchedOn,
   ];
 }

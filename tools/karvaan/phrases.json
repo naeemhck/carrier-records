@@ -7608,5 +7608,113 @@
     "origins": [
       "text-qa-quote-mode-office-review"
     ]
+  },
+  {
+    "key": "readMore",
+    "semantic_key": "ui.readMore",
+    "en": "Read more",
+    "ur": "مزید پڑھیں",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "dispatchedNow",
+    "semantic_key": "ui.dispatchedNow",
+    "en": "Dispatched now",
+    "ur": "اس وقت روانہ",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "draftTrips",
+    "semantic_key": "ui.draftTrips",
+    "en": "Draft trips",
+    "ur": "مسودہ سفر",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "settlementsDue",
+    "semantic_key": "ui.settlementsDue",
+    "en": "Settlements due",
+    "ur": "واجب الادا تصفیے",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "agingNotYetDue",
+    "semantic_key": "ui.agingNotYetDue",
+    "en": "Not yet due",
+    "ur": "ابھی واجب الادا نہیں",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "agingUpTo30Days",
+    "semantic_key": "ui.agingUpTo30Days",
+    "en": "1-30 days",
+    "ur": "1-30 دن",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "aging31To60Days",
+    "semantic_key": "ui.aging31To60Days",
+    "en": "31-60 days",
+    "ur": "31-60 دن",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "aging61To90Days",
+    "semantic_key": "ui.aging61To90Days",
+    "en": "61-90 days",
+    "ur": "61-90 دن",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "agingOver90Days",
+    "semantic_key": "ui.agingOver90Days",
+    "en": "Over 90 days",
+    "ur": "90 دن سے زیادہ",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "createdOn",
+    "semantic_key": "ui.createdOn",
+    "en": "Created",
+    "ur": "بنایا گیا",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "updatedOn",
+    "semantic_key": "ui.updatedOn",
+    "en": "Updated",
+    "ur": "اپ ڈیٹ کیا گیا",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "dispatchedOn",
+    "semantic_key": "ui.dispatchedOn",
+    "en": "Dispatched",
+    "ur": "روانہ کیا گیا",
+    "origins": [
+      "ui-restructure-patterns"
+    ]
   }
 ]
