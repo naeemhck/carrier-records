@@ -12,7 +12,7 @@ import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../trips/trip_workspace.dart';
 import 'output_repository.dart';
-import 'authorized_output.dart' show integerKeys;
+import 'authorized_output.dart' show integerKeys, isBalanceDueKey;
 import 'document_repository.dart';
 import 'document_workspace.dart';
 import 'output_export_service.dart';
@@ -952,20 +952,45 @@ class OutputPreview extends StatelessWidget {
             ),
             Wrap(
               spacing: 12,
+              runSpacing: 12,
               children: [
                 for (final e in (data['totals'] as Map).entries)
-                  BilingualText(
-                    L10n.labelValuesfb62fe.withValues([
-                      summaries
-                              .where((f) => f['field_key'] == e.key)
-                              .firstOrNull?['label'] ??
-                          e.key,
-                      displayField(
-                        integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY',
-                        e.value,
-                      ),
-                    ]),
-                  ),
+                  isBalanceDueKey(e.key)
+                      ? DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEAF4ED),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: BilingualText(
+                              L10n.labelValuesfb62fe.withValues([
+                                summaries
+                                        .where((f) => f['field_key'] == e.key)
+                                        .firstOrNull?['label'] ??
+                                    e.key,
+                                displayField(
+                                  integerKeys.contains(e.key)
+                                      ? 'INTEGER'
+                                      : 'MONEY',
+                                  e.value,
+                                ),
+                              ]),
+                            ),
+                          ),
+                        )
+                      : BilingualText(
+                          L10n.labelValuesfb62fe.withValues([
+                            summaries
+                                    .where((f) => f['field_key'] == e.key)
+                                    .firstOrNull?['label'] ??
+                                e.key,
+                            displayField(
+                              integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY',
+                              e.value,
+                            ),
+                          ]),
+                        ),
               ],
             ),
             if ((data['rows'] as List).isEmpty)

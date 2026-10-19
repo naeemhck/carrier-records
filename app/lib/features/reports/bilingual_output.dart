@@ -11,18 +11,12 @@ class BilingualOutput {
     if (p is! Map ||
         p['version'] != 2 ||
         p['font_set'] != 'noto-karvaan-20261013' ||
-        !_sameKeys(p, {
-          'version',
-          'font_set',
-          'brand',
-          'title',
-          'fields',
-          'summaries',
-          'frames',
-          'date_bases',
-        })) {
+        !_presentationKeys(p)) {
       throw const FormatException('Invalid frozen presentation.');
     }
+    internalUse = p.containsKey('internal_use')
+        ? message(p['internal_use'])
+        : _internalUseFallback;
     brand = message(p['brand']);
     titlePair = message(p['title']);
     if (titlePair.en != base.title) {
@@ -67,6 +61,31 @@ class BilingualOutput {
   };
   static bool _sameKeys(Map map, Set<String> keys) =>
       map.length == keys.length && map.keys.every(keys.contains);
+
+  /// Required presentation keys, plus the optional server-supplied
+  /// "internal use" footer note. Unknown keys are still rejected.
+  static const _requiredPresentationKeys = {
+    'version',
+    'font_set',
+    'brand',
+    'title',
+    'fields',
+    'summaries',
+    'frames',
+    'date_bases',
+  };
+  static bool _presentationKeys(Map p) =>
+      _requiredPresentationKeys.every(p.containsKey) &&
+      p.keys.every(
+        (k) => _requiredPresentationKeys.contains(k) || k == 'internal_use',
+      );
+
+  /// Renderer-side frozen fallback for the footer "internal use" note, used
+  /// only when the server presentation does not supply its own wording.
+  static const _internalUseFallback = FrozenLabel(
+    'Internal use only',
+    'صرف اندرونی استعمال',
+  );
   static FrozenLabel message(dynamic raw) {
     if (raw is! Map ||
         !_sameKeys(raw, {'en', 'ur'}) ||
@@ -91,7 +110,7 @@ class BilingualOutput {
   }
 
   late final AuthorizedOutput base;
-  late final FrozenLabel brand, titlePair;
+  late final FrozenLabel brand, titlePair, internalUse;
   late final Map<String, FrozenLabel> labels, summaries, frames, dates;
   String get title => '${brand.combined}\n${titlePair.combined}';
   List<OutputField> get fields => [

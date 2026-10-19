@@ -2,10 +2,39 @@ import 'bilingual_finders.dart';
 
 import 'package:carrier_records/features/reports/report_repository.dart';
 import 'package:carrier_records/features/reports/report_workspace.dart';
+import 'package:carrier_records/features/trips/trip_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'trip_workspace_test.dart' show FakeMasters, FakeTrips;
+
+/// Fake trips returning live-state rows so the dashboard KPI figures and
+/// drill-downs exercise real counts and lists.
+class KpiFakeTrips extends FakeTrips {
+  @override
+  Future<TripPage> list({
+    String search = '',
+    int offset = 0,
+    String? office,
+    String? vehicle,
+    String? state,
+    String? from,
+    String? to,
+  }) async {
+    if (state == 'DISPATCHED') {
+      return TripPage('ASSIGNED_OFFICES', [
+        {'id': 'd1', 'trip_number': 'T14-DISPATCHED-1', 'state': 'DISPATCHED'},
+        {'id': 'd2', 'trip_number': 'T14-DISPATCHED-2', 'state': 'DISPATCHED'},
+      ]);
+    }
+    if (state == 'DRAFT') {
+      return TripPage('ASSIGNED_OFFICES', [
+        {'id': 'r1', 'trip_number': 'T14-DRAFT-1', 'state': 'DRAFT'},
+      ]);
+    }
+    return TripPage('ASSIGNED_OFFICES', []);
+  }
+}
 
 class ReportsFake implements ReportCommands {
   final offsets = <int>[];
@@ -42,8 +71,7 @@ class ReportsFake implements ReportCommands {
   }
 }
 
-void main() {
-  testWidgets(
+void main() {  testWidgets(
     'Scoped report pagination retains filters and distinct server totals',
     (t) async {
       final fake = ReportsFake();
@@ -73,13 +101,28 @@ void main() {
       expect(find.text('Next vehicle'), findsOneWidget);
     },
   );
-  testWidgets('Dashboard balances navigate to same scoped filters', (t) async {
+  testWidgets('Dashboard KPI cards drill down to the underlying records', (
+    t,
+  ) async {
+    // Tall viewport: all four KPI cards and the builder button stay mounted
+    // (a scrolling ListView unmounts far-offscreen children, which would make
+    // finders miss them after ensureVisible scrolled).
+    t.view.physicalSize = const Size(800, 1400);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+
+    Future<void> tapKpi(String label) async {
+      await t.tap(englishTextContaining(label));
+      await t.pumpAndSettle();
+    }
+
     final fake = ReportsFake();
     await t.pumpWidget(
       MaterialApp(
         home: ReportWorkspace(
           reports: fake,
-          trips: FakeTrips(),
+          trips: KpiFakeTrips(),
           masters: FakeMasters(),
           offices: const [],
           dashboard: true,
@@ -87,11 +130,29 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    await t.ensureVisible(englishTextContaining('Owner settlement due'));
-    await t.tap(englishTextContaining('Owner settlement due'));
-    await t.pumpAndSettle();
-    expect(fake.offsets, [0, 0]);
-    expect(fake.filters[0], fake.filters[1]);
-    expect(find.text('Pending arrivals (up to 5; all dates)'), findsOneWidget);
+    expect(englishTextContaining('Dispatched now'), findsOneWidget);
+    expect(englishTextContaining('Customer outstanding'), findsOneWidget);
+    expect(englishTextContaining('Settlements due'), findsOneWidget);
+    expect(englishTextContaining('Draft trips'), findsOneWidget);
+    expect(englishTextContaining('PKR 95,000.00'), findsOneWidget);
+
+    // Dispatched drill-down lists the dispatched trips behind the figure.
+    await tapKpi('Dispatched now');
+    expect(find.text('T14-DISPATCHED-1'), findsOneWidget);
+    expect(find.text('T14-DISPATCHED-2'), findsOneWidget);
+
+    // Draft drill-down lists the draft trips.
+    await tapKpi('Draft trips');
+    expect(find.text('T14-DRAFT-1'), findsOneWidget);
+    expect(find.text('T14-DISPATCHED-1'), findsNothing);
+
+    // Outstanding drill-down shows the claims breakdown for the same scope.
+    await tapKpi('Customer outstanding');
+    expect(find.text('First vehicle'), findsOneWidget);
+    expect(fake.filters.last['office_id'], isNull);
+
+    // The report builder is one tap away on its own page.
+    await tapKpi('Reports');
+    expect(englishTextContaining('Report period'), findsOneWidget);
   });
 }

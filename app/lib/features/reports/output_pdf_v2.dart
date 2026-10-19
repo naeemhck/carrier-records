@@ -7,7 +7,16 @@ import 'package:pdf/widgets.dart' as pw;
 import 'authorized_output.dart';
 import 'bilingual_output.dart';
 
-/// New issued documents use only their frozen v2 labels and pinned font set.
+/// Report-format restyle of template 2 (newly issued documents only).
+///
+/// Page header: Karvaan/کاروان wordmark in brand green, the stacked report
+/// title, a scope line (offices, period) and the generated-on timestamp in
+/// Latin digits. Tables use hairlines only — no zebra striping, no colored
+/// fills; amounts are right-aligned Latin digits. Every financial report ends
+/// with a totals strip: key totals in bold green, outstanding / balance-due
+/// rows highlighted #EAF4ED. Footer: page numbers, a bilingual "internal use"
+/// note, and generation metadata (issuer, timestamp). Green appears only on
+/// totals, status accents and the wordmark.
 Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
   if (!const bool.fromEnvironment('use_arabic')) {
     throw const FormatException(
@@ -40,22 +49,30 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
       arabic = font('arabic'),
       arabicBold = font('arabic_bold'),
       math = font('math');
-  pw.Widget latin(String value, {bool heading = false}) => pw.Text(
+  const green = PdfColor.fromInt(0xFF0E7A3D);
+  const dueHighlight = PdfColor.fromInt(0xFFEAF4ED);
+  const hairline = PdfColors.grey400;
+  pw.Widget latin(
+    String value, {
+    bool heading = false,
+    PdfColor? color,
+  }) => pw.Text(
     value,
     textDirection: pw.TextDirection.ltr,
     style: pw.TextStyle(
       font: heading ? bold : regular,
       fontFallback: [arabic, math],
       fontSize: heading ? 10 : 9,
+      color: color,
     ),
     softWrap: true,
   );
   final urduRuns = RegExp(
     r'[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]+(?:\s+[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]+)*',
   );
-  pw.Widget data(String value, {bool heading = false}) {
+  pw.Widget data(String value, {bool heading = false, PdfColor? color}) {
     final matches = urduRuns.allMatches(value).toList();
-    if (matches.isEmpty) return latin(value, heading: heading);
+    if (matches.isEmpty) return latin(value, heading: heading, color: color);
     final children = <pw.Widget>[];
     var end = 0;
     for (final match in matches) {
@@ -73,6 +90,7 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
             fontFallback: [regular, math],
             fontSize: heading ? 10 : 9,
             height: 1.4,
+            color: color,
           ),
         ),
       );
@@ -84,11 +102,15 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
     return pw.Wrap(children: children, runSpacing: 2);
   }
 
-  pw.Widget label(FrozenLabel value, {bool heading = false}) => pw.Inseparable(
+  pw.Widget label(
+    FrozenLabel value, {
+    bool heading = false,
+    PdfColor? color,
+  }) => pw.Inseparable(
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        data(value.en, heading: heading),
+        data(value.en, heading: heading, color: color),
         pw.Text(
           value.ur,
           textDirection: pw.TextDirection.rtl,
@@ -97,6 +119,7 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
             fontFallback: [regular, math],
             fontSize: heading ? 10 : 9,
             height: 1.4,
+            color: color,
           ),
           softWrap: true,
         ),
@@ -116,6 +139,22 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
       ),
     ),
   );
+
+  /// Display text of a header field, or null when absent/empty.
+  String? headerText(String key) {
+    final field = base.fields.where((f) => f.header && f.key == key).firstOrNull;
+    if (field == null) return null;
+    final text = displayValue(field.type, base.metadata[field.key]);
+    return text.isEmpty ? null : text;
+  }
+
+  final scopeParts = [
+    if (base.offices.join(', ').isNotEmpty) base.offices.join(', '),
+    if (headerText('period') != null) headerText('period')!,
+  ];
+  final generatedAt = headerText('generated_at');
+  final generatedLabel = output.labels['generated_at'];
+
   final document = pw.Document(
     title: output.titlePair.en,
     creator: output.brand.en,
@@ -135,6 +174,50 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
     for (var i = 0; i < columns.length; i += bandSize)
       columns.sublist(i, (i + bandSize).clamp(0, columns.length)),
   ];
+
+  /// Totals strip: key totals in bold green, outstanding / balance-due rows
+  /// highlighted #EAF4ED. Rendered once, at the end of the last band.
+  pw.Widget totalsStrip() => pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      pw.Container(
+        decoration: const pw.BoxDecoration(
+          border: pw.Border(top: pw.BorderSide(color: hairline, width: .8)),
+        ),
+        padding: const pw.EdgeInsets.only(top: 8, bottom: 4),
+        child: label(output.frames['summary']!, heading: true),
+      ),
+      for (final e in base.totals.entries.where(
+        (e) => !base.fields.any((f) => f.header && f.key == e.key),
+      ))
+        pw.Container(
+          decoration: isBalanceDueKey(e.key)
+              ? const pw.BoxDecoration(color: dueHighlight)
+              : null,
+          padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+          child: pw.Row(
+            children: [
+              pw.Expanded(
+                child: label(output.summaries[e.key]!, heading: true),
+              ),
+              pw.SizedBox(width: 12),
+              data(
+                displayValue(
+                  integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY',
+                  e.value,
+                ),
+                heading: true,
+                color: green,
+              ),
+            ],
+          ),
+        ),
+      pw.SizedBox(height: 8),
+      label(output.frames['totals']!.values([base.recordCount])),
+      label(output.frames['continuation']!),
+    ],
+  );
+
   pw.Widget cell(pw.Widget child, {bool money = false}) => pw.Padding(
     padding: const pw.EdgeInsets.all(5),
     child: pw.Align(
@@ -156,10 +239,18 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              label(output.brand, heading: true),
+              label(output.brand, heading: true, color: green),
               label(output.titlePair, heading: true),
               if (base.metadata['document_number'] != null)
                 data(base.metadata['document_number'] as String),
+              if (scopeParts.isNotEmpty) data(scopeParts.join(' · ')),
+              if (generatedAt != null && generatedLabel != null)
+                label(
+                  FrozenLabel(
+                    '${generatedLabel.en}: $generatedAt',
+                    '${generatedLabel.ur}: $generatedAt',
+                  ),
+                ),
               label(
                 output.frames['selected']!.values([
                   band * bandSize + 1,
@@ -170,21 +261,42 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
             ],
           ),
         ),
-        footer: (context) => pw.Padding(
-          padding: const pw.EdgeInsets.only(top: 8),
-          child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              label(
-                output.frames['page']!.values([
-                  context.pageNumber,
-                  context.pagesCount,
-                ]),
-              ),
-              label(output.frames[base.issued ? 'issued' : 'live']!),
-            ],
-          ),
-        ),
+        footer: (context) {
+          final issuer =
+              base.metadata['issuer_name'] as String? ?? output.brand.en;
+          final when =
+              base.metadata['issued_at'] as String? ??
+              base.metadata['generated_at'] as String? ??
+              '';
+          return pw.Padding(
+            padding: const pw.EdgeInsets.only(top: 8),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    label(
+                      output.frames['page']!.values([
+                        context.pageNumber,
+                        context.pagesCount,
+                      ]),
+                    ),
+                    label(output.internalUse),
+                  ],
+                ),
+                pw.SizedBox(height: 4),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    label(output.frames[base.issued ? 'issued' : 'live']!),
+                    if (when.isNotEmpty) data('$issuer · $when'),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
         build: (context) => [
           if (band == 0) ...[
             for (final field in base.fields.where((f) => f.header))
@@ -205,23 +317,15 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
             ],
             metadata(output.frames['currency']!, 'PKR'),
             metadata(output.frames['records']!, base.recordCount.toString()),
-            pw.SizedBox(height: 8),
-            label(output.frames['summary']!, heading: true),
-            for (final e in base.totals.entries.where(
-              (e) => !base.fields.any((f) => f.header && f.key == e.key),
-            ))
-              metadata(
-                output.summaries[e.key]!,
-                displayValue(
-                  integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY',
-                  e.value,
-                ),
-              ),
             pw.SizedBox(height: 12),
           ],
           if (rows.isEmpty) label(output.frames['no_records']!),
           pw.Table(
-            border: pw.TableBorder.all(color: PdfColors.grey400, width: .4),
+            border: const pw.TableBorder(
+              top: pw.BorderSide(color: hairline, width: .5),
+              bottom: pw.BorderSide(color: hairline, width: .5),
+              horizontalInside: pw.BorderSide(color: hairline, width: .4),
+            ),
             defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
             columnWidths: {
               0: const pw.FixedColumnWidth(35),
@@ -231,7 +335,6 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
             children: [
               pw.TableRow(
                 repeat: true,
-                decoration: const pw.BoxDecoration(color: PdfColors.grey200),
                 children: [
                   cell(label(output.frames['row']!, heading: true)),
                   for (final f in selected)
@@ -266,12 +369,7 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
           if (band == bands.length - 1)
             pw.Padding(
               padding: const pw.EdgeInsets.only(top: 10),
-              child: pw.Column(
-                children: [
-                  label(output.frames['totals']!.values([base.recordCount])),
-                  label(output.frames['continuation']!),
-                ],
-              ),
+              child: totalsStrip(),
             ),
         ],
       ),

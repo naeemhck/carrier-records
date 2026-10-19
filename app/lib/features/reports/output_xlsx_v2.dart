@@ -31,8 +31,35 @@ bool _preciseInExcel(String money) =>
         .length <=
     15;
 
+/// Cell style indexes into the styles.xml cellXfs table below:
+/// 0 normal, 1 workbook title, 2 column header (bold, no fill),
+/// 3 money (PKR number format, right aligned), 4 date,
+/// 5 totals label (bold), 6 totals integer (bold),
+/// 7 totals money (bold, PKR format), 8 outstanding integer (bold, #EAF4ED),
+/// 9 outstanding money (bold, PKR format, #EAF4ED).
+int _dataStyle(String type) => switch (type) {
+  'MONEY' => 3,
+  'DATE' => 4,
+  _ => 0,
+};
+
+int _totalValueStyle(String key, String type) {
+  final due = isBalanceDueKey(key);
+  return switch (type) {
+    'MONEY' => due ? 9 : 7,
+    'INTEGER' => due ? 8 : 6,
+    _ => 5,
+  };
+}
+
 /// Template 2 uses frozen bilingual labels; v1 is unchanged.
 /// OOXML writes decimal tokens directly. No binary floating-point money conversion.
+///
+/// Layout mirrors the PDF: title and scope metadata on top, the frozen
+/// bilingual header row, data rows, then a totals strip at the end — key
+/// totals bold, outstanding / balance-due rows highlighted #EAF4ED. Amounts
+/// are stored as real numbers (never text) so they sum. Green appears only
+/// on the totals strip.
 Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
   final output = BilingualOutput(payload), archive = Archive();
   void file(String name, String value) {
@@ -57,7 +84,7 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
     if (type == 'MONEY') {
       validatedValue(type, value);
       if (_preciseInExcel(value as String)) {
-        return '<c r="$ref" s="3"><v>$value</v></c>';
+        return '<c r="$ref" s="$style"><v>$value</v></c>';
       }
       wideMoney =
           true; // Excel has a 15-digit limit; preserve larger values as text.
@@ -72,7 +99,7 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
         d.month,
         d.day,
       ).difference(DateTime.utc(1899, 12, 30)).inDays;
-      return '<c r="$ref" s="4"><v>$serial</v></c>';
+      return '<c r="$ref" s="$style"><v>$serial</v></c>';
     }
     // Explicit inline strings never become formulas, links or external references.
     return '<c r="$ref" s="$style" t="inlineStr"><is><t xml:space="preserve">${_xml(value.toString())}</t></is></c>';
@@ -106,20 +133,6 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
       );
     }
   }
-  add([(output.frames['summary']!.combined, 'TEXT', 2)], merged: true);
-  for (final e in output.totals.entries.where(
-    (e) => !output.fields.any((f) => f.header && f.key == e.key),
-  )) {
-    add([
-      (output.summaries[e.key]!.combined, 'TEXT', 0),
-      (e.value, integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY', 0),
-    ], height: 60);
-  }
-  add(
-    [(output.frames['continuation']!.combined, 'TEXT', 0)],
-    height: 60,
-    merged: true,
-  );
   add([for (final f in output.columns) (f.label, 'TEXT', 2)], height: 80);
   final heading = rowNumber;
   for (final values in output.displayRows) {
@@ -129,12 +142,38 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
     ].fold<int>(1, math.max);
     add([
       for (var i = 0; i < values.length; i++)
-        (values[i], output.columns[i].type, 0),
+        (values[i], output.columns[i].type, _dataStyle(output.columns[i].type)),
     ], height: math.min(390, math.max(24, lines * 15 + 10)));
   }
   if (output.rows.isEmpty) {
     add([(output.frames['no_records']!.combined, 'TEXT', 0)], merged: true);
   }
+  // Totals strip at the end, mirroring the PDF: bold totals, outstanding /
+  // balance-due highlighted. Amounts stay real numbers so they sum.
+  final totals = [
+    for (final e in output.totals.entries.where(
+      (e) => !output.fields.any((f) => f.header && f.key == e.key),
+    ))
+      e,
+  ];
+  if (totals.isNotEmpty) {
+    add(
+      [(output.frames['totals']!.values([output.recordCount]).combined, 'TEXT', 2)],
+      merged: true,
+    );
+    for (final e in totals) {
+      final type = integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY';
+      add([
+        (output.summaries[e.key]!.combined, 'TEXT', 5),
+        (e.value, type, _totalValueStyle(e.key, type)),
+      ], height: 60);
+    }
+  }
+  add(
+    [(output.frames['continuation']!.combined, 'TEXT', 0)],
+    height: 60,
+    merged: true,
+  );
   if (wideMoney) {
     add(
       [(output.frames['precision']!.combined, 'TEXT', 0)],
@@ -168,7 +207,7 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
   );
   file(
     'xl/styles.xml',
-    '''<?xml version="1.0"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="&quot;PKR&quot; #,##0.00;[Red]&quot;PKR&quot; -#,##0.00"/><numFmt numFmtId="165" formatCode="dd mmm yyyy"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="16"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE7ECEB"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1" readingOrder="1"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="top" wrapText="1" readingOrder="1"/></xf><xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"><alignment vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>''',
+    '''<?xml version="1.0"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="&quot;PKR&quot; #,##0.00;[Red]&quot;PKR&quot; -#,##0.00"/><numFmt numFmtId="165" formatCode="dd mmm yyyy"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="16"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF4ED"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="10"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1" readingOrder="1"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="top" wrapText="1" readingOrder="1"/></xf><xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"><alignment vertical="top"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="164" fontId="2" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="1"/></xf><xf numFmtId="164" fontId="2" fillId="2" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>''',
   );
   file(
     'xl/worksheets/sheet1.xml',

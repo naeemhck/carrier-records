@@ -63,6 +63,12 @@ const outputKeys = {
 };
 const integerKeys = {'car_count', 'dispatched', 'arrived'};
 
+/// Presentation helper for the report format: summary keys rendered as
+/// balance-due rows (outstanding / *_due) get the #EAF4ED highlight in the
+/// totals strip. Pure presentation; it never selects or computes data.
+bool isBalanceDueKey(String key) =>
+    key.contains('outstanding') || key.endsWith('_due');
+
 class OutputField {
   OutputField(Map raw)
     : key = raw['field_key'] as String,

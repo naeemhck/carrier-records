@@ -3,6 +3,7 @@ import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
+import '../../app/karvaan_patterns.dart';
 
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
@@ -49,8 +50,18 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   String kind = 'MONTHLY_VEHICLE';
   String? office, vehicle, owner, trip, vehicleName, ownerName, tripName;
   int offset = 0;
-  late Future<Map<String, dynamic>> page;
-  Future<TripPage>? recent, pending;
+  Future<Map<String, dynamic>>? page;
+
+  /// Dashboard KPI data: [scoped monthly report, dispatched trips, draft trips].
+  Future<List<dynamic>>? kpis;
+
+  /// Lazy claims breakdown for the money KPI drill-downs. Null until drilled.
+  Future<Map<String, dynamic>>? claims;
+
+  /// Selected KPI drill-down: 0 dispatched, 1 outstanding, 2 settlements,
+  /// 3 drafts. Null shows the four cards only.
+  int? drill;
+
   @override
   void initState() {
     super.initState();
@@ -69,19 +80,19 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   void reload({int start = 0}) {
     setState(() {
       offset = start;
-      page = widget.reports.report(kind, filters, offset: offset);
       if (widget.dashboard) {
-        recent = widget.trips.list(
-          office: office,
-          vehicle: vehicle,
-          from: from.text,
-          to: to.text,
-        );
-        pending = widget.trips.list(
-          office: office,
-          vehicle: vehicle,
-          state: 'DISPATCHED',
-        );
+        // Dashboard KPIs always cover all permitted offices for the current
+        // month; office/vehicle scoping lives in the report builder page.
+        page = null;
+        drill = null;
+        claims = null;
+        kpis = Future.wait([
+          widget.reports.report('MONTHLY_VEHICLE', filters),
+          widget.trips.list(state: 'DISPATCHED'),
+          widget.trips.list(state: 'DRAFT'),
+        ]);
+      } else {
+        page = widget.reports.report(kind, filters, offset: offset);
       }
     });
   }
@@ -92,6 +103,32 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     to.dispose();
     search.dispose();
     super.dispose();
+  }
+
+  void selectDrill(int index) {
+    setState(() {
+      drill = drill == index ? null : index;
+      if ((drill == 1 || drill == 2) && claims == null) {
+        claims = widget.reports.report('CLAIMS', filters);
+      }
+    });
+  }
+
+  void openReportBuilder() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => widget.guard(
+          ReportWorkspace(
+            reports: widget.reports,
+            trips: widget.trips,
+            masters: widget.masters,
+            offices: widget.offices,
+            guard: widget.guard,
+            outputs: widget.outputs,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> pick(String target) async {
@@ -145,33 +182,483 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
       amount,
     ),
   );
-  Widget journeys(Future<TripPage>? future, String title) =>
-      FutureBuilder<TripPage>(
-        future: future,
-        builder: (_, s) => Column(
+
+  /// KPI-first dashboard: four headline cards answering "what needs me right
+  /// now" on one viewport. The report builder is one tap away on its own page.
+  Widget dashboardBody() => ListView(
+    padding: const EdgeInsets.all(16),
+    children: [
+      if (widget.backupStatus != null) widget.backupStatus!,
+      Align(
+        alignment: AlignmentDirectional.centerEnd,
+        child: OutlinedButton.icon(
+          onPressed: openReportBuilder,
+          icon: const Icon(Icons.assessment_outlined),
+          label: const BilingualCaption(L10n.reports),
+        ),
+      ),
+      const SizedBox(height: 16),
+      FutureBuilder<List<dynamic>>(
+        future: kpis,
+        builder: (_, s) {
+          if (s.connectionState != ConnectionState.done) {
+            return const LinearProgressIndicator();
+          }
+          if (s.hasError || !s.hasData) {
+            return const BilingualText(
+              L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+            );
+          }
+          final data = s.data![0] as Map<String, dynamic>;
+          final totals = Map<String, dynamic>.from(data['totals'] as Map);
+          final dispatched = (s.data![1] as TripPage).rows;
+          final drafts = (s.data![2] as TripPage).rows;
+          final now = DateTime.now();
+          final today =
+              '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+          final period = '${from.text.trim()} — ${to.text.trim()}';
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (_, c) {
+                  final width = (c.maxWidth - 3 * 12) / 4;
+                  Widget card(Widget child) => SizedBox(
+                    width: width < 240 ? c.maxWidth : width,
+                    child: child,
+                  );
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      card(
+                        KpiCard(
+                          label: L10n.dispatchedNow,
+                          figure: displayCount(dispatched.length),
+                          period: today,
+                          filled: true,
+                          onTap: () => selectDrill(0),
+                        ),
+                      ),
+                      card(
+                        KpiCard(
+                          label: L10n.customerOutstanding,
+                          figure: displayField(
+                            'MONEY',
+                            totals['customer_outstanding'],
+                          ),
+                          period: period,
+                          onTap: () => selectDrill(1),
+                        ),
+                      ),
+                      card(
+                        KpiCard(
+                          label: L10n.settlementsDue,
+                          figure: displayField('MONEY', totals['owner_due']),
+                          period: period,
+                          onTap: () => selectDrill(2),
+                        ),
+                      ),
+                      card(
+                        KpiCard(
+                          label: L10n.draftTrips,
+                          figure: displayCount(drafts.length),
+                          period: today,
+                          onTap: () => selectDrill(3),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              BilingualOwnedText(
+                data['scope'] as String,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              BilingualText(
+                L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
+                    .withValues([data['generated_at']]),
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              if (drill != null) ...[
+                const SizedBox(height: 16),
+                drillPanel(
+                  totals,
+                  dispatched: dispatched,
+                  drafts: drafts,
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    ],
+  );
+
+  /// The drill-down panel: the records behind the tapped KPI figure.
+  Widget drillPanel(
+    Map<String, dynamic> totals, {
+    required List<Map<String, dynamic>> dispatched,
+    required List<Map<String, dynamic>> drafts,
+  }) {
+    final heading = switch (drill) {
+      0 => L10n.dispatchedNow,
+      1 => L10n.customerOutstanding,
+      2 => L10n.settlementsDue,
+      _ => L10n.draftTrips,
+    };
+    Widget content;
+    if (drill == 0) {
+      content = tripDrillRows(dispatched);
+    } else if (drill == 3) {
+      content = tripDrillRows(drafts);
+    } else {
+      content = moneyDrillRows(
+        drill == 1 ? 'customer_outstanding' : 'owner_due',
+        totals,
+      );
+    }
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BilingualOwnedText(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            if (s.hasError)
-              const BilingualText(L10n.unableToLoadCurrentPermittedJourneys),
-            if (s.hasData) ...[
-              BilingualOwnedText(s.data!.scope),
-              for (final row in s.data!.rows.take(5))
-                BilingualText(
-                  L10n.labelValuescd55a9.withValues([
-                    row['trip_number'],
-                    tripStateLabel(row['state']),
-                  ]),
+            Row(
+              children: [
+                Expanded(
+                  child: BilingualText(
+                    heading,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
-              if (s.data!.rows.isEmpty)
-                const BilingualText(L10n.noRecordsInThisPeriodScope),
-            ],
+                IconButton(
+                  tooltip: L10n.close.inline,
+                  onPressed: () => setState(() => drill = null),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            content,
           ],
         ),
+      ),
+    );
+  }
+
+  Widget tripDrillRows(List<Map<String, dynamic>> rows) {
+    if (rows.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: BilingualText(L10n.noRecordsInThisPeriodScope),
       );
+    }
+    return Column(
+      children: [
+        for (final row in rows)
+          BilingualListTile(
+            dense: true,
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${row['trip_number']}',
+                    textDirection: TextDirection.ltr,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TripStatusBadge('${row['state']}'),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget moneyDrillRows(String key, Map<String, dynamic> totals) =>
+      FutureBuilder<Map<String, dynamic>>(
+        future: claims,
+        builder: (_, s) {
+          if (s.connectionState != ConnectionState.done) {
+            return const LinearProgressIndicator();
+          }
+          if (s.hasError || !s.hasData) {
+            return const BilingualText(
+              L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+            );
+          }
+          final data = s.data!;
+          final rows = data['rows'] as List;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              value(key, totals[key], hero: true),
+              const SizedBox(height: 8),
+              if (rows.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: BilingualText(L10n.noRecordsInThisPeriodScope),
+                ),
+              for (final row in rows)
+                BilingualListTile(
+                  dense: true,
+                  title: Text(row['name'] as String),
+                  trailing: KarvaanFigure(
+                    displayField(
+                      'MONEY',
+                      (row['values'] as Map)[key],
+                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+            ],
+          );
+        },
+      );
+
+  Widget reportBuilderBody() => SingleChildScrollView(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        KarvaanSection(
+          title: L10n.reportPeriod,
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              SizedBox(
+                width: 220,
+                child: KarvaanChoiceField<String>(
+                  initialValue: kind,
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(label: BilingualCaption(L10n.report)),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'MONTHLY_VEHICLE',
+                      child: BilingualText(L10n.vehicleMonthly),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MONTHLY_OWNER',
+                      child: BilingualText(L10n.ownerMonthly),
+                    ),
+                    DropdownMenuItem(
+                      value: 'CLAIMS',
+                      child: BilingualText(L10n.partyClaimsAndHeldMoney),
+                    ),
+                    DropdownMenuItem(
+                      value: 'TRIP_PROFIT',
+                      child: BilingualText(L10n.lifetimeTripProfit),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    setState(() {
+                      kind = v!;
+                    });
+                  },
+                ),
+              ),
+              for (final entry in [
+                ('From (YYYY-MM-DD)', from),
+                ('To (YYYY-MM-DD)', to),
+                ('Trip / vehicle search', search),
+              ])
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: entry.$2,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                    ),
+                  ),
+                ),
+              SizedBox(
+                width: 230,
+                child: KarvaanChoiceField<String>(
+                  initialValue: office,
+                  decoration: bilingualDecoration(
+                    context,
+                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
+                  ),
+                  items: [
+                    const DropdownMenuItem<String>(
+                      value: null,
+                      child: BilingualText(L10n.allPermittedOffices),
+                    ),
+                    for (final o in widget.offices)
+                      DropdownMenuItem(
+                        value: o['id'] as String,
+                        child: Text(o['name'] as String),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() => office = v),
+                ),
+              ),
+              OutlinedButton(
+                onPressed: () => pick('VEHICLE'),
+                child: BilingualCaption(
+                  (vehicleName != null
+                      ? Bilingual.data(vehicleName)
+                      : L10n.selectVehicle),
+                ),
+              ),
+              OutlinedButton(
+                onPressed: () => pick('OWNER'),
+                child: BilingualCaption(
+                  (ownerName != null
+                      ? Bilingual.data(ownerName)
+                      : L10n.selectHistoricalOwner),
+                ),
+              ),
+              if (kind == 'TRIP_PROFIT')
+                OutlinedButton(
+                  onPressed: () => pick('TRIP'),
+                  child: BilingualCaption(
+                    (tripName != null
+                        ? Bilingual.data(tripName)
+                        : L10n.selectTrip),
+                  ),
+                ),
+              TextButton(
+                onPressed: () => setState(() {
+                  vehicle = owner = trip = null;
+                  vehicleName = ownerName = tripName = null;
+                  search.clear();
+                }),
+                child: const BilingualCaption(L10n.clearRecordFilters),
+              ),
+              FilledButton(
+                onPressed: () => reload(),
+                child: const BilingualCaption(L10n.runReport),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        FutureBuilder<Map<String, dynamic>>(
+          future: page,
+          builder: (_, s) {
+            if (s.connectionState != ConnectionState.done) {
+              return const LinearProgressIndicator();
+            }
+            if (s.hasError) {
+              return const BilingualText(
+                L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+              );
+            }
+            final data = s.data!;
+            final totals = Map<String, dynamic>.from(data['totals'] as Map);
+            final rows = data['rows'] as List;
+            final lifetime = data['lifetime'] == true;
+            final primary = switch (kind) {
+              'MONTHLY_OWNER' || 'TRIP_PROFIT' => 'owner_profit',
+              'CLAIMS' => 'customer_outstanding',
+              _ => 'operating_profit',
+            };
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BilingualOwnedText(
+                  data['scope'] as String,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                BilingualText(
+                  L10n.offices024b84.withValues([
+                    (data['offices'] as List).join(', '),
+                  ]),
+                ),
+                BilingualText(
+                  (lifetime
+                      ? L10n.lifetimeTripAllLinkedDatesCurrentBalances
+                      : L10n.to.withValues([
+                          (data['period'] as Map)['from'],
+                          (data['period'] as Map)['to'],
+                        ])),
+                ),
+                BilingualText(
+                  L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
+                      .withValues([data['generated_at']]),
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                if (rows.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: BilingualText(L10n.noRecordsInThisPeriodScope),
+                  ),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (final key in [
+                      primary,
+                      ...reportLabels.keys.where((key) => key != primary),
+                    ])
+                      SizedBox(
+                        width: 310,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: value(
+                              key,
+                              totals[key],
+                              lifetime: lifetime,
+                              hero: key == primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                BilingualText(
+                  L10n.groupsRowsPerPage.withValues([data['row_count']]),
+                ),
+                for (final row in rows)
+                  ExpansionTile(
+                    expansionAnimationStyle: AnimationStyle.noAnimation,
+                    title: Text(row['name'] as String),
+                    children: [
+                      for (final key in reportLabels.keys)
+                        BilingualListTile(
+                          dense: true,
+                          title: value(
+                            key,
+                            (row['values'] as Map)[key],
+                            lifetime: lifetime,
+                            compact: true,
+                          ),
+                        ),
+                    ],
+                  ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: offset > 0
+                          ? () => reload(start: offset - 50)
+                          : null,
+                      child: const BilingualCaption(L10n.previous),
+                    ),
+                    BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
+                    TextButton(
+                      onPressed: data['has_more'] == true
+                          ? () => reload(start: offset + 50)
+                          : null,
+                      child: const BilingualCaption(L10n.next),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -188,281 +675,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
           ),
       ],
     ),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.dashboard && widget.backupStatus != null)
-            widget.backupStatus!,
-          KarvaanSection(
-            title: L10n.reportPeriod,
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                SizedBox(
-                  width: 220,
-                  child: KarvaanChoiceField<String>(
-                    initialValue: kind,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(label: BilingualCaption(L10n.report)),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'MONTHLY_VEHICLE',
-                        child: BilingualText(L10n.vehicleMonthly),
-                      ),
-                      DropdownMenuItem(
-                        value: 'MONTHLY_OWNER',
-                        child: BilingualText(L10n.ownerMonthly),
-                      ),
-                      DropdownMenuItem(
-                        value: 'CLAIMS',
-                        child: BilingualText(L10n.partyClaimsAndHeldMoney),
-                      ),
-                      DropdownMenuItem(
-                        value: 'TRIP_PROFIT',
-                        child: BilingualText(L10n.lifetimeTripProfit),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      setState(() {
-                        kind = v!;
-                      });
-                    },
-                  ),
-                ),
-                for (final entry in [
-                  ('From (YYYY-MM-DD)', from),
-                  ('To (YYYY-MM-DD)', to),
-                  ('Trip / vehicle search', search),
-                ])
-                  SizedBox(
-                    width: 200,
-                    child: TextField(
-                      controller: entry.$2,
-                      decoration: bilingualDecoration(
-                        context,
-                        InputDecoration(label: BilingualOwnedCaption(entry.$1)),
-                      ),
-                    ),
-                  ),
-                SizedBox(
-                  width: 230,
-                  child: KarvaanChoiceField<String>(
-                    initialValue: office,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.officeScope),
-                      ),
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: BilingualText(L10n.allPermittedOffices),
-                      ),
-                      for (final o in widget.offices)
-                        DropdownMenuItem(
-                          value: o['id'] as String,
-                          child: Text(o['name'] as String),
-                        ),
-                    ],
-                    onChanged: (v) => setState(() => office = v),
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () => pick('VEHICLE'),
-                  child: BilingualCaption(
-                    (vehicleName != null
-                        ? Bilingual.data(vehicleName)
-                        : L10n.selectVehicle),
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () => pick('OWNER'),
-                  child: BilingualCaption(
-                    (ownerName != null
-                        ? Bilingual.data(ownerName)
-                        : L10n.selectHistoricalOwner),
-                  ),
-                ),
-                if (kind == 'TRIP_PROFIT')
-                  OutlinedButton(
-                    onPressed: () => pick('TRIP'),
-                    child: BilingualCaption(
-                      (tripName != null
-                          ? Bilingual.data(tripName)
-                          : L10n.selectTrip),
-                    ),
-                  ),
-                TextButton(
-                  onPressed: () => setState(() {
-                    vehicle = owner = trip = null;
-                    vehicleName = ownerName = tripName = null;
-                    search.clear();
-                  }),
-                  child: const BilingualCaption(L10n.clearRecordFilters),
-                ),
-                FilledButton(
-                  onPressed: () => reload(),
-                  child: const BilingualCaption(L10n.runReport),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          FutureBuilder<Map<String, dynamic>>(
-            future: page,
-            builder: (_, s) {
-              if (s.connectionState != ConnectionState.done) {
-                return const LinearProgressIndicator();
-              }
-              if (s.hasError) {
-                return const BilingualText(
-                  L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
-                );
-              }
-              final data = s.data!;
-              final totals = Map<String, dynamic>.from(data['totals'] as Map);
-              final rows = data['rows'] as List;
-              final lifetime = data['lifetime'] == true;
-              final primary = switch (kind) {
-                'MONTHLY_OWNER' || 'TRIP_PROFIT' => 'owner_profit',
-                'CLAIMS' => 'customer_outstanding',
-                _ => 'operating_profit',
-              };
-              final summaryKeys = widget.dashboard
-                  ? [
-                      'dispatched',
-                      'arrived',
-                      'owner_earnings',
-                      'vehicle_cost',
-                      'operating_profit',
-                      'customer_outstanding',
-                      'owner_due',
-                    ]
-                  : reportLabels.keys;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BilingualOwnedText(
-                    data['scope'] as String,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  BilingualText(
-                    L10n.offices024b84.withValues([
-                      (data['offices'] as List).join(', '),
-                    ]),
-                  ),
-                  BilingualText(
-                    (lifetime
-                        ? L10n.lifetimeTripAllLinkedDatesCurrentBalances
-                        : L10n.to.withValues([
-                            (data['period'] as Map)['from'],
-                            (data['period'] as Map)['to'],
-                          ])),
-                  ),
-                  BilingualText(
-                    L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
-                        .withValues([data['generated_at']]),
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  if (rows.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: BilingualText(L10n.noRecordsInThisPeriodScope),
-                    ),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      for (final key in [
-                        primary,
-                        ...summaryKeys.where((key) => key != primary),
-                      ])
-                        SizedBox(
-                          width: 310,
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: InkWell(
-                                onTap: widget.dashboard
-                                    ? () {
-                                        setState(
-                                          () => kind =
-                                              [
-                                                'customer_outstanding',
-                                                'owner_due',
-                                              ].contains(key)
-                                              ? 'CLAIMS'
-                                              : 'MONTHLY_VEHICLE',
-                                        );
-                                        reload();
-                                      }
-                                    : null,
-                                child: value(
-                                  key,
-                                  totals[key],
-                                  lifetime: lifetime,
-                                  hero: key == primary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  BilingualText(
-                    L10n.groupsRowsPerPage.withValues([data['row_count']]),
-                  ),
-                  for (final row in rows)
-                    ExpansionTile(
-                      expansionAnimationStyle: AnimationStyle.noAnimation,
-                      title: Text(row['name'] as String),
-                      children: [
-                        for (final key in reportLabels.keys)
-                          BilingualListTile(
-                            dense: true,
-                            title: value(
-                              key,
-                              (row['values'] as Map)[key],
-                              lifetime: lifetime,
-                              compact: true,
-                            ),
-                          ),
-                      ],
-                    ),
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: offset > 0
-                            ? () => reload(start: offset - 50)
-                            : null,
-                        child: const BilingualCaption(L10n.previous),
-                      ),
-                      BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
-                      TextButton(
-                        onPressed: data['has_more'] == true
-                            ? () => reload(start: offset + 50)
-                            : null,
-                        child: const BilingualCaption(L10n.next),
-                      ),
-                    ],
-                  ),
-                  if (widget.dashboard) ...[
-                    journeys(recent, 'Recent journeys (up to 5)'),
-                    journeys(pending, 'Pending arrivals (up to 5; all dates)'),
-                  ],
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    ),
+    body: widget.dashboard ? dashboardBody() : reportBuilderBody(),
   );
 }
 
