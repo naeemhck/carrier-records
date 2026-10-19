@@ -5104,6 +5104,38 @@ abstract final class L10n {
   static const whereSectionAccessibility = "Where. گاڑی اور ٹرپ";
   static const proofSection = Bilingual("ui.proofSection", "Proof", "ثبوت");
   static const proofSectionAccessibility = "Proof. ثبوت";
+  static const mostUsed = Bilingual(
+    "ui.mostUsed",
+    "Most used",
+    "سب سے زیادہ استعمال شدہ",
+  );
+  static const mostUsedAccessibility =
+      "Most used. سب سے زیادہ استعمال شدہ";
+  static const clearSearch = Bilingual(
+    "ui.clearSearch",
+    "Clear search",
+    "تلاش صاف کریں",
+  );
+  static const clearSearchAccessibility = "Clear search. تلاش صاف کریں";
+  static const expenseActive = Bilingual(
+    "ui.expenseActive",
+    "Active",
+    "فعال",
+  );
+  static const expenseActiveAccessibility = "Active. فعال";
+  static const expenseHistorical = Bilingual(
+    "ui.expenseHistorical",
+    "Historical",
+    "پرانا",
+  );
+  static const expenseHistoricalAccessibility = "Historical. پرانا";
+  static const pageExpensesTotal = Bilingual(
+    "ui.pageExpensesTotal",
+    "Expenses total · this page",
+    "اس صفحے کے اخراجات کا کل",
+  );
+  static const pageExpensesTotalAccessibility =
+      "Expenses total · this page. اس صفحے کے اخراجات کا کل";
   static const moneyNavigation = Bilingual(
     "ui.moneyNavigation",
     "Money",
@@ -5323,6 +5355,94 @@ abstract final class L10n {
     "روانہ کیا گیا",
   );
   static const dispatchedOnAccessibility = "Dispatched. روانہ کیا گیا";
+  static const masterRecordTypeSection = Bilingual(
+    "ui.masterRecordTypeSection",
+    "Record type",
+    "ریکارڈ کی قسم",
+  );
+  static const masterRecordTypeSectionAccessibility =
+      "Record type. ریکارڈ کی قسم";
+  static const findRecordsSection = Bilingual(
+    "ui.findRecordsSection",
+    "Find records",
+    "ریکارڈ تلاش کریں",
+  );
+  static const findRecordsSectionAccessibility =
+      "Find records. ریکارڈ تلاش کریں";
+  static const recordsSection = Bilingual(
+    "ui.recordsSection",
+    "Records",
+    "ریکارڈ",
+  );
+  static const recordsSectionAccessibility = "Records. ریکارڈ";
+  static const importSetupNotLoadedYet = Bilingual(
+    "ui.importSetupNotLoadedYet",
+    "The import setup has not loaded yet. Wait for the field list, then download the template.",
+    "درآمد کی ترتیب ابھی لوڈ نہیں ہوئی۔ فیلڈز کی فہرست کا انتظار کریں، پھر سانچہ ڈاؤن لوڈ کریں۔",
+  );
+  static const importSetupNotLoadedYetAccessibility =
+      "The import setup has not loaded yet. Wait for the field list, then download the template.. درآمد کی ترتیب ابھی لوڈ نہیں ہوئی۔ فیلڈز کی فہرست کا انتظار کریں، پھر سانچہ ڈاؤن لوڈ کریں۔";
+  static const noExpenseDraftsAwaitingReview = Bilingual(
+    "ui.noExpenseDraftsAwaitingReview",
+    "No expense drafts are waiting for review.",
+    "خرچ کے کوئی مسودے جانچ کے منتظر نہیں ہیں۔",
+  );
+  static const noExpenseDraftsAwaitingReviewAccessibility =
+      "No expense drafts are waiting for review.. خرچ کے کوئی مسودے جانچ کے منتظر نہیں ہیں۔";
+  static const noExpenseCategoryCodesReturned = Bilingual(
+    "ui.noExpenseCategoryCodesReturned",
+    "No expense category codes were returned by the server.",
+    "سرور سے خرچ کی اقسام کے کوئی کوڈ موصول نہیں ہوئے۔",
+  );
+  static const noExpenseCategoryCodesReturnedAccessibility =
+      "No expense category codes were returned by the server.. سرور سے خرچ کی اقسام کے کوئی کوڈ موصول نہیں ہوئے۔";
+  static const backupStatus = Bilingual(
+    "ui.backupStatus",
+    "Backup status",
+    "بیک اپ کی صورتحال",
+  );
+  static const backupStatusAccessibility = "Backup status. بیک اپ کی صورتحال";
+  static const backupSchedule = Bilingual(
+    "ui.backupSchedule",
+    "Schedule",
+    "شیڈول",
+  );
+  static const backupScheduleAccessibility = "Schedule. شیڈول";
+  static const backupTraffic = Bilingual(
+    "ui.backupTraffic",
+    "Monthly traffic",
+    "ماہانہ ٹریفک",
+  );
+  static const backupTrafficAccessibility = "Monthly traffic. ماہانہ ٹریفک";
+  static const manualBackup = Bilingual(
+    "ui.manualBackup",
+    "Manual backup",
+    "دستی بیک اپ",
+  );
+  static const manualBackupAccessibility = "Manual backup. دستی بیک اپ";
+  static const accountRole = Bilingual(
+    "ui.accountRole",
+    "Role",
+    "کردار",
+  );
+  static const accountRoleAccessibility = "Role. کردار";
+  static const confirmImportBlocked = Bilingual(
+    "ui.confirmImportBlocked",
+    "Resolve the validation errors, or acknowledge the overlap warnings, before confirming the import.",
+    "درآمد کی تصدیق سے پہلے توثیق کی غلطیاں درست کریں یا متداخل سفر کے انتباہات کو تسلیم کریں۔",
+  );
+  static const confirmImportBlockedAccessibility =
+      "Resolve the validation errors, or acknowledge the overlap warnings, before confirming the import.. درآمد کی تصدیق سے پہلے توثیق کی غلطیاں درست کریں یا متداخل سفر کے انتباہات کو تسلیم کریں۔";
+  // Phase 2 (trips list): zero-state wording for a settled outstanding and the
+  // "All" status filter chip.
+  static const settled = Bilingual(
+    "ui.settled",
+    "Settled",
+    "تصفیہ شدہ",
+  );
+  static const settledAccessibility = "Settled. تصفیہ شدہ";
+  static const all = Bilingual("ui.all", "All", "تمام");
+  static const allAccessibility = "All. تمام";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6137,6 +6257,11 @@ abstract final class L10n {
     whoseMoneySection,
     whereSection,
     proofSection,
+    mostUsed,
+    clearSearch,
+    expenseActive,
+    expenseHistorical,
+    pageExpensesTotal,
     moneyNavigation,
     accountNavigation,
     collapseNavigation,
@@ -6172,5 +6297,19 @@ abstract final class L10n {
     createdOn,
     updatedOn,
     dispatchedOn,
+    masterRecordTypeSection,
+    findRecordsSection,
+    recordsSection,
+    importSetupNotLoadedYet,
+    noExpenseDraftsAwaitingReview,
+    noExpenseCategoryCodesReturned,
+    backupStatus,
+    backupSchedule,
+    backupTraffic,
+    manualBackup,
+    accountRole,
+    confirmImportBlocked,
+    settled,
+    all,
   ];
 }

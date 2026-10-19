@@ -6907,7 +6907,8 @@
     "en": "Commission due",
     "ur": "واجب الادا کمیشن",
     "origins": [
-      "reviewed.dynamic.presentation"
+      "reviewed.dynamic.presentation",
+      "ui-restructure-phase6"
     ]
   },
   {
@@ -7715,6 +7716,177 @@
     "ur": "روانہ کیا گیا",
     "origins": [
       "ui-restructure-patterns"
+    ]
+  },
+  {
+    "key": "settled",
+    "semantic_key": "ui.settled",
+    "en": "Settled",
+    "ur": "تصفیہ شدہ",
+    "origins": [
+      "ui-restructure-phase2"
+    ]
+  },
+  {
+    "key": "all",
+    "semantic_key": "ui.all",
+    "en": "All",
+    "ur": "تمام",
+    "origins": [
+      "ui-restructure-phase2"
+    ]
+  },
+  {
+    "key": "mostUsed",
+    "semantic_key": "ui.mostUsed",
+    "en": "Most used",
+    "ur": "سب سے زیادہ استعمال شدہ",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "clearSearch",
+    "semantic_key": "ui.clearSearch",
+    "en": "Clear search",
+    "ur": "تلاش صاف کریں",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "expenseActive",
+    "semantic_key": "ui.expenseActive",
+    "en": "Active",
+    "ur": "فعال",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "expenseHistorical",
+    "semantic_key": "ui.expenseHistorical",
+    "en": "Historical",
+    "ur": "پرانا",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "pageExpensesTotal",
+    "semantic_key": "ui.pageExpensesTotal",
+    "en": "Expenses total · this page",
+    "ur": "اس صفحے کے اخراجات کا کل",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "masterRecordTypeSection",
+    "semantic_key": "ui.masterRecordTypeSection",
+    "en": "Record type",
+    "ur": "ریکارڈ کی قسم",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "findRecordsSection",
+    "semantic_key": "ui.findRecordsSection",
+    "en": "Find records",
+    "ur": "ریکارڈ تلاش کریں",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "recordsSection",
+    "semantic_key": "ui.recordsSection",
+    "en": "Records",
+    "ur": "ریکارڈ",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "importSetupNotLoadedYet",
+    "semantic_key": "ui.importSetupNotLoadedYet",
+    "en": "The import setup has not loaded yet. Wait for the field list, then download the template.",
+    "ur": "درآمد کی ترتیب ابھی لوڈ نہیں ہوئی۔ فیلڈز کی فہرست کا انتظار کریں، پھر سانچہ ڈاؤن لوڈ کریں۔",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "noExpenseDraftsAwaitingReview",
+    "semantic_key": "ui.noExpenseDraftsAwaitingReview",
+    "en": "No expense drafts are waiting for review.",
+    "ur": "خرچ کے کوئی مسودے جانچ کے منتظر نہیں ہیں۔",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "noExpenseCategoryCodesReturned",
+    "semantic_key": "ui.noExpenseCategoryCodesReturned",
+    "en": "No expense category codes were returned by the server.",
+    "ur": "سرور سے خرچ کی اقسام کے کوئی کوڈ موصول نہیں ہوئے۔",
+    "origins": [
+      "ui-restructure-phase5"
+    ]
+  },
+  {
+    "key": "backupStatus",
+    "semantic_key": "ui.backupStatus",
+    "en": "Backup status",
+    "ur": "بیک اپ کی صورتحال",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "backupSchedule",
+    "semantic_key": "ui.backupSchedule",
+    "en": "Schedule",
+    "ur": "شیڈول",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "backupTraffic",
+    "semantic_key": "ui.backupTraffic",
+    "en": "Monthly traffic",
+    "ur": "ماہانہ ٹریفک",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "manualBackup",
+    "semantic_key": "ui.manualBackup",
+    "en": "Manual backup",
+    "ur": "دستی بیک اپ",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "accountRole",
+    "semantic_key": "ui.accountRole",
+    "en": "Role",
+    "ur": "کردار",
+    "origins": [
+      "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "confirmImportBlocked",
+    "semantic_key": "ui.confirmImportBlocked",
+    "en": "Resolve the validation errors, or acknowledge the overlap warnings, before confirming the import.",
+    "ur": "درآمد کی تصدیق سے پہلے توثیق کی غلطیاں درست کریں یا متداخل سفر کے انتباہات کو تسلیم کریں۔",
+    "origins": [
+      "ui-restructure-phase8"
     ]
   }
 ]
