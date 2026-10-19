@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
+import '../../app/karvaan_typography.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -65,6 +66,8 @@ class BackupRepository implements BackupCommands {
   }
 }
 
+/// Summary-first: the screen's answer (run state + last verified success)
+/// leads at headline size; the remaining detail is disclosed in sections.
 class BackupSummary extends StatelessWidget {
   const BackupSummary({super.key, required this.status});
   final Map<String, dynamic> status;
@@ -73,73 +76,102 @@ class BackupSummary extends StatelessWidget {
     final schedule = (status['schedule'] as Map?) ?? {},
         metrics = (status['metrics'] as Map?) ?? {};
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         BilingualText(
           L10n.backupRunState.withValues([
             backupOutcomeLabel(status['outcome']),
           ]),
+          style: KarvaanTypography.textTheme.headlineSmall,
         ),
+        const SizedBox(height: 4),
         BilingualText(
           status['last_verified_success_at'] == null
               ? L10n.noVerifiedBackupYet
               : L10n.lastVerifiedBackupSuccessUTC.withValues([
                   status['last_verified_success_at'],
                 ]),
+          style: KarvaanTypography.textTheme.titleSmall,
         ),
-        BilingualText(
-          status['last_attempt_at'] == null
-              ? L10n.noBackupAttemptYet
-              : L10n.lastAttempt.withValues([
-                  status['last_attempt_at'],
-                  backupOutcomeLabel(status['outcome']),
+        const SizedBox(height: 16),
+        KarvaanSection(
+          title: L10n.backupStatus,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BilingualText(
+                status['last_attempt_at'] == null
+                    ? L10n.noBackupAttemptYet
+                    : L10n.lastAttempt.withValues([
+                        status['last_attempt_at'],
+                        backupOutcomeLabel(status['outcome']),
+                      ]),
+              ),
+              if (status['stale'] == true)
+                const BilingualText(
+                  L10n.backupIsStaleOrHasNeverSucceededRunThe,
+                ),
+              if (status['outcome'] == 'FAILED')
+                BilingualText(
+                  L10n.backupFailed.withValues([
+                    status['safe_error_code'] ??
+                        'Review the administrator helper status.',
+                  ]),
+                ),
+              if (status['interrupted'] == true)
+                const BilingualText(
+                  L10n.theLastRunMayHaveBeenInterruptedItHas,
+                ),
+              BilingualText(
+                L10n.pendingReceiptCopies.withValues([
+                  status['pending_receipt_count'] ?? 0,
                 ]),
-        ),
-        if (status['stale'] == true)
-          const BilingualText(L10n.backupIsStaleOrHasNeverSucceededRunThe),
-        if (status['outcome'] == 'FAILED')
-          BilingualText(
-            L10n.backupFailed.withValues([
-              status['safe_error_code'] ??
-                  'Review the administrator helper status.',
-            ]),
+              ),
+              if (status['quota_level'] != 'NORMAL')
+                BilingualText(
+                  L10n.freeTierUsageWarningReviewProviderQuotasAndBackup
+                      .withValues([status['quota_level']]),
+                ),
+              if ((status['incomplete_traffic_attempts'] as int? ?? 0) > 0)
+                BilingualText(
+                  L10n.trafficForInterruptedOrIncompleteAttemptsMayBeMissing
+                      .withValues([status['incomplete_traffic_attempts']]),
+                ),
+            ],
           ),
-        if (status['interrupted'] == true)
-          const BilingualText(L10n.theLastRunMayHaveBeenInterruptedItHas),
-        BilingualText(
-          L10n.pendingReceiptCopies.withValues([
-            status['pending_receipt_count'] ?? 0,
-          ]),
         ),
-        BilingualText(
-          (schedule['active'] == true
-              ? L10n.dailyScheduleVerifiedRunsDuringTheAdministratorWindowsSession
-                    .withValues([schedule['daily_time'], schedule['time_zone']])
-              : L10n.noActiveScheduleHasBeenVerifiedConfigureTheSeparate),
+        KarvaanSection(
+          title: L10n.backupSchedule,
+          child: BilingualText(
+            (schedule['active'] == true
+                ? L10n.dailyScheduleVerifiedRunsDuringTheAdministratorWindowsSession
+                      .withValues([
+                        schedule['daily_time'],
+                        schedule['time_zone'],
+                      ])
+                : L10n.noActiveScheduleHasBeenVerifiedConfigureTheSeparate),
+          ),
         ),
-        BilingualText(
-          L10n.estimatedBackupTrafficThisMonthBytesDatabaseBytesFiles
-              .withValues([
-                status['backup_traffic_monthly_bytes'] ?? '0',
-                metrics['database_bytes'] ?? 'unknown',
-                metrics['storage_bytes'] ?? 'unknown',
-              ]),
+        KarvaanSection(
+          title: L10n.backupTraffic,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BilingualText(
+                L10n.estimatedBackupTrafficThisMonthBytesDatabaseBytesFiles
+                    .withValues([
+                      status['backup_traffic_monthly_bytes'] ?? '0',
+                      metrics['database_bytes'] ?? 'unknown',
+                      metrics['storage_bytes'] ?? 'unknown',
+                    ]),
+              ),
+              if (status['other_traffic_known'] != true)
+                const BilingualText(
+                  L10n.otherApplicationProviderTrafficIsNotMeasuredHereCheck,
+                ),
+            ],
+          ),
         ),
-        if (status['quota_level'] != 'NORMAL')
-          BilingualText(
-            L10n.freeTierUsageWarningReviewProviderQuotasAndBackup.withValues([
-              status['quota_level'],
-            ]),
-          ),
-        if ((status['incomplete_traffic_attempts'] as int? ?? 0) > 0)
-          BilingualText(
-            L10n.trafficForInterruptedOrIncompleteAttemptsMayBeMissing
-                .withValues([status['incomplete_traffic_attempts']]),
-          ),
-        if (status['other_traffic_known'] != true)
-          const BilingualText(
-            L10n.otherApplicationProviderTrafficIsNotMeasuredHereCheck,
-          ),
         const BilingualText(
           L10n.copyEncryptedDatabaseArchivesANDReceiptObjectBackupsOff,
         ),
@@ -163,20 +195,19 @@ class _BackupStatusPanelState extends State<BackupStatusPanel> {
     status = widget.commands.status();
   }
 
+  // BackupSummary already groups itself in cards; the panel only pads.
   @override
   Widget build(BuildContext context) => FutureBuilder<Map<String, dynamic>>(
     future: status,
-    builder: (_, snap) => Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: snap.hasData
-            ? BackupSummary(status: snap.data!)
-            : BilingualText(
-                (snap.hasError
-                    ? L10n.backupStatusUnavailableCheckTheAdministratorHelperAndConnection
-                    : L10n.loadingBackupStatus),
-              ),
-      ),
+    builder: (_, snap) => Padding(
+      padding: const EdgeInsets.all(12),
+      child: snap.hasData
+          ? BackupSummary(status: snap.data!)
+          : BilingualText(
+              (snap.hasError
+                  ? L10n.backupStatusUnavailableCheckTheAdministratorHelperAndConnection
+                  : L10n.loadingBackupStatus),
+            ),
     ),
   );
 }
@@ -268,16 +299,27 @@ class _BackupWorkspaceState extends State<BackupWorkspace> {
             L10n.runBackupsOnTheConfiguredAdministratorWindowsPC,
           ),
         KarvaanSection(
-          title: L10n.administratorBackups,
+          title: L10n.manualBackup,
           child: Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: [
-              FilledButton(
-                onPressed:
-                    busy || karvaanLocalOnly || kIsWeb || !Platform.isWindows
-                    ? null
-                    : manual,
-                child: const BilingualCaption(L10n.runManualWindowsBackup),
+              // Disabled here for a named reason, never silently: the
+              // stacked caption above names it, and the tooltip repeats it
+              // in both languages for hover and focus users.
+              Tooltip(
+                message:
+                    (karvaanLocalOnly
+                            ? L10n.administratorHelperIsDisabledInThisIsolatedCandidate
+                            : L10n.runBackupsOnTheConfiguredAdministratorWindowsPC)
+                        .inline,
+                child: FilledButton(
+                  onPressed:
+                      busy || karvaanLocalOnly || kIsWeb || !Platform.isWindows
+                      ? null
+                      : manual,
+                  child: const BilingualCaption(L10n.runManualWindowsBackup),
+                ),
               ),
               TextButton(
                 onPressed: busy ? null : load,

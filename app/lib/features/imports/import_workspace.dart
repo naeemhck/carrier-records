@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
+import '../../app/karvaan_typography.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -305,6 +306,52 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
     }
   }
 
+  /// Enablement mirrors the original gating exactly; the helpers only let
+  /// the UI name the pending requirement for each disabled action.
+  bool get _templateEnabled => !busy && fields.isNotEmpty;
+  bool get _chooseEnabled => !busy && office != null;
+  bool get _validateEnabled =>
+      !busy && command != null && localErrors.isEmpty && result == null;
+
+  Bilingual _validateDisabledReason() {
+    if (localErrors.isNotEmpty) return L10n.importErrorsRequired;
+    if (result != null) return L10n.importAlreadyCommitted;
+    return L10n.importFileRequired;
+  }
+
+  /// A disabled button must explain why: the stacked caption under the
+  /// actions names the pending requirement, and the tooltip repeats it in
+  /// both languages for hover and focus users.
+  Widget _explained({
+    required bool enabled,
+    required Bilingual whenEnabled,
+    required Bilingual whenDisabled,
+    required Widget child,
+  }) => Tooltip(
+    message: (enabled ? whenEnabled : whenDisabled).inline,
+    child: child,
+  );
+
+  /// Confirm stays disabled until validation passes; the tooltip names the
+  /// blocker (row errors or unacknowledged overlap warnings) in both
+  /// languages instead of leaving a dead button.
+  Widget _confirmButton() {
+    final blocked =
+        busy ||
+        (preview!['errors'] as List).isNotEmpty ||
+        ((preview!['warnings'] as List).isNotEmpty && !overlaps);
+    return Tooltip(
+      message: (blocked
+              ? L10n.confirmImportBlocked
+              : L10n.confirmReviewedImport)
+          .inline,
+      child: FilledButton(
+        onPressed: blocked ? null : confirm,
+        child: const BilingualCaption(L10n.confirmReviewedImport),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -346,26 +393,37 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                         result = null;
                       }),
               ),
+              const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: [
-                  TextButton(
-                    onPressed: busy || fields.isEmpty ? null : template,
-                    child: const BilingualCaption(L10n.downloadTemplate),
+                  _explained(
+                    enabled: _templateEnabled,
+                    whenEnabled: L10n.downloadTemplate,
+                    whenDisabled: L10n.importSetupNotLoadedYet,
+                    child: TextButton(
+                      onPressed: _templateEnabled ? template : null,
+                      child: const BilingualCaption(L10n.downloadTemplate),
+                    ),
                   ),
-                  TextButton(
-                    onPressed: busy || office == null ? null : choose,
-                    child: const BilingualCaption(L10n.chooseXLSX),
+                  _explained(
+                    enabled: _chooseEnabled,
+                    whenEnabled: L10n.chooseXLSX,
+                    whenDisabled: L10n.importOfficeRequired,
+                    child: TextButton(
+                      onPressed: _chooseEnabled ? choose : null,
+                      child: const BilingualCaption(L10n.chooseXLSX),
+                    ),
                   ),
-                  TextButton(
-                    onPressed:
-                        busy ||
-                            command == null ||
-                            localErrors.isNotEmpty ||
-                            result != null
-                        ? null
-                        : validate,
-                    child: const BilingualCaption(L10n.validateAndPreview),
+                  _explained(
+                    enabled: _validateEnabled,
+                    whenEnabled: L10n.validateAndPreview,
+                    whenDisabled: _validateDisabledReason(),
+                    child: TextButton(
+                      onPressed: _validateEnabled ? validate : null,
+                      child: const BilingualCaption(L10n.validateAndPreview),
+                    ),
                   ),
                 ],
               ),
@@ -409,16 +467,7 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                 L10n.iReviewedTheActiveVehicleOverlapWarningsAndThe,
               ),
             ),
-          if (result == null)
-            FilledButton(
-              onPressed:
-                  busy ||
-                      (preview!['errors'] as List).isNotEmpty ||
-                      ((preview!['warnings'] as List).isNotEmpty && !overlaps)
-                  ? null
-                  : confirm,
-              child: const BilingualCaption(L10n.confirmReviewedImport),
-            ),
+          if (result == null) _confirmButton(),
         ],
         if (result != null)
           const BilingualText(
@@ -428,43 +477,87 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
           expansionAnimationStyle: AnimationStyle.noAnimation,
           title: const BilingualText(L10n.expenseCategoryCodes),
           children: [
-            for (final c in categories)
-              SelectableText('${c['code']}: ${c['name']}'),
+            if (categories.isEmpty)
+              const BilingualText(L10n.noExpenseCategoryCodesReturned)
+            else
+              for (final c in categories)
+                SelectableText('${c['code']}: ${c['name']}'),
           ],
         ),
-        const Divider(),
-        const BilingualText(L10n.importedExpenseDraftsAwaitingNormalReview),
-        for (final d in drafts)
-          BilingualListTile(
-            title: Text(
-              '${d['payload']['effective_date']} | ${displayMoney(d['payload']['amount'])} | ${d['payload']['reason']}',
-            ),
-            trailing: TextButton(
-              onPressed: busy ? null : () => expense(d),
-              child: const BilingualCaption(L10n.reviewExpenseDraft),
-            ),
+        KarvaanSection(
+          title: L10n.labelValues10866a.withValues([
+            L10n.importedExpenseDraftsAwaitingNormalReview,
+            Bilingual.data(displayCount(drafts.length)),
+          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (drafts.isEmpty && !busy)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const BilingualText(
+                        L10n.noExpenseDraftsAwaitingReview,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      _explained(
+                        enabled: _chooseEnabled,
+                        whenEnabled: L10n.chooseXLSX,
+                        whenDisabled: L10n.importOfficeRequired,
+                        child: FilledButton(
+                          onPressed: _chooseEnabled ? choose : null,
+                          child: const BilingualCaption(L10n.chooseXLSX),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                for (final d in drafts)
+                  BilingualListTile(
+                    title: Text(
+                      displayMoney(d['payload']['amount']),
+                      style: KarvaanTypography.textTheme.headlineSmall,
+                      textDirection: TextDirection.ltr,
+                    ),
+                    subtitle: Text(
+                      '${d['payload']['effective_date']} | ${d['payload']['reason']}',
+                      style: KarvaanTypography.textTheme.bodySmall?.copyWith(
+                        color: KarvaanDesign.secondary,
+                      ),
+                    ),
+                    trailing: TextButton(
+                      onPressed: busy ? null : () => expense(d),
+                      child: const BilingualCaption(L10n.reviewExpenseDraft),
+                    ),
+                  ),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: busy || draftOffset == 0
+                        ? null
+                        : () {
+                            draftOffset -= 50;
+                            load();
+                          },
+                    child: const BilingualCaption(L10n.previous),
+                  ),
+                  TextButton(
+                    onPressed: busy || drafts.length < 50
+                        ? null
+                        : () {
+                            draftOffset += 50;
+                            load();
+                          },
+                    child: const BilingualCaption(L10n.next),
+                  ),
+                ],
+              ),
+            ],
           ),
-        Row(
-          children: [
-            TextButton(
-              onPressed: busy || draftOffset == 0
-                  ? null
-                  : () {
-                      draftOffset -= 50;
-                      load();
-                    },
-              child: const BilingualCaption(L10n.previous),
-            ),
-            TextButton(
-              onPressed: busy || drafts.length < 50
-                  ? null
-                  : () {
-                      draftOffset += 50;
-                      load();
-                    },
-              child: const BilingualCaption(L10n.next),
-            ),
-          ],
         ),
       ],
     ),

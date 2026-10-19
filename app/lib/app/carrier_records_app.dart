@@ -308,6 +308,9 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       child: const BilingualCaption(L10n.changePassword),
                     ),
                   ] else ...[
+                    // Session/refresh errors surface here too, so they render
+                    // at the top of the card instead of below the fold.
+                    feedback(),
                     BilingualText(
                       L10n.signedInAs.withValues([p['display_name']]),
                       style: KarvaanTypography.screenTitle,
@@ -339,8 +342,6 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                     ),
                   ],
                   if (busy) const LinearProgressIndicator(),
-                  if (p != null && p['must_change_password'] != true)
-                    feedback(),
                 ],
               ),
             ),
@@ -522,8 +523,18 @@ class _AccountsPanelState extends State<AccountsPanel> {
             );
           }
           if (!snapshot.hasData) return const LinearProgressIndicator();
+          final rows = snapshot.data!;
+          if (rows.isEmpty) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: BilingualText(
+                L10n.noRecordsFound,
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
           return Column(
-            children: snapshot.data!
+            children: rows
                 .map((a) => AccountRow(account: a, onManage: () => edit(a)))
                 .toList(),
           );
@@ -654,6 +665,10 @@ class _AccountDialogState extends State<AccountDialog> {
             ),
             KarvaanChoiceField<String>(
               initialValue: role,
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.accountRole)),
+              ),
               items: ['STAFF', 'ADMIN']
                   .map(
                     (r) => DropdownMenuItem(
