@@ -2,6 +2,8 @@ import 'package:carrier_records/app/bilingual.dart';
 
 import 'dart:convert';
 
+import '../../app/karvaan_patterns.dart';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -111,6 +113,58 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
     }
   }
 
+  /// One correction-history row. The recorded amount is a PaperTrailAmount:
+  /// tapping it deep-links to this record's correction review form, so no
+  /// money figure is a dead end. Tabular numerals, money-green per the
+  /// blue-is-movement/green-is-money rule.
+  Widget _historyCard(Map<String, dynamic> row) {
+    final eventName = ownedMessage(eventLabel(row['kind'] as String));
+    final eventUr = eventName.ur.isEmpty ? eventName.en : eventName.ur;
+    return Card(
+      child: BilingualListTile(
+        title: BilingualText(
+          Bilingual(
+            L10n.pkr.key,
+            '${eventName.en} · ${row['effective_date']}',
+            '$eventUr · ${row['effective_date']}',
+          ),
+        ),
+        subtitle: BilingualText(
+          L10n.correctionTrace.withValues([
+            row['actor'],
+            row['recorded_at'],
+            row['reason'] ?? '',
+            row['reversed'] == true
+                ? L10n.reversedEntry
+                : Bilingual.data(''),
+            row['reversal_of_id'] != null
+                ? L10n.reversesEntry.withValues([row['reversal_of_id']])
+                : Bilingual.data(''),
+            row['replacement_of_id'] != null
+                ? L10n.replacesEntry.withValues([row['replacement_of_id']])
+                : Bilingual.data(''),
+          ]),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PaperTrailAmount(
+              formatted: displayMoney(row['amount']),
+              onTap: () => form(row),
+              semanticLabel:
+                  '${eventName.en}: ${displayMoney(row['amount'])}',
+            ),
+            if (row['can_correct'] == true)
+              TextButton(
+                onPressed: () => form(row),
+                child: const BilingualCaption(L10n.correct),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -165,48 +219,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
               children: [
                 if (data.isEmpty)
                   const BilingualText(L10n.noRecordedEventsInThisScope),
-                for (final row in data)
-                  Card(
-                    child: BilingualListTile(
-                      title: BilingualText(
-                        moneyMessage(
-                          L10n.pkr,
-                          [
-                            ownedMessage(eventLabel(row['kind'] as String)),
-                            row['amount'],
-                            row['effective_date'],
-                          ],
-                          {1},
-                        ),
-                      ),
-                      subtitle: BilingualText(
-                        L10n.correctionTrace.withValues([
-                          row['actor'],
-                          row['recorded_at'],
-                          row['reason'] ?? '',
-                          row['reversed'] == true
-                              ? L10n.reversedEntry
-                              : Bilingual.data(''),
-                          row['reversal_of_id'] != null
-                              ? L10n.reversesEntry.withValues([
-                                  row['reversal_of_id'],
-                                ])
-                              : Bilingual.data(''),
-                          row['replacement_of_id'] != null
-                              ? L10n.replacesEntry.withValues([
-                                  row['replacement_of_id'],
-                                ])
-                              : Bilingual.data(''),
-                        ]),
-                      ),
-                      trailing: row['can_correct'] == true
-                          ? TextButton(
-                              onPressed: () => form(row),
-                              child: const BilingualCaption(L10n.correct),
-                            )
-                          : null,
-                    ),
-                  ),
+                for (final row in data) _historyCard(row),
                 Row(
                   children: [
                     TextButton(
@@ -296,6 +309,9 @@ class _CorrectionTripPickerState extends State<_CorrectionTripPicker> {
                 }
                 if (!s.hasData) {
                   return const LinearProgressIndicator();
+                }
+                if (s.data!.rows.isEmpty) {
+                  return const BilingualText(L10n.noRecordsFound);
                 }
                 return ListView(
                   children: [

@@ -3,7 +3,6 @@
 // totals strip, empty state). Presentation only; synthetic fakes.
 import 'bilingual_finders.dart';
 
-import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/expenses/expense_workspace.dart';
 import 'package:carrier_records/features/masters/master_repository.dart';

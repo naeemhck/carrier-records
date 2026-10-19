@@ -4,6 +4,7 @@ import 'package:carrier_records/app/bilingual.dart';
 import 'dart:convert';
 
 import '../../app/karvaan_design.dart';
+import '../../app/karvaan_patterns.dart';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,6 +18,18 @@ import 'financial_repository.dart';
 import 'payment_model.dart';
 
 Widget unguardedPayments(Widget child) => child;
+
+/// One nonzero per-trip balance for the balances & custody summary.
+class _BalanceLine {
+  const _BalanceLine({
+    required this.tripId,
+    required this.tripNumber,
+    required this.purpose,
+    required this.partyId,
+    required this.display,
+  });
+  final String tripId, tripNumber, purpose, partyId, display;
+}
 
 class PaymentRow {
   PaymentRow(this.trip, this.number, this.claims, this.consignments);
@@ -422,6 +435,123 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     }
   }
 
+  /// Presentation-only sums of the already-fetched per-trip ledgers.
+  /// Nothing here posts, allocates, or reinterprets backend figures.
+  BigInt _heldPaisa() {
+    var total = BigInt.zero;
+    for (final entry in balances.entries) {
+      for (final b in entry.value['balances'] as List) {
+        if (b['account_purpose'] == 'CUSTODY_RECEIVABLE') {
+          total += LedgerAmount.fromJson(b['balance'] as String).paisa;
+        }
+      }
+    }
+    return total;
+  }
+
+  /// One paper-trail line per nonzero balance: money-state chip, party and
+  /// trip, and the figure deep-linking to that trip's balances.
+  List<Widget> _balanceLines() {
+    final lines = <_BalanceLine>[];
+    for (final entry in balances.entries) {
+      final number = rows.firstWhere((r) => r.trip == entry.key).number;
+      for (final b in entry.value['balances'] as List) {
+        final purpose = b['account_purpose'] as String;
+        final paisa = LedgerAmount.fromJson(b['balance'] as String).paisa;
+        if (paisa == BigInt.zero) continue;
+        lines.add(
+          _BalanceLine(
+            tripId: entry.key,
+            tripNumber: number,
+            purpose: purpose,
+            partyId: b['party_id'] as String,
+            display: displayBalance(purpose, b['balance'] as String),
+          ),
+        );
+      }
+    }
+    lines.sort(
+      (a, b) => accountPurposeRank(a.purpose).compareTo(
+        accountPurposeRank(b.purpose),
+      ),
+    );
+    return [
+      for (final line in lines)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              MoneyStateChip(line.purpose),
+              const SizedBox(width: 8),
+              Expanded(
+                child: BilingualText(
+                  Bilingual.data(
+                    '${partyLabel(line.partyId)} · ${line.tripNumber}',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              PaperTrailAmount(
+                formatted: line.display,
+                onTap: busy || pendingRequest != null
+                    ? () {}
+                    : () => _focusTrip(line.tripId),
+                semanticLabel:
+                    '${accountPurposeLabel(line.purpose).en} '
+                    '${partyLabel(line.partyId)} ${line.tripNumber}: '
+                    '${line.display}',
+              ),
+            ],
+          ),
+        ),
+    ];
+  }
+
+  /// Paper-trail target: rescope this workspace to the single trip whose
+  /// ledger the figure came from. Its balances card below is the record.
+  Future<void> _focusTrip(String tripId) async {
+    for (final r in rows) {
+      r.amount.dispose();
+    }
+    setState(() {
+      rows.clear();
+      balances.clear();
+      reviewed = null;
+      pendingSignature = null;
+      pendingRequest = null;
+      conflict = false;
+      error = null;
+    });
+    await load(tripId);
+  }
+
+  /// Balances & custody summary: the intermediary-held figure leads as the
+  /// one hero amount per viewport; per-party balances follow with paper-trail
+  /// links to their source trips. Summary-first, tabular figures.
+  Widget _balancesSummary() {
+    // Don't flash a zero hero / "no records" before the first ledger load.
+    if (busy && balances.isEmpty) return const SizedBox.shrink();
+    return KarvaanSection(
+      title: L10n.partyClaimsAndHeldMoney,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          KarvaanMetric(
+            hero: true,
+            label: L10n.intermediaryHeldMoney,
+            formattedValue: displayMoney(
+              AllocationTotals.decimal(_heldPaisa()),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ..._balanceLines(),
+          if (balances.isEmpty && !busy)
+            const BilingualText(L10n.noRecordsFound),
+        ],
+      ),
+    );
+  }
+
   Bilingual totals() {
     try {
       final values = rows
@@ -473,6 +603,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
           const BilingualText(
             L10n.collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate,
           ),
+          _balancesSummary(),
           if (busy) const LinearProgressIndicator(),
           KarvaanChoiceField<PaymentAction>(
             initialValue: action,
@@ -574,17 +705,20 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final b in entry.value['balances'] as List)
-                    KarvaanAmount(
-                      label: L10n.labelValuesfb62fe.withValues([
-                        ownedMessage(
-                          accountLabel(b['account_purpose'] as String),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MoneyStateChip(b['account_purpose'] as String),
+                        KarvaanAmount(
+                          label: Bilingual.data(
+                            partyLabel(b['party_id'] as String),
+                          ),
+                          value: displayBalance(
+                            b['account_purpose'] as String,
+                            b['balance'] as String,
+                          ),
                         ),
-                        Bilingual.data(partyLabel(b['party_id'] as String)),
-                      ]),
-                      value: displayBalance(
-                        b['account_purpose'] as String,
-                        b['balance'] as String,
-                      ),
+                      ],
                     ),
                 ],
               ),
@@ -808,7 +942,7 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
               moneyMessage(
                 L10n.pkrd24bdd,
                 [
-                  ownedMessage(accountLabel(c['account_purpose'] as String)),
+                  accountPurposeLabel(c['account_purpose'] as String),
                   c['effective_date'],
                   c['remaining'],
                 ],
@@ -831,18 +965,62 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
   );
 }
 
-String accountLabel(String key) =>
-    const {
-      'CUSTOMER_RECEIVABLE': 'Customer outstanding',
-      'CUSTODY_RECEIVABLE': 'Money held',
-      'OWNER_PAYABLE': 'Owner settlement due',
-      'BROKER_COMMISSION_PAYABLE': 'Commission due',
-      'TRIP_FUNDING_PAYABLE': 'Personal funding due',
-      'CUSTOMER_ADVANCE_CREDIT': 'Customer credit',
-      'EXPENSE_REIMBURSEMENT_PAYABLE': 'Expense reimbursement due',
-      'PARTY_COST_RECOVERY': 'Cost recovery',
-    }[key] ??
-    key;
+/// Bilingual label for each ledger account purpose, from the branch
+/// catalogue/glossary — never English-only. Used by money-state chips and
+/// picker rows alike.
+Bilingual accountPurposeLabel(String key) => switch (key) {
+  'CUSTOMER_RECEIVABLE' => L10n.customerOutstanding,
+  'CUSTODY_RECEIVABLE' => L10n.heldFunds,
+  'OWNER_PAYABLE' => L10n.ownerSettlement,
+  'BROKER_COMMISSION_PAYABLE' => L10n.commissionDue,
+  'TRIP_FUNDING_PAYABLE' => L10n.personalFundingDue,
+  'CUSTOMER_ADVANCE_CREDIT' => L10n.customerCredit,
+  'EXPENSE_REIMBURSEMENT_PAYABLE' => L10n.expenseReimbursementDue,
+  'PARTY_COST_RECOVERY' => L10n.costRecovery,
+  _ => Bilingual.data(key),
+};
+
+/// Display order for money states: held funds first (the custody figure the
+/// balances view leads with), then receivables, credits, and payables.
+int accountPurposeRank(String key) => const {
+  'CUSTODY_RECEIVABLE': 0,
+  'CUSTOMER_RECEIVABLE': 1,
+  'CUSTOMER_ADVANCE_CREDIT': 2,
+  'OWNER_PAYABLE': 3,
+  'BROKER_COMMISSION_PAYABLE': 4,
+  'EXPENSE_REIMBURSEMENT_PAYABLE': 5,
+  'TRIP_FUNDING_PAYABLE': 6,
+  'PARTY_COST_RECOVERY': 7,
+}[key] ?? 99;
+
+/// Money-state chip: stacked bilingual purpose label in the money-green
+/// family (blue is reserved for the physical/journey flow). Held funds render
+/// filled; every other state renders on the outstanding highlight.
+class MoneyStateChip extends StatelessWidget {
+  const MoneyStateChip(this.purpose, {super.key});
+  final String purpose;
+  @override
+  Widget build(BuildContext context) {
+    final held = purpose == 'CUSTODY_RECEIVABLE';
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: held ? KarvaanDesign.accent : const Color(0xFFEAF4ED),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: BilingualText(
+          accountPurposeLabel(purpose),
+          style: TextStyle(
+            color: held ? Colors.white : const Color(0xFF0B5C2E),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 String displayBalance(String purpose, String value) {
   final amount = LedgerAmount.fromJson(value).paisa;
@@ -908,6 +1086,11 @@ class _PartyPickerState extends State<_PartyPicker> {
                   ? const BilingualText(L10n.partyChoicesUnavailable)
                   : !s.hasData
                   ? const Center(child: CircularProgressIndicator())
+                  // NOTE: "most-used first" needs a backend change:
+                  // list_master_records returns name-ordered pages with no
+                  // usage counts. Flagged in docs/karvaan-restructure-phase6.md.
+                  : s.data!.isEmpty
+                  ? const BilingualText(L10n.noRecordsFound)
                   : ListView(
                       children: [
                         for (final p in s.data!)
@@ -993,6 +1176,8 @@ class _TripPickerState extends State<_TripPicker> {
                   ? const BilingualText(L10n.tripChoicesUnavailable)
                   : !s.hasData
                   ? const Center(child: CircularProgressIndicator())
+                  : s.data!.rows.isEmpty
+                  ? const BilingualText(L10n.noRecordsFound)
                   : ListView(
                       children: [
                         BilingualOwnedText(s.data!.scope),

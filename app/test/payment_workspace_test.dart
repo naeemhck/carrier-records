@@ -111,6 +111,15 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    // The Phase 6 balances & custody summary sits above the form, so the
+    // party buttons may start below the fold: scroll them into view first.
+    final payerButton = find.widgetWithText(
+      TextButton,
+      'Payer: Choose',
+      skipOffstage: false,
+    );
+    await tester.ensureVisible(payerButton);
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(TextButton, 'Payer: Choose'));
     await tester.pumpAndSettle();
     expect(find.widgetWithText(ListTile, 'Customer'), findsOneWidget);
@@ -181,7 +190,13 @@ void main() {
       }
 
       await prepare();
-      final confirm = find.widgetWithText(FilledButton, 'Confirm payment');
+      // The review section renders at the bottom of a long form; find it
+      // even while below the fold, then scroll it into view.
+      final confirm = find.widgetWithText(
+        FilledButton,
+        'Confirm payment',
+        skipOffstage: false,
+      );
       await tester.ensureVisible(confirm);
       await tester.pump();
       await tester.tap(confirm);
@@ -205,6 +220,11 @@ void main() {
         find.text('Payment confirmed. Balances reloaded.'),
         findsOneWidget,
       );
+      // The confirmation snackbar overlays the bottom of the form (where the
+      // Phase 6 summary now places the Review button); let it time out so
+      // later taps land on the form instead of the snackbar.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
       await prepare();
       fake.pending = Completer();
       await tester.ensureVisible(confirm);
