@@ -1,11 +1,14 @@
 import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/app/karvaan_patterns.dart';
+import 'package:carrier_records/core/domain/record_context.dart';
 
 import 'dart:convert';
 
 import '../../app/karvaan_design.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../masters/master_repository.dart';
@@ -27,6 +30,72 @@ String tripError(Object e) => e is FormatException
           ? TripStrings.conflict
           : TripStrings.serverErrors[e.message] ?? TripStrings.failed)
     : TripStrings.failed;
+
+String _decimalString(BigInt paisa) {
+  final negative = paisa.isNegative;
+  final abs = paisa.abs();
+  return '${negative ? '-' : ''}${abs ~/ BigInt.from(100)}.${(abs % BigInt.from(100)).toString().padLeft(2, '0')}';
+}
+
+/// Presentation-only read of get_trip_financials: the trip's customer
+/// outstanding is the sum of open CUSTOMER_RECEIVABLE claim remainders — the
+/// same figure the Money workspace labels "Customer outstanding". Returns a
+/// canonical decimal string, or null when the payload carries no claims.
+String? tripCustomerOutstanding(Map<String, dynamic> financials) {
+  final claims = financials['claims'];
+  if (claims is! List) return null;
+  var total = BigInt.zero;
+  for (final c in claims) {
+    if (c is Map && c['account_purpose'] == 'CUSTOMER_RECEIVABLE') {
+      final remaining = c['remaining'];
+      if (remaining is String) {
+        total += LedgerAmount.fromJson(remaining).paisa;
+      }
+    }
+  }
+  return _decimalString(total);
+}
+
+bool _looksLikeUuid(String value) => RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+).hasMatch(value);
+
+/// Long user-entered notes truncate behind a Read more control instead of
+/// stretching the card. One-way expansion; the full note stays on screen.
+class ExpandableNote extends StatefulWidget {
+  const ExpandableNote(this.note, {super.key});
+  final String note;
+  @override
+  State<ExpandableNote> createState() => _ExpandableNoteState();
+}
+
+class _ExpandableNoteState extends State<ExpandableNote> {
+  bool expanded = false;
+  @override
+  Widget build(BuildContext context) {
+    final text = widget.note.trim();
+    if (text.isEmpty) return const SizedBox.shrink();
+    if (expanded) {
+      return Text(text, textDirection: TextDirection.ltr);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          text,
+          textDirection: TextDirection.ltr,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        TextButton(
+          onPressed: () => setState(() => expanded = true),
+          child: const BilingualCaption(L10n.readMore),
+        ),
+      ],
+    );
+  }
+}
 
 class TripWorkspace extends StatefulWidget {
   const TripWorkspace({
@@ -59,6 +128,18 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   late Future<TripPage> page;
   String? office, vehicle, vehicleName, status;
   int offset = 0;
+
+  /// Per-trip get_trip_financials futures, memoized so list rebuilds do not
+  /// refetch. Cleared on every reload; entries are presentation-only reads.
+  final _moneyFutures = <String, Future<Map<String, dynamic>>>{};
+
+  Future<Map<String, dynamic>> _tripFinancials(String id) {
+    final finance = widget.finance;
+    if (finance == null || !_looksLikeUuid(id)) {
+      return Future.value(const <String, dynamic>{});
+    }
+    return _moneyFutures.putIfAbsent(id, () => finance.trip(RecordId(id)));
+  }
   @override
   void initState() {
     super.initState();
@@ -77,6 +158,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   void reload({int? start}) {
     setState(() {
       offset = start ?? offset;
+      _moneyFutures.clear();
       page = fetch();
     });
   }
@@ -108,7 +190,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     if (saved != null) await detail(saved['id'] as String, saved: true);
   }
 
-  Future<void> detail(String id, {bool saved = false}) async {
+  Future<void> detail(String id, {bool saved = false, int initialTab = 0}) async {
     if (widget.moneyMode && widget.finance != null) {
       await Navigator.push<void>(
         context,
@@ -136,6 +218,8 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             repository: widget.repository,
             id: id,
             saved: saved,
+            initialTab: initialTab,
+            finance: widget.finance,
             canReturn: (o) => widget.offices.any((a) => a['id'] == o),
             onEdit: edit,
             onExpenses: widget.onExpenses,
@@ -177,6 +261,139 @@ class _TripWorkspaceState extends State<TripWorkspace> {
       ),
     );
     if (mounted) reload();
+  }
+
+  /// Route-drawn trip card (competitor pattern 1): the route line answers
+  /// "where", the badge answers "what state", and the single headline figure
+  /// answers "what is owed" — deep-linking to the trip's Money tab.
+  /// Cards stay solid; glass never touches content.
+  Widget _tripCard(Map<String, dynamic> r) {
+    final id = (r['id'] ?? '').toString();
+    final dispatchDate = (r['dispatch_date'] ?? '').toString();
+    final plannedDate = (r['planned_dispatch_date'] ?? '').toString();
+    final arrivalDate = (r['arrival_date'] ?? '').toString();
+    final legDate = dispatchDate.isNotEmpty ? dispatchDate : plannedDate;
+    final destDate = arrivalDate.isNotEmpty ? arrivalDate : legDate;
+    final registration = (r['registration'] ?? '').toString();
+    final owner = (r['owner_name'] ?? '').toString();
+    final captionStyle = Theme.of(
+      context,
+    ).textTheme.bodySmall?.copyWith(color: KarvaanDesign.secondary);
+    return Card(
+      key: ValueKey('trip:$id'),
+      child: InkWell(
+        onTap: () => detail(id),
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: BilingualText(
+                      Bilingual.data((r['trip_number'] ?? '').toString()),
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
+                  TripStatusBadge((r['state'] ?? '').toString()),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TripRouteLine(
+                origin: (r['origin_name'] ?? '').toString(),
+                originMeta: legDate,
+                destination: (r['destination_name'] ?? '').toString(),
+                destinationMeta: destDate,
+              ),
+              const SizedBox(height: 8),
+              BilingualText(
+                owner.isEmpty
+                    ? Bilingual.data(registration)
+                    : L10n.labelValuescd55a9.withValues([
+                        Bilingual.data(registration),
+                        Bilingual.data(owner),
+                      ]),
+                style: captionStyle,
+              ),
+              BilingualText(
+                L10n.labelValues10866a.withValues([
+                  L10n.carCount04a594.withValues([
+                    displayCount(r['car_count'] ?? 0),
+                  ]),
+                  loadKindLabel(r['load_kind']),
+                ]),
+                style: captionStyle,
+              ),
+              ExpandableNote((r['notes'] ?? '').toString()),
+              const SizedBox(height: 8),
+              _outstandingFigure(id),
+              const SizedBox(height: 8),
+              // updated_at is not returned by list_trips; only stamps with
+              // real data render.
+              TimestampFooter(
+                created: (r['created_at'] ?? '').toString().split('T').first,
+                dispatched: dispatchDate.isNotEmpty ? dispatchDate : null,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The card's one headline figure: customer outstanding from the existing
+  /// get_trip_financials read, rendered as a paper-trail amount deep-linking
+  /// to the trip's Money tab. Zero outstanding renders the settled
+  /// zero-state wording; loading and error states render nothing rather than
+  /// a guessed figure.
+  Widget _outstandingFigure(String id) {
+    if (widget.finance == null) return const SizedBox.shrink();
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _tripFinancials(id),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        String outstanding;
+        try {
+          outstanding = tripCustomerOutstanding(snapshot.data!) ?? '0.00';
+        } on FormatException {
+          return const SizedBox.shrink();
+        }
+        final settled =
+            LedgerAmount.fromJson(outstanding).paisa == BigInt.zero;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (settled)
+              BilingualText(
+                L10n.settled,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: KarvaanDesign.accent,
+                ),
+              )
+            else
+              PaperTrailAmount(
+                formatted: displayMoney(outstanding),
+                onTap: () => detail(id, initialTab: 1),
+                semanticLabel:
+                    '${L10n.customerOutstandingAccessibility} ${displayMoney(outstanding)}',
+              ),
+            const SizedBox(height: 2),
+            BilingualText(
+              L10n.customerOutstanding,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: KarvaanDesign.secondary),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -222,102 +439,128 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           ),
           onSubmitted: (_) => reload(start: 0),
         ),
-        KarvaanChoiceField<String>(
-          initialValue: office,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(label: BilingualCaption(L10n.officeFilter)),
-          ),
-          items: [
-            const DropdownMenuItem(
-              value: null,
-              child: BilingualText(L10n.allOffices),
-            ),
-            for (final o in widget.offices)
-              DropdownMenuItem(
-                value: o['id'] as String,
-                child: Text(o['name'] as String),
-              ),
-          ],
-          onChanged: (v) {
-            office = v;
-            reload(start: 0);
-          },
-        ),
-        BilingualListTile(
-          title: BilingualText(
-            (vehicleName != null
-                ? Bilingual.data(vehicleName)
-                : L10n.vehicleFilterAll),
-          ),
-          trailing: Wrap(
-            children: [
-              TextButton(
-                onPressed: () async {
-                  final v = await chooseMaster(
-                    context,
-                    widget.masters,
-                    MasterKind.vehicle,
-                  );
-                  if (v != null && mounted) {
-                    vehicle = v.id;
-                    vehicleName = v.label;
-                    reload(start: 0);
-                  }
-                },
-                child: const BilingualCaption(L10n.choose),
-              ),
-              TextButton(
-                onPressed: () {
-                  vehicle = null;
-                  vehicleName = null;
+        const SizedBox(height: 16),
+        // Status filter chips. "All" clears the filter; the remaining chips
+        // map 1:1 to the backend trip states, including Cancelled.
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final s in const [null, 'DRAFT', 'DISPATCHED', 'ARRIVED', 'CANCELLED'])
+              ChoiceChip(
+                key: ValueKey('trip-filter-${s ?? 'ALL'}'),
+                label: BilingualText(
+                  s == null ? L10n.all : tripStateLabel(s),
+                ),
+                selected: status == s,
+                showCheckmark: false,
+                selectedColor: const Color(0xFFEAF4ED),
+                onSelected: (_) {
+                  status = s;
                   reload(start: 0);
                 },
-                child: const BilingualCaption(L10n.clear),
               ),
-            ],
-          ),
-        ),
-        KarvaanChoiceField<String>(
-          initialValue: status,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(label: BilingualCaption(L10n.tripState)),
-          ),
-          items: [
-            const DropdownMenuItem(
-              value: null,
-              child: BilingualText(L10n.allStates),
-            ),
-            for (final s in ['DRAFT', 'DISPATCHED', 'ARRIVED', 'CANCELLED'])
-              DropdownMenuItem(value: s, child: BilingualOwnedText(s)),
           ],
-          onChanged: (v) {
-            status = v;
-            reload(start: 0);
-          },
         ),
-        TextField(
-          controller: from,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(
-              label: BilingualOwnedCaption(TripStrings.labels['from']),
+        const SizedBox(height: 16),
+        // Compact secondary filters: office, vehicle, and date range stay
+        // fully working, restyled to share one row instead of full-width rows.
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SizedBox(
+              width: 220,
+              child: KarvaanChoiceField<String>(
+                initialValue: office,
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(label: BilingualCaption(L10n.officeFilter)),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: BilingualText(L10n.allOffices),
+                  ),
+                  for (final o in widget.offices)
+                    DropdownMenuItem(
+                      value: o['id'] as String,
+                      child: Text(o['name'] as String),
+                    ),
+                ],
+                onChanged: (v) {
+                  office = v;
+                  reload(start: 0);
+                },
+              ),
             ),
-          ),
-        ),
-        TextField(
-          controller: to,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(
-              label: BilingualOwnedCaption(TripStrings.labels['to']),
+            SizedBox(
+              width: 320,
+              child: BilingualListTile(
+                title: BilingualText(
+                  (vehicleName != null
+                      ? Bilingual.data(vehicleName)
+                      : L10n.vehicleFilterAll),
+                ),
+                trailing: Wrap(
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        final v = await chooseMaster(
+                          context,
+                          widget.masters,
+                          MasterKind.vehicle,
+                        );
+                        if (v != null && mounted) {
+                          vehicle = v.id;
+                          vehicleName = v.label;
+                          reload(start: 0);
+                        }
+                      },
+                      child: const BilingualCaption(L10n.choose),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        vehicle = null;
+                        vehicleName = null;
+                        reload(start: 0);
+                      },
+                      child: const BilingualCaption(L10n.clear),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        TextButton(
-          onPressed: () => reload(start: 0),
-          child: const BilingualCaption(L10n.searchRefresh),
+            SizedBox(
+              width: 200,
+              child: TextField(
+                controller: from,
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualOwnedCaption(TripStrings.labels['from']),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: TextField(
+                controller: to,
+                decoration: bilingualDecoration(
+                  context,
+                  InputDecoration(
+                    label: BilingualOwnedCaption(TripStrings.labels['to']),
+                  ),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => reload(start: 0),
+              child: const BilingualCaption(L10n.searchRefresh),
+            ),
+          ],
         ),
         FutureBuilder<TripPage>(
           future: page,
@@ -328,51 +571,35 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             if (!snapshot.hasData) return const LinearProgressIndicator();
             final result = snapshot.data!;
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 BilingualText(
                   (result.scope == 'ALL_OFFICES'
                       ? L10n.allOffices
                       : L10n.assignedOfficeTrips),
                 ),
+                const SizedBox(height: 12),
                 if (result.rows.isEmpty)
-                  const BilingualText(L10n.noTripsInThisScope),
-                for (final r in result.rows)
                   Card(
-                    child: BilingualListTile(
-                      key: ValueKey('trip:${r['id']}'),
-                      title: BilingualText(
-                        L10n.labelValuescd55a9.withValues([
-                          r['trip_number'],
-                          r['registration'],
-                        ]),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          RouteLabel(
-                            origin: r['origin_name'] as String,
-                            destination: r['destination_name'] as String,
-                          ),
-                          BilingualText(
-                            L10n.labelValues10866a.withValues([
-                              tripStateLabel(r['state']),
-                              loadKindLabel(r['load_kind']),
-                            ]),
-                          ),
-                          Text(
-                            (r['dispatch_date'] ??
-                                    r['planned_dispatch_date'] ??
-                                    '')
-                                .toString(),
-                            textDirection: TextDirection.ltr,
-                          ),
+                          const BilingualText(L10n.noTripsInThisScope),
+                          if (!widget.moneyMode) ...[
+                            const SizedBox(height: 12),
+                            FilledButton.icon(
+                              onPressed: () => edit(TripDraft()),
+                              icon: const Icon(Icons.add),
+                              label: const BilingualText(L10n.newDraft),
+                            ),
+                          ],
                         ],
                       ),
-                      trailingBelow: true,
-                      trailing: TripStatusBadge(r['state'] as String),
-                      onTap: () => detail(r['id'] as String),
                     ),
                   ),
+                for (final r in result.rows) _tripCard(r),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -427,6 +654,10 @@ class _MasterChoiceState extends State<_MasterChoice> {
   final search = TextEditingController();
   late Future<List<MasterRecord>> rows;
   int offset = 0;
+
+  /// Session-scoped selection frequency per picker (kind + role). The most
+  /// used records sort first; nothing is persisted. Presentation only.
+  static final _usage = <String, Map<String, int>>{};
   @override
   void initState() {
     super.initState();
@@ -488,6 +719,8 @@ class _MasterChoiceState extends State<_MasterChoice> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final all = snapshot.data!;
+                final usageKey = '${widget.kind}:${widget.role ?? ''}';
+                final counts = _usage[usageKey] ?? const <String, int>{};
                 final choices = all
                     .where(
                       (r) =>
@@ -495,7 +728,17 @@ class _MasterChoiceState extends State<_MasterChoice> {
                           (widget.role == null ||
                               r.roles.contains(widget.role)),
                     )
-                    .toList();
+                    .toList()
+                  // Most-used first, then alphabetical. The five most-used
+                  // records therefore always lead the searchable list.
+                  ..sort((a, b) {
+                    final byUse = (counts[b.id] ?? 0).compareTo(
+                      counts[a.id] ?? 0,
+                    );
+                    return byUse != 0
+                        ? byUse
+                        : a.label.compareTo(b.label);
+                  });
                 return ListView(
                   children: [
                     if (choices.isEmpty)
@@ -504,7 +747,14 @@ class _MasterChoiceState extends State<_MasterChoice> {
                       BilingualListTile(
                         title: Text(r.label),
                         subtitle: Text(r.value('code')),
-                        onTap: () => Navigator.pop(context, r),
+                        onTap: () {
+                          final seen = _usage.putIfAbsent(
+                            usageKey,
+                            () => <String, int>{},
+                          );
+                          seen[r.id] = (seen[r.id] ?? 0) + 1;
+                          Navigator.pop(context, r);
+                        },
                       ),
                     Row(
                       children: [
@@ -541,26 +791,80 @@ class _MasterChoiceState extends State<_MasterChoice> {
 
 /// Existing quote totals, with one optional primary customer figure.
 class TripTotalsStrip extends StatelessWidget {
-  const TripTotalsStrip({super.key, required this.values, this.hero = false});
+  const TripTotalsStrip({
+    super.key,
+    required this.values,
+    this.hero = false,
+    this.outstanding,
+  });
   final Map values;
   final bool hero;
+
+  /// Canonical decimal-string customer outstanding. Null hides the cell;
+  /// zero renders the settled zero-state wording, highlighted.
+  final String? outstanding;
+
   @override
-  Widget build(BuildContext context) => Wrap(
-    spacing: 24,
-    runSpacing: 12,
-    children: [
-      for (final key in ['customer_charge', 'commission', 'owner_entitlement'])
-        SizedBox(
-          width: 280,
-          child: KarvaanMetric(
-            key: ValueKey('trip-total-$key'),
-            label: ownedMessage(TripStrings.labels[key]),
-            formattedValue: displayMoney(values[key]),
-            hero: hero && key == 'customer_charge',
+  Widget build(BuildContext context) {
+    final pending = outstanding;
+    return Wrap(
+      spacing: 24,
+      runSpacing: 12,
+      children: [
+        for (final key in ['customer_charge', 'commission', 'owner_entitlement'])
+          SizedBox(
+            width: 280,
+            child: KarvaanMetric(
+              key: ValueKey('trip-total-$key'),
+              label: ownedMessage(TripStrings.labels[key]),
+              formattedValue: displayMoney(values[key]),
+              hero: hero && key == 'customer_charge',
+            ),
           ),
-        ),
-    ],
-  );
+        if (pending != null)
+          SizedBox(
+            width: 280,
+            child: _OutstandingCell(value: pending, hero: hero),
+          ),
+      ],
+    );
+  }
+}
+
+/// Highlighted outstanding cell: the money-green #EAF4ED treatment marks the
+/// amount owed. A settled trip shows the settled wording instead of a
+/// zero figure — arrival never implies payment, and neither does a zero here
+/// without the claims behind it.
+class _OutstandingCell extends StatelessWidget {
+  const _OutstandingCell({required this.value, required this.hero});
+  final String value;
+  final bool hero;
+  @override
+  Widget build(BuildContext context) {
+    final settled = LedgerAmount.fromJson(value).paisa == BigInt.zero;
+    final type = Theme.of(context).textTheme;
+    final figureStyle = (hero ? type.displaySmall : type.headlineSmall)
+        ?.copyWith(color: KarvaanDesign.accent);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF4ED),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (settled)
+            BilingualText(L10n.settled, style: figureStyle)
+          else
+            KarvaanFigure(displayMoney(value), style: figureStyle),
+          const SizedBox(height: 4),
+          BilingualText(L10n.customerOutstanding, style: type.bodySmall),
+        ],
+      ),
+    );
+  }
 }
 
 class TripEditor extends StatefulWidget {
@@ -641,6 +945,20 @@ class _TripEditorState extends State<TripEditor> {
   bool busy = false, conflicted = false;
   String? error, pendingBase, pendingRequest;
   Map<String, dynamic>? pendingPayload;
+
+  /// Keyboard: Enter advances a step, Esc goes back. Single-line text fields
+  /// consume Enter themselves, and focused buttons handle their own
+  /// activation, so the shortcut only fires from non-editing focus — never
+  /// mid-typing. Step 2 keeps save as an explicit tap.
+  void advanceKeyboard() {
+    if (busy) return;
+    if (step < 2) moveStep(step + 1);
+  }
+
+  void backKeyboard() {
+    if (busy) return;
+    if (step > 0) moveStep(step - 1);
+  }
   Future<void> defaults({bool replaceOwner = false}) async {
     if (d.vehicle == null ||
         d.origin == null ||
@@ -1037,7 +1355,13 @@ class _TripEditorState extends State<TripEditor> {
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
-    child: Scaffold(
+    child: CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.enter): advanceKeyboard,
+        const SingleActivator(LogicalKeyboardKey.numpadEnter): advanceKeyboard,
+        const SingleActivator(LogicalKeyboardKey.escape): backKeyboard,
+      },
+      child: Scaffold(
       appBar: AppBar(
         toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
         title: BilingualText(
@@ -1323,14 +1647,29 @@ class _TripEditorState extends State<TripEditor> {
                           spacing: 16,
                           runSpacing: 8,
                           children: [
-                            if (step > 0)
-                              OutlinedButton(
-                                key: const Key('trip-previous'),
-                                onPressed: busy
-                                    ? null
-                                    : () => moveStep(step - 1),
-                                child: const BilingualCaption(L10n.previous),
-                              ),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                if (step > 0)
+                                  OutlinedButton(
+                                    key: const Key('trip-previous'),
+                                    onPressed: busy
+                                        ? null
+                                        : () => moveStep(step - 1),
+                                    child: const BilingualCaption(
+                                      L10n.previous,
+                                    ),
+                                  ),
+                                OutlinedButton(
+                                  key: const Key('trip-cancel'),
+                                  onPressed: busy
+                                      ? null
+                                      : () => Navigator.pop(context),
+                                  child: const BilingualCaption(L10n.cancel),
+                                ),
+                              ],
+                            ),
                             if (step < 2)
                               FilledButton(
                                 key: const Key('trip-next'),
@@ -1356,6 +1695,7 @@ class _TripEditorState extends State<TripEditor> {
             ),
           ),
         ),
+      ),
       ),
     ),
   );
@@ -1455,6 +1795,8 @@ class TripDetail extends StatefulWidget {
     required this.canReturn,
     required this.onEdit,
     this.saved = false,
+    this.initialTab = 0,
+    this.finance,
     this.guard = unguardedTrip,
     this.onPayments,
     this.onCorrections,
@@ -1465,6 +1807,8 @@ class TripDetail extends StatefulWidget {
   final Widget Function(Widget) guard;
   final String id;
   final bool saved;
+  final int initialTab;
+  final FinancialCommands? finance;
   final bool Function(String) canReturn;
   final Future<void> Function(TripDraft) onEdit;
   @override
@@ -1474,7 +1818,17 @@ class TripDetail extends StatefulWidget {
 class _TripDetailState extends State<TripDetail> {
   final scroll = ScrollController();
   final summaryKey = GlobalKey();
-  int tab = 0;
+  late int tab;
+
+  /// Memoized get_trip_financials read for the outstanding figure and the
+  /// Money tab. Presentation-only; null when no finance commands are wired.
+  Future<Map<String, dynamic>>? _financials;
+
+  Future<Map<String, dynamic>>? _loadFinancials() {
+    final finance = widget.finance;
+    if (finance == null || !_looksLikeUuid(widget.id)) return null;
+    return finance.trip(RecordId(widget.id));
+  }
 
   void selectTab(int value) {
     setState(() => tab = value);
@@ -1504,13 +1858,168 @@ class _TripDetailState extends State<TripDetail> {
   @override
   void initState() {
     super.initState();
+    tab = widget.initialTab;
     data = widget.repository.detail(widget.id);
+    _financials = _loadFinancials();
   }
 
   void reload() {
     setState(() {
       data = widget.repository.detail(widget.id);
+      _financials = _loadFinancials();
     });
+  }
+
+  /// Hero totals strip. The outstanding cell renders once get_trip_financials
+  /// resolves; until then the three quote cells stand alone. Nothing is
+  /// guessed while loading or on error.
+  Widget _heroTotals(Map totals) {
+    final financials = _financials;
+    if (financials == null) {
+      return TripTotalsStrip(values: totals, hero: true);
+    }
+    return FutureBuilder<Map<String, dynamic>>(
+      future: financials,
+      builder: (context, snapshot) {
+        String? outstanding;
+        if (snapshot.hasData && !snapshot.hasError) {
+          try {
+            outstanding = tripCustomerOutstanding(snapshot.data!);
+          } on FormatException {
+            outstanding = null;
+          }
+        }
+        return TripTotalsStrip(
+          values: totals,
+          hero: true,
+          outstanding: outstanding,
+        );
+      },
+    );
+  }
+
+  /// Per-trip paid-vs-outstanding in the Money tab. The billed total is the
+  /// totals strip above; this section shows the open customer outstanding
+  /// (highlighted, with the settled zero-state) plus the open claims behind
+  /// it, each deep-linking to Payments & allocations. No "paid" figure is
+  /// computed here — the backend owns that arithmetic.
+  Widget _moneyOutstanding(List consignments) {
+    final financials = _financials;
+    if (financials == null) return const SizedBox.shrink();
+    return FutureBuilder<Map<String, dynamic>>(
+      future: financials,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: BilingualOwnedText(tripError(snapshot.error!)),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: LinearProgressIndicator(),
+          );
+        }
+        try {
+          return _moneyOutstandingBody(snapshot.data!, consignments);
+        } on FormatException {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+
+  Widget _moneyOutstandingBody(
+    Map<String, dynamic> data,
+    List consignments,
+  ) {
+    final outstanding = tripCustomerOutstanding(data) ?? '0.00';
+    final settled = LedgerAmount.fromJson(outstanding).paisa == BigInt.zero;
+    final claims = <Map>[];
+    for (final c in (data['claims'] as List? ?? [])) {
+      if (c is Map && c['account_purpose'] == 'CUSTOMER_RECEIVABLE') {
+        claims.add(c);
+      }
+    }
+    final type = Theme.of(context).textTheme;
+    Bilingual claimLabel(Map c) {
+      final consignment = consignments
+          .where((s) => s is Map && s['id'] == c['consignment_id'])
+          .firstOrNull;
+      final customer = consignment is Map
+          ? (consignment['customer_name'] ?? '').toString()
+          : '';
+      // The branch catalogue owns the bilingual purpose wording; only
+      // CUSTOMER_RECEIVABLE claims reach this section.
+      const purpose = L10n.customerOutstanding;
+      if (customer.isEmpty) return purpose;
+      return L10n.labelValuescd55a9.withValues([
+        Bilingual.data(customer),
+        purpose,
+      ]);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEAF4ED),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (settled)
+                BilingualText(
+                  L10n.settled,
+                  style: type.headlineSmall?.copyWith(
+                    color: KarvaanDesign.accent,
+                  ),
+                )
+              else
+                KarvaanFigure(
+                  displayMoney(outstanding),
+                  style: type.headlineSmall?.copyWith(
+                    color: KarvaanDesign.accent,
+                  ),
+                ),
+              const SizedBox(height: 4),
+              BilingualText(L10n.customerOutstanding, style: type.bodySmall),
+            ],
+          ),
+        ),
+        if (claims.isNotEmpty && widget.onPayments != null) ...[
+          const SizedBox(height: 8),
+          for (final c in claims)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: BilingualText(
+                      claimLabel(c),
+                      style: type.bodySmall?.copyWith(
+                        color: KarvaanDesign.secondary,
+                      ),
+                    ),
+                  ),
+                  PaperTrailAmount(
+                    formatted: displayMoney(c['remaining']),
+                    onTap: widget.onPayments!,
+                    semanticLabel:
+                        '${L10n.customerOutstandingAccessibility} ${displayMoney(c['remaining'])}',
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ],
+    );
   }
 
   Future<void> operate(
@@ -1608,11 +2117,22 @@ class _TripDetailState extends State<TripDetail> {
                         ),
                         TripStatusBadge(r['state'] as String),
                         const SizedBox(height: 16),
-                        TripTotalsStrip(values: r['totals'] as Map, hero: true),
+                        _heroTotals(r['totals'] as Map),
                         const SizedBox(height: 16),
-                        RouteLabel(
-                          origin: r['origin_name'] as String,
-                          destination: r['destination_name'] as String,
+                        TripRouteLine(
+                          origin: (r['origin_name'] ?? '').toString(),
+                          originMeta:
+                              ((r['dispatch_date'] ??
+                                          r['planned_dispatch_date'] ??
+                                          '')
+                                      .toString()),
+                          destination: (r['destination_name'] ?? '').toString(),
+                          destinationMeta:
+                              ((r['arrival_date'] ??
+                                          r['dispatch_date'] ??
+                                          r['planned_dispatch_date'] ??
+                                          '')
+                                      .toString()),
                         ),
                         BilingualText(
                           L10n.labelValuescd55a9.withValues([
@@ -1665,7 +2185,7 @@ class _TripDetailState extends State<TripDetail> {
                             (r['totals'] as Map)['car_count'],
                           ]),
                         ),
-                        Text((r['notes']).toString()),
+                        ExpandableNote((r['notes'] ?? '').toString()),
                         if (r['overlap_confirmed'] == true)
                           BilingualText(
                             L10n.overlapReviewed.withValues([
@@ -1819,25 +2339,50 @@ class _TripDetailState extends State<TripDetail> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                BilingualText(
-                                  L10n.cars7b7a19.withValues([
-                                    c['customer_name'],
-                                    consignmentStateLabel(c['state']),
-                                    c['car_count'],
-                                  ]),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: BilingualText(
+                                        L10n.cars7b7a19.withValues([
+                                          c['customer_name'],
+                                          consignmentStateLabel(c['state']),
+                                          c['car_count'],
+                                        ]),
+                                      ),
+                                    ),
+                                    // Destructive actions never sit next to
+                                    // ordinary buttons: cancellation lives in
+                                    // an overflow menu whose confirmation
+                                    // sheet narrates what will be reversed.
+                                    if (r['can_cancel_consignment'] == true &&
+                                        c['state'] == 'ACTIVE')
+                                      PopupMenuButton<String>(
+                                        key: ValueKey(
+                                          'consignment-menu-${c['id']}',
+                                        ),
+                                        popUpAnimationStyle:
+                                            AnimationStyle.noAnimation,
+                                        tooltip: L10n
+                                            .correctionsAndCancellationAccessibility,
+                                        onSelected: (_) => operate(
+                                          TripAction.cancelConsignment,
+                                          r,
+                                          consignment: c['id'] as String,
+                                        ),
+                                        itemBuilder: (_) => [
+                                          PopupMenuItem(
+                                            value: 'cancel',
+                                            child: BilingualOwnedCaption(
+                                              TripAction
+                                                  .cancelConsignment
+                                                  .label,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
                                 ),
-                                if (r['can_cancel_consignment'] == true &&
-                                    c['state'] == 'ACTIVE')
-                                  TextButton(
-                                    onPressed: () => operate(
-                                      TripAction.cancelConsignment,
-                                      r,
-                                      consignment: c['id'] as String,
-                                    ),
-                                    child: BilingualOwnedCaption(
-                                      TripAction.cancelConsignment.label,
-                                    ),
-                                  ),
                                 BilingualText(
                                   L10n.broker.withValues([
                                     c['broker_name'] ??
@@ -1901,6 +2446,9 @@ class _TripDetailState extends State<TripDetail> {
                               L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
                             ),
                             TripTotalsStrip(values: r['totals'] as Map),
+                            _moneyOutstanding(
+                              r['consignments'] as List? ?? const [],
+                            ),
                             if (widget.onPayments != null)
                               OutlinedButton(
                                 onPressed: widget.onPayments,
@@ -1955,6 +2503,7 @@ class _TripDetailState extends State<TripDetail> {
           canReturn: widget.canReturn,
           onEdit: widget.onEdit,
           onExpenses: widget.onExpenses,
+          finance: widget.finance,
           guard: widget.guard,
         ),
       ),
