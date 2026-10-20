@@ -370,6 +370,19 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
   Widget previewPanel() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
+      // The preview pane carries a badge, not a disclaimer paragraph
+      // (plan §5.8).
+      DecoratedBox(
+        decoration: BoxDecoration(
+          color: KarvaanDesign.muted,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: BilingualText(L10n.preview),
+        ),
+      ),
+      const SizedBox(height: 12),
       if (widget.documents != null &&
           ['CUSTOMER_INVOICE', 'PAYMENT_RECEIPT'].contains(report) &&
           recipient != 'INTERNAL')
@@ -451,390 +464,416 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
     final s = selection;
     final current = presets.where((p) => p['id'] == presetId).firstOrNull;
     final wide = MediaQuery.sizeOf(context).width >= 1100;
-    final configuration = SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const BilingualText(
-            L10n.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords,
-          ),
-          if (busy) const LinearProgressIndicator(),
-          if (error != null)
-            BilingualOwnedText(
-              error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          KarvaanSection(
-            title: L10n.reportOutputType,
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
+    final configuration = Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 260,
-                  child: KarvaanChoiceField<String>(
-                    initialValue: report,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.reportOutputType),
-                      ),
-                    ),
-                    items: [
-                      for (final e in outputReports.entries)
-                        DropdownMenuItem(
-                          value: e.key,
-                          child: BilingualOwnedText(e.value),
-                        ),
-                    ],
-                    onChanged: busy
-                        ? null
-                        : (v) {
-                            setState(() {
-                              report = v!;
-                              recipient = recipients.first;
-                              party = partyName = event = eventName = null;
-                            });
-                            load();
-                          },
-                  ),
-                ),
-                SizedBox(
-                  width: 200,
-                  child: KarvaanChoiceField<String>(
-                    key: ValueKey('recipient-$report'),
-                    initialValue: recipient,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.recipientTemplate),
-                      ),
-                    ),
-                    items: [
-                      for (final r in recipients)
-                        DropdownMenuItem(
-                          value: r,
-                          child: BilingualOwnedText(r),
-                        ),
-                    ],
-                    onChanged: busy
-                        ? null
-                        : (v) {
-                            setState(() {
-                              recipient = v!;
-                              party = partyName = event = eventName = null;
-                            });
-                            load();
-                          },
-                  ),
-                ),
-                if (recipient != 'INTERNAL')
-                  OutlinedButton(
-                    onPressed: busy ? null : () => pick('RECIPIENT'),
-                    child: BilingualCaption(
-                      (partyName != null
-                          ? Bilingual.data(partyName)
-                          : L10n.selectRecipient),
+                if (busy) const LinearProgressIndicator(),
+                if (error != null)
+                  BilingualOwnedText(
+                    error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
                     ),
                   ),
-                for (final entry in <(Object, TextEditingController)>[
-                  ('From (YYYY-MM-DD)', from),
-                  ('To (YYYY-MM-DD)', to),
-                  (L10n.tripVehicleSearch, search),
-                ])
-                  SizedBox(
-                    width: 200,
-                    child: TextField(
-                      controller: entry.$2,
-                      enabled: !busy,
-                      decoration: bilingualDecoration(
-                        context,
-                        InputDecoration(
-                          label: entry.$1 is Bilingual
-                              ? BilingualCaption(entry.$1 as Bilingual)
-                              : BilingualOwnedCaption(entry.$1),
+                KarvaanSection(
+                  title: L10n.reportOutputType,
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      SizedBox(
+                        width: 260,
+                        child: KarvaanChoiceField<String>(
+                          initialValue: report,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.reportOutputType),
+                            ),
+                          ),
+                          items: [
+                            for (final e in outputReports.entries)
+                              DropdownMenuItem(
+                                value: e.key,
+                                child: BilingualOwnedText(e.value),
+                              ),
+                          ],
+                          onChanged: busy
+                              ? null
+                              : (v) {
+                                  setState(() {
+                                    report = v!;
+                                    recipient = recipients.first;
+                                    party = partyName = event = eventName =
+                                        null;
+                                  });
+                                  load();
+                                },
                         ),
                       ),
-                      onChanged: (_) => changed(),
-                    ),
-                  ),
-                SizedBox(
-                  width: 220,
-                  child: KarvaanChoiceField<String>(
-                    initialValue: office,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.officeScope),
-                      ),
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: BilingualText(L10n.allPermittedOffices),
-                      ),
-                      for (final o in widget.offices)
-                        DropdownMenuItem(
-                          value: o['id'] as String,
-                          child: Text(o['name'] as String),
+                      SizedBox(
+                        width: 200,
+                        child: KarvaanChoiceField<String>(
+                          key: ValueKey('recipient-$report'),
+                          initialValue: recipient,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.recipientTemplate),
+                            ),
+                          ),
+                          items: [
+                            for (final r in recipients)
+                              DropdownMenuItem(
+                                value: r,
+                                child: BilingualOwnedText(r),
+                              ),
+                          ],
+                          onChanged: busy
+                              ? null
+                              : (v) {
+                                  setState(() {
+                                    recipient = v!;
+                                    party = partyName = event = eventName =
+                                        null;
+                                  });
+                                  load();
+                                },
                         ),
-                    ],
-                    onChanged: busy
-                        ? null
-                        : (v) => setState(() {
-                            office = v;
-                            preview = null;
-                          }),
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: busy ? null : () => pick('VEHICLE'),
-                  child: BilingualCaption(
-                    (vehicleName != null
-                        ? Bilingual.data(vehicleName)
-                        : L10n.selectVehicle),
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: busy ? null : () => pick('OWNER'),
-                  child: BilingualCaption(
-                    (ownerName != null
-                        ? Bilingual.data(ownerName)
-                        : L10n.selectHistoricalOwner),
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: busy ? null : () => pick('TRIP'),
-                  child: BilingualCaption(
-                    (tripName != null
-                        ? Bilingual.data(tripName)
-                        : L10n.selectTrip),
-                  ),
-                ),
-                if (report == 'PAYMENT_RECEIPT')
-                  OutlinedButton(
-                    onPressed: busy ? null : () => pick('RECEIPT'),
-                    child: BilingualCaption(
-                      (eventName != null
-                          ? Bilingual.data(eventName)
-                          : L10n.selectActualPaymentReceipt),
-                    ),
-                  ),
-                TextButton(
-                  onPressed: busy
-                      ? null
-                      : () => setState(() {
-                          vehicle = vehicleName = owner = ownerName = trip =
-                              tripName = event = eventName = null;
-                          search.clear();
-                          preview = null;
-                        }),
-                  child: const BilingualCaption(L10n.clearRecordFilters),
-                ),
-              ],
-            ),
-          ),
-          if (s != null) ...[
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                OutlinedButton(
-                  onPressed: busy ? null : load,
-                  child: const BilingualCaption(L10n.reloadCatalogueAndPresets),
-                ),
-                SizedBox(
-                  width: 280,
-                  child: KarvaanChoiceField<String>(
-                    key: ValueKey('preset-$presetId-${presets.length}'),
-                    initialValue: presetId,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.savedPreset),
                       ),
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: BilingualText(L10n.systemDefaults),
-                      ),
-                      for (final p in presets)
-                        DropdownMenuItem(
-                          value: p['id'] as String,
-                          child: BilingualText(
-                            L10n.labelValuesfb62fe.withValues([
-                              p['shared'] == true ? 'Company' : 'Personal',
-                              p['name'],
-                            ]),
+                      if (recipient != 'INTERNAL')
+                        OutlinedButton(
+                          onPressed: busy ? null : () => pick('RECIPIENT'),
+                          child: BilingualCaption(
+                            (partyName != null
+                                ? Bilingual.data(partyName)
+                                : L10n.selectRecipient),
                           ),
                         ),
-                    ],
-                    onChanged: busy ? null : usePreset,
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: busy
-                      ? null
-                      : () => setState(() {
-                          s.all();
-                          preview = null;
-                        }),
-                  child: const BilingualCaption(L10n.selectAllPermitted),
-                ),
-                OutlinedButton(
-                  onPressed: busy
-                      ? null
-                      : () => setState(() {
-                          s.reset();
-                          presetId = null;
-                          preview = null;
-                        }),
-                  child: const BilingualCaption(L10n.resetDefaults),
-                ),
-                OutlinedButton(
-                  onPressed: busy ? null : () => manage(),
-                  child: const BilingualCaption(L10n.saveNamedPreset),
-                ),
-                if (current?['can_manage'] == true) ...[
-                  OutlinedButton(
-                    onPressed: busy ? null : () => manage(existing: current),
-                    child: const BilingualCaption(L10n.updateRenamePreset),
-                  ),
-                  TextButton(
-                    onPressed: busy
-                        ? null
-                        : () => manage(existing: current, deleting: true),
-                    child: const BilingualCaption(L10n.deletePreset),
-                  ),
-                ],
-                SizedBox(
-                  width: 190,
-                  child: KarvaanChoiceField<String>(
-                    key: ValueKey(orientation),
-                    initialValue: orientation,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.pdfOrientation),
-                      ),
-                    ),
-                    items: [
-                      for (final v in ['AUTO', 'PORTRAIT', 'LANDSCAPE'])
-                        DropdownMenuItem(
-                          value: v,
-                          child: BilingualOwnedText(v),
+                      for (final entry in <(Object, TextEditingController)>[
+                        ('From (YYYY-MM-DD)', from),
+                        ('To (YYYY-MM-DD)', to),
+                        (L10n.tripVehicleSearch, search),
+                      ])
+                        SizedBox(
+                          width: 200,
+                          child: TextField(
+                            controller: entry.$2,
+                            enabled: !busy,
+                            decoration: bilingualDecoration(
+                              context,
+                              InputDecoration(
+                                label: entry.$1 is Bilingual
+                                    ? BilingualCaption(entry.$1 as Bilingual)
+                                    : BilingualOwnedCaption(entry.$1),
+                              ),
+                            ),
+                            onChanged: (_) => changed(),
+                          ),
                         ),
+                      SizedBox(
+                        width: 220,
+                        child: KarvaanChoiceField<String>(
+                          initialValue: office,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.officeScope),
+                            ),
+                          ),
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: null,
+                              child: BilingualText(L10n.allPermittedOffices),
+                            ),
+                            for (final o in widget.offices)
+                              DropdownMenuItem(
+                                value: o['id'] as String,
+                                child: Text(o['name'] as String),
+                              ),
+                          ],
+                          onChanged: busy
+                              ? null
+                              : (v) => setState(() {
+                                  office = v;
+                                  preview = null;
+                                }),
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: busy ? null : () => pick('VEHICLE'),
+                        child: BilingualCaption(
+                          (vehicleName != null
+                              ? Bilingual.data(vehicleName)
+                              : L10n.selectVehicle),
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: busy ? null : () => pick('OWNER'),
+                        child: BilingualCaption(
+                          (ownerName != null
+                              ? Bilingual.data(ownerName)
+                              : L10n.selectHistoricalOwner),
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: busy ? null : () => pick('TRIP'),
+                        child: BilingualCaption(
+                          (tripName != null
+                              ? Bilingual.data(tripName)
+                              : L10n.selectTrip),
+                        ),
+                      ),
+                      if (report == 'PAYMENT_RECEIPT')
+                        OutlinedButton(
+                          onPressed: busy ? null : () => pick('RECEIPT'),
+                          child: BilingualCaption(
+                            (eventName != null
+                                ? Bilingual.data(eventName)
+                                : L10n.selectActualPaymentReceipt),
+                          ),
+                        ),
+                      TextButton(
+                        onPressed: busy
+                            ? null
+                            : () => setState(() {
+                                vehicle = vehicleName = owner = ownerName =
+                                    trip = tripName = event = eventName = null;
+                                search.clear();
+                                preview = null;
+                              }),
+                        child: const BilingualCaption(L10n.clearRecordFilters),
+                      ),
                     ],
-                    onChanged: busy
-                        ? null
-                        : (v) => setState(() {
-                            orientation = v!;
-                            preview = null;
-                          }),
                   ),
                 ),
-                SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: sheet,
-                    enabled: !busy,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.excelSheetLabel),
+                if (s != null) ...[
+                  const SizedBox(height: 16),
+                  for (final group
+                      in s.fields
+                          .map((f) => f['field_group'] as String)
+                          .toSet())
+                    ExpansionTile(
+                      expansionAnimationStyle: AnimationStyle.noAnimation,
+                      initiallyExpanded: true,
+                      title: BilingualOwnedText(group),
+                      children: [
+                        for (final f in s.fields.where(
+                          (f) => f['field_group'] == group,
+                        ))
+                          CheckboxListTile(
+                            key: ValueKey('field-${f['field_key']}'),
+                            dense: true,
+                            title: BilingualOwnedText(f['label'] as String),
+                            subtitle: f['required'] == true
+                                ? const BilingualText(L10n.documentHeaderFields)
+                                : null,
+                            secondary: f['required'] == true
+                                ? const Icon(Icons.lock)
+                                : null,
+                            value: s.order.contains(f['field_key']),
+                            onChanged: busy || f['required'] == true
+                                ? null
+                                : (v) => setState(() {
+                                    s.toggle(f['field_key'] as String, v!);
+                                    preview = null;
+                                  }),
+                          ),
+                      ],
+                    ),
+                  const BilingualText(L10n.selectedFieldOrder),
+                  for (var i = 0; i < s.order.length; i++)
+                    BilingualListTile(
+                      dense: true,
+                      title: BilingualOwnedText(
+                        s.fields.firstWhere(
+                              (f) => f['field_key'] == s.order[i],
+                            )['label']
+                            as String,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: L10n.moveUp81ba09.withValues([
+                              s.order[i],
+                            ]).inline,
+                            onPressed: busy || i == 0
+                                ? null
+                                : () => setState(() {
+                                    s.move(i, -1);
+                                    preview = null;
+                                  }),
+                            icon: const Icon(Icons.arrow_upward),
+                          ),
+                          IconButton(
+                            tooltip: L10n.moveDowndcbe95.withValues([
+                              s.order[i],
+                            ]).inline,
+                            onPressed: busy || i == s.order.length - 1
+                                ? null
+                                : () => setState(() {
+                                    s.move(i, 1);
+                                    preview = null;
+                                  }),
+                            icon: const Icon(Icons.arrow_downward),
+                          ),
+                        ],
                       ),
                     ),
-                    onChanged: (_) => changed(),
-                  ),
-                ),
-                FilledButton(
-                  onPressed: busy ? null : () => prepare(),
-                  child: const BilingualCaption(L10n.preview),
-                ),
+                ],
               ],
             ),
-            const SizedBox(height: 12),
-            const BilingualText(
-              L10n.requiredFieldsStayInTheHeaderOrSummarySelecting,
+          ),
+        ),
+        // Sticky action bar (plan §5.8): preset controls and Preview stay
+        // reachable instead of scrolling away with the form.
+        if (s != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: KarvaanDesign.surface,
+              border: Border(top: BorderSide(color: KarvaanDesign.borderColor)),
             ),
-            for (final group
-                in s.fields.map((f) => f['field_group'] as String).toSet())
-              ExpansionTile(
-                expansionAnimationStyle: AnimationStyle.noAnimation,
-                initiallyExpanded: true,
-                title: BilingualOwnedText(group),
-                children: [
-                  for (final f in s.fields.where(
-                    (f) => f['field_group'] == group,
-                  ))
-                    CheckboxListTile(
-                      key: ValueKey('field-${f['field_key']}'),
-                      dense: true,
-                      title: BilingualOwnedText(f['label'] as String),
-                      subtitle: f['required'] == true
-                          ? const BilingualText(
-                              L10n.requiredHeaderIdentityField,
-                            )
-                          : null,
-                      secondary: f['required'] == true
-                          ? const Icon(Icons.lock)
-                          : null,
-                      value: s.order.contains(f['field_key']),
-                      onChanged: busy || f['required'] == true
-                          ? null
-                          : (v) => setState(() {
-                              s.toggle(f['field_key'] as String, v!);
-                              preview = null;
-                            }),
-                    ),
-                ],
-              ),
-            const BilingualText(L10n.selectedFieldOrder),
-            for (var i = 0; i < s.order.length; i++)
-              BilingualListTile(
-                dense: true,
-                title: BilingualOwnedText(
-                  s.fields.firstWhere(
-                        (f) => f['field_key'] == s.order[i],
-                      )['label']
-                      as String,
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+            // The bar stays compact at desktop sizes; at phone widths and
+            // 200% text it scrolls internally instead of pushing the form
+            // off-screen.
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 240),
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    IconButton(
-                      tooltip: L10n.moveUp81ba09.withValues([
-                        s.order[i],
-                      ]).inline,
-                      onPressed: busy || i == 0
-                          ? null
-                          : () => setState(() {
-                              s.move(i, -1);
-                              preview = null;
-                            }),
-                      icon: const Icon(Icons.arrow_upward),
+                    OutlinedButton(
+                      onPressed: busy ? null : load,
+                      child: const BilingualCaption(
+                        L10n.reloadCatalogueAndPresets,
+                      ),
                     ),
-                    IconButton(
-                      tooltip: L10n.moveDowndcbe95.withValues([
-                        s.order[i],
-                      ]).inline,
-                      onPressed: busy || i == s.order.length - 1
+                    SizedBox(
+                      width: 280,
+                      child: KarvaanChoiceField<String>(
+                        key: ValueKey('preset-$presetId-${presets.length}'),
+                        initialValue: presetId,
+                        decoration: bilingualDecoration(
+                          context,
+                          InputDecoration(
+                            label: BilingualCaption(L10n.savedPreset),
+                          ),
+                        ),
+                        items: [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: BilingualText(L10n.systemDefaults),
+                          ),
+                          for (final p in presets)
+                            DropdownMenuItem(
+                              value: p['id'] as String,
+                              child: BilingualText(
+                                L10n.labelValuesfb62fe.withValues([
+                                  p['shared'] == true ? 'Company' : 'Personal',
+                                  p['name'],
+                                ]),
+                              ),
+                            ),
+                        ],
+                        onChanged: busy ? null : usePreset,
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: busy
                           ? null
                           : () => setState(() {
-                              s.move(i, 1);
+                              s.all();
                               preview = null;
                             }),
-                      icon: const Icon(Icons.arrow_downward),
+                      child: const BilingualCaption(L10n.selectAllPermitted),
+                    ),
+                    OutlinedButton(
+                      onPressed: busy
+                          ? null
+                          : () => setState(() {
+                              s.reset();
+                              presetId = null;
+                              preview = null;
+                            }),
+                      child: const BilingualCaption(L10n.resetDefaults),
+                    ),
+                    OutlinedButton(
+                      onPressed: busy ? null : () => manage(),
+                      child: const BilingualCaption(L10n.saveNamedPreset),
+                    ),
+                    if (current?['can_manage'] == true) ...[
+                      OutlinedButton(
+                        onPressed: busy
+                            ? null
+                            : () => manage(existing: current),
+                        child: const BilingualCaption(L10n.updateRenamePreset),
+                      ),
+                      TextButton(
+                        onPressed: busy
+                            ? null
+                            : () => manage(existing: current, deleting: true),
+                        child: const BilingualCaption(L10n.deletePreset),
+                      ),
+                    ],
+                    SizedBox(
+                      width: 190,
+                      child: KarvaanChoiceField<String>(
+                        key: ValueKey(orientation),
+                        initialValue: orientation,
+                        decoration: bilingualDecoration(
+                          context,
+                          InputDecoration(
+                            label: BilingualCaption(L10n.pdfOrientation),
+                          ),
+                        ),
+                        items: [
+                          for (final v in ['AUTO', 'PORTRAIT', 'LANDSCAPE'])
+                            DropdownMenuItem(
+                              value: v,
+                              child: BilingualOwnedText(v),
+                            ),
+                        ],
+                        onChanged: busy
+                            ? null
+                            : (v) => setState(() {
+                                orientation = v!;
+                                preview = null;
+                              }),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: TextField(
+                        controller: sheet,
+                        enabled: !busy,
+                        decoration: bilingualDecoration(
+                          context,
+                          InputDecoration(
+                            label: BilingualCaption(L10n.excelSheetLabel),
+                          ),
+                        ),
+                        onChanged: (_) => changed(),
+                      ),
+                    ),
+                    FilledButton(
+                      onPressed: busy ? null : () => prepare(),
+                      child: const BilingualCaption(L10n.preview),
                     ),
                   ],
                 ),
               ),
-          ],
-        ],
-      ),
+            ),
+          ),
+      ],
     );
     return Scaffold(
       appBar: AppBar(

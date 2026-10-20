@@ -8365,5 +8365,14 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "documentHeaderFields",
+  "semantic_key": "ui.documentHeaderFields",
+  "en": "Document header fields",
+  "ur": "دستاویز کے سرخی خانے",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

@@ -5750,6 +5750,13 @@ abstract final class L10n {
   );
   static const showAllAccessibility =
       "Show all. سب دکھائیں";
+  static const documentHeaderFields = Bilingual(
+    "ui.documentHeaderFields",
+    "Document header fields",
+    "دستاویز کے سرخی خانے",
+  );
+  static const documentHeaderFieldsAccessibility =
+      "Document header fields. دستاویز کے سرخی خانے";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6671,5 +6678,6 @@ abstract final class L10n {
     moneyHeldGroup,
     activityGroup,
     showAll,
+    documentHeaderFields,
   ];
 }
