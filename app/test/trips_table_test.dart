@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/trips/trip_repository.dart';
 import 'package:carrier_records/features/trips/trip_workspace.dart';
@@ -32,59 +33,90 @@ class TableFakeTrips extends FakeTrips {
   ]);
 }
 
+Future<void> pumpTrips(WidgetTester t, Size size) async {
+  t.view.physicalSize = size;
+  t.view.devicePixelRatio = 1;
+  addTearDown(t.view.resetPhysicalSize);
+  addTearDown(t.view.resetDevicePixelRatio);
+  await t.pumpWidget(
+    MaterialApp(
+      theme: KarvaanDesign.theme(),
+      home: TripWorkspace(
+        repository: TableFakeTrips(),
+        masters: FakeMasters(),
+        offices: const [],
+      ),
+    ),
+  );
+  await t.pumpAndSettle();
+}
+
 void main() {
-  testWidgets('wide trips list toggles between route cards and table', (
+  testWidgets('wide trips list defaults to the table, toggles to cards', (
     t,
   ) async {
-    t.view.physicalSize = const Size(1280, 900);
-    t.view.devicePixelRatio = 1;
-    addTearDown(t.view.resetPhysicalSize);
-    addTearDown(t.view.resetDevicePixelRatio);
-    await t.pumpWidget(
-      MaterialApp(
-        theme: KarvaanDesign.theme(),
-        home: TripWorkspace(
-          repository: TableFakeTrips(),
-          masters: FakeMasters(),
-          offices: const [],
-        ),
-      ),
-    );
-    await t.pumpAndSettle();
-    // Cards by default: the route line renders, no data table.
-    expect(find.byType(DataTable), findsNothing);
-    expect(find.text('Karachi'), findsOneWidget);
-    // Toggle to the table view.
-    await t.tap(find.byKey(const ValueKey('trips-view-table')));
-    await t.pumpAndSettle();
+    await pumpTrips(t, const Size(1280, 900));
+    // Table by default on desktop (density pass): no toggle tap needed.
     expect(find.byType(DataTable), findsOneWidget);
     expect(find.text('TRIP-001'), findsOneWidget);
     expect(find.text('Karachi → Lahore'), findsOneWidget);
-    expect(find.text('QA-ONLY-001'), findsOneWidget);
-    // And back to cards.
+    expect(find.text('QA-ONLY-001'), findsWidgets);
+    // Toggle to compact cards.
     await t.tap(find.byKey(const ValueKey('trips-view-cards')));
     await t.pumpAndSettle();
     expect(find.byType(DataTable), findsNothing);
+    // The compact card still shows the full route as one wrapping line,
+    // the vehicle/owner line, and the date.
+    expect(find.text('Karachi → Lahore'), findsOneWidget);
+    expect(find.text('QA-ONLY-001 · Synthetic owner'), findsOneWidget);
+    expect(find.text('2026-10-15'), findsOneWidget);
+    expect(find.byType(TripStatusBadge), findsOneWidget);
+    // And back to the table.
+    await t.tap(find.byKey(const ValueKey('trips-view-table')));
+    await t.pumpAndSettle();
+    expect(find.byType(DataTable), findsOneWidget);
     expect(t.takeException(), isNull);
   });
 
-  testWidgets('narrow trips list has no view toggle', (t) async {
-    t.view.physicalSize = const Size(400, 900);
-    t.view.devicePixelRatio = 1;
-    addTearDown(t.view.resetPhysicalSize);
-    addTearDown(t.view.resetDevicePixelRatio);
-    await t.pumpWidget(
-      MaterialApp(
-        theme: KarvaanDesign.theme(),
-        home: TripWorkspace(
-          repository: TableFakeTrips(),
-          masters: FakeMasters(),
-          offices: const [],
-        ),
-      ),
-    );
-    await t.pumpAndSettle();
+  testWidgets('narrow trips list has no view toggle and one heading', (
+    t,
+  ) async {
+    await pumpTrips(t, const Size(400, 900));
     expect(find.byKey(const ValueKey('trips-view-table')), findsNothing);
     expect(find.byType(DataTable), findsNothing);
+    // One page heading only: the AppBar. The old duplicate body heading
+    // is gone (density pass).
+    expect(find.text(L10n.trips.en), findsOneWidget);
+    // Compact card renders on phone widths.
+    expect(find.text('Karachi → Lahore'), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+
+  testWidgets('filters stay collapsed until the toolbar toggle opens them', (
+    t,
+  ) async {
+    await pumpTrips(t, const Size(1280, 900));
+    // Search is always visible; the panel and its fields are not.
+    expect(
+      find.widgetWithText(TextField, L10n.searchTripVehicleOrParty.en),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('trips-filters-panel')), findsNothing);
+    expect(find.text(L10n.dateFrom.en), findsNothing);
+    await t.tap(find.byKey(const ValueKey('trips-filters-toggle')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('trips-filters-panel')), findsOneWidget);
+    // Short From/To labels with date pickers, office and vehicle filters
+    // in the same aligned panel.
+    expect(find.text(L10n.dateFrom.en), findsOneWidget);
+    expect(find.text(L10n.dateTo.en), findsOneWidget);
+    expect(find.text(L10n.officeFilter.en), findsOneWidget);
+    await t.tap(find.text(L10n.dateFrom.en));
+    await t.pumpAndSettle();
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+    await t.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await t.pumpAndSettle();
+    expect(find.byType(DatePickerDialog), findsNothing);
+    expect(t.takeException(), isNull);
   });
 }

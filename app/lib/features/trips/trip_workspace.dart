@@ -145,7 +145,13 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   int offset = 0;
 
   /// Cards/table choice for wide layouts; remembered for the session.
-  bool tableView = false;
+  /// Null means "use the default": table on desktop, cards on phone
+  /// (density pass — dispatchers scan long lists in the table).
+  bool? tableViewOverride;
+
+  /// Secondary filters (office, vehicle, dates) live behind the toolbar's
+  /// Filters toggle so results start immediately (density pass).
+  bool filtersOpen = false;
 
   /// Per-trip get_trip_financials futures, memoized so list rebuilds do not
   /// refetch. Cleared on every reload; entries are presentation-only reads.
@@ -286,9 +292,9 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     if (mounted) reload();
   }
 
-  /// Route-drawn trip card (competitor pattern 1): the route line answers
-  /// "where", the badge answers "what state", and the single headline figure
-  /// answers "what is owed" — deep-linking to the trip's Money tab.
+  /// Compact trip card (density pass): trip number + status, the full route
+  /// (never truncated — it wraps), vehicle + dates, and the one money
+  /// figure. Everything else lives on the detail screen the tap opens.
   /// Cards stay solid; glass never touches content.
   Widget _tripCard(Map<String, dynamic> r) {
     final id = (r['id'] ?? '').toString();
@@ -299,74 +305,75 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     final destDate = arrivalDate.isNotEmpty ? arrivalDate : legDate;
     final registration = (r['registration'] ?? '').toString();
     final owner = (r['owner_name'] ?? '').toString();
+    final origin = (r['origin_name'] ?? '').toString();
+    final destination = (r['destination_name'] ?? '').toString();
     final captionStyle = Theme.of(context).textTheme.bodySmall
         ?.copyWith(color: KarvaanDesign.secondary);
+    final route = [origin, destination].where((s) => s.isNotEmpty).join(' → ');
+    final vehicleLine = [
+      registration,
+      owner,
+    ].where((s) => s.isNotEmpty).join(' · ');
+    final dateLine = destDate.isNotEmpty && destDate != legDate
+        ? '$legDate → $destDate'
+        : legDate;
     return Card(
       key: ValueKey('trip:$id'),
       child: InkWell(
         onTap: () => detail(id),
         borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: BilingualText(
-                      Bilingual.data((r['trip_number'] ?? '').toString()),
+                    child: Text(
+                      (r['trip_number'] ?? '').toString(),
                       style: Theme.of(context).textTheme.titleSmall,
+                      textDirection: TextDirection.ltr,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   TripStatusBadge((r['state'] ?? '').toString()),
                 ],
               ),
-              const SizedBox(height: 12),
-              // Money view leads with the money figure; the operational
-              // view leads with the route.
               if (widget.moneyMode) ...[
+                const SizedBox(height: 6),
                 _outstandingFigure(id),
-                const SizedBox(height: 8),
               ],
-              TripRouteLine(
-                origin: (r['origin_name'] ?? '').toString(),
-                originMeta: legDate,
-                destination: (r['destination_name'] ?? '').toString(),
-                destinationMeta: destDate,
+              const SizedBox(height: 6),
+              // The whole route, always: wrapping beats truncation.
+              Text(
+                route,
+                style: Theme.of(context).textTheme.titleSmall,
+                textDirection: TextDirection.ltr,
               ),
-              const SizedBox(height: 8),
-              BilingualText(
-                owner.isEmpty
-                    ? Bilingual.data(registration)
-                    : L10n.labelValuescd55a9.withValues([
-                        Bilingual.data(registration),
-                        Bilingual.data(owner),
-                      ]),
-                style: captionStyle,
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      vehicleLine,
+                      style: captionStyle,
+                      textDirection: TextDirection.ltr,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (dateLine.isNotEmpty)
+                    Text(
+                      dateLine,
+                      style: captionStyle,
+                      textDirection: TextDirection.ltr,
+                    ),
+                ],
               ),
-              BilingualText(
-                L10n.labelValues10866a.withValues([
-                  L10n.carCount04a594.withValues([
-                    displayCount(r['car_count'] ?? 0),
-                  ]),
-                  loadKindLabel(r['load_kind']),
-                ]),
-                style: captionStyle,
-              ),
-              ExpandableNote((r['notes'] ?? '').toString()),
               if (!widget.moneyMode) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 _outstandingFigure(id),
-                const SizedBox(height: 8),
               ],
-              // updated_at is not returned by list_trips; only stamps with
-              // real data render.
-              TimestampFooter(
-                created: (r['created_at'] ?? '').toString().split('T').first,
-                dispatched: dispatchDate.isNotEmpty ? dispatchDate : null,
-              ),
             ],
           ),
         ),
@@ -478,273 +485,331 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     body: LayoutBuilder(
       builder: (context, constraints) {
         final wide = constraints.maxWidth > 768;
-        return ListView(
+        // Desktop defaults to the table, phone to compact cards; the
+        // toolbar toggle overrides the default for the session.
+        final showTable = wide && (tableViewOverride ?? true);
+        return Padding(
           padding: const EdgeInsets.all(16),
-          children: [
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              spacing: 24,
-              runSpacing: 16,
-              children: [
-                BilingualText(
-                  widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                if (wide)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        key: const ValueKey('trips-view-cards'),
-                        tooltip: L10n.cardsView.inline,
-                        isSelected: !tableView,
-                        style: IconButton.styleFrom(
-                          backgroundColor: !tableView
-                              ? KarvaanDesign.borderColor
-                              : null,
-                        ),
-                        icon: const Icon(Icons.view_agenda_outlined),
-                        onPressed: () => setState(() => tableView = false),
-                      ),
-                      IconButton(
-                        key: const ValueKey('trips-view-table'),
-                        tooltip: L10n.tableView.inline,
-                        isSelected: tableView,
-                        style: IconButton.styleFrom(
-                          backgroundColor: tableView
-                              ? KarvaanDesign.borderColor
-                              : null,
-                        ),
-                        icon: const Icon(Icons.table_rows_outlined),
-                        onPressed: () => setState(() => tableView = true),
-                      ),
-                    ],
-                  ),
-                if (!widget.moneyMode)
-                  FilledButton.icon(
-                    onPressed: () => edit(TripDraft()),
-                    icon: const Icon(Icons.add),
-                    label: const BilingualText(L10n.newTrip),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            if (widget.moneyMode) ...[
-              const BilingualText(L10n.moneyWorkspacePurpose),
-              const SizedBox(height: 8),
-              const BilingualText(
-                L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
-              ),
-              const SizedBox(height: 8),
-            ],
-            TextField(
-              controller: search,
-              decoration: bilingualDecoration(
-                context,
-                InputDecoration(
-                  label: BilingualCaption(L10n.searchTripVehicleOrParty),
-                ),
-              ),
-              onSubmitted: (_) => reload(start: 0),
-            ),
-            const SizedBox(height: 16),
-            // Status filter chips. "All" clears the filter; the remaining chips
-            // map 1:1 to the backend trip states, including Cancelled.
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final s in const [
-                  null,
-                  'DRAFT',
-                  'DISPATCHED',
-                  'ARRIVED',
-                  'CANCELLED',
-                ])
-                  ChoiceChip(
-                    key: ValueKey('trip-filter-${s ?? 'ALL'}'),
-                    label: BilingualText(
-                      s == null ? L10n.all : tripStateLabel(s),
-                    ),
-                    selected: status == s,
-                    showCheckmark: false,
-                    selectedColor: KarvaanDesign.borderColor,
-                    onSelected: (_) {
-                      status = s;
-                      reload(start: 0);
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Compact secondary filters: office, vehicle, and date range stay
-            // fully working, restyled to share one row instead of full-width rows.
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                SizedBox(
-                  width: 220,
-                  child: KarvaanChoiceField<String>(
-                    initialValue: office,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualCaption(L10n.officeFilter),
-                      ),
-                    ),
-                    items: [
-                      const DropdownMenuItem(
-                        value: null,
-                        child: BilingualText(L10n.allOffices),
-                      ),
-                      for (final o in widget.offices)
-                        DropdownMenuItem(
-                          value: o['id'] as String,
-                          child: Text(o['name'] as String),
-                        ),
-                    ],
-                    onChanged: (v) {
-                      office = v;
-                      reload(start: 0);
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 320,
-                  child: BilingualListTile(
-                    title: BilingualText(
-                      (vehicleName != null
-                          ? Bilingual.data(vehicleName)
-                          : L10n.vehicleFilterAll),
-                    ),
-                    trailing: Wrap(
-                      children: [
-                        TextButton(
-                          onPressed: () async {
-                            final v = await chooseMaster(
-                              context,
-                              widget.masters,
-                              MasterKind.vehicle,
-                            );
-                            if (v != null && mounted) {
-                              vehicle = v.id;
-                              vehicleName = v.label;
-                              reload(start: 0);
-                            }
-                          },
-                          child: const BilingualCaption(L10n.choose),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            vehicle = null;
-                            vehicleName = null;
-                            reload(start: 0);
-                          },
-                          child: const BilingualCaption(L10n.clear),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 280,
-                  child: TextField(
-                    controller: from,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualOwnedCaption(
-                          TripStrings.labels['from'],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 280,
-                  child: TextField(
-                    controller: to,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: BilingualOwnedCaption(TripStrings.labels['to']),
-                      ),
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => reload(start: 0),
-                  child: const BilingualCaption(L10n.searchRefresh),
-                ),
-              ],
-            ),
-            FutureBuilder<TripPage>(
-              future: page,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return BilingualOwnedText(tripError(snapshot.error!));
-                }
-                if (!snapshot.hasData) return const LinearProgressIndicator();
-                final result = snapshot.data!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    BilingualText(
-                      (result.scope == 'ALL_OFFICES'
-                          ? L10n.allOffices
-                          : widget.moneyMode
-                          ? L10n.tripsWithMoneyScope
-                          : L10n.assignedOfficeTrips),
-                    ),
-                    const SizedBox(height: 12),
-                    if (result.rows.isEmpty)
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const BilingualText(L10n.noTripsInThisScope),
-                              if (!widget.moneyMode) ...[
-                                const SizedBox(height: 12),
-                                FilledButton.icon(
-                                  onPressed: () => edit(TripDraft()),
-                                  icon: const Icon(Icons.add),
-                                  label: const BilingualText(L10n.newTrip),
-                                ),
-                              ],
-                            ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // One heading (the AppBar) and one toolbar: search stays
+              // visible, the remaining filters collapse behind Filters,
+              // and results start immediately below (density pass). A Wrap,
+              // not a Row: a decorated field inside a flex row mis-measures
+              // its bilingual helper at phone widths.
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  SizedBox(
+                    width: wide ? 360 : constraints.maxWidth - 32,
+                    child: TextField(
+                      controller: search,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(
+                            L10n.searchTripVehicleOrParty,
                           ),
                         ),
                       ),
-                    if (tableView && wide)
-                      _tripsTable(result.rows)
-                    else
-                      for (final r in result.rows) _tripCard(r),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      onSubmitted: (_) => reload(start: 0),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    key: const ValueKey('trips-filters-toggle'),
+                    onPressed: () => setState(() => filtersOpen = !filtersOpen),
+                    icon: Icon(
+                      filtersOpen
+                          ? Icons.filter_list_off_outlined
+                          : Icons.filter_list_outlined,
+                    ),
+                    label: const BilingualCaption(L10n.filters),
+                  ),
+                  if (wide) ...[
+                    IconButton(
+                      key: const ValueKey('trips-view-cards'),
+                      tooltip: L10n.cardsView.inMode(
+                        LanguageModeStore.instance.mode.value,
+                      ),
+                      isSelected: !showTable,
+                      style: IconButton.styleFrom(
+                        backgroundColor: !showTable
+                            ? KarvaanDesign.borderColor
+                            : null,
+                      ),
+                      icon: const Icon(Icons.view_agenda_outlined),
+                      onPressed: () =>
+                          setState(() => tableViewOverride = false),
+                    ),
+                    IconButton(
+                      key: const ValueKey('trips-view-table'),
+                      tooltip: L10n.tableView.inMode(
+                        LanguageModeStore.instance.mode.value,
+                      ),
+                      isSelected: showTable,
+                      style: IconButton.styleFrom(
+                        backgroundColor: showTable
+                            ? KarvaanDesign.borderColor
+                            : null,
+                      ),
+                      icon: const Icon(Icons.table_rows_outlined),
+                      onPressed: () => setState(() => tableViewOverride = true),
+                    ),
+                  ],
+                  if (!widget.moneyMode)
+                    FilledButton.icon(
+                      onPressed: () => edit(TripDraft()),
+                      icon: const Icon(Icons.add),
+                      label: const BilingualText(L10n.newTrip),
+                    ),
+                ],
+              ),
+              if (widget.moneyMode) ...[
+                const SizedBox(height: 8),
+                const BilingualCaption(L10n.moneyWorkspacePurpose),
+                const BilingualCaption(
+                  L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
+                ),
+              ],
+              const SizedBox(height: 10),
+              // Status filter chips. "All" clears the filter; the remaining
+              // chips map 1:1 to the backend trip states, including Cancelled.
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final s in const [
+                    null,
+                    'DRAFT',
+                    'DISPATCHED',
+                    'ARRIVED',
+                    'CANCELLED',
+                  ])
+                    ChoiceChip(
+                      key: ValueKey('trip-filter-${s ?? 'ALL'}'),
+                      label: BilingualText(
+                        s == null ? L10n.all : tripStateLabel(s),
+                      ),
+                      selected: status == s,
+                      showCheckmark: false,
+                      selectedColor: KarvaanDesign.borderColor,
+                      onSelected: (_) {
+                        status = s;
+                        reload(start: 0);
+                      },
+                    ),
+                ],
+              ),
+              if (filtersOpen) ...[
+                const SizedBox(height: 10),
+                Card(
+                  key: const ValueKey('trips-filters-panel'),
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        TextButton(
-                          onPressed: offset == 0
-                              ? null
-                              : () => reload(start: offset - 50),
-                          child: const BilingualCaption(L10n.previous),
+                        SizedBox(
+                          width: 220,
+                          child: KarvaanChoiceField<String>(
+                            initialValue: office,
+                            decoration: bilingualDecoration(
+                              context,
+                              InputDecoration(
+                                label: BilingualCaption(L10n.officeFilter),
+                              ),
+                            ),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: BilingualText(L10n.allOffices),
+                              ),
+                              for (final o in widget.offices)
+                                DropdownMenuItem(
+                                  value: o['id'] as String,
+                                  child: Text(o['name'] as String),
+                                ),
+                            ],
+                            onChanged: (v) {
+                              office = v;
+                              reload(start: 0);
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 320,
+                          child: BilingualListTile(
+                            title: BilingualText(
+                              (vehicleName != null
+                                  ? Bilingual.data(vehicleName)
+                                  : L10n.vehicleFilterAll),
+                            ),
+                            trailing: Wrap(
+                              children: [
+                                TextButton(
+                                  onPressed: () async {
+                                    final v = await chooseMaster(
+                                      context,
+                                      widget.masters,
+                                      MasterKind.vehicle,
+                                    );
+                                    if (v != null && mounted) {
+                                      vehicle = v.id;
+                                      vehicleName = v.label;
+                                      reload(start: 0);
+                                    }
+                                  },
+                                  child: const BilingualCaption(L10n.choose),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    vehicle = null;
+                                    vehicleName = null;
+                                    reload(start: 0);
+                                  },
+                                  child: const BilingualCaption(L10n.clear),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 170,
+                          child: KarvaanDateField(
+                            controller: from,
+                            label: L10n.dateFrom,
+                            onChanged: () => reload(start: 0),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 170,
+                          child: KarvaanDateField(
+                            controller: to,
+                            label: L10n.dateTo,
+                            onChanged: () => reload(start: 0),
+                          ),
                         ),
                         TextButton(
-                          onPressed: result.rows.length < 50
-                              ? null
-                              : () => reload(start: offset + 50),
-                          child: const BilingualCaption(L10n.next),
+                          onPressed: () => reload(start: 0),
+                          child: const BilingualCaption(L10n.searchRefresh),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              office = null;
+                              vehicle = null;
+                              vehicleName = null;
+                              from.clear();
+                              to.clear();
+                            });
+                            reload(start: 0);
+                          },
+                          child: const BilingualCaption(
+                            L10n.clearRecordFilters,
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 8),
+              // Results own the remaining height and scroll internally;
+              // the page itself never scrolls on desktop (plan §4).
+              Expanded(
+                child: FutureBuilder<TripPage>(
+                  future: page,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return BilingualOwnedText(tripError(snapshot.error!));
+                    }
+                    if (!snapshot.hasData) {
+                      return const LinearProgressIndicator();
+                    }
+                    final result = snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        BilingualText(
+                          (result.scope == 'ALL_OFFICES'
+                              ? L10n.allOffices
+                              : widget.moneyMode
+                              ? L10n.tripsWithMoneyScope
+                              : L10n.assignedOfficeTrips),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: result.rows.isEmpty
+                              ? ListView(
+                                  children: [
+                                    Card(
+                                      margin: EdgeInsets.zero,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(24),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const BilingualText(
+                                              L10n.noTripsInThisScope,
+                                            ),
+                                            if (!widget.moneyMode) ...[
+                                              const SizedBox(height: 12),
+                                              FilledButton.icon(
+                                                onPressed: () =>
+                                                    edit(TripDraft()),
+                                                icon: const Icon(Icons.add),
+                                                label: const BilingualText(
+                                                  L10n.newTrip,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : showTable
+                              ? SingleChildScrollView(
+                                  child: _tripsTable(result.rows),
+                                )
+                              : ListView(
+                                  children: [
+                                    for (final r in result.rows) _tripCard(r),
+                                  ],
+                                ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              onPressed: offset == 0
+                                  ? null
+                                  : () => reload(start: offset - 50),
+                              child: const BilingualCaption(L10n.previous),
+                            ),
+                            TextButton(
+                              onPressed: result.rows.length < 50
+                                  ? null
+                                  : () => reload(start: offset + 50),
+                              child: const BilingualCaption(L10n.next),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
     ),
@@ -1231,32 +1296,93 @@ class _TripEditorState extends State<TripEditor> {
       onChanged: busy ? null : (v) => setState(() => change(v)),
     ),
   );
+
+  /// Label beside its selector (density pass): the label takes a fixed
+  /// column, the chosen value sits immediately next to it, and Choose /
+  /// Clear follow at once — never stranded at a full-width row's far edge.
   Widget picker(
     String key,
     String? label,
     VoidCallback select, {
     VoidCallback? clear,
-  }) => BilingualListTile(
-    contentPadding: EdgeInsets.zero,
-    title: BilingualText(
-      L10n.labelValuesfb62fe.withValues([
-        ownedMessage(TripStrings.labels[key]),
-        label ?? ownedMessage(TripStrings.none),
-      ]),
-    ),
-    trailing: Wrap(
-      children: [
-        TextButton(
-          onPressed: busy ? null : select,
-          child: const BilingualCaption(L10n.choose),
-        ),
-        if (clear != null)
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final labelWidget = BilingualText(
+          ownedMessage(TripStrings.labels[key]),
+          style: Theme.of(context).textTheme.labelLarge,
+        );
+        final actions = [
           TextButton(
-            onPressed: busy ? null : () => setState(clear),
-            child: const BilingualCaption(L10n.clear),
+            onPressed: busy ? null : select,
+            child: const BilingualCaption(L10n.choose),
           ),
-      ],
+          if (clear != null)
+            TextButton(
+              onPressed: busy ? null : () => setState(clear),
+              child: const BilingualCaption(L10n.clear),
+            ),
+        ];
+        final valueWidget = Text(
+          label ?? TripStrings.none,
+          textDirection: TextDirection.ltr,
+          overflow: TextOverflow.ellipsis,
+        );
+        if (constraints.maxWidth < 560) {
+          // Narrow: the label takes its own line and the actions wrap
+          // below the value, so nothing squeezes off the right edge even
+          // at 200% text scale.
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              labelWidget,
+              valueWidget,
+              Wrap(children: actions),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            SizedBox(width: 128, child: labelWidget),
+            const SizedBox(width: 8),
+            Expanded(child: valueWidget),
+            ...actions,
+          ],
+        );
+      },
     ),
+  );
+
+  /// Two-column form layout on desktop (density pass): field pairs sit
+  /// side by side so labels stay beside their selectors instead of fields
+  /// spanning the full width; one column on phone widths.
+  Widget _formRows(List<Widget> children) => LayoutBuilder(
+    builder: (context, constraints) {
+      if (constraints.maxWidth < 720) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        );
+      }
+      return Column(
+        children: [
+          for (var i = 0; i < children.length; i += 2)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: children[i]),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: i + 1 < children.length
+                      ? children[i + 1]
+                      : const SizedBox(),
+                ),
+              ],
+            ),
+        ],
+      );
+    },
   );
   Widget stopChoice(
     String key,
@@ -1356,19 +1482,21 @@ class _TripEditorState extends State<TripEditor> {
               c.fareRevision++;
             },
           ),
-          field(
-            '${c.id}:count',
-            c.count,
-            (v) => c.count = v,
-            label: TripStrings.labels['count'],
-          ),
-          field(
-            '${c.id}:amount',
-            c.amount,
-            (v) => c.amount = v,
-            label: TripStrings.labels['amount'],
-            revision: c.fareRevision,
-          ),
+          _formRows([
+            field(
+              '${c.id}:count',
+              c.count,
+              (v) => c.count = v,
+              label: TripStrings.labels['count'],
+            ),
+            field(
+              '${c.id}:amount',
+              c.amount,
+              (v) => c.amount = v,
+              label: TripStrings.labels['amount'],
+              revision: c.fareRevision,
+            ),
+          ]),
           if (d.suggestedFare != null)
             TextButton(
               onPressed: busy
@@ -1384,34 +1512,44 @@ class _TripEditorState extends State<TripEditor> {
                 ]),
               ),
             ),
-          choice(
-            '${c.id}:mode',
-            c.mode,
-            ['DEDUCTED', 'ADDED'],
-            (v) {
-              if (v != null) c.mode = v;
-            },
-            label: 'Quote basis: DEDUCTED = customer quote; ADDED = owner fare',
-          ),
-          choice('${c.id}:method', c.method, ['FIXED', 'PERCENTAGE'], (v) {
-            if (v != null) c.method = v;
-          }, label: TripStrings.labels['method']),
-          field(
-            '${c.id}:value',
-            c.commissionValue,
-            (v) => c.commissionValue = v,
-            label: TripStrings.labels['value'],
-            revision: c.fareRevision,
-          ),
+          _formRows([
+            choice(
+              '${c.id}:mode',
+              c.mode,
+              ['DEDUCTED', 'ADDED'],
+              (v) {
+                if (v != null) c.mode = v;
+              },
+              label:
+                  'Quote basis: DEDUCTED = customer quote; ADDED = owner fare',
+            ),
+            choice('${c.id}:method', c.method, ['FIXED', 'PERCENTAGE'], (v) {
+              if (v != null) c.method = v;
+            }, label: TripStrings.labels['method']),
+            field(
+              '${c.id}:value',
+              c.commissionValue,
+              (v) => c.commissionValue = v,
+              label: TripStrings.labels['value'],
+              revision: c.fareRevision,
+            ),
+            field(
+              '${c.id}:notes',
+              c.notes,
+              (v) => c.notes = v,
+              label: TripStrings.labels['notes'],
+            ),
+          ]),
           preview(c),
-          stopChoice('${c.id}:pickup', c.pickup, 'PICKUP', (v) => c.pickup = v),
-          stopChoice('${c.id}:drop', c.drop, 'DROP', (v) => c.drop = v),
-          field(
-            '${c.id}:notes',
-            c.notes,
-            (v) => c.notes = v,
-            label: TripStrings.labels['notes'],
-          ),
+          _formRows([
+            stopChoice(
+              '${c.id}:pickup',
+              c.pickup,
+              'PICKUP',
+              (v) => c.pickup = v,
+            ),
+            stopChoice('${c.id}:drop', c.drop, 'DROP', (v) => c.drop = v),
+          ]),
           const BilingualText(
             L10n.countIncludesAllCarsIdentifiersAreOptionalCarStops,
           ),
@@ -1428,18 +1566,20 @@ class _TripEditorState extends State<TripEditor> {
                       (v) => a.identifier = v,
                       label: TripStrings.labels['identifier'],
                     ),
-                    stopChoice(
-                      '${a.id}:pickup',
-                      a.pickup,
-                      'PICKUP',
-                      (v) => a.pickup = v,
-                    ),
-                    stopChoice(
-                      '${a.id}:drop',
-                      a.drop,
-                      'DROP',
-                      (v) => a.drop = v,
-                    ),
+                    _formRows([
+                      stopChoice(
+                        '${a.id}:pickup',
+                        a.pickup,
+                        'PICKUP',
+                        (v) => a.pickup = v,
+                      ),
+                      stopChoice(
+                        '${a.id}:drop',
+                        a.drop,
+                        'DROP',
+                        (v) => a.drop = v,
+                      ),
+                    ]),
                     TextButton(
                       onPressed: busy
                           ? null
@@ -1588,92 +1728,102 @@ class _TripEditorState extends State<TripEditor> {
                                 d.parentNumber ?? d.parent,
                               ]),
                             ),
-                          picker(
-                            'vehicle',
-                            d.registration,
-                            () => pick('vehicle', MasterKind.vehicle),
-                          ),
-                          BilingualText(
-                            L10n.labelValuesfb62fe.withValues([
-                              ownedMessage(TripStrings.labels['owner']),
-                              d.ownerName ?? L10n.reconciledOnSave,
-                            ]),
-                          ),
-                          picker(
-                            'driver',
-                            d.driverName ??
-                                (d.driver == null
-                                    ? null
-                                    : TripStrings.defaultDriver),
-                            () => pick(
-                              'driver',
-                              MasterKind.party,
-                              role: 'DRIVER',
+                          _formRows([
+                            picker(
+                              'vehicle',
+                              d.registration,
+                              () => pick('vehicle', MasterKind.vehicle),
                             ),
-                            clear: () {
-                              d.driver = null;
-                              d.driverName = null;
-                            },
-                          ),
-                          KarvaanChoiceField<String>(
-                            key: ValueKey('origin:${d.origin}'),
-                            initialValue:
-                                widget.offices.any((o) => o['id'] == d.origin)
-                                ? d.origin
-                                : null,
-                            decoration: bilingualDecoration(
-                              context,
-                              InputDecoration(
-                                label: BilingualOwnedCaption(
-                                  TripStrings.labels['origin'],
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: BilingualText(
+                                L10n.labelValuesfb62fe.withValues([
+                                  ownedMessage(TripStrings.labels['owner']),
+                                  d.ownerName ?? L10n.reconciledOnSave,
+                                ]),
                               ),
                             ),
-                            items: [
-                              for (final o in widget.offices)
-                                DropdownMenuItem(
-                                  value: o['id'] as String,
-                                  child: Text(o['name'] as String),
+                            picker(
+                              'driver',
+                              d.driverName ??
+                                  (d.driver == null
+                                      ? null
+                                      : TripStrings.defaultDriver),
+                              () => pick(
+                                'driver',
+                                MasterKind.party,
+                                role: 'DRIVER',
+                              ),
+                              clear: () {
+                                d.driver = null;
+                                d.driverName = null;
+                              },
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: KarvaanChoiceField<String>(
+                                key: ValueKey('origin:${d.origin}'),
+                                initialValue:
+                                    widget.offices.any(
+                                      (o) => o['id'] == d.origin,
+                                    )
+                                    ? d.origin
+                                    : null,
+                                decoration: bilingualDecoration(
+                                  context,
+                                  InputDecoration(
+                                    label: BilingualOwnedCaption(
+                                      TripStrings.labels['origin'],
+                                    ),
+                                  ),
                                 ),
-                            ],
-                            onChanged: busy
-                                ? null
-                                : (v) async {
-                                    setState(() => d.origin = v);
-                                    if (d.version == 0) await defaults();
-                                  },
-                          ),
-                          picker(
-                            'destination',
-                            widget.offices
-                                    .where((o) => o['id'] == d.destination)
-                                    .map((o) => o['name'])
-                                    .firstOrNull
-                                    ?.toString() ??
-                                d.destinationName ??
-                                (d.destination == null
+                                items: [
+                                  for (final o in widget.offices)
+                                    DropdownMenuItem(
+                                      value: o['id'] as String,
+                                      child: Text(o['name'] as String),
+                                    ),
+                                ],
+                                onChanged: busy
                                     ? null
-                                    : 'Selected office'),
-                            () => pick('destination', MasterKind.office),
-                          ),
-                          picker(
-                            'route',
-                            d.routeName,
-                            () => pick('route', MasterKind.route),
-                            clear: () {
-                              d.route = null;
-                              d.routeName = null;
-                              d.suggestedFare = null;
-                            },
-                          ),
-                          field('planned', d.planned, (v) => d.planned = v),
-                          choice('load', d.kind, ['LOADED', 'EMPTY'], (v) {
-                            if (v == 'EMPTY' && d.consignments.isNotEmpty) {
-                              error = TripStrings.emptySwitch;
-                            } else if (v != null) {
-                              d.kind = v;
-                            }
-                          }),
+                                    : (v) async {
+                                        setState(() => d.origin = v);
+                                        if (d.version == 0) await defaults();
+                                      },
+                              ),
+                            ),
+                            picker(
+                              'destination',
+                              widget.offices
+                                      .where((o) => o['id'] == d.destination)
+                                      .map((o) => o['name'])
+                                      .firstOrNull
+                                      ?.toString() ??
+                                  d.destinationName ??
+                                  (d.destination == null
+                                      ? null
+                                      : 'Selected office'),
+                              () => pick('destination', MasterKind.office),
+                            ),
+                            picker(
+                              'route',
+                              d.routeName,
+                              () => pick('route', MasterKind.route),
+                              clear: () {
+                                d.route = null;
+                                d.routeName = null;
+                                d.suggestedFare = null;
+                              },
+                            ),
+                            field('planned', d.planned, (v) => d.planned = v),
+                            choice('load', d.kind, ['LOADED', 'EMPTY'], (v) {
+                              if (v == 'EMPTY' && d.consignments.isNotEmpty) {
+                                error = TripStrings.emptySwitch;
+                              } else if (v != null) {
+                                d.kind = v;
+                              }
+                            }),
+                          ]),
                           field('notes', d.notes, (v) => d.notes = v),
 
                           if (d.version > 0)

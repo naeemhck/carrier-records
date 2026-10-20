@@ -143,7 +143,7 @@ Widget wrap(Widget child) => MaterialApp(
 Finder cardText(String text) => find.text(text, skipOffstage: false);
 
 void main() {
-  testWidgets('trips list renders route-drawn cards with money figure', (
+  testWidgets('trips list renders compact cards with money figure', (
     tester,
   ) async {
     final repository = ListFixture();
@@ -161,48 +161,33 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    // Route-drawn card: route line, status badge, vehicle line, timestamps.
-    expect(find.byType(TripRouteLine, skipOffstage: false), findsOneWidget);
+    // Desktop defaults to the table; switch to the compact cards.
+    await tester.tap(find.byKey(const ValueKey('trips-view-cards')));
+    await tester.pumpAndSettle();
+    // Compact card (density pass): number + status, the full route as one
+    // wrapping line, vehicle · owner, dates, and the money figure. Notes
+    // and timestamps live on the detail screen now, not on the card.
     expect(find.byType(TripStatusBadge, skipOffstage: false), findsOneWidget);
     expect(cardText('TRP-000001'), findsOneWidget);
+    expect(cardText('Karachi → Islamabad'), findsOneWidget);
     expect(
       find.textContaining('LEA-24-8841', skipOffstage: false),
       findsWidgets,
     );
     expect(
-      find.textContaining('2026-10-11', skipOffstage: false),
+      find.textContaining('2026-10-12', skipOffstage: false),
       findsWidgets,
     );
+    expect(find.text(L10n.readMore.en, skipOffstage: false), findsNothing);
     // Zero outstanding renders the settled zero-state wording, not PKR 0.00.
     expect(cardText(L10n.settled.en), findsOneWidget);
     expect(find.text('PKR 0.00', skipOffstage: false), findsNothing);
-    // Long notes truncate behind Read more.
-    final readMore = find.text(L10n.readMore.en, skipOffstage: false);
-    expect(readMore, findsOneWidget);
-    await tester.ensureVisible(readMore);
-    await tester.pumpAndSettle();
-    await tester.tap(readMore);
-    await tester.pumpAndSettle();
-    // Filter chips drive the status filter; All clears it. The list unmounts
-    // off-screen children outside its cache extent, so scroll back up first.
-    await tester.drag(find.byType(ListView), const Offset(0, 800));
-    await tester.pumpAndSettle();
-    final draftChip = find.byKey(
-      const ValueKey('trip-filter-DRAFT'),
-      skipOffstage: false,
-    );
-    await tester.ensureVisible(draftChip);
-    await tester.pumpAndSettle();
-    await tester.tap(draftChip);
+    // Filter chips drive the status filter; All clears it. The chips sit
+    // in the fixed toolbar area, always reachable above the results.
+    await tester.tap(find.byKey(const ValueKey('trip-filter-DRAFT')));
     await tester.pumpAndSettle();
     expect(repository.seenState, 'DRAFT');
-    final allChip = find.byKey(
-      const ValueKey('trip-filter-ALL'),
-      skipOffstage: false,
-    );
-    await tester.ensureVisible(allChip);
-    await tester.pumpAndSettle();
-    await tester.tap(allChip);
+    await tester.tap(find.byKey(const ValueKey('trip-filter-ALL')));
     await tester.pumpAndSettle();
     expect(repository.seenState, isNull);
     expect(tester.takeException(), isNull);
@@ -234,6 +219,8 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trips-view-cards')));
     await tester.pumpAndSettle();
     expect(find.byType(PaperTrailAmount, skipOffstage: false), findsOneWidget);
     expect(cardText('PKR 165,000.00'), findsOneWidget);
