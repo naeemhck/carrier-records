@@ -1,3 +1,4 @@
+import 'package:carrier_records/app/bilingual.dart';
 import 'package:carrier_records/features/masters/master_repository.dart';
 import 'package:carrier_records/features/trips/trip_draft.dart';
 import 'package:carrier_records/features/trips/trip_repository.dart';
@@ -139,12 +140,17 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      // QA text fixes 2026-10-20: scope header is now "Your office's trips".
+      final scopeFinder = find.byWidgetPredicate(
+        (w) =>
+            w is BilingualText && w.text.en == L10n.assignedOfficeTrips.en,
+      );
       await tester.scrollUntilVisible(
-        find.text(TripStrings.scope),
+        scopeFinder,
         250,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(find.text(TripStrings.scope), findsOneWidget);
+      expect(scopeFinder, findsOneWidget);
       expect(find.text(TripStrings.empty), findsOneWidget);
     },
   );

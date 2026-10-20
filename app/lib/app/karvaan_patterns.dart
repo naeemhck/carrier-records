@@ -151,7 +151,7 @@ class KpiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onFilled = Colors.white;
-    final figureStyle = KarvaanTypography.textTheme.displaySmall?.copyWith(
+    final figureStyle = KarvaanTypography.textTheme.headlineSmall?.copyWith(
       color: filled ? onFilled : KarvaanDesign.ink,
     );
     final captionStyle = KarvaanTypography.textTheme.bodySmall?.copyWith(
@@ -273,8 +273,12 @@ class TimestampFooter extends StatelessWidget {
     this.dispatched,
   });
   final String? created, updated, dispatched;
-  Bilingual _stamp(Bilingual label, String value) =>
-      Bilingual('pattern.stamp', '${label.en}: $value', '${label.ur}: $value');
+  Bilingual _stamp(Bilingual label, String value) => Bilingual(
+    'pattern.stamp',
+    '${label.en}: $value',
+    // Isolate the Latin date so it renders as one LTR unit in the RTL line.
+    '${label.ur}: \u2066$value\u2069',
+  );
   @override
   Widget build(BuildContext context) {
     final stamps = [

@@ -293,7 +293,7 @@
     "key": "confirmTheAgreedOwnerSettlementOffset",
     "semantic_key": "ui.confirmTheAgreedOwnerSettlementOffset",
     "en": "Confirm the agreed owner settlement offset.",
-    "ur": "مالک کے تصفیے میں طے شدہ غیر نقد ایڈجسٹمنٹ کی تصدیق کریں۔",
+    "ur": "مالک کے تصفیے میں طے شدہ غیر نقد تصحیح کی تصدیق کریں۔",
     "origins": [
       "error"
     ]
@@ -302,7 +302,7 @@
     "key": "allocateTheExactOffsetAndHeldFundsSpendingSeparately",
     "semantic_key": "ui.allocateTheExactOffsetAndHeldFundsSpendingSeparately",
     "en": "Allocate the exact offset and held-funds spending separately.",
-    "ur": "غیر نقد ایڈجسٹمنٹ اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔",
+    "ur": "غیر نقد تصحیح اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔",
     "origins": [
       "error"
     ]
@@ -1541,7 +1541,7 @@
     "key": "customerFareDispatchAdjustmentDate",
     "semantic_key": "ui.customerFareDispatchAdjustmentDate",
     "en": "Customer fare — dispatch / adjustment date",
-    "ur": "گاہک کا کرایہ — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "ur": "گاہک کا کرایہ — روانگی / تصحیح کی تاریخ",
     "origins": [
       "reportLabels[customer_fare]"
     ]
@@ -1550,7 +1550,7 @@
     "key": "ownerEarningsDispatchAdjustmentDate",
     "semantic_key": "ui.ownerEarningsDispatchAdjustmentDate",
     "en": "Owner earnings — dispatch / adjustment date",
-    "ur": "مالک کی آمدن — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "ur": "مالک کی آمدن — روانگی / تصحیح کی تاریخ",
     "origins": [
       "reportLabels[owner_earnings]"
     ]
@@ -1559,7 +1559,7 @@
     "key": "brokerageEarnedDispatchAdjustmentDate",
     "semantic_key": "ui.brokerageEarnedDispatchAdjustmentDate",
     "en": "Brokerage earned — dispatch / adjustment date",
-    "ur": "حاصل شدہ کمیشن — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "ur": "حاصل شدہ کمیشن — روانگی / تصحیح کی تاریخ",
     "origins": [
       "reportLabels[brokerage]"
     ]
@@ -1576,8 +1576,8 @@
   {
     "key": "ownerBorneCostsExpenseDate",
     "semantic_key": "ui.ownerBorneCostsExpenseDate",
-    "en": "Owner-borne costs — expense date",
-    "ur": "مالک کے ذمے اخراجات — خرچ کی تاریخ",
+    "en": "Owner's costs — expense date",
+    "ur": "مالک کے اخراجات — خرچ کی تاریخ",
     "origins": [
       "reportLabels[owner_cost]"
     ]
@@ -1594,8 +1594,8 @@
   {
     "key": "ownerProfitOwnerEarningsLessOwnerBorneCosts",
     "semantic_key": "ui.ownerProfitOwnerEarningsLessOwnerBorneCosts",
-    "en": "Owner profit — owner earnings less owner-borne costs",
-    "ur": "مالک کا منافع — مالک کی آمدن منفی مالک کے ذمے اخراجات",
+    "en": "Owner profit — owner earnings less owner's costs",
+    "ur": "مالک کا منافع — مالک کی آمدن منفی مالک کے اخراجات",
     "origins": [
       "reportLabels[owner_profit]"
     ]
@@ -1675,8 +1675,8 @@
   {
     "key": "intermediaryHeldMoneyPeriodEnd",
     "semantic_key": "ui.intermediaryHeldMoneyPeriodEnd",
-    "en": "Intermediary-held money — period end",
-    "ur": "واسطہ دار کی رقم زیرِ تحویل — مدت کے اختتام پر",
+    "en": "Held money — period end",
+    "ur": "زیرِ تحویل رقم — مدت کے اختتام پر",
     "origins": [
       "reportLabels[custody]"
     ]
@@ -1819,8 +1819,8 @@
   {
     "key": "assignedOfficeTrips",
     "semantic_key": "ui.assignedOfficeTrips",
-    "en": "Assigned-office trips",
-    "ur": "مقررہ دفتر کے ٹرپس",
+    "en": "Your office's trips",
+    "ur": "آپ کے دفتر کے ٹرپس",
     "origins": [
       "TripStrings.scope"
     ]
@@ -2577,7 +2577,7 @@
     "key": "confirmedFareChangesAndDependentFinancialCorrectionsNeedThe",
     "semantic_key": "ui.confirmedFareChangesAndDependentFinancialCorrectionsNeedThe",
     "en": "Confirmed fare changes and dependent financial corrections need the later financial adjustment workflow. Date corrections retain linked reversal/replacement history.",
-    "ur": "تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی ایڈجسٹمنٹ طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔",
+    "ur": "تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی تصحیح طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔",
     "origins": [
       "LifecycleStrings.correction"
     ]
@@ -2676,7 +2676,7 @@
     "key": "aDispatchedOrArrivedTripRequiresAnExplicitFinancial",
     "semantic_key": "ui.aDispatchedOrArrivedTripRequiresAnExplicitFinancial",
     "en": "A dispatched or arrived trip requires an explicit financial adjustment/cancellation plan in the later workflow.",
-    "ur": "روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی ایڈجسٹمنٹ یا منسوخی کا منصوبہ ضروری ہے۔",
+    "ur": "روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی تصحیح یا منسوخی کا منصوبہ ضروری ہے۔",
     "origins": [
       "LifecycleStrings.errorMessages[FINANCIAL_ADJUSTMENT_REQUIRED]"
     ]
@@ -3107,8 +3107,8 @@
   {
     "key": "permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless",
     "semantic_key": "ui.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless",
-    "en": "Permitted office and trip expenses. Maintenance remains unlinked unless explicitly assigned to a trip.",
-    "ur": "اجازت یافتہ دفتر اور ٹرپ کے اخراجات۔ مرمت کا خرچ کسی ٹرپ سے منسلک نہیں ہوتا جب تک واضح طور پر مقرر نہ کیا جائے۔",
+    "en": "Office and trip expenses — unassigned maintenance stays separate.",
+    "ur": "دفتر اور ٹرپ کے اخراجات — غیر منسلک مرمت الگ رہتی ہے۔",
     "origins": [
       "app/lib/features/expenses/expense_workspace.dart:253"
     ]
@@ -3672,8 +3672,8 @@
   {
     "key": "permittedTripsOnlyNotACompletePartyOrBusiness",
     "semantic_key": "ui.permittedTripsOnlyNotACompletePartyOrBusiness",
-    "en": "Permitted trips only — not a complete party or business balance.",
-    "ur": "صرف اجازت یافتہ ٹرپس — فریق یا کاروبار کی مکمل بقایا رقم نہیں۔",
+    "en": "Only your permitted trips — not the full balance.",
+    "ur": "صرف آپ کے اجازت یافتہ ٹرپس — مکمل بقایا نہیں۔",
     "origins": [
       "app/lib/features/finance/payment_workspace.dart:452"
     ]
@@ -4016,8 +4016,8 @@
   {
     "key": "importedExpenseDraftsAwaitingNormalReview",
     "semantic_key": "ui.importedExpenseDraftsAwaitingNormalReview",
-    "en": "Imported expense drafts awaiting normal review",
-    "ur": "درآمد شدہ خرچ کے مسودے معمول کی جانچ کے منتظر ہیں",
+    "en": "Imported expense drafts awaiting standard review",
+    "ur": "درآمد شدہ خرچ کے مسودے معیاری جانچ کے منتظر ہیں",
     "origins": [
       "app/lib/features/imports/import_workspace.dart:398"
     ]
@@ -4226,8 +4226,8 @@
   {
     "key": "previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
     "semantic_key": "ui.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
-    "en": "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.",
-    "ur": "صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
+    "en": "Preview only — not an issued document.",
+    "ur": "صرف پیش منظر — جاری شدہ دستاویز نہیں۔",
     "origins": [
       "app/lib/features/reports/output_workspace.dart:448"
     ]
@@ -4391,8 +4391,8 @@
   {
     "key": "requiredHeaderIdentityField",
     "semantic_key": "ui.requiredHeaderIdentityField",
-    "en": "Required header / identity field",
-    "ur": "ضروری سرخی / شناخت کا خانہ",
+    "en": "Report identity fields",
+    "ur": "رپورٹ کی شناختی معلومات",
     "origins": [
       "app/lib/features/reports/output_workspace.dart:709"
     ]
@@ -5240,7 +5240,7 @@
     "key": "historicalOwner",
     "semantic_key": "ui.historicalOwner",
     "en": "Historical owner: {0}",
-    "ur": "اس وقت کا مالک: {0}",
+    "ur": "سابقہ مالک: {0}",
     "origins": [
       "app/lib/features/expenses/expense_workspace.dart:789"
     ]
@@ -5348,7 +5348,7 @@
     "key": "cancellationAndAdjustmentsCommittedActualExpensesRetainedRefundsRequire",
     "semantic_key": "ui.cancellationAndAdjustmentsCommittedActualExpensesRetainedRefundsRequire",
     "en": "Cancellation and adjustments committed. Actual expenses retained; refunds require separate confirmation.",
-    "ur": "منسوخی اور ایڈجسٹمنٹس مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔",
+    "ur": "منسوخی اور تصحیحات مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔",
     "origins": [
       "app/lib/features/finance/correction_workspace.dart:514"
     ]
@@ -5537,7 +5537,7 @@
     "key": "selectHistoricalOwner",
     "semantic_key": "ui.selectHistoricalOwner",
     "en": "Select historical owner",
-    "ur": "اس وقت کا مالک منتخب کریں",
+    "ur": "سابقہ مالک منتخب کریں",
     "origins": [
       "app/lib/features/reports/output_workspace.dart:560"
     ]
@@ -6157,8 +6157,8 @@
   {
     "key": "ownerBorneCosts",
     "semantic_key": "ui.ownerBorneCosts",
-    "en": "Owner-borne costs",
-    "ur": "مالک کے ذمے اخراجات",
+    "en": "Owner's costs",
+    "ur": "مالک کے اخراجات",
     "origins": [
       "server.field.owner_cost"
     ]
@@ -6256,8 +6256,8 @@
   {
     "key": "intermediaryHeldMoney",
     "semantic_key": "ui.intermediaryHeldMoney",
-    "en": "Intermediary-held money",
-    "ur": "واسطہ دار کی رقم زیرِ تحویل",
+    "en": "Held money",
+    "ur": "زیرِ تحویل رقم",
     "origins": [
       "server.field.custody"
     ]
@@ -6472,7 +6472,7 @@
   {
     "key": "loaded",
     "semantic_key": "ui.loaded",
-    "en": "LOADED",
+    "en": "Loaded",
     "ur": "لوڈ کے ساتھ",
     "origins": [
       "system.code.LOADED"
@@ -6653,7 +6653,7 @@
     "key": "thisRecordBelongsToACancelledTripItsCancellation",
     "semantic_key": "ui.thisRecordBelongsToACancelledTripItsCancellation",
     "en": "This record belongs to a cancelled trip. Its cancellation adjustments must be resolved first.",
-    "ur": "یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی ایڈجسٹمنٹس حل کریں۔",
+    "ur": "یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی تصحیحات حل کریں۔",
     "origins": [
       "safe.presentation"
     ]
@@ -6823,8 +6823,8 @@
   {
     "key": "assignedOfficeRecordScope",
     "semantic_key": "presentation.assignedOfficeRecordScope",
-    "en": "Assigned-office records — not a complete business balance",
-    "ur": "مقررہ دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
+    "en": "Your office's records — not a complete business balance",
+    "ur": "آپ کے دفتر کا ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -6832,8 +6832,8 @@
   {
     "key": "selectedOfficeRecordScope",
     "semantic_key": "presentation.selectedOfficeRecordScope",
-    "en": "Selected-office records — not a complete business balance",
-    "ur": "منتخب دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
+    "en": "Selected office's records — not the full business balance",
+    "ur": "منتخب دفتر کا ریکارڈ — کاروبار کا مکمل بقایا نہیں",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -6842,7 +6842,7 @@
     "key": "dispatchAdjustmentDateBasis",
     "semantic_key": "presentation.dispatchAdjustmentDateBasis",
     "en": "Dispatch / explicit adjustment date",
-    "ur": "روانگی / واضح ایڈجسٹمنٹ کی تاریخ",
+    "ur": "روانگی / واضح تصحیح کی تاریخ",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -6960,7 +6960,7 @@
     "key": "earningsAdjustmentEvent",
     "semantic_key": "presentation.earningsAdjustmentEvent",
     "en": "earnings adjustment",
-    "ur": "آمدن کی ایڈجسٹمنٹ",
+    "ur": "آمدن کی تصحیح",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -7175,8 +7175,8 @@
   {
     "key": "lifetimeReportLabel4",
     "semantic_key": "presentation.lifetimeReportLabel4",
-    "en": "Owner-borne costs — all linked expense dates",
-    "ur": "مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+    "en": "Owner's costs — all linked expense dates",
+    "ur": "مالک کے اخراجات — تمام منسلک اخراجات کی تاریخیں",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -7211,8 +7211,8 @@
   {
     "key": "lifetimeReportLabel15",
     "semantic_key": "presentation.lifetimeReportLabel15",
-    "en": "Intermediary-held money — current lifetime",
-    "ur": "واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر",
+    "en": "Held money — current lifetime",
+    "ur": "زیرِ تحویل رقم — موجودہ مکمل مدت پر",
     "origins": [
       "reviewed.dynamic.presentation"
     ]
@@ -7622,8 +7622,8 @@
   {
     "key": "dispatchedNow",
     "semantic_key": "ui.dispatchedNow",
-    "en": "Dispatched now",
-    "ur": "اس وقت روانہ",
+    "en": "In transit",
+    "ur": "دورانِ سفر",
     "origins": [
       "ui-restructure-patterns"
     ]
@@ -7887,6 +7887,294 @@
     "ur": "درآمد کی تصدیق سے پہلے توثیق کی غلطیاں درست کریں یا متداخل سفر کے انتباہات کو تسلیم کریں۔",
     "origins": [
       "ui-restructure-phase8"
+    ]
+  },
+  {
+    "key": "tripVehicleSearch",
+    "semantic_key": "ui.tripVehicleSearch",
+    "en": "Trip / vehicle search",
+    "ur": "ٹرپ / گاڑی تلاش کریں",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "agreedFare",
+    "semantic_key": "ui.agreedFare",
+    "en": "Agreed fare",
+    "ur": "طے شدہ کرایہ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "brokerCommissionFixed",
+    "semantic_key": "ui.brokerCommissionFixed",
+    "en": "Broker commission (fixed)",
+    "ur": "کمیشن (مقررہ)",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "brokerCommissionPercent",
+    "semantic_key": "ui.brokerCommissionPercent",
+    "en": "Broker commission (percent)",
+    "ur": "کمیشن (فیصد)",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "netOwnerShare",
+    "semantic_key": "ui.netOwnerShare",
+    "en": "Net owner share",
+    "ur": "مالک کا خالص حصہ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "customerLine",
+    "semantic_key": "ui.customerLine",
+    "en": "Customer",
+    "ur": "گاہک",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "brokerLine",
+    "semantic_key": "ui.brokerLine",
+    "en": "Broker",
+    "ur": "بروکر",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldDispatchDate",
+    "semantic_key": "ui.historyFieldDispatchDate",
+    "en": "Dispatch date",
+    "ur": "روانگی کی تاریخ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldArrivalDate",
+    "semantic_key": "ui.historyFieldArrivalDate",
+    "en": "Arrival date",
+    "ur": "آمد کی تاریخ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldPlannedDate",
+    "semantic_key": "ui.historyFieldPlannedDate",
+    "en": "Planned date",
+    "ur": "مجوزہ تاریخ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldStatus",
+    "semantic_key": "ui.historyFieldStatus",
+    "en": "Status",
+    "ur": "حالت",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldLoad",
+    "semantic_key": "ui.historyFieldLoad",
+    "en": "Load",
+    "ur": "لوڈ",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldCars",
+    "semantic_key": "ui.historyFieldCars",
+    "en": "Cars",
+    "ur": "کاریں",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldDriver",
+    "semantic_key": "ui.historyFieldDriver",
+    "en": "Driver",
+    "ur": "ڈرائیور",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldNotes",
+    "semantic_key": "ui.historyFieldNotes",
+    "en": "Notes",
+    "ur": "نوٹس",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyFieldChanged",
+    "semantic_key": "ui.historyFieldChanged",
+    "en": "changed",
+    "ur": "تبدیل ہوا",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "historyNoChanges",
+    "semantic_key": "ui.historyNoChanges",
+    "en": "No field changes recorded.",
+    "ur": "کوئی خانے کی تبدیلی درج نہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "noTripExpensesRecorded",
+    "semantic_key": "ui.noTripExpensesRecorded",
+    "en": "No expenses recorded for this trip.",
+    "ur": "اس ٹرپ کا کوئی خرچ درج نہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "openOfficeExpenseListHint",
+    "semantic_key": "ui.openOfficeExpenseListHint",
+    "en": "Trip expenses live in the office expense list.",
+    "ur": "ٹرپ کے اخراجات دفتر کی اخراجات کی فہرست میں ہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "noMoneyMovementsYet",
+    "semantic_key": "ui.noMoneyMovementsYet",
+    "en": "No payments or allocations recorded yet.",
+    "ur": "ابھی کوئی ادائیگی یا تخصیص درج نہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "dispatchPostsDebtShareBrokerageShort",
+    "semantic_key": "ui.dispatchPostsDebtShareBrokerageShort",
+    "en": "Dispatch posts customer debt, owner share and brokerage — no receipt or settlement.",
+    "ur": "روانگی پر گاہک کا قرض، مالک کا حصہ اور کمیشن درج ہوتا ہے — کوئی وصولی یا تصفیہ نہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "arrivalSettlementIndependentShort",
+    "semantic_key": "ui.arrivalSettlementIndependentShort",
+    "en": "Arrival and settlement are independent — arrival records no payment.",
+    "ur": "آمد اور تصفیہ الگ ہیں — آمد پر کوئی ادائیگی درج نہیں ہوتی۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "moneySummaryHint",
+    "semantic_key": "ui.moneySummaryHint",
+    "en": "Summary of recognized amounts. Payments and allocations are recorded separately.",
+    "ur": "تسلیم شدہ رقوم کا خلاصہ۔ ادائیگیاں اور تخصیصات الگ درج ہوتی ہیں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "moneyWorkspacePurpose",
+    "semantic_key": "ui.moneyWorkspacePurpose",
+    "en": "Track per-trip money: what customers owe and what owners are due.",
+    "ur": "ہر ٹرپ کی رقم کی نگرانی: گاہکوں کے واجبات اور مالکوں کے حقوق۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "tripsWithMoneyScope",
+    "semantic_key": "ui.tripsWithMoneyScope",
+    "en": "Your office's trips — money view",
+    "ur": "آپ کے دفتر کے ٹرپس — رقوم کا منظر",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateV1NewRecordsOnly",
+    "semantic_key": "ui.templateV1NewRecordsOnly",
+    "en": "Template v1 — new records only.",
+    "ur": "سانچہ ورژن 1 — صرف نئے ریکارڈ۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "howToFillTemplate",
+    "semantic_key": "ui.howToFillTemplate",
+    "en": "How to fill the template",
+    "ur": "سانچہ کیسے پُر کریں",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateRuleDates",
+    "semantic_key": "ui.templateRuleDates",
+    "en": "Enter dates as YYYY-MM-DD text.",
+    "ur": "تاریخیں YYYY-MM-DD متن کے طور پر درج کریں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateRuleAmounts",
+    "semantic_key": "ui.templateRuleAmounts",
+    "en": "Enter exact decimal amounts as text.",
+    "ur": "درست اعشاری رقوم متن کے طور پر درج کریں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateRuleCodes",
+    "semantic_key": "ui.templateRuleCodes",
+    "en": "Use stable record codes, not names.",
+    "ur": "ناموں کی بجائے مستقل ریکارڈ کوڈ استعمال کریں۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateRuleMasters",
+    "semantic_key": "ui.templateRuleMasters",
+    "en": "Parties, vehicles and routes require an administrator.",
+    "ur": "فریقوں، گاڑیوں اور راستوں کے لیے منتظم ضروری ہے۔",
+    "origins": [
+      "qa-fix-2026-10-20"
+    ]
+  },
+  {
+    "key": "templateRuleDrafts",
+    "semantic_key": "ui.templateRuleDrafts",
+    "en": "Operational and expense rows remain drafts.",
+    "ur": "عملی اور خرچ کی قطاریں مسودے رہیں گی۔",
+    "origins": [
+      "qa-fix-2026-10-20"
     ]
   }
 ]

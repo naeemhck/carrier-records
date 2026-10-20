@@ -68,7 +68,7 @@ enum WorkspaceDestination {
   reports(Icons.assessment_outlined, L10n.reports, L10n.outputsGroup),
   documents(
     Icons.description_outlined,
-    L10n.documentsNavigation,
+    L10n.issuedDocuments,
     L10n.outputsGroup,
   ),
   masters(
@@ -278,10 +278,19 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                     destinations[i - 1].group))
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                            // Section headers are uppercase and non-interactive
+                            // so they are never mistaken for navigation items.
                             child: BilingualText(
-                              destinations[i].group,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: KarvaanDesign.secondary),
+                              Bilingual(
+                                destinations[i].group.key,
+                                destinations[i].group.en.toUpperCase(),
+                                destinations[i].group.ur,
+                              ),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: KarvaanDesign.secondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         Padding(

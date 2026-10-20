@@ -7,6 +7,19 @@ import 'ui_catalogue.dart';
 // Call only for source-owned labels and mapped safe errors. Never call on
 // names, notes, addresses, identifiers or arbitrary operational records.
 final _exact = {for (final value in L10n.values) value.en: value};
+
+/// Backend-provided labels with known bad or missing translations, corrected
+/// client-side. Presentation-only: backend values are unchanged.
+final _backendLabelFixes = <String, Bilingual>{
+  // Garbled "Round debit amount" translation from the outputs field list.
+  'ڈیبٹ کی رند رقم': const Bilingual(
+    'fix.roundDebitAmount',
+    'Round debit amount',
+    'گول ڈیبٹ رقم',
+  ),
+  // Urdu-only office-scope group label from the outputs field list.
+  'دفتر کا دائرہ رسائی': L10n.officeScope,
+};
 final _folded = {
   for (final value in L10n.values)
     if (!value.en.contains('{')) value.en.toLowerCase(): value,
@@ -56,6 +69,8 @@ class _OwnedTemplate {
 
 Bilingual ownedMessage(Object? source) {
   final english = source?.toString() ?? '';
+  final fixed = _backendLabelFixes[english];
+  if (fixed != null) return fixed;
   final exact = _exact[english];
   if (exact != null) return exact;
   final folded = _folded[english.toLowerCase()];
@@ -121,6 +136,17 @@ String displayMoney(Object? value) {
       ? value.toString()
       : value;
   return displayValue('MONEY', LedgerAmount.fromJson(canonical).toString());
+}
+
+/// Short human timestamp for UI: "2026-10-15T23:27:26.539984+00:00" becomes
+/// "2026-10-15 23:27". Raw ISO stamps with microseconds never reach the UI.
+String displayTimestamp(Object? value) {
+  final text = value?.toString().trim() ?? '';
+  final match = RegExp(
+    r'^([0-9]{4}-[0-9]{2}-[0-9]{2})[T ]([0-9]{2}:[0-9]{2})',
+  ).firstMatch(text);
+  if (match != null) return '${match[1]} ${match[2]}';
+  return text;
 }
 
 String displayMoneyDigits(Object? value) => displayMoney(value).substring(4);

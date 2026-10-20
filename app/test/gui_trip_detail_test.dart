@@ -99,8 +99,14 @@ void main() {
         );
         expect(repo.details, 1);
         expect(repo.histories, 0);
+        // QA text fixes 2026-10-20: consignment money block is fare -> commission -> net.
+        final fareFinder = find.byWidgetPredicate(
+          (w) =>
+              w is BilingualInlineLine &&
+              w.label.key == L10n.agreedFare.key,
+        );
         await tester.scrollUntilVisible(
-          find.textContaining('Quoted:'),
+          fareFinder,
           250,
           scrollable: find
               .descendant(
@@ -111,20 +117,30 @@ void main() {
           maxScrolls: 60,
         );
         await tester.pumpAndSettle();
-        expect(
-          find.text('Quoted: PKR 100,000.00 · DEDUCTED · FIXED 5,000.00'),
-          findsOneWidget,
-          reason: tester
-              .widgetList<BilingualText>(find.byType(BilingualText))
-              .where((w) => w.text.key == L10n.quotedPKR.key)
-              .map((w) => w.text.en)
-              .join(' | '),
-        );
-        final quote = tester
-            .widgetList<BilingualText>(find.byType(BilingualText))
-            .singleWhere((w) => w.text.key == L10n.quotedPKR.key);
-        expect(quote.text.ur, contains(L10n.quoteDeducted.ur));
-        expect(quote.text.ur, isNot(contains('DEDUCTED')));
+        // QA text fixes 2026-10-20: the consignment money block is now
+        // fare -> commission -> net, each on its own plain-words line.
+        final fare = tester
+            .widgetList<BilingualInlineLine>(
+              find.byType(BilingualInlineLine),
+            )
+            .singleWhere((w) => w.label.key == L10n.agreedFare.key);
+        expect(fare.value.en, contains('100,000.00'));
+        expect(fare.label.ur, contains('طے شدہ کرایہ'));
+        final commission = tester
+            .widgetList<BilingualInlineLine>(
+              find.byType(BilingualInlineLine),
+            )
+            .singleWhere(
+              (w) => w.label.key == L10n.brokerCommissionFixed.key,
+            );
+        expect(commission.value.en, contains('5,000.00'));
+        expect(commission.label.ur, isNot(contains('DEDUCTED')));
+        final net = tester
+            .widgetList<BilingualInlineLine>(
+              find.byType(BilingualInlineLine),
+            )
+            .singleWhere((w) => w.label.key == L10n.netOwnerShare.key);
+        expect(net.value.en, contains('95,000.00'));
         final stopText = tester
             .widgetList<BilingualText>(find.byType(BilingualText))
             .singleWhere((w) => w.text.key == L10n.pickupDrop.key);
@@ -151,10 +167,23 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('detail-tab-2')));
         await tester.pumpAndSettle();
-        expect(find.text(L10n.tripExpensesScopeNotice.en), findsOneWidget);
+        // QA text fixes 2026-10-20: expenses tab shows a short empty state,
+        // not the long disclaimer.
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is BilingualText &&
+                w.text.key == L10n.noTripExpensesRecorded.key,
+          ),
+          findsOneWidget,
+        );
         expect(expensesOpened, 0);
         final notice = tester.getRect(
-          find.text(L10n.tripExpensesScopeNotice.en),
+          find.byWidgetPredicate(
+            (w) =>
+                w is BilingualText &&
+                w.text.key == L10n.noTripExpensesRecorded.key,
+          ),
         );
         final tabs = tester.getRect(
           find.descendant(

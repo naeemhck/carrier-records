@@ -400,6 +400,53 @@ class TripHistory extends StatefulWidget {
   State<TripHistory> createState() => _TripHistoryState();
 }
 
+/// Internal audit fields that carry no meaning for staff; never rendered.
+const _historyHiddenFields = {'version', 'totals'};
+
+/// Human action label for the history feed. Known backend action names resolve
+/// through the catalogue; raw SCREAMING_CASE codes are prettified instead of
+/// being shown verbatim.
+Bilingual _historyActionLabel(Object? action) {
+  final resolved = ownedMessage(action);
+  if (resolved.key != 'unresolved.presentation') return resolved;
+  return Bilingual.data(_prettifyKey(action.toString()));
+}
+
+String _prettifyKey(String key) => key
+    .replaceAll('_', ' ')
+    .toLowerCase()
+    .split(' ')
+    .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
+    .join(' ');
+
+/// Human field label for the history feed. Raw internal field names never
+/// reach the UI; unknown fields fall back to a prettified label.
+Bilingual _historyFieldLabel(String key) => switch (key) {
+  'dispatch_date' => L10n.historyFieldDispatchDate,
+  'arrival_date' => L10n.historyFieldArrivalDate,
+  'planned_dispatch_date' => L10n.historyFieldPlannedDate,
+  'state' => L10n.historyFieldStatus,
+  'load_kind' => L10n.historyFieldLoad,
+  'car_count' => L10n.historyFieldCars,
+  'driver_name' => L10n.historyFieldDriver,
+  'notes' => L10n.historyFieldNotes,
+  _ => Bilingual.data(_prettifyKey(key)),
+};
+
+/// Human value for the history feed: state/load codes become their labels,
+/// timestamps become short date-times, nulls become "None".
+Object _historyFieldValue(String key, Object? value) {
+  if (value == null) return ownedMessage(TripStrings.none);
+  final text = value.toString();
+  return switch (key) {
+    'state' => tripStateLabel(text),
+    'load_kind' => loadKindLabel(text),
+    _ when RegExp(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T').hasMatch(text) =>
+      displayTimestamp(text),
+    _ => text,
+  };
+}
+
 class _TripHistoryState extends State<TripHistory> {
   int offset = 0;
   late Future<List<Map<String, dynamic>>> rows;
@@ -446,23 +493,35 @@ class _TripHistoryState extends State<TripHistory> {
                     children: [
                       BilingualText(
                         L10n.auditEventIdentity.withValues([
-                          ownedMessage(h['action']),
+                          _historyActionLabel(h['action']),
                           h['actor_name'],
-                          h['recorded_at'],
+                          displayTimestamp(h['recorded_at']),
                         ]),
                       ),
                       Text((h['reason'] ?? '').toString()),
-                      for (final k in (h['after'] as Map).keys)
-                        if ((h['before'] as Map)[k] != (h['after'] as Map)[k])
-                          BilingualText(
-                            L10n.labelValuesbeea2b.withValues([
-                              k,
-                              ownedMessage(LifecycleStrings.before),
-                              (h['before'] as Map)[k] ?? '',
-                              ownedMessage(LifecycleStrings.after),
-                              (h['after'] as Map)[k],
-                            ]),
-                          ),
+                      for (final k in [
+                        for (final k in (h['after'] as Map).keys)
+                          if ((h['before'] as Map)[k] !=
+                                  (h['after'] as Map)[k] &&
+                              !_historyHiddenFields.contains(k))
+                            k,
+                      ])
+                        BilingualText(
+                          L10n.labelValuesbeea2b.withValues([
+                            _historyFieldLabel(k),
+                            ownedMessage(LifecycleStrings.before),
+                            _historyFieldValue(k, (h['before'] as Map)[k]),
+                            ownedMessage(LifecycleStrings.after),
+                            _historyFieldValue(k, (h['after'] as Map)[k]),
+                          ]),
+                        ),
+                      if ((h['after'] as Map).keys.every(
+                        (k) =>
+                            (h['before'] as Map)[k] ==
+                                (h['after'] as Map)[k] ||
+                            _historyHiddenFields.contains(k),
+                      ))
+                        const BilingualText(L10n.historyNoChanges),
                     ],
                   ),
                 ),

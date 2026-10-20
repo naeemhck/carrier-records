@@ -8,14 +8,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('original 554 semantic keys and English wording remain stable', () {
-    const corrected =
-        'Preview only — not an issued document. Filters determine records; checkboxes determine presentation.';
+    const corrected = 'Preview only — not an issued document.';
     expect(
       L10n.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords.en,
       corrected,
     );
-    // One explicitly authorized punctuation correction; every original key and
-    // all other English wording remain protected by the original digest.
+    // QA text fixes authorized 2026-10-20 (branch fix/karvaan-qa-text-fixes):
+    // plain-words relabeling across the original catalogue. Every original key
+    // remains; the digest below pins the newly authorized English wording.
     final baseline = L10n.values
         .take(554)
         .map((entry) {
@@ -29,7 +29,7 @@ void main() {
         .join('\n');
     expect(
       sha256.convert(utf8.encode(baseline)).toString(),
-      '1097229ad60e19dea0873f36dc35f8dc5ff74e73846c54be6a20776c7bc7cb33',
+      'a560ea975ef0a3f134bef634ce5b109e5262ae8d880ca247d7d3677995d70b5c',
     );
   });
   test('owned catalogue preserves placeholders and Latin digits', () {

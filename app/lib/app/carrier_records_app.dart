@@ -181,7 +181,10 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
       return Scaffold(
         appBar: AppBar(
           toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-          title: const BilingualText(L10n.brand),
+          title: BilingualText(
+            // Signed-in users are on their account screen, not a brand page.
+            p == null ? L10n.brand : L10n.accountNavigation,
+          ),
           actions: [
             if (p != null && p['must_change_password'] == true)
               TextButton(

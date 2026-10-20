@@ -466,15 +466,12 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
           if (busy) const LinearProgressIndicator(),
           if (error != null) BilingualOwnedText(error!),
           if (!busy && error == null && rows.isNotEmpty) totalsStrip(),
-          FilledButton(
-            onPressed: busy ? null : () => open(newEntry()),
-            child: const Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(Icons.add),
-                SizedBox(width: 16),
-                Expanded(child: BilingualText(L10n.newExpense)),
-              ],
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: busy ? null : () => open(newEntry()),
+              icon: const Icon(Icons.add),
+              label: const BilingualText(L10n.newExpense),
             ),
           ),
           if (widget.corrections != null)

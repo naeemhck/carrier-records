@@ -538,10 +538,10 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                           : L10n.selectRecipient),
                     ),
                   ),
-                for (final entry in [
+                for (final entry in <(Object, TextEditingController)>[
                   ('From (YYYY-MM-DD)', from),
                   ('To (YYYY-MM-DD)', to),
-                  ('Trip / vehicle search', search),
+                  (L10n.tripVehicleSearch, search),
                 ])
                   SizedBox(
                     width: 200,
@@ -550,7 +550,11 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                       enabled: !busy,
                       decoration: bilingualDecoration(
                         context,
-                        InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                        InputDecoration(
+                          label: entry.$1 is Bilingual
+                              ? BilingualCaption(entry.$1 as Bilingual)
+                              : BilingualOwnedCaption(entry.$1),
+                        ),
                       ),
                       onChanged: (_) => changed(),
                     ),

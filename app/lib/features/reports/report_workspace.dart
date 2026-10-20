@@ -8,6 +8,7 @@ import '../../app/karvaan_patterns.dart';
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
 import '../trips/trip_workspace.dart';
+import '../finance/financial_repository.dart';
 import 'report_repository.dart';
 
 class ReportWorkspace extends StatefulWidget {
@@ -183,6 +184,21 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     ),
   );
 
+  /// Zero-value KPI cards are hidden to keep the grid scannable; the primary
+  /// card always shows.
+  bool _isZeroKpi(String key, Object? amount) {
+    if (amount == null) return true;
+    final text = amount.toString().trim();
+    try {
+      if (['dispatched', 'arrived'].contains(key)) {
+        return BigInt.parse(text.split('.').first) == BigInt.zero;
+      }
+      return LedgerAmount.fromJson(amount).paisa == BigInt.zero;
+    } on FormatException {
+      return false;
+    }
+  }
+
   /// KPI-first dashboard: four headline cards answering "what needs me right
   /// now" on one viewport. The report builder is one tap away on its own page.
   Widget dashboardBody() => ListView(
@@ -278,7 +294,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               ),
               BilingualText(
                 L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
-                    .withValues([data['generated_at']]),
+                    .withValues([displayTimestamp(data['generated_at'])]),
                 style: Theme.of(context).textTheme.labelSmall,
               ),
               if (drill != null) ...[
@@ -462,10 +478,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   },
                 ),
               ),
-              for (final entry in [
+              for (final entry in <(Object, TextEditingController)>[
                 ('From (YYYY-MM-DD)', from),
                 ('To (YYYY-MM-DD)', to),
-                ('Trip / vehicle search', search),
+                (L10n.tripVehicleSearch, search),
               ])
                 SizedBox(
                   width: 200,
@@ -473,7 +489,11 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                     controller: entry.$2,
                     decoration: bilingualDecoration(
                       context,
-                      InputDecoration(label: BilingualOwnedCaption(entry.$1)),
+                      InputDecoration(
+                        label: entry.$1 is Bilingual
+                            ? BilingualCaption(entry.$1 as Bilingual)
+                            : BilingualOwnedCaption(entry.$1),
+                      ),
                     ),
                   ),
                 ),
@@ -582,7 +602,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 ),
                 BilingualText(
                   L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
-                      .withValues([data['generated_at']]),
+                      .withValues([displayTimestamp(data['generated_at'])]),
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
                 if (rows.isEmpty)
@@ -598,20 +618,21 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                       primary,
                       ...reportLabels.keys.where((key) => key != primary),
                     ])
-                      SizedBox(
-                        width: 310,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: value(
-                              key,
-                              totals[key],
-                              lifetime: lifetime,
-                              hero: key == primary,
+                      if (key == primary || !_isZeroKpi(key, totals[key]))
+                        SizedBox(
+                          width: 310,
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: value(
+                                key,
+                                totals[key],
+                                lifetime: lifetime,
+                                hero: key == primary,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                   ],
                 ),
                 BilingualText(

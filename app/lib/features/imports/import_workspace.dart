@@ -361,7 +361,18 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const BilingualText(L10n.templateVersionNewRecordsOnlyEnterDatesAsYYYY),
+        const BilingualText(L10n.templateV1NewRecordsOnly),
+        ExpansionTile(
+          expansionAnimationStyle: AnimationStyle.noAnimation,
+          title: const BilingualText(L10n.howToFillTemplate),
+          children: const [
+            _TemplateRule(L10n.templateRuleDates),
+            _TemplateRule(L10n.templateRuleAmounts),
+            _TemplateRule(L10n.templateRuleCodes),
+            _TemplateRule(L10n.templateRuleMasters),
+            _TemplateRule(L10n.templateRuleDrafts),
+          ],
+        ),
         if (busy) const LinearProgressIndicator(),
         if (error != null) BilingualOwnedText(error!),
         KarvaanSection(
@@ -600,4 +611,21 @@ class _DraftExpenseCommands implements ExpenseCommands {
   Future<Uint8List?> download(String expense) => base.download(expense);
   @override
   Future<int> cleanup() => base.cleanup();
+}
+
+/// One numbered checklist row inside the "How to fill the template" guide.
+class _TemplateRule extends StatelessWidget {
+  const _TemplateRule(this.message);
+  final Bilingual message;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('• '),
+        Expanded(child: BilingualText(message)),
+      ],
+    ),
+  );
 }

@@ -78,21 +78,38 @@ class _ExpandableNoteState extends State<ExpandableNote> {
     if (expanded) {
       return Text(text, textDirection: TextDirection.ltr);
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          text,
+    // Only offer "Read more" when the note actually overflows two lines;
+    // otherwise the control is dead weight.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(
+            text: text,
+            style: DefaultTextStyle.of(context).style,
+          ),
           textDirection: TextDirection.ltr,
           maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        TextButton(
-          onPressed: () => setState(() => expanded = true),
-          child: const BilingualCaption(L10n.readMore),
-        ),
-      ],
+        )..layout(maxWidth: constraints.maxWidth);
+        final overflows = painter.didExceedMaxLines;
+        painter.dispose();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              textDirection: TextDirection.ltr,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (overflows)
+              TextButton(
+                onPressed: () => setState(() => expanded = true),
+                child: const BilingualCaption(L10n.readMore),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -302,6 +319,12 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                 ],
               ),
               const SizedBox(height: 12),
+              // Money view leads with the money figure; the operational
+              // view leads with the route.
+              if (widget.moneyMode) ...[
+                _outstandingFigure(id),
+                const SizedBox(height: 8),
+              ],
               TripRouteLine(
                 origin: (r['origin_name'] ?? '').toString(),
                 originMeta: legDate,
@@ -328,9 +351,11 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                 style: captionStyle,
               ),
               ExpandableNote((r['notes'] ?? '').toString()),
-              const SizedBox(height: 8),
-              _outstandingFigure(id),
-              const SizedBox(height: 8),
+              if (!widget.moneyMode) ...[
+                const SizedBox(height: 8),
+                _outstandingFigure(id),
+                const SizedBox(height: 8),
+              ],
               // updated_at is not returned by list_trips; only stamps with
               // real data render.
               TimestampFooter(
@@ -425,10 +450,14 @@ class _TripWorkspaceState extends State<TripWorkspace> {
           ],
         ),
         const SizedBox(height: 24),
-        if (widget.moneyMode)
+        if (widget.moneyMode) ...[
+          const BilingualText(L10n.moneyWorkspacePurpose),
+          const SizedBox(height: 8),
           const BilingualText(
             L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
           ),
+          const SizedBox(height: 8),
+        ],
         TextField(
           controller: search,
           decoration: bilingualDecoration(
@@ -533,7 +562,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
               ),
             ),
             SizedBox(
-              width: 200,
+              width: 280,
               child: TextField(
                 controller: from,
                 decoration: bilingualDecoration(
@@ -545,7 +574,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
               ),
             ),
             SizedBox(
-              width: 200,
+              width: 280,
               child: TextField(
                 controller: to,
                 decoration: bilingualDecoration(
@@ -576,6 +605,8 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                 BilingualText(
                   (result.scope == 'ALL_OFFICES'
                       ? L10n.allOffices
+                      : widget.moneyMode
+                      ? L10n.tripsWithMoneyScope
                       : L10n.assignedOfficeTrips),
                 ),
                 const SizedBox(height: 12),
@@ -843,8 +874,9 @@ class _OutstandingCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final settled = LedgerAmount.fromJson(value).paisa == BigInt.zero;
     final type = Theme.of(context).textTheme;
-    final figureStyle = (hero ? type.displaySmall : type.headlineSmall)
-        ?.copyWith(color: KarvaanDesign.accent);
+    final figureStyle = type.headlineSmall?.copyWith(
+      color: KarvaanDesign.accent,
+    );
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -2108,12 +2140,11 @@ class _TripDetailState extends State<TripDetail> {
                           const BilingualText(
                             L10n.draftSavedServerCalculatedAmountsShownBelow,
                           ),
-                        BilingualText(
-                          L10n.labelValuescd55a9.withValues([
-                            r['trip_number'],
-                            r['registration'],
-                          ]),
+                        // Pure identifiers print once, LTR, with no Urdu mirror.
+                        Text(
+                          '${r['trip_number']} · ${r['registration']}',
                           style: Theme.of(context).textTheme.headlineSmall,
+                          textDirection: TextDirection.ltr,
                         ),
                         TripStatusBadge(r['state'] as String),
                         const SizedBox(height: 16),
@@ -2175,10 +2206,10 @@ class _TripDetailState extends State<TripDetail> {
                           ),
                         if (r['earnings_recognized'] == true)
                           const BilingualText(
-                            L10n.dispatchRecognizesCustomerDebtOwnerFareShareAndBrokerage,
+                            L10n.dispatchPostsDebtShareBrokerageShort,
                           ),
                         const BilingualText(
-                          L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
+                          L10n.arrivalSettlementIndependentShort,
                         ),
                         BilingualText(
                           L10n.carCount04a594.withValues([
@@ -2343,12 +2374,13 @@ class _TripDetailState extends State<TripDetail> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Expanded(
-                                      child: BilingualText(
-                                        L10n.cars7b7a19.withValues([
-                                          c['customer_name'],
-                                          consignmentStateLabel(c['state']),
-                                          c['car_count'],
-                                        ]),
+                                      // Single bilingual line: values stay in
+                                      // place, only the label is translated.
+                                      child: BilingualInlineLine(
+                                        L10n.customerLine,
+                                        value: Bilingual.data(
+                                          '${c['customer_name']} · ${consignmentStateLabel(c['state']).en} · ${c['car_count']}',
+                                        ),
                                       ),
                                     ),
                                     // Destructive actions never sit next to
@@ -2383,39 +2415,35 @@ class _TripDetailState extends State<TripDetail> {
                                       ),
                                   ],
                                 ),
-                                BilingualText(
-                                  L10n.broker.withValues([
-                                    c['broker_name'] ??
-                                        ownedMessage(TripStrings.none),
-                                  ]),
+                                BilingualInlineLine(
+                                  L10n.brokerLine,
+                                  value: c['broker_name'] == null
+                                      ? ownedMessage(TripStrings.none)
+                                      : Bilingual.data(
+                                          c['broker_name'].toString(),
+                                        ),
                                 ),
-                                BilingualText(
-                                  moneyMessage(
-                                    L10n.quotedPKR,
-                                    [
-                                      c['quoted_amount'],
-                                      ownedMessage(c['quote_mode']),
-                                      ownedMessage(c['commission_method']),
-                                      c['commission_method'] == 'FIXED'
-                                          ? displayMoneyDigits(
-                                              c['commission_value'],
-                                            )
-                                          : c['commission_value'],
-                                    ],
-                                    {0},
+                                // Plain money block: each amount shown once.
+                                BilingualInlineLine(
+                                  L10n.agreedFare,
+                                  value: Bilingual.data(
+                                    displayMoney(c['quoted_amount']),
                                   ),
                                 ),
-                                for (final k in [
-                                  'customer_charge',
-                                  'commission',
-                                  'owner_entitlement',
-                                ])
-                                  BilingualText(
-                                    moneyLabel([
-                                      ownedMessage(TripStrings.labels[k]),
-                                      c[k],
-                                    ]),
+                                BilingualInlineLine(
+                                  c['commission_method'] == 'FIXED'
+                                      ? L10n.brokerCommissionFixed
+                                      : L10n.brokerCommissionPercent,
+                                  value: Bilingual.data(
+                                    displayMoney(c['commission']),
                                   ),
+                                ),
+                                BilingualInlineLine(
+                                  L10n.netOwnerShare,
+                                  value: Bilingual.data(
+                                    displayMoney(c['owner_entitlement']),
+                                  ),
+                                ),
                                 BilingualText(
                                   L10n.pickupDrop.withValues([
                                     stopLabel(c['pickup_stop_id']),
@@ -2442,9 +2470,7 @@ class _TripDetailState extends State<TripDetail> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const BilingualText(
-                              L10n.operationalCompletionAndFinancialSettlementAreIndependentArrivalCreates,
-                            ),
+                            const BilingualText(L10n.moneySummaryHint),
                             TripTotalsStrip(values: r['totals'] as Map),
                             _moneyOutstanding(
                               r['consignments'] as List? ?? const [],
@@ -2465,7 +2491,8 @@ class _TripDetailState extends State<TripDetail> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const BilingualText(L10n.tripExpensesScopeNotice),
+                            const BilingualText(L10n.noTripExpensesRecorded),
+                            const BilingualText(L10n.openOfficeExpenseListHint),
                             if (widget.onExpenses != null)
                               OutlinedButton(
                                 onPressed: widget.onExpenses,

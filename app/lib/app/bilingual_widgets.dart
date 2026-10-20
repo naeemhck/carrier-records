@@ -80,6 +80,45 @@ class BilingualText extends StatelessWidget {
   }
 }
 
+/// One-line bilingual label/value row: "English / اردو: value", overall LTR.
+/// Used where a stacked EN/UR pair would only repeat the same fact twice.
+/// Values stay in place; only the label is translated. Pass Bilingual.data
+/// for opaque values (names, amounts, identifiers) that have no Urdu form.
+class BilingualInlineLine extends StatelessWidget {
+  const BilingualInlineLine(
+    this.label, {
+    super.key,
+    required this.value,
+    this.style,
+  });
+  final Bilingual label;
+  final Bilingual value;
+  final TextStyle? style;
+  @override
+  Widget build(BuildContext context) {
+    final latin = style ?? DefaultTextStyle.of(context).style;
+    final urdu = _urduStyle(context, latin);
+    return Semantics(
+      label: '${label.en}. ${label.ur}: ${value.en}',
+      excludeSemantics: true,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: label.en),
+            const TextSpan(text: ' / '),
+            TextSpan(text: label.ur, style: urdu),
+            TextSpan(text: ': ${value.en}'),
+            if (value.ur.isNotEmpty)
+              TextSpan(text: ' / ${value.ur}', style: urdu),
+          ],
+        ),
+        style: latin,
+        textDirection: TextDirection.ltr,
+      ),
+    );
+  }
+}
+
 class BilingualCaption extends StatelessWidget {
   const BilingualCaption(this.text, {super.key, this.style});
   final Bilingual text;

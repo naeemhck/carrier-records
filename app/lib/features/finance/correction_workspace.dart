@@ -132,7 +132,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
         subtitle: BilingualText(
           L10n.correctionTrace.withValues([
             row['actor'],
-            row['recorded_at'],
+            displayTimestamp(row['recorded_at']),
             row['reason'] ?? '',
             row['reversed'] == true
                 ? L10n.reversedEntry

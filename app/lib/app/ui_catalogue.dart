@@ -229,17 +229,17 @@ abstract final class L10n {
   static const confirmTheAgreedOwnerSettlementOffset = Bilingual(
     "ui.confirmTheAgreedOwnerSettlementOffset",
     "Confirm the agreed owner settlement offset.",
-    "مالک کے تصفیے میں طے شدہ غیر نقد ایڈجسٹمنٹ کی تصدیق کریں۔",
+    "مالک کے تصفیے میں طے شدہ غیر نقد تصحیح کی تصدیق کریں۔",
   );
   static const confirmTheAgreedOwnerSettlementOffsetAccessibility =
-      "Confirm the agreed owner settlement offset.. مالک کے تصفیے میں طے شدہ غیر نقد ایڈجسٹمنٹ کی تصدیق کریں۔";
+      "Confirm the agreed owner settlement offset.. مالک کے تصفیے میں طے شدہ غیر نقد تصحیح کی تصدیق کریں۔";
   static const allocateTheExactOffsetAndHeldFundsSpendingSeparately = Bilingual(
     "ui.allocateTheExactOffsetAndHeldFundsSpendingSeparately",
     "Allocate the exact offset and held-funds spending separately.",
-    "غیر نقد ایڈجسٹمنٹ اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔",
+    "غیر نقد تصحیح اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔",
   );
   static const allocateTheExactOffsetAndHeldFundsSpendingSeparatelyAccessibility =
-      "Allocate the exact offset and held-funds spending separately.. غیر نقد ایڈجسٹمنٹ اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔";
+      "Allocate the exact offset and held-funds spending separately.. غیر نقد تصحیح اور زیرِ تحویل رقم کے خرچ کی درست رقم الگ الگ مختص کریں۔";
   static const receiptMustBeAtMostMB = Bilingual(
     "ui.receiptMustBeAtMostMB",
     "Receipt must be at most 5 MB.",
@@ -1079,24 +1079,24 @@ abstract final class L10n {
   static const customerFareDispatchAdjustmentDate = Bilingual(
     "ui.customerFareDispatchAdjustmentDate",
     "Customer fare — dispatch / adjustment date",
-    "گاہک کا کرایہ — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "گاہک کا کرایہ — روانگی / تصحیح کی تاریخ",
   );
   static const customerFareDispatchAdjustmentDateAccessibility =
-      "Customer fare — dispatch / adjustment date. گاہک کا کرایہ — روانگی / ایڈجسٹمنٹ کی تاریخ";
+      "Customer fare — dispatch / adjustment date. گاہک کا کرایہ — روانگی / تصحیح کی تاریخ";
   static const ownerEarningsDispatchAdjustmentDate = Bilingual(
     "ui.ownerEarningsDispatchAdjustmentDate",
     "Owner earnings — dispatch / adjustment date",
-    "مالک کی آمدن — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "مالک کی آمدن — روانگی / تصحیح کی تاریخ",
   );
   static const ownerEarningsDispatchAdjustmentDateAccessibility =
-      "Owner earnings — dispatch / adjustment date. مالک کی آمدن — روانگی / ایڈجسٹمنٹ کی تاریخ";
+      "Owner earnings — dispatch / adjustment date. مالک کی آمدن — روانگی / تصحیح کی تاریخ";
   static const brokerageEarnedDispatchAdjustmentDate = Bilingual(
     "ui.brokerageEarnedDispatchAdjustmentDate",
     "Brokerage earned — dispatch / adjustment date",
-    "حاصل شدہ کمیشن — روانگی / ایڈجسٹمنٹ کی تاریخ",
+    "حاصل شدہ کمیشن — روانگی / تصحیح کی تاریخ",
   );
   static const brokerageEarnedDispatchAdjustmentDateAccessibility =
-      "Brokerage earned — dispatch / adjustment date. حاصل شدہ کمیشن — روانگی / ایڈجسٹمنٹ کی تاریخ";
+      "Brokerage earned — dispatch / adjustment date. حاصل شدہ کمیشن — روانگی / تصحیح کی تاریخ";
   static const vehicleCostsExpenseDate = Bilingual(
     "ui.vehicleCostsExpenseDate",
     "Vehicle costs — expense date",
@@ -1106,11 +1106,11 @@ abstract final class L10n {
       "Vehicle costs — expense date. گاڑی کے اخراجات — خرچ کی تاریخ";
   static const ownerBorneCostsExpenseDate = Bilingual(
     "ui.ownerBorneCostsExpenseDate",
-    "Owner-borne costs — expense date",
-    "مالک کے ذمے اخراجات — خرچ کی تاریخ",
+    "Owner's costs — expense date",
+    "مالک کے اخراجات — خرچ کی تاریخ",
   );
   static const ownerBorneCostsExpenseDateAccessibility =
-      "Owner-borne costs — expense date. مالک کے ذمے اخراجات — خرچ کی تاریخ";
+      "Owner's costs — expense date. مالک کے اخراجات — خرچ کی تاریخ";
   static const vehicleOperatingProfitEarningsLessPeriodCosts = Bilingual(
     "ui.vehicleOperatingProfitEarningsLessPeriodCosts",
     "Vehicle operating profit — earnings less period costs",
@@ -1120,11 +1120,11 @@ abstract final class L10n {
       "Vehicle operating profit — earnings less period costs. گاڑی کا عملی منافع — آمدن منفی مدت کے اخراجات";
   static const ownerProfitOwnerEarningsLessOwnerBorneCosts = Bilingual(
     "ui.ownerProfitOwnerEarningsLessOwnerBorneCosts",
-    "Owner profit — owner earnings less owner-borne costs",
-    "مالک کا منافع — مالک کی آمدن منفی مالک کے ذمے اخراجات",
+    "Owner profit — owner earnings less owner's costs",
+    "مالک کا منافع — مالک کی آمدن منفی مالک کے اخراجات",
   );
   static const ownerProfitOwnerEarningsLessOwnerBorneCostsAccessibility =
-      "Owner profit — owner earnings less owner-borne costs. مالک کا منافع — مالک کی آمدن منفی مالک کے ذمے اخراجات";
+      "Owner profit — owner earnings less owner's costs. مالک کا منافع — مالک کی آمدن منفی مالک کے اخراجات";
   static const customerReceiptsPaymentDate = Bilingual(
     "ui.customerReceiptsPaymentDate",
     "Customer receipts — payment date",
@@ -1183,11 +1183,11 @@ abstract final class L10n {
       "Customer credit — period end. گاہک کی زائد رقم — مدت کے اختتام پر";
   static const intermediaryHeldMoneyPeriodEnd = Bilingual(
     "ui.intermediaryHeldMoneyPeriodEnd",
-    "Intermediary-held money — period end",
-    "واسطہ دار کی رقم زیرِ تحویل — مدت کے اختتام پر",
+    "Held money — period end",
+    "زیرِ تحویل رقم — مدت کے اختتام پر",
   );
   static const intermediaryHeldMoneyPeriodEndAccessibility =
-      "Intermediary-held money — period end. واسطہ دار کی رقم زیرِ تحویل — مدت کے اختتام پر";
+      "Held money — period end. زیرِ تحویل رقم — مدت کے اختتام پر";
   static const ownerSettlementDuePeriodEnd = Bilingual(
     "ui.ownerSettlementDuePeriodEnd",
     "Owner settlement due — period end",
@@ -1285,11 +1285,11 @@ abstract final class L10n {
       "Draft quotes are potential fare. No earnings or payment status is posted.. مسودے کے نرخ ممکنہ کرایہ ہیں۔ کوئی آمدن یا ادائیگی درج نہیں ہوئی۔";
   static const assignedOfficeTrips = Bilingual(
     "ui.assignedOfficeTrips",
-    "Assigned-office trips",
-    "مقررہ دفتر کے ٹرپس",
+    "Your office's trips",
+    "آپ کے دفتر کے ٹرپس",
   );
   static const assignedOfficeTripsAccessibility =
-      "Assigned-office trips. مقررہ دفتر کے ٹرپس";
+      "Your office's trips. آپ کے دفتر کے ٹرپس";
   static const allOffices = Bilingual(
     "ui.allOffices",
     "All offices",
@@ -1802,10 +1802,10 @@ abstract final class L10n {
       Bilingual(
         "ui.confirmedFareChangesAndDependentFinancialCorrectionsNeedThe",
         "Confirmed fare changes and dependent financial corrections need the later financial adjustment workflow. Date corrections retain linked reversal/replacement history.",
-        "تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی ایڈجسٹمنٹ طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔",
+        "تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی تصحیح طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔",
       );
   static const confirmedFareChangesAndDependentFinancialCorrectionsNeedTheAccessibility =
-      "Confirmed fare changes and dependent financial corrections need the later financial adjustment workflow. Date corrections retain linked reversal/replacement history.. تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی ایڈجسٹمنٹ طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔";
+      "Confirmed fare changes and dependent financial corrections need the later financial adjustment workflow. Date corrections retain linked reversal/replacement history.. تصدیق شدہ کرائے کی تبدیلیوں اور متعلقہ مالی تصحیحات کے لیے بعد کا مالی تصحیح طریقہ درکار ہے۔ تاریخ کی تصحیح میں منسلک الٹ اندراج اور متبادل کی تاریخ محفوظ رہتی ہے۔";
   static const cancelledConsignmentsStayOnTheTripAndAreNot = Bilingual(
     "ui.cancelledConsignmentsStayOnTheTripAndAreNot",
     "Cancelled consignments stay on the trip and are not delivered or recognized at dispatch.",
@@ -1865,10 +1865,10 @@ abstract final class L10n {
   static const aDispatchedOrArrivedTripRequiresAnExplicitFinancial = Bilingual(
     "ui.aDispatchedOrArrivedTripRequiresAnExplicitFinancial",
     "A dispatched or arrived trip requires an explicit financial adjustment/cancellation plan in the later workflow.",
-    "روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی ایڈجسٹمنٹ یا منسوخی کا منصوبہ ضروری ہے۔",
+    "روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی تصحیح یا منسوخی کا منصوبہ ضروری ہے۔",
   );
   static const aDispatchedOrArrivedTripRequiresAnExplicitFinancialAccessibility =
-      "A dispatched or arrived trip requires an explicit financial adjustment/cancellation plan in the later workflow.. روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی ایڈجسٹمنٹ یا منسوخی کا منصوبہ ضروری ہے۔";
+      "A dispatched or arrived trip requires an explicit financial adjustment/cancellation plan in the later workflow.. روانہ شدہ یا پہنچے ہوئے ٹرپ کے لیے بعد کے طریقے میں واضح مالی تصحیح یا منسوخی کا منصوبہ ضروری ہے۔";
   static const financialOrIssuedDocumentDependenciesRequireAnExplicitCorrection =
       Bilingual(
         "ui.financialOrIssuedDocumentDependenciesRequireAnExplicitCorrection",
@@ -2180,11 +2180,11 @@ abstract final class L10n {
   static const permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless =
       Bilingual(
         "ui.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless",
-        "Permitted office and trip expenses. Maintenance remains unlinked unless explicitly assigned to a trip.",
-        "اجازت یافتہ دفتر اور ٹرپ کے اخراجات۔ مرمت کا خرچ کسی ٹرپ سے منسلک نہیں ہوتا جب تک واضح طور پر مقرر نہ کیا جائے۔",
+        "Office and trip expenses — unassigned maintenance stays separate.",
+        "دفتر اور ٹرپ کے اخراجات — غیر منسلک مرمت الگ رہتی ہے۔",
       );
   static const permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnlessAccessibility =
-      "Permitted office and trip expenses. Maintenance remains unlinked unless explicitly assigned to a trip.. اجازت یافتہ دفتر اور ٹرپ کے اخراجات۔ مرمت کا خرچ کسی ٹرپ سے منسلک نہیں ہوتا جب تک واضح طور پر مقرر نہ کیا جائے۔";
+      "Office and trip expenses — unassigned maintenance stays separate.. دفتر اور ٹرپ کے اخراجات — غیر منسلک مرمت الگ رہتی ہے۔";
   static const newExpense = Bilingual(
     "ui.newExpense",
     "New expense",
@@ -2591,11 +2591,11 @@ abstract final class L10n {
       "Reload balances. بقایا رقوم دوبارہ لوڈ کریں";
   static const permittedTripsOnlyNotACompletePartyOrBusiness = Bilingual(
     "ui.permittedTripsOnlyNotACompletePartyOrBusiness",
-    "Permitted trips only — not a complete party or business balance.",
-    "صرف اجازت یافتہ ٹرپس — فریق یا کاروبار کی مکمل بقایا رقم نہیں۔",
+    "Only your permitted trips — not the full balance.",
+    "صرف آپ کے اجازت یافتہ ٹرپس — مکمل بقایا نہیں۔",
   );
   static const permittedTripsOnlyNotACompletePartyOrBusinessAccessibility =
-      "Permitted trips only — not a complete party or business balance.. صرف اجازت یافتہ ٹرپس — فریق یا کاروبار کی مکمل بقایا رقم نہیں۔";
+      "Only your permitted trips — not the full balance.. صرف آپ کے اجازت یافتہ ٹرپس — مکمل بقایا نہیں۔";
   static const collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate =
       Bilingual(
         "ui.collectionsHeldFundsOwnerSettlementAndEarningsAreSeparate",
@@ -2841,11 +2841,11 @@ abstract final class L10n {
       "Expense category codes. خرچ کی اقسام کے کوڈ";
   static const importedExpenseDraftsAwaitingNormalReview = Bilingual(
     "ui.importedExpenseDraftsAwaitingNormalReview",
-    "Imported expense drafts awaiting normal review",
-    "درآمد شدہ خرچ کے مسودے معمول کی جانچ کے منتظر ہیں",
+    "Imported expense drafts awaiting standard review",
+    "درآمد شدہ خرچ کے مسودے معیاری جانچ کے منتظر ہیں",
   );
   static const importedExpenseDraftsAwaitingNormalReviewAccessibility =
-      "Imported expense drafts awaiting normal review. درآمد شدہ خرچ کے مسودے معمول کی جانچ کے منتظر ہیں";
+      "Imported expense drafts awaiting standard review. درآمد شدہ خرچ کے مسودے معیاری جانچ کے منتظر ہیں";
   static const reviewExpenseDraft = Bilingual(
     "ui.reviewExpenseDraft",
     "Review expense draft",
@@ -2990,11 +2990,11 @@ abstract final class L10n {
   static const previewOnlyNotAnIssuedDocumentFiltersDetermineRecords =
       Bilingual(
         "ui.previewOnlyNotAnIssuedDocumentFiltersDetermineRecords",
-        "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.",
-        "صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔",
+        "Preview only — not an issued document.",
+        "صرف پیش منظر — جاری شدہ دستاویز نہیں۔",
       );
   static const previewOnlyNotAnIssuedDocumentFiltersDetermineRecordsAccessibility =
-      "Preview only — not an issued document. Filters determine records; checkboxes determine presentation.. صرف پیش منظر — جاری شدہ دستاویز نہیں۔ فلٹر ریکارڈ منتخب کرتے ہیں؛ چیک باکس پیشکش منتخب کرتے ہیں۔";
+      "Preview only — not an issued document.. صرف پیش منظر — جاری شدہ دستاویز نہیں۔";
   static const reportOutputType = Bilingual(
     "ui.reportOutputType",
     "Report / output type",
@@ -3108,11 +3108,11 @@ abstract final class L10n {
       "Required fields stay in the header or summary. Selecting fewer columns never recalculates totals.. ضروری خانے سرخی یا خلاصے میں برقرار رہتے ہیں۔ کم کالم منتخب کرنے سے کل رقوم دوبارہ حساب نہیں ہوتیں۔";
   static const requiredHeaderIdentityField = Bilingual(
     "ui.requiredHeaderIdentityField",
-    "Required header / identity field",
-    "ضروری سرخی / شناخت کا خانہ",
+    "Report identity fields",
+    "رپورٹ کی شناختی معلومات",
   );
   static const requiredHeaderIdentityFieldAccessibility =
-      "Required header / identity field. ضروری سرخی / شناخت کا خانہ";
+      "Report identity fields. رپورٹ کی شناختی معلومات";
   static const selectedFieldOrder = Bilingual(
     "ui.selectedFieldOrder",
     "Selected field order",
@@ -3648,10 +3648,10 @@ abstract final class L10n {
   static const historicalOwner = Bilingual(
     "ui.historicalOwner",
     "Historical owner: {0}",
-    "اس وقت کا مالک: {0}",
+    "سابقہ مالک: {0}",
   );
   static const historicalOwnerAccessibility =
-      "Historical owner: {0}. اس وقت کا مالک: {0}";
+      "Historical owner: {0}. سابقہ مالک: {0}";
   static const confirmTheVehicleOwnerAsCostBearerWhenApplicable = Bilingual(
     "ui.confirmTheVehicleOwnerAsCostBearerWhenApplicable",
     "Confirm the vehicle owner as cost bearer when applicable.",
@@ -3732,10 +3732,10 @@ abstract final class L10n {
       Bilingual(
         "ui.cancellationAndAdjustmentsCommittedActualExpensesRetainedRefundsRequire",
         "Cancellation and adjustments committed. Actual expenses retained; refunds require separate confirmation.",
-        "منسوخی اور ایڈجسٹمنٹس مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔",
+        "منسوخی اور تصحیحات مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔",
       );
   static const cancellationAndAdjustmentsCommittedActualExpensesRetainedRefundsRequireAccessibility =
-      "Cancellation and adjustments committed. Actual expenses retained; refunds require separate confirmation.. منسوخی اور ایڈجسٹمنٹس مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔";
+      "Cancellation and adjustments committed. Actual expenses retained; refunds require separate confirmation.. منسوخی اور تصحیحات مکمل ہو گئیں۔ اصل اخراجات برقرار ہیں؛ رقم کی واپسی کے لیے الگ تصدیق ضروری ہے۔";
   static const correctionCommittedOriginalRecordsAndEvidenceRetained =
       Bilingual(
         "ui.correctionCommittedOriginalRecordsAndEvidenceRetained",
@@ -3876,10 +3876,10 @@ abstract final class L10n {
   static const selectHistoricalOwner = Bilingual(
     "ui.selectHistoricalOwner",
     "Select historical owner",
-    "اس وقت کا مالک منتخب کریں",
+    "سابقہ مالک منتخب کریں",
   );
   static const selectHistoricalOwnerAccessibility =
-      "Select historical owner. اس وقت کا مالک منتخب کریں";
+      "Select historical owner. سابقہ مالک منتخب کریں";
   static const selectTrip = Bilingual(
     "ui.selectTrip",
     "Select trip",
@@ -4313,11 +4313,10 @@ abstract final class L10n {
   static const expensesAccessibility = "Expenses. اخراجات";
   static const ownerBorneCosts = Bilingual(
     "ui.ownerBorneCosts",
-    "Owner-borne costs",
-    "مالک کے ذمے اخراجات",
+    "Owner's costs",
+    "مالک کے اخراجات",
   );
-  static const ownerBorneCostsAccessibility =
-      "Owner-borne costs. مالک کے ذمے اخراجات";
+  static const ownerBorneCostsAccessibility = "Owner's costs. مالک کے اخراجات";
   static const vehicleOperatingProfit = Bilingual(
     "ui.vehicleOperatingProfit",
     "Vehicle operating profit",
@@ -4384,11 +4383,11 @@ abstract final class L10n {
       "Customer credit. گاہک کی زائد رقم";
   static const intermediaryHeldMoney = Bilingual(
     "ui.intermediaryHeldMoney",
-    "Intermediary-held money",
-    "واسطہ دار کی رقم زیرِ تحویل",
+    "Held money",
+    "زیرِ تحویل رقم",
   );
   static const intermediaryHeldMoneyAccessibility =
-      "Intermediary-held money. واسطہ دار کی رقم زیرِ تحویل";
+      "Held money. زیرِ تحویل رقم";
   static const ownerSettlementDue = Bilingual(
     "ui.ownerSettlementDue",
     "Owner settlement due",
@@ -4495,8 +4494,8 @@ abstract final class L10n {
   static const deliveredAccessibility = "DELIVERED. حوالہ شدہ";
   static const cancelled = Bilingual("ui.cancelled", "CANCELLED", "منسوخ");
   static const cancelledAccessibility = "CANCELLED. منسوخ";
-  static const loaded = Bilingual("ui.loaded", "LOADED", "لوڈ کے ساتھ");
-  static const loadedAccessibility = "LOADED. لوڈ کے ساتھ";
+  static const loaded = Bilingual("ui.loaded", "Loaded", "لوڈ کے ساتھ");
+  static const loadedAccessibility = "Loaded. لوڈ کے ساتھ";
   static const empty = Bilingual("ui.empty", "EMPTY", "خالی");
   static const emptyAccessibility = "EMPTY. خالی";
   static const total = Bilingual("ui.total", "TOTAL", "کل");
@@ -4569,10 +4568,10 @@ abstract final class L10n {
   static const thisRecordBelongsToACancelledTripItsCancellation = Bilingual(
     "ui.thisRecordBelongsToACancelledTripItsCancellation",
     "This record belongs to a cancelled trip. Its cancellation adjustments must be resolved first.",
-    "یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی ایڈجسٹمنٹس حل کریں۔",
+    "یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی تصحیحات حل کریں۔",
   );
   static const thisRecordBelongsToACancelledTripItsCancellationAccessibility =
-      "This record belongs to a cancelled trip. Its cancellation adjustments must be resolved first.. یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی ایڈجسٹمنٹس حل کریں۔";
+      "This record belongs to a cancelled trip. Its cancellation adjustments must be resolved first.. یہ ریکارڈ منسوخ ٹرپ کا ہے۔ پہلے اس کی منسوخی کی تصحیحات حل کریں۔";
   static const thisEntryHasAlreadyBeenReversed = Bilingual(
     "ui.thisEntryHasAlreadyBeenReversed",
     "This entry has already been reversed.",
@@ -4696,25 +4695,25 @@ abstract final class L10n {
       "Complete business records. کاروبار کے مکمل ریکارڈ";
   static const assignedOfficeRecordScope = Bilingual(
     "presentation.assignedOfficeRecordScope",
-    "Assigned-office records — not a complete business balance",
-    "مقررہ دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
+    "Your office's records — not a complete business balance",
+    "آپ کے دفتر کا ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
   );
   static const assignedOfficeRecordScopeAccessibility =
-      "Assigned-office records — not a complete business balance. مقررہ دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں";
+      "Your office's records — not a complete business balance. آپ کے دفتر کا ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں";
   static const selectedOfficeRecordScope = Bilingual(
     "presentation.selectedOfficeRecordScope",
-    "Selected-office records — not a complete business balance",
-    "منتخب دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں",
+    "Selected office's records — not the full business balance",
+    "منتخب دفتر کا ریکارڈ — کاروبار کا مکمل بقایا نہیں",
   );
   static const selectedOfficeRecordScopeAccessibility =
-      "Selected-office records — not a complete business balance. منتخب دفتر کے ریکارڈ — کاروبار کی مکمل بقایا رقم نہیں";
+      "Selected office's records — not the full business balance. منتخب دفتر کا ریکارڈ — کاروبار کا مکمل بقایا نہیں";
   static const dispatchAdjustmentDateBasis = Bilingual(
     "presentation.dispatchAdjustmentDateBasis",
     "Dispatch / explicit adjustment date",
-    "روانگی / واضح ایڈجسٹمنٹ کی تاریخ",
+    "روانگی / واضح تصحیح کی تاریخ",
   );
   static const dispatchAdjustmentDateBasisAccessibility =
-      "Dispatch / explicit adjustment date. روانگی / واضح ایڈجسٹمنٹ کی تاریخ";
+      "Dispatch / explicit adjustment date. روانگی / واضح تصحیح کی تاریخ";
   static const expenseDateBasis = Bilingual(
     "presentation.expenseDateBasis",
     "Expense date",
@@ -4798,10 +4797,10 @@ abstract final class L10n {
   static const earningsAdjustmentEvent = Bilingual(
     "presentation.earningsAdjustmentEvent",
     "earnings adjustment",
-    "آمدن کی ایڈجسٹمنٹ",
+    "آمدن کی تصحیح",
   );
   static const earningsAdjustmentEventAccessibility =
-      "earnings adjustment. آمدن کی ایڈجسٹمنٹ";
+      "earnings adjustment. آمدن کی تصحیح";
   static const tripCancellationEvent = Bilingual(
     "presentation.tripCancellationEvent",
     "trip cancellation",
@@ -4952,11 +4951,11 @@ abstract final class L10n {
       "Vehicle costs — all linked expense dates. گاڑی کے اخراجات — تمام منسلک اخراجات کی تاریخیں";
   static const lifetimeReportLabel4 = Bilingual(
     "presentation.lifetimeReportLabel4",
-    "Owner-borne costs — all linked expense dates",
-    "مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں",
+    "Owner's costs — all linked expense dates",
+    "مالک کے اخراجات — تمام منسلک اخراجات کی تاریخیں",
   );
   static const lifetimeReportLabel4Accessibility =
-      "Owner-borne costs — all linked expense dates. مالک کے ذمے اخراجات — تمام منسلک اخراجات کی تاریخیں";
+      "Owner's costs — all linked expense dates. مالک کے اخراجات — تمام منسلک اخراجات کی تاریخیں";
   static const lifetimeReportLabel5 = Bilingual(
     "presentation.lifetimeReportLabel5",
     "Vehicle operating profit — earnings less all linked costs",
@@ -4980,11 +4979,11 @@ abstract final class L10n {
       "Customer credit — current lifetime. گاہک کی زائد رقم — موجودہ مکمل مدت پر";
   static const lifetimeReportLabel15 = Bilingual(
     "presentation.lifetimeReportLabel15",
-    "Intermediary-held money — current lifetime",
-    "واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر",
+    "Held money — current lifetime",
+    "زیرِ تحویل رقم — موجودہ مکمل مدت پر",
   );
   static const lifetimeReportLabel15Accessibility =
-      "Intermediary-held money — current lifetime. واسطہ دار کی رقم زیرِ تحویل — موجودہ مکمل مدت پر";
+      "Held money — current lifetime. زیرِ تحویل رقم — موجودہ مکمل مدت پر";
   static const lifetimeReportLabel16 = Bilingual(
     "presentation.lifetimeReportLabel16",
     "Owner settlement due — current lifetime",
@@ -5104,38 +5103,6 @@ abstract final class L10n {
   static const whereSectionAccessibility = "Where. گاڑی اور ٹرپ";
   static const proofSection = Bilingual("ui.proofSection", "Proof", "ثبوت");
   static const proofSectionAccessibility = "Proof. ثبوت";
-  static const mostUsed = Bilingual(
-    "ui.mostUsed",
-    "Most used",
-    "سب سے زیادہ استعمال شدہ",
-  );
-  static const mostUsedAccessibility =
-      "Most used. سب سے زیادہ استعمال شدہ";
-  static const clearSearch = Bilingual(
-    "ui.clearSearch",
-    "Clear search",
-    "تلاش صاف کریں",
-  );
-  static const clearSearchAccessibility = "Clear search. تلاش صاف کریں";
-  static const expenseActive = Bilingual(
-    "ui.expenseActive",
-    "Active",
-    "فعال",
-  );
-  static const expenseActiveAccessibility = "Active. فعال";
-  static const expenseHistorical = Bilingual(
-    "ui.expenseHistorical",
-    "Historical",
-    "پرانا",
-  );
-  static const expenseHistoricalAccessibility = "Historical. پرانا";
-  static const pageExpensesTotal = Bilingual(
-    "ui.pageExpensesTotal",
-    "Expenses total · this page",
-    "اس صفحے کے اخراجات کا کل",
-  );
-  static const pageExpensesTotalAccessibility =
-      "Expenses total · this page. اس صفحے کے اخراجات کا کل";
   static const moneyNavigation = Bilingual(
     "ui.moneyNavigation",
     "Money",
@@ -5283,18 +5250,14 @@ abstract final class L10n {
     "کرائے کے علاوہ کمیشن",
   );
   static const quoteAddedAccessibility = "ADDED. کرائے کے علاوہ کمیشن";
-  static const readMore = Bilingual(
-    "ui.readMore",
-    "Read more",
-    "مزید پڑھیں",
-  );
+  static const readMore = Bilingual("ui.readMore", "Read more", "مزید پڑھیں");
   static const readMoreAccessibility = "Read more. مزید پڑھیں";
   static const dispatchedNow = Bilingual(
     "ui.dispatchedNow",
-    "Dispatched now",
-    "اس وقت روانہ",
+    "In transit",
+    "دورانِ سفر",
   );
-  static const dispatchedNowAccessibility = "Dispatched now. اس وقت روانہ";
+  static const dispatchedNowAccessibility = "In transit. دورانِ سفر";
   static const draftTrips = Bilingual(
     "ui.draftTrips",
     "Draft trips",
@@ -5306,13 +5269,15 @@ abstract final class L10n {
     "Settlements due",
     "واجب الادا تصفیے",
   );
-  static const settlementsDueAccessibility = "Settlements due. واجب الادا تصفیے";
+  static const settlementsDueAccessibility =
+      "Settlements due. واجب الادا تصفیے";
   static const agingNotYetDue = Bilingual(
     "ui.agingNotYetDue",
     "Not yet due",
     "ابھی واجب الادا نہیں",
   );
-  static const agingNotYetDueAccessibility = "Not yet due. ابھی واجب الادا نہیں";
+  static const agingNotYetDueAccessibility =
+      "Not yet due. ابھی واجب الادا نہیں";
   static const agingUpTo30Days = Bilingual(
     "ui.agingUpTo30Days",
     "1-30 days",
@@ -5337,11 +5302,7 @@ abstract final class L10n {
     "90 دن سے زیادہ",
   );
   static const agingOver90DaysAccessibility = "Over 90 days. 90 دن سے زیادہ";
-  static const createdOn = Bilingual(
-    "ui.createdOn",
-    "Created",
-    "بنایا گیا",
-  );
+  static const createdOn = Bilingual("ui.createdOn", "Created", "بنایا گیا");
   static const createdOnAccessibility = "Created. بنایا گیا";
   static const updatedOn = Bilingual(
     "ui.updatedOn",
@@ -5355,6 +5316,37 @@ abstract final class L10n {
     "روانہ کیا گیا",
   );
   static const dispatchedOnAccessibility = "Dispatched. روانہ کیا گیا";
+  static const settled = Bilingual("ui.settled", "Settled", "تصفیہ شدہ");
+  static const settledAccessibility = "Settled. تصفیہ شدہ";
+  static const all = Bilingual("ui.all", "All", "تمام");
+  static const allAccessibility = "All. تمام";
+  static const mostUsed = Bilingual(
+    "ui.mostUsed",
+    "Most used",
+    "سب سے زیادہ استعمال شدہ",
+  );
+  static const mostUsedAccessibility = "Most used. سب سے زیادہ استعمال شدہ";
+  static const clearSearch = Bilingual(
+    "ui.clearSearch",
+    "Clear search",
+    "تلاش صاف کریں",
+  );
+  static const clearSearchAccessibility = "Clear search. تلاش صاف کریں";
+  static const expenseActive = Bilingual("ui.expenseActive", "Active", "فعال");
+  static const expenseActiveAccessibility = "Active. فعال";
+  static const expenseHistorical = Bilingual(
+    "ui.expenseHistorical",
+    "Historical",
+    "پرانا",
+  );
+  static const expenseHistoricalAccessibility = "Historical. پرانا";
+  static const pageExpensesTotal = Bilingual(
+    "ui.pageExpensesTotal",
+    "Expenses total · this page",
+    "اس صفحے کے اخراجات کا کل",
+  );
+  static const pageExpensesTotalAccessibility =
+      "Expenses total · this page. اس صفحے کے اخراجات کا کل";
   static const masterRecordTypeSection = Bilingual(
     "ui.masterRecordTypeSection",
     "Record type",
@@ -5420,11 +5412,7 @@ abstract final class L10n {
     "دستی بیک اپ",
   );
   static const manualBackupAccessibility = "Manual backup. دستی بیک اپ";
-  static const accountRole = Bilingual(
-    "ui.accountRole",
-    "Role",
-    "کردار",
-  );
+  static const accountRole = Bilingual("ui.accountRole", "Role", "کردار");
   static const accountRoleAccessibility = "Role. کردار";
   static const confirmImportBlocked = Bilingual(
     "ui.confirmImportBlocked",
@@ -5433,16 +5421,212 @@ abstract final class L10n {
   );
   static const confirmImportBlockedAccessibility =
       "Resolve the validation errors, or acknowledge the overlap warnings, before confirming the import.. درآمد کی تصدیق سے پہلے توثیق کی غلطیاں درست کریں یا متداخل سفر کے انتباہات کو تسلیم کریں۔";
-  // Phase 2 (trips list): zero-state wording for a settled outstanding and the
-  // "All" status filter chip.
-  static const settled = Bilingual(
-    "ui.settled",
-    "Settled",
-    "تصفیہ شدہ",
+  static const tripVehicleSearch = Bilingual(
+    "ui.tripVehicleSearch",
+    "Trip / vehicle search",
+    "ٹرپ / گاڑی تلاش کریں",
   );
-  static const settledAccessibility = "Settled. تصفیہ شدہ";
-  static const all = Bilingual("ui.all", "All", "تمام");
-  static const allAccessibility = "All. تمام";
+  static const tripVehicleSearchAccessibility =
+      "Trip / vehicle search. ٹرپ / گاڑی تلاش کریں";
+  static const agreedFare = Bilingual(
+    "ui.agreedFare",
+    "Agreed fare",
+    "طے شدہ کرایہ",
+  );
+  static const agreedFareAccessibility = "Agreed fare. طے شدہ کرایہ";
+  static const brokerCommissionFixed = Bilingual(
+    "ui.brokerCommissionFixed",
+    "Broker commission (fixed)",
+    "کمیشن (مقررہ)",
+  );
+  static const brokerCommissionFixedAccessibility =
+      "Broker commission (fixed). کمیشن (مقررہ)";
+  static const brokerCommissionPercent = Bilingual(
+    "ui.brokerCommissionPercent",
+    "Broker commission (percent)",
+    "کمیشن (فیصد)",
+  );
+  static const brokerCommissionPercentAccessibility =
+      "Broker commission (percent). کمیشن (فیصد)";
+  static const netOwnerShare = Bilingual(
+    "ui.netOwnerShare",
+    "Net owner share",
+    "مالک کا خالص حصہ",
+  );
+  static const netOwnerShareAccessibility = "Net owner share. مالک کا خالص حصہ";
+  static const customerLine = Bilingual("ui.customerLine", "Customer", "گاہک");
+  static const customerLineAccessibility = "Customer. گاہک";
+  static const brokerLine = Bilingual("ui.brokerLine", "Broker", "بروکر");
+  static const brokerLineAccessibility = "Broker. بروکر";
+  static const historyFieldDispatchDate = Bilingual(
+    "ui.historyFieldDispatchDate",
+    "Dispatch date",
+    "روانگی کی تاریخ",
+  );
+  static const historyFieldDispatchDateAccessibility =
+      "Dispatch date. روانگی کی تاریخ";
+  static const historyFieldArrivalDate = Bilingual(
+    "ui.historyFieldArrivalDate",
+    "Arrival date",
+    "آمد کی تاریخ",
+  );
+  static const historyFieldArrivalDateAccessibility =
+      "Arrival date. آمد کی تاریخ";
+  static const historyFieldPlannedDate = Bilingual(
+    "ui.historyFieldPlannedDate",
+    "Planned date",
+    "مجوزہ تاریخ",
+  );
+  static const historyFieldPlannedDateAccessibility =
+      "Planned date. مجوزہ تاریخ";
+  static const historyFieldStatus = Bilingual(
+    "ui.historyFieldStatus",
+    "Status",
+    "حالت",
+  );
+  static const historyFieldStatusAccessibility = "Status. حالت";
+  static const historyFieldLoad = Bilingual(
+    "ui.historyFieldLoad",
+    "Load",
+    "لوڈ",
+  );
+  static const historyFieldLoadAccessibility = "Load. لوڈ";
+  static const historyFieldCars = Bilingual(
+    "ui.historyFieldCars",
+    "Cars",
+    "کاریں",
+  );
+  static const historyFieldCarsAccessibility = "Cars. کاریں";
+  static const historyFieldDriver = Bilingual(
+    "ui.historyFieldDriver",
+    "Driver",
+    "ڈرائیور",
+  );
+  static const historyFieldDriverAccessibility = "Driver. ڈرائیور";
+  static const historyFieldNotes = Bilingual(
+    "ui.historyFieldNotes",
+    "Notes",
+    "نوٹس",
+  );
+  static const historyFieldNotesAccessibility = "Notes. نوٹس";
+  static const historyFieldChanged = Bilingual(
+    "ui.historyFieldChanged",
+    "changed",
+    "تبدیل ہوا",
+  );
+  static const historyFieldChangedAccessibility = "changed. تبدیل ہوا";
+  static const historyNoChanges = Bilingual(
+    "ui.historyNoChanges",
+    "No field changes recorded.",
+    "کوئی خانے کی تبدیلی درج نہیں۔",
+  );
+  static const historyNoChangesAccessibility =
+      "No field changes recorded.. کوئی خانے کی تبدیلی درج نہیں۔";
+  static const noTripExpensesRecorded = Bilingual(
+    "ui.noTripExpensesRecorded",
+    "No expenses recorded for this trip.",
+    "اس ٹرپ کا کوئی خرچ درج نہیں۔",
+  );
+  static const noTripExpensesRecordedAccessibility =
+      "No expenses recorded for this trip.. اس ٹرپ کا کوئی خرچ درج نہیں۔";
+  static const openOfficeExpenseListHint = Bilingual(
+    "ui.openOfficeExpenseListHint",
+    "Trip expenses live in the office expense list.",
+    "ٹرپ کے اخراجات دفتر کی اخراجات کی فہرست میں ہیں۔",
+  );
+  static const openOfficeExpenseListHintAccessibility =
+      "Trip expenses live in the office expense list.. ٹرپ کے اخراجات دفتر کی اخراجات کی فہرست میں ہیں۔";
+  static const noMoneyMovementsYet = Bilingual(
+    "ui.noMoneyMovementsYet",
+    "No payments or allocations recorded yet.",
+    "ابھی کوئی ادائیگی یا تخصیص درج نہیں۔",
+  );
+  static const noMoneyMovementsYetAccessibility =
+      "No payments or allocations recorded yet.. ابھی کوئی ادائیگی یا تخصیص درج نہیں۔";
+  static const dispatchPostsDebtShareBrokerageShort = Bilingual(
+    "ui.dispatchPostsDebtShareBrokerageShort",
+    "Dispatch posts customer debt, owner share and brokerage — no receipt or settlement.",
+    "روانگی پر گاہک کا قرض، مالک کا حصہ اور کمیشن درج ہوتا ہے — کوئی وصولی یا تصفیہ نہیں۔",
+  );
+  static const dispatchPostsDebtShareBrokerageShortAccessibility =
+      "Dispatch posts customer debt, owner share and brokerage — no receipt or settlement.. روانگی پر گاہک کا قرض، مالک کا حصہ اور کمیشن درج ہوتا ہے — کوئی وصولی یا تصفیہ نہیں۔";
+  static const arrivalSettlementIndependentShort = Bilingual(
+    "ui.arrivalSettlementIndependentShort",
+    "Arrival and settlement are independent — arrival records no payment.",
+    "آمد اور تصفیہ الگ ہیں — آمد پر کوئی ادائیگی درج نہیں ہوتی۔",
+  );
+  static const arrivalSettlementIndependentShortAccessibility =
+      "Arrival and settlement are independent — arrival records no payment.. آمد اور تصفیہ الگ ہیں — آمد پر کوئی ادائیگی درج نہیں ہوتی۔";
+  static const moneySummaryHint = Bilingual(
+    "ui.moneySummaryHint",
+    "Summary of recognized amounts. Payments and allocations are recorded separately.",
+    "تسلیم شدہ رقوم کا خلاصہ۔ ادائیگیاں اور تخصیصات الگ درج ہوتی ہیں۔",
+  );
+  static const moneySummaryHintAccessibility =
+      "Summary of recognized amounts. Payments and allocations are recorded separately.. تسلیم شدہ رقوم کا خلاصہ۔ ادائیگیاں اور تخصیصات الگ درج ہوتی ہیں۔";
+  static const moneyWorkspacePurpose = Bilingual(
+    "ui.moneyWorkspacePurpose",
+    "Track per-trip money: what customers owe and what owners are due.",
+    "ہر ٹرپ کی رقم کی نگرانی: گاہکوں کے واجبات اور مالکوں کے حقوق۔",
+  );
+  static const moneyWorkspacePurposeAccessibility =
+      "Track per-trip money: what customers owe and what owners are due.. ہر ٹرپ کی رقم کی نگرانی: گاہکوں کے واجبات اور مالکوں کے حقوق۔";
+  static const tripsWithMoneyScope = Bilingual(
+    "ui.tripsWithMoneyScope",
+    "Your office's trips — money view",
+    "آپ کے دفتر کے ٹرپس — رقوم کا منظر",
+  );
+  static const tripsWithMoneyScopeAccessibility =
+      "Your office's trips — money view. آپ کے دفتر کے ٹرپس — رقوم کا منظر";
+  static const templateV1NewRecordsOnly = Bilingual(
+    "ui.templateV1NewRecordsOnly",
+    "Template v1 — new records only.",
+    "سانچہ ورژن 1 — صرف نئے ریکارڈ۔",
+  );
+  static const templateV1NewRecordsOnlyAccessibility =
+      "Template v1 — new records only.. سانچہ ورژن 1 — صرف نئے ریکارڈ۔";
+  static const howToFillTemplate = Bilingual(
+    "ui.howToFillTemplate",
+    "How to fill the template",
+    "سانچہ کیسے پُر کریں",
+  );
+  static const howToFillTemplateAccessibility =
+      "How to fill the template. سانچہ کیسے پُر کریں";
+  static const templateRuleDates = Bilingual(
+    "ui.templateRuleDates",
+    "Enter dates as YYYY-MM-DD text.",
+    "تاریخیں YYYY-MM-DD متن کے طور پر درج کریں۔",
+  );
+  static const templateRuleDatesAccessibility =
+      "Enter dates as YYYY-MM-DD text.. تاریخیں YYYY-MM-DD متن کے طور پر درج کریں۔";
+  static const templateRuleAmounts = Bilingual(
+    "ui.templateRuleAmounts",
+    "Enter exact decimal amounts as text.",
+    "درست اعشاری رقوم متن کے طور پر درج کریں۔",
+  );
+  static const templateRuleAmountsAccessibility =
+      "Enter exact decimal amounts as text.. درست اعشاری رقوم متن کے طور پر درج کریں۔";
+  static const templateRuleCodes = Bilingual(
+    "ui.templateRuleCodes",
+    "Use stable record codes, not names.",
+    "ناموں کی بجائے مستقل ریکارڈ کوڈ استعمال کریں۔",
+  );
+  static const templateRuleCodesAccessibility =
+      "Use stable record codes, not names.. ناموں کی بجائے مستقل ریکارڈ کوڈ استعمال کریں۔";
+  static const templateRuleMasters = Bilingual(
+    "ui.templateRuleMasters",
+    "Parties, vehicles and routes require an administrator.",
+    "فریقوں، گاڑیوں اور راستوں کے لیے منتظم ضروری ہے۔",
+  );
+  static const templateRuleMastersAccessibility =
+      "Parties, vehicles and routes require an administrator.. فریقوں، گاڑیوں اور راستوں کے لیے منتظم ضروری ہے۔";
+  static const templateRuleDrafts = Bilingual(
+    "ui.templateRuleDrafts",
+    "Operational and expense rows remain drafts.",
+    "عملی اور خرچ کی قطاریں مسودے رہیں گی۔",
+  );
+  static const templateRuleDraftsAccessibility =
+      "Operational and expense rows remain drafts.. عملی اور خرچ کی قطاریں مسودے رہیں گی۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6257,11 +6441,6 @@ abstract final class L10n {
     whoseMoneySection,
     whereSection,
     proofSection,
-    mostUsed,
-    clearSearch,
-    expenseActive,
-    expenseHistorical,
-    pageExpensesTotal,
     moneyNavigation,
     accountNavigation,
     collapseNavigation,
@@ -6297,6 +6476,13 @@ abstract final class L10n {
     createdOn,
     updatedOn,
     dispatchedOn,
+    settled,
+    all,
+    mostUsed,
+    clearSearch,
+    expenseActive,
+    expenseHistorical,
+    pageExpensesTotal,
     masterRecordTypeSection,
     findRecordsSection,
     recordsSection,
@@ -6309,7 +6495,37 @@ abstract final class L10n {
     manualBackup,
     accountRole,
     confirmImportBlocked,
-    settled,
-    all,
+    tripVehicleSearch,
+    agreedFare,
+    brokerCommissionFixed,
+    brokerCommissionPercent,
+    netOwnerShare,
+    customerLine,
+    brokerLine,
+    historyFieldDispatchDate,
+    historyFieldArrivalDate,
+    historyFieldPlannedDate,
+    historyFieldStatus,
+    historyFieldLoad,
+    historyFieldCars,
+    historyFieldDriver,
+    historyFieldNotes,
+    historyFieldChanged,
+    historyNoChanges,
+    noTripExpensesRecorded,
+    openOfficeExpenseListHint,
+    noMoneyMovementsYet,
+    dispatchPostsDebtShareBrokerageShort,
+    arrivalSettlementIndependentShort,
+    moneySummaryHint,
+    moneyWorkspacePurpose,
+    tripsWithMoneyScope,
+    templateV1NewRecordsOnly,
+    howToFillTemplate,
+    templateRuleDates,
+    templateRuleAmounts,
+    templateRuleCodes,
+    templateRuleMasters,
+    templateRuleDrafts,
   ];
 }

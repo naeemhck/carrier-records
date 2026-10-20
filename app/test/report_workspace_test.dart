@@ -62,7 +62,7 @@ class ReportsFake implements ReportCommands {
       ],
       'row_count': 51,
       'has_more': offset == 0,
-      'scope': 'Assigned-office records — not a complete business balance',
+      'scope': "Your office's records — not a complete business balance",
       'offices': ['Test office'],
       'period': {'from': f['from'], 'to': f['to']},
       'lifetime': kind == 'TRIP_PROFIT',
@@ -130,14 +130,14 @@ void main() {  testWidgets(
       ),
     );
     await t.pumpAndSettle();
-    expect(englishTextContaining('Dispatched now'), findsOneWidget);
+    expect(englishTextContaining('In transit'), findsOneWidget);
     expect(englishTextContaining('Customer outstanding'), findsOneWidget);
     expect(englishTextContaining('Settlements due'), findsOneWidget);
     expect(englishTextContaining('Draft trips'), findsOneWidget);
     expect(englishTextContaining('PKR 95,000.00'), findsOneWidget);
 
     // Dispatched drill-down lists the dispatched trips behind the figure.
-    await tapKpi('Dispatched now');
+    await tapKpi('In transit');
     expect(find.text('T14-DISPATCHED-1'), findsOneWidget);
     expect(find.text('T14-DISPATCHED-2'), findsOneWidget);
 
