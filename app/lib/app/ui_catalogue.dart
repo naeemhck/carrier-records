@@ -5627,6 +5627,25 @@ abstract final class L10n {
   );
   static const templateRuleDraftsAccessibility =
       "Operational and expense rows remain drafts.. عملی اور خرچ کی قطاریں مسودے رہیں گی۔";
+  static const signInFailed = Bilingual(
+    "ui.signInFailed",
+    "Username or password is wrong.",
+    "صارف نام یا پاس ورڈ غلط ہے۔",
+  );
+  static const signInFailedAccessibility =
+      "Username or password is wrong.. صارف نام یا پاس ورڈ غلط ہے۔";
+  static const showPassword = Bilingual(
+    "ui.showPassword",
+    "Show password",
+    "پاس ورڈ دکھائیں",
+  );
+  static const showPasswordAccessibility = "Show password. پاس ورڈ دکھائیں";
+  static const hidePassword = Bilingual(
+    "ui.hidePassword",
+    "Hide password",
+    "پاس ورڈ چھپائیں",
+  );
+  static const hidePasswordAccessibility = "Hide password. پاس ورڈ چھپائیں";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6527,5 +6546,8 @@ abstract final class L10n {
     templateRuleCodes,
     templateRuleMasters,
     templateRuleDrafts,
+    signInFailed,
+    showPassword,
+    hidePassword,
   ];
 }

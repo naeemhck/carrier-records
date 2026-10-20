@@ -962,7 +962,7 @@ class OutputPreview extends StatelessWidget {
                   isBalanceDueKey(e.key)
                       ? DecoratedBox(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEAF4ED),
+                            color: KarvaanDesign.moneySurface,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Padding(

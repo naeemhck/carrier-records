@@ -1,6 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 String accountErrorMessage(Object error) {
+  // Sign-in failures get one plain sentence (frontend plan §5.1); the exact
+  // string is a catalogue entry so the feedback renders bilingually.
+  if (error is AuthException) {
+    return 'Username or password is wrong.';
+  }
   if (error is FunctionException) {
     const messages = {
       'CURRENT_PASSWORD_VERIFICATION_FAILED': 'Current password verification failed. Check the temporary password or contact your administrator.',

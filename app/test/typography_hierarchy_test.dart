@@ -20,10 +20,10 @@ import 'text_layout_qa_test.dart' show captureTextQa;
 void main() {
   test('one shared scale including tabular numeric roles', () {
     final theme = KarvaanDesign.theme().textTheme;
-    expect(theme.displaySmall!.fontSize, 30);
+    expect(theme.displaySmall!.fontSize, 28);
     expect(theme.titleLarge!.fontSize, 22);
-    expect(theme.titleMedium!.fontSize, 16);
-    expect(theme.bodyMedium!.fontSize, 13);
+    expect(theme.titleMedium!.fontSize, 18);
+    expect(theme.bodyMedium!.fontSize, 14);
     expect(theme.bodySmall!.fontSize, 12);
     expect(theme.labelSmall!.fontSize, 11);
     for (final style in [

@@ -6,32 +6,50 @@ import 'bilingual.dart';
 import 'karvaan_typography.dart';
 
 /// Presentation tokens only. No domain state or derived financial totals.
+///
+/// Redesign tokens (frontend plan §2.1): color is semantic — blue always
+/// means movement, green always means money, amber means attention, red
+/// means error/overdue. Radius: cards 10, inputs/buttons 8, chips full-round.
 abstract final class KarvaanDesign {
-  static const background = Color(0xFFF4F5F7);
-  static const ink = Color(0xFF1D1D1F);
-  static const secondary = Color(0xFF646469);
-  static const accent = Color(0xFF0E7A3D);
+  static const primary = Color(0xFF1E40AF);
+  static const primaryBright = Color(0xFF3B82F6);
+  static const money = Color(0xFF15803D);
+  static const moneySurface = Color(0xFFF0FDF4);
+  static const attention = Color(0xFFD97706);
+  static const destructive = Color(0xFFDC2626);
+  static const background = Color(0xFFF8FAFC);
+  static const surface = Color(0xFFFFFFFF);
+  static const headingInk = Color(0xFF172554);
+  static const ink = Color(0xFF1F2937);
+  static const muted = Color(0xFFE9EEF6);
+  static const secondary = Color(0xFF475569);
+  static const borderColor = Color(0xFFDBEAFE);
+
+  /// Money green. Kept as the accent name existing screens reference; it
+  /// marks money only — movement and primary actions use [primary].
+  static const accent = money;
   static const space = 8.0;
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFF12A150), Color(0xFF0B5C2E)],
+    colors: [primary, primaryBright],
   );
 
   static ThemeData theme() {
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
     );
     return ThemeData(
       useMaterial3: true,
       splashFactory: NoSplash.splashFactory,
-      fontFamily: 'NotoSans',
+      fontFamily: KarvaanTypography.latinFamily,
       textTheme: KarvaanTypography.textTheme,
-      fontFamilyFallback: const ['NotoSansArabic', 'NotoSansMath'],
+      fontFamilyFallback: KarvaanTypography.latinFallback,
       scaffoldBackgroundColor: background,
-      colorScheme: ColorScheme.fromSeed(seedColor: accent).copyWith(
-        primary: accent,
+      colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
+        primary: primary,
         onSurface: ink,
-        surface: Colors.white,
+        surface: surface,
         onSurfaceVariant: secondary,
+        error: destructive,
       ),
       // Entry, focus, dropdown and navigation changes remain immediate.
       pageTransitionsTheme: const PageTransitionsTheme(
@@ -46,21 +64,21 @@ abstract final class KarvaanDesign {
       appBarTheme: AppBarTheme(
         toolbarHeight: 88,
         titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
-          color: ink,
-          fontFamily: 'NotoSans',
+          color: headingInk,
+          fontFamily: KarvaanTypography.latinFamily,
         ),
         backgroundColor: background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: const BorderSide(color: Color(0x0D000000)),
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: borderColor),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -70,9 +88,9 @@ abstract final class KarvaanDesign {
         // Avoid Material shrinking Urdu floating labels below the readable floor.
         floatingLabelStyle: KarvaanTypography.textTheme.bodyMedium,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: surface,
         contentPadding: const EdgeInsets.all(16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style:
@@ -86,7 +104,7 @@ abstract final class KarvaanDesign {
                   states.contains(WidgetState.disabled)
                   ? child ?? const SizedBox()
                   : ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                       child: DecoratedBox(
                         decoration: const BoxDecoration(
                           gradient: primaryGradient,
@@ -116,21 +134,21 @@ abstract final class KarvaanDesign {
       listTileTheme: ListTileThemeData(
         titleTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
           color: ink,
-          fontFamily: 'NotoSans',
+          fontFamily: KarvaanTypography.latinFamily,
         ),
         subtitleTextStyle: KarvaanTypography.textTheme.bodySmall?.copyWith(
           color: secondary,
-          fontFamily: 'NotoSans',
+          fontFamily: KarvaanTypography.latinFamily,
         ),
       ),
       dialogTheme: DialogThemeData(
         titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
-          color: ink,
-          fontFamily: 'NotoSans',
+          color: headingInk,
+          fontFamily: KarvaanTypography.latinFamily,
         ),
         contentTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
           color: ink,
-          fontFamily: 'NotoSans',
+          fontFamily: KarvaanTypography.latinFamily,
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
@@ -145,7 +163,7 @@ abstract final class KarvaanDesign {
         headingTextStyle: KarvaanTypography.textTheme.labelLarge,
         dataTextStyle: KarvaanTypography.textTheme.bodyMedium,
       ),
-      dividerTheme: const DividerThemeData(color: Color(0x0D000000)),
+      dividerTheme: const DividerThemeData(color: borderColor),
     );
   }
 }
@@ -178,13 +196,13 @@ class KarvaanGlass extends StatelessWidget {
     final panel = DecoratedBox(
       decoration: BoxDecoration(
         color: solid ? Colors.white : const Color(0xE6FFFFFF),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0x16000000)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: KarvaanDesign.borderColor),
       ),
       child: child,
     );
     return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(10),
       child: solid
           ? panel
           : BackdropFilter(
@@ -251,6 +269,7 @@ class KarvaanMetric extends StatelessWidget {
 
 /// Keep decimal digits on one line without reducing the user's text scale.
 /// A bounded horizontal scrollbar exposes long values at narrow/large scales.
+/// Figures always render in the tabular figure face (plan §2.2).
 class KarvaanFigure extends StatefulWidget {
   const KarvaanFigure(this.value, {super.key, required this.style});
   final String value;
@@ -277,7 +296,11 @@ class _KarvaanFigureState extends State<KarvaanFigure> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         widget.value,
-        style: widget.style,
+        style: (widget.style ?? const TextStyle()).copyWith(
+          fontFamily: KarvaanTypography.figureFamily,
+          fontFamilyFallback: KarvaanTypography.latinFallback,
+          fontFeatures: KarvaanTypography.figureFeatures,
+        ),
         textDirection: TextDirection.ltr,
         softWrap: false,
       ),
@@ -301,8 +324,8 @@ class KarvaanAmount extends StatelessWidget {
     margin: const EdgeInsets.symmetric(vertical: 8),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: const Color(0xFFEAF4ED),
-      borderRadius: BorderRadius.circular(12),
+      color: KarvaanDesign.moneySurface,
+      borderRadius: BorderRadius.circular(10),
     ),
     child: KarvaanMetric(
       label: label,
@@ -312,24 +335,30 @@ class KarvaanAmount extends StatelessWidget {
   );
 }
 
+/// Status chip (plan §2.1): one component, fixed colors everywhere —
+/// Draft muted, Dispatched blue, Arrived green, Cancelled red outline.
 class TripStatusBadge extends StatelessWidget {
   const TripStatusBadge(this.state, {super.key});
   final String state;
   @override
   Widget build(BuildContext context) {
     final (foreground, background) = switch (state) {
-      'DRAFT' => (const Color(0xFFB25000), const Color(0xFFFFF4E0)),
-      'DISPATCHED' => (const Color(0xFF0B57D0), const Color(0xFFE8F1FE)),
-      'ARRIVED' => (const Color(0xFF0B5C2E), const Color(0xFFEAF4ED)),
+      'DRAFT' => (KarvaanDesign.secondary, KarvaanDesign.muted),
+      'DISPATCHED' => (KarvaanDesign.primary, KarvaanDesign.borderColor),
+      'ARRIVED' => (KarvaanDesign.money, KarvaanDesign.moneySurface),
+      'CANCELLED' => (KarvaanDesign.destructive, KarvaanDesign.surface),
       _ => (KarvaanDesign.secondary, KarvaanDesign.background),
     };
     return DecoratedBox(
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(999),
+        border: state == 'CANCELLED'
+            ? Border.all(color: KarvaanDesign.destructive)
+            : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         child: BilingualText(
           tripStateLabel(state),
           style: TextStyle(color: foreground),
@@ -375,7 +404,7 @@ class KarvaanPinnedTabs extends SliverPersistentHeaderDelegate {
                     key: ValueKey('detail-tab-$i'),
                     style: TextButton.styleFrom(
                       backgroundColor: selected == i
-                          ? const Color(0xFFEAF4ED)
+                          ? KarvaanDesign.borderColor
                           : Colors.transparent,
                     ),
                     onPressed: () => onSelected(i),

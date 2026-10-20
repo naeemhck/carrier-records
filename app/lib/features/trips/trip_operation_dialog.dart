@@ -517,8 +517,7 @@ class _TripHistoryState extends State<TripHistory> {
                         ),
                       if ((h['after'] as Map).keys.every(
                         (k) =>
-                            (h['before'] as Map)[k] ==
-                                (h['after'] as Map)[k] ||
+                            (h['before'] as Map)[k] == (h['after'] as Map)[k] ||
                             _historyHiddenFields.contains(k),
                       ))
                         const BilingualText(L10n.historyNoChanges),
@@ -526,7 +525,10 @@ class _TripHistoryState extends State<TripHistory> {
                   ),
                 ),
               ),
-            Row(
+            // Wrap: bilingual buttons overflow a fixed Row at 200%.
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
               children: [
                 TextButton(
                   onPressed: offset == 0 ? null : () => reload(offset - 50),

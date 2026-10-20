@@ -249,12 +249,12 @@ class AgingBandStrip extends StatelessWidget {
           selected: i == selected,
           onSelected: (_) => onSelect(i),
           showCheckmark: false,
-          selectedColor: const Color(0xFFEAF4ED),
+          selectedColor: KarvaanDesign.borderColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: i == selected
-                  ? KarvaanDesign.accent
+                  ? KarvaanDesign.primary
                   : const Color(0x16000000),
             ),
           ),

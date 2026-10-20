@@ -1004,7 +1004,7 @@ class MoneyStateChip extends StatelessWidget {
     final held = purpose == 'CUSTODY_RECEIVABLE';
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: held ? KarvaanDesign.accent : const Color(0xFFEAF4ED),
+        color: held ? KarvaanDesign.accent : KarvaanDesign.moneySurface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(

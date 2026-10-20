@@ -4,18 +4,26 @@ import 'bilingual_message.dart';
 import 'owned_presentation.dart';
 import 'karvaan_typography.dart';
 
-/// Use the bundled font's natural ascent/descent. Inheriting Material's Latin
-/// line height compresses Urdu ink into adjacent labels, especially at 200%.
+/// Urdu runs never inherit Material's Latin line height, which compresses
+/// Urdu ink into adjacent labels, especially at 200%. Plan §2.2: headings
+/// render in Noto Nastaliq Urdu (keeping that font's naturally tall metrics),
+/// body and labels in Noto Naskh Arabic at the plan's 14/26 leading. The
+/// bundled Noto Sans Arabic remains the offline/test fallback.
 TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
   final base = DefaultTextStyle.of(context).style.merge(requested);
+  final size = (base.fontSize ?? KarvaanTypography.body).clamp(
+    KarvaanTypography.urduMinimum,
+    double.infinity,
+  );
+  final display = size >= KarvaanTypography.title;
   return TextStyle(
     inherit: false,
-    fontFamily: 'NotoSansArabic',
-    fontFamilyFallback: const ['NotoSans', 'NotoSansMath'],
-    fontSize: (base.fontSize ?? KarvaanTypography.body).clamp(
-      KarvaanTypography.urduMinimum,
-      double.infinity,
-    ),
+    fontFamily: display
+        ? KarvaanTypography.urduDisplayFamily
+        : KarvaanTypography.urduBodyFamily,
+    fontFamilyFallback: KarvaanTypography.urduFallback,
+    fontSize: size,
+    height: display ? null : 26 / 14,
     fontWeight: base.fontWeight ?? FontWeight.w400,
     fontFeatures: KarvaanTypography.figureFeatures,
     color: base.color,

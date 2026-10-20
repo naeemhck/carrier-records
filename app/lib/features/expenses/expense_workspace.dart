@@ -106,7 +106,7 @@ class ExpenseStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (foreground, background) = effective
-        ? (const Color(0xFF0B5C2E), const Color(0xFFEAF4ED))
+        ? (KarvaanDesign.money, KarvaanDesign.moneySurface)
         : (KarvaanDesign.secondary, KarvaanDesign.background);
     return DecoratedBox(
       decoration: BoxDecoration(

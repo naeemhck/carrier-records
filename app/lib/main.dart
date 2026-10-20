@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/carrier_records_app.dart';
@@ -58,4 +59,31 @@ Future<void> main() async {
   }
 }
 
-void _launch(Widget app) => runApp(ProviderScope(child: app));
+/// Starts loading the redesign font families (plan §2.2) in the background.
+/// Rendering falls back to the bundled Noto fonts until a family arrives and
+/// permanently when offline. Font loading must never block or break startup,
+/// and tests never run main(), so they always render through the fallbacks.
+void _preloadFonts() {
+  try {
+    for (final weight in [
+      FontWeight.w400,
+      FontWeight.w500,
+      FontWeight.w600,
+      FontWeight.w700,
+    ]) {
+      GoogleFonts.firaSans(fontWeight: weight);
+      GoogleFonts.firaCode(fontWeight: weight);
+      GoogleFonts.notoNaskhArabic(fontWeight: weight);
+    }
+    for (final weight in [FontWeight.w400, FontWeight.w600, FontWeight.w700]) {
+      GoogleFonts.notoNastaliqUrdu(fontWeight: weight);
+    }
+  } catch (_) {
+    // Fallback fonts are already bundled; ignore loader failures.
+  }
+}
+
+void _launch(Widget app) {
+  _preloadFonts();
+  runApp(ProviderScope(child: app));
+}

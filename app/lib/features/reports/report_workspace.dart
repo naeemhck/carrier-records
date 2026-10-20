@@ -299,11 +299,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               ),
               if (drill != null) ...[
                 const SizedBox(height: 16),
-                drillPanel(
-                  totals,
-                  dispatched: dispatched,
-                  drafts: drafts,
-                ),
+                drillPanel(totals, dispatched: dispatched, drafts: drafts),
               ],
             ],
           );
@@ -422,10 +418,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                   dense: true,
                   title: Text(row['name'] as String),
                   trailing: KarvaanFigure(
-                    displayField(
-                      'MONEY',
-                      (row['values'] as Map)[key],
-                    ),
+                    displayField('MONEY', (row['values'] as Map)[key]),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -655,7 +648,12 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                         ),
                     ],
                   ),
-                Row(
+                // Wrap, not Row: at 200% text scale the bilingual buttons
+                // plus the page label exceed a phone-width row.
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     TextButton(
                       onPressed: offset > 0
@@ -787,7 +785,9 @@ class _ReportChoiceState extends State<_ReportChoice> {
               },
             ),
           ),
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
             children: [
               TextButton(
                 onPressed: offset > 0

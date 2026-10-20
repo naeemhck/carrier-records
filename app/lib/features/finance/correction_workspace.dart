@@ -134,9 +134,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
             row['actor'],
             displayTimestamp(row['recorded_at']),
             row['reason'] ?? '',
-            row['reversed'] == true
-                ? L10n.reversedEntry
-                : Bilingual.data(''),
+            row['reversed'] == true ? L10n.reversedEntry : Bilingual.data(''),
             row['reversal_of_id'] != null
                 ? L10n.reversesEntry.withValues([row['reversal_of_id']])
                 : Bilingual.data(''),
@@ -151,8 +149,7 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
             PaperTrailAmount(
               formatted: displayMoney(row['amount']),
               onTap: () => form(row),
-              semanticLabel:
-                  '${eventName.en}: ${displayMoney(row['amount'])}',
+              semanticLabel: '${eventName.en}: ${displayMoney(row['amount'])}',
             ),
             if (row['can_correct'] == true)
               TextButton(
@@ -220,7 +217,10 @@ class _CorrectionWorkspaceState extends State<CorrectionWorkspace> {
                 if (data.isEmpty)
                   const BilingualText(L10n.noRecordedEventsInThisScope),
                 for (final row in data) _historyCard(row),
-                Row(
+                // Wrap: bilingual buttons overflow a fixed Row at 200%.
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
                   children: [
                     TextButton(
                       onPressed: offset == 0

@@ -300,7 +300,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                           ),
                           child: Material(
                             color: selected == destinations[i]
-                                ? const Color(0xFFEAF4ED)
+                                ? KarvaanDesign.borderColor
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                             child: compact

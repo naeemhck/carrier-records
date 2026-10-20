@@ -483,7 +483,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                 ),
                 selected: status == s,
                 showCheckmark: false,
-                selectedColor: const Color(0xFFEAF4ED),
+                selectedColor: KarvaanDesign.borderColor,
                 onSelected: (_) {
                   status = s;
                   reload(start: 0);
@@ -880,7 +880,7 @@ class _OutstandingCell extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF4ED),
+        color: KarvaanDesign.moneySurface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -1419,7 +1419,7 @@ class _TripEditorState extends State<TripEditor> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.all(8),
                             backgroundColor: step == i
-                                ? const Color(0xFFEAF4ED)
+                                ? KarvaanDesign.borderColor
                                 : Colors.white,
                           ),
                           child: BilingualText(
@@ -1999,7 +1999,7 @@ class _TripDetailState extends State<TripDetail> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFEAF4ED),
+            color: KarvaanDesign.moneySurface,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
