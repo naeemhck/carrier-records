@@ -8212,5 +8212,41 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "ownerName",
+  "semantic_key": "ui.ownerName",
+  "en": "Owner",
+  "ur": "مالک",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "driverName",
+  "semantic_key": "ui.driverName",
+  "en": "Driver",
+  "ur": "ڈرائیور",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "routeLabel",
+  "semantic_key": "ui.routeLabel",
+  "en": "Route",
+  "ur": "راستہ",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "plannedDateLabel",
+  "semantic_key": "ui.plannedDateLabel",
+  "en": "Planned date",
+  "ur": "منصوبہ بند تاریخ",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

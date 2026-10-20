@@ -5648,6 +5648,34 @@ abstract final class L10n {
   static const hidePasswordAccessibility = "Hide password. پاس ورڈ چھپائیں";
   static const details = Bilingual("ui.details", "Details", "تفصیلات");
   static const detailsAccessibility = "Details. تفصیلات";
+  static const ownerName = Bilingual(
+    "ui.ownerName",
+    "Owner",
+    "مالک",
+  );
+  static const ownerNameAccessibility =
+      "Owner. مالک";
+  static const driverName = Bilingual(
+    "ui.driverName",
+    "Driver",
+    "ڈرائیور",
+  );
+  static const driverNameAccessibility =
+      "Driver. ڈرائیور";
+  static const routeLabel = Bilingual(
+    "ui.routeLabel",
+    "Route",
+    "راستہ",
+  );
+  static const routeLabelAccessibility =
+      "Route. راستہ";
+  static const plannedDateLabel = Bilingual(
+    "ui.plannedDateLabel",
+    "Planned date",
+    "منصوبہ بند تاریخ",
+  );
+  static const plannedDateLabelAccessibility =
+      "Planned date. منصوبہ بند تاریخ";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6552,5 +6580,9 @@ abstract final class L10n {
     showPassword,
     hidePassword,
     details,
+    ownerName,
+    driverName,
+    routeLabel,
+    plannedDateLabel,
   ];
 }

@@ -1,6 +1,7 @@
 import 'text_layout_qa_test.dart' show captureTextQa;
 
 import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/app/karvaan_components.dart';
 import 'package:carrier_records/app/karvaan_design.dart';
 import 'package:carrier_records/features/trips/trip_workspace.dart';
 import 'package:flutter/material.dart';
@@ -99,14 +100,10 @@ void main() {
         );
         expect(repo.details, 1);
         expect(repo.histories, 0);
-        // QA text fixes 2026-10-20: consignment money block is fare -> commission -> net.
-        final fareFinder = find.byWidgetPredicate(
-          (w) =>
-              w is BilingualInlineLine &&
-              w.label.key == L10n.agreedFare.key,
-        );
+        // Redesign §5.4: the consignment money block is the ledger strip —
+        // fare -> −commission -> =net, each amount shown once.
         await tester.scrollUntilVisible(
-          fareFinder,
+          find.byType(LedgerStrip),
           250,
           scrollable: find
               .descendant(
@@ -117,30 +114,23 @@ void main() {
           maxScrolls: 60,
         );
         await tester.pumpAndSettle();
-        // QA text fixes 2026-10-20: the consignment money block is now
-        // fare -> commission -> net, each on its own plain-words line.
-        final fare = tester
-            .widgetList<BilingualInlineLine>(
-              find.byType(BilingualInlineLine),
-            )
-            .singleWhere((w) => w.label.key == L10n.agreedFare.key);
-        expect(fare.value.en, contains('100,000.00'));
+        final strip = tester.widget<LedgerStrip>(
+          find.byType(LedgerStrip).first,
+        );
+        final fare = strip.segments.singleWhere(
+          (s) => s.label.key == L10n.agreedFare.key,
+        );
+        expect(fare.formattedValue, contains('100,000.00'));
         expect(fare.label.ur, contains('طے شدہ کرایہ'));
-        final commission = tester
-            .widgetList<BilingualInlineLine>(
-              find.byType(BilingualInlineLine),
-            )
-            .singleWhere(
-              (w) => w.label.key == L10n.brokerCommissionFixed.key,
-            );
-        expect(commission.value.en, contains('5,000.00'));
+        final commission = strip.segments.singleWhere(
+          (s) => s.label.key == L10n.brokerCommissionFixed.key,
+        );
+        expect(commission.formattedValue, contains('5,000.00'));
         expect(commission.label.ur, isNot(contains('DEDUCTED')));
-        final net = tester
-            .widgetList<BilingualInlineLine>(
-              find.byType(BilingualInlineLine),
-            )
-            .singleWhere((w) => w.label.key == L10n.netOwnerShare.key);
-        expect(net.value.en, contains('95,000.00'));
+        final net = strip.segments.singleWhere(
+          (s) => s.label.key == L10n.netOwnerShare.key,
+        );
+        expect(net.formattedValue, contains('95,000.00'));
         final stopText = tester
             .widgetList<BilingualText>(find.byType(BilingualText))
             .singleWhere((w) => w.text.key == L10n.pickupDrop.key);
