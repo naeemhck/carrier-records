@@ -115,7 +115,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text(TripStrings.newTrip));
+    await tester.tap(find.text(L10n.newTrip.en));
     await tester.pumpAndSettle();
     expect(find.byType(TripEditor), findsOneWidget);
     access.value = false;

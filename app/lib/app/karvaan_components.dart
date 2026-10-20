@@ -225,6 +225,11 @@ class KarvaanDataTable extends StatelessWidget {
     scrollDirection: Axis.horizontal,
     child: DataTable(
       headingRowColor: const WidgetStatePropertyAll(KarvaanDesign.muted),
+      // Stacked bilingual headers and status chips are taller than the
+      // Material default row heights; let rows size to their content.
+      headingRowHeight: 64,
+      dataRowMinHeight: 52,
+      dataRowMaxHeight: double.infinity,
       columns: columns,
       rows: rows,
     ),

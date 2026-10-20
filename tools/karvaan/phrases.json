@@ -8293,5 +8293,32 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "newTrip",
+  "semantic_key": "ui.newTrip",
+  "en": "New trip",
+  "ur": "نیا دورہ",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "cardsView",
+  "semantic_key": "ui.cardsView",
+  "en": "Cards view",
+  "ur": "کارڈ منظر",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "tableView",
+  "semantic_key": "ui.tableView",
+  "en": "Table view",
+  "ur": "جدول منظر",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

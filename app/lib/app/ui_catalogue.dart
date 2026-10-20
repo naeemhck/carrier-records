@@ -5694,6 +5694,27 @@ abstract final class L10n {
   );
   static const viewTripsAccessibility =
       "View trips. دورے دیکھیں";
+  static const newTrip = Bilingual(
+    "ui.newTrip",
+    "New trip",
+    "نیا دورہ",
+  );
+  static const newTripAccessibility =
+      "New trip. نیا دورہ";
+  static const cardsView = Bilingual(
+    "ui.cardsView",
+    "Cards view",
+    "کارڈ منظر",
+  );
+  static const cardsViewAccessibility =
+      "Cards view. کارڈ منظر";
+  static const tableView = Bilingual(
+    "ui.tableView",
+    "Table view",
+    "جدول منظر",
+  );
+  static const tableViewAccessibility =
+      "Table view. جدول منظر";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6607,5 +6628,8 @@ abstract final class L10n {
     nothingNeedsAttention,
     noMovementsToday,
     viewTrips,
+    newTrip,
+    cardsView,
+    tableView,
   ];
 }

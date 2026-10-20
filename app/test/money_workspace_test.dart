@@ -67,6 +67,10 @@ void main() {
   testWidgets('money workspace is balances-first with a party table', (
     t,
   ) async {
+    t.view.physicalSize = const Size(1280, 900);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
     var tripsOpened = 0;
     final fake = MoneyFake();
     await t.pumpWidget(
