@@ -91,6 +91,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
           widget.reports.report('MONTHLY_VEHICLE', filters),
           widget.trips.list(state: 'DISPATCHED'),
           widget.trips.list(state: 'DRAFT'),
+          widget.trips.list(state: 'ARRIVED'),
         ]);
       } else {
         page = widget.reports.report(kind, filters, offset: offset);
@@ -229,6 +230,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
           final totals = Map<String, dynamic>.from(data['totals'] as Map);
           final dispatched = (s.data![1] as TripPage).rows;
           final drafts = (s.data![2] as TripPage).rows;
+          final arrived = (s.data![3] as TripPage).rows;
           final now = DateTime.now();
           final today =
               '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -292,15 +294,28 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                 data['scope'] as String,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              BilingualText(
-                L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
-                    .withValues([displayTimestamp(data['generated_at'])]),
-                style: Theme.of(context).textTheme.labelSmall,
+              BilingualInlineLine(
+                L10n.generatedAt,
+                value: Bilingual.data(displayTimestamp(data['generated_at'])),
               ),
               if (drill != null) ...[
                 const SizedBox(height: 16),
                 drillPanel(totals, dispatched: dispatched, drafts: drafts),
               ],
+              const SizedBox(height: 24),
+              BilingualText(
+                L10n.todaysMovements,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              movementsList(dispatched, arrived, today),
+              const SizedBox(height: 24),
+              BilingualText(
+                L10n.needsAttention,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              attentionList(totals, drafts),
             ],
           );
         },
@@ -387,6 +402,143 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
           ),
       ],
     );
+  }
+
+  /// Today's movements (plan §5.2): trips dispatched or arrived today as
+  /// compact route rows. Reads only the already-fetched state lists.
+  Widget movementsList(
+    List<Map<String, dynamic>> dispatched,
+    List<Map<String, dynamic>> arrived,
+    String today,
+  ) {
+    bool isToday(Object? value) => (value ?? '').toString().startsWith(today);
+    final rows = [
+      for (final r in dispatched)
+        if (isToday(r['dispatch_date'])) r,
+      for (final r in arrived)
+        if (isToday(r['arrival_date'])) r,
+    ];
+    if (rows.isEmpty) {
+      return BilingualText(
+        L10n.noMovementsToday,
+        style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(color: KarvaanDesign.secondary),
+      );
+    }
+    return Column(children: [for (final r in rows.take(6)) movementRow(r)]);
+  }
+
+  Widget movementRow(Map<String, dynamic> r) {
+    final type = Theme.of(context).textTheme;
+    final origin = (r['origin_name'] ?? '').toString();
+    final destination = (r['destination_name'] ?? '').toString();
+    final route = [
+      if (origin.isNotEmpty) origin,
+      if (destination.isNotEmpty) destination,
+    ].join(' → ');
+    final meta = [
+      (r['trip_number'] ?? '').toString(),
+      (r['registration'] ?? '').toString(),
+    ].where((s) => s.isNotEmpty).join(' · ');
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  route.isEmpty ? meta : route,
+                  textDirection: TextDirection.ltr,
+                  style: type.titleSmall,
+                ),
+                if (route.isNotEmpty && meta.isNotEmpty)
+                  Text(
+                    meta,
+                    textDirection: TextDirection.ltr,
+                    style: type.bodySmall?.copyWith(
+                      color: KarvaanDesign.secondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          TripStatusBadge((r['state'] ?? '').toString()),
+        ],
+      ),
+    );
+  }
+
+  /// The attention list (plan §5.2): draft trips waiting on the office and
+  /// money owed, each row opening its KPI drill-down. A clear day says so.
+  Widget attentionList(
+    Map<String, dynamic> totals,
+    List<Map<String, dynamic>> drafts,
+  ) {
+    final type = Theme.of(context).textTheme;
+    final rows = <Widget>[];
+    for (final r in drafts.take(5)) {
+      rows.add(InkWell(onTap: () => selectDrill(3), child: movementRow(r)));
+    }
+    if (!_isZeroKpi('owner_due', totals['owner_due'])) {
+      rows.add(
+        InkWell(
+          onTap: () => selectDrill(2),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: BilingualText(
+                    L10n.settlementsDue,
+                    style: type.titleSmall,
+                  ),
+                ),
+                KarvaanFigure(
+                  displayField('MONEY', totals['owner_due']),
+                  style: type.titleMedium?.copyWith(
+                    color: KarvaanDesign.attention,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    if (!_isZeroKpi('customer_outstanding', totals['customer_outstanding'])) {
+      rows.add(
+        InkWell(
+          onTap: () => selectDrill(1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: BilingualText(
+                    L10n.customerOutstanding,
+                    style: type.titleSmall,
+                  ),
+                ),
+                KarvaanFigure(
+                  displayField('MONEY', totals['customer_outstanding']),
+                  style: type.titleMedium?.copyWith(color: KarvaanDesign.money),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    if (rows.isEmpty) {
+      return BilingualText(
+        L10n.nothingNeedsAttention,
+        style: type.bodySmall?.copyWith(color: KarvaanDesign.secondary),
+      );
+    }
+    return Column(children: rows);
   }
 
   Widget moneyDrillRows(String key, Map<String, dynamic> totals) =>

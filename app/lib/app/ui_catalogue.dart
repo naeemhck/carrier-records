@@ -5648,34 +5648,45 @@ abstract final class L10n {
   static const hidePasswordAccessibility = "Hide password. پاس ورڈ چھپائیں";
   static const details = Bilingual("ui.details", "Details", "تفصیلات");
   static const detailsAccessibility = "Details. تفصیلات";
-  static const ownerName = Bilingual(
-    "ui.ownerName",
-    "Owner",
-    "مالک",
-  );
-  static const ownerNameAccessibility =
-      "Owner. مالک";
-  static const driverName = Bilingual(
-    "ui.driverName",
-    "Driver",
-    "ڈرائیور",
-  );
-  static const driverNameAccessibility =
-      "Driver. ڈرائیور";
-  static const routeLabel = Bilingual(
-    "ui.routeLabel",
-    "Route",
-    "راستہ",
-  );
-  static const routeLabelAccessibility =
-      "Route. راستہ";
+  static const ownerName = Bilingual("ui.ownerName", "Owner", "مالک");
+  static const ownerNameAccessibility = "Owner. مالک";
+  static const driverName = Bilingual("ui.driverName", "Driver", "ڈرائیور");
+  static const driverNameAccessibility = "Driver. ڈرائیور";
+  static const routeLabel = Bilingual("ui.routeLabel", "Route", "راستہ");
+  static const routeLabelAccessibility = "Route. راستہ";
   static const plannedDateLabel = Bilingual(
     "ui.plannedDateLabel",
     "Planned date",
     "منصوبہ بند تاریخ",
   );
-  static const plannedDateLabelAccessibility =
-      "Planned date. منصوبہ بند تاریخ";
+  static const plannedDateLabelAccessibility = "Planned date. منصوبہ بند تاریخ";
+  static const todaysMovements = Bilingual(
+    "ui.todaysMovements",
+    "Today's movements",
+    "آج کی نقل و حرکت",
+  );
+  static const todaysMovementsAccessibility =
+      "Today's movements. آج کی نقل و حرکت";
+  static const needsAttention = Bilingual(
+    "ui.needsAttention",
+    "Needs attention",
+    "توجہ درکار ہے",
+  );
+  static const needsAttentionAccessibility = "Needs attention. توجہ درکار ہے";
+  static const nothingNeedsAttention = Bilingual(
+    "ui.nothingNeedsAttention",
+    "Nothing needs attention",
+    "کسی چیز پر توجہ درکار نہیں",
+  );
+  static const nothingNeedsAttentionAccessibility =
+      "Nothing needs attention. کسی چیز پر توجہ درکار نہیں";
+  static const noMovementsToday = Bilingual(
+    "ui.noMovementsToday",
+    "No movements today",
+    "آج کوئی نقل و حرکت نہیں",
+  );
+  static const noMovementsTodayAccessibility =
+      "No movements today. آج کوئی نقل و حرکت نہیں";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6584,5 +6595,9 @@ abstract final class L10n {
     driverName,
     routeLabel,
     plannedDateLabel,
+    todaysMovements,
+    needsAttention,
+    nothingNeedsAttention,
+    noMovementsToday,
   ];
 }

@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'trip_workspace_test.dart' show FakeMasters, FakeTrips;
 
+import 'package:carrier_records/app/karvaan_patterns.dart' show KpiCard;
+
 /// Fake trips returning live-state rows so the dashboard KPI figures and
 /// drill-downs exercise real counts and lists.
 class KpiFakeTrips extends FakeTrips {
@@ -112,8 +114,15 @@ void main() {  testWidgets(
     addTearDown(t.view.resetPhysicalSize);
     addTearDown(t.view.resetDevicePixelRatio);
 
+    // KPI labels can repeat in the attention list (same words, same drill
+    // target), so KPI interactions are scoped to the cards themselves.
+    Finder kpiLabel(String label) => find.descendant(
+      of: find.byType(KpiCard),
+      matching: englishTextContaining(label),
+    );
+
     Future<void> tapKpi(String label) async {
-      await t.tap(englishTextContaining(label));
+      await t.tap(label == 'Reports' ? englishTextContaining(label) : kpiLabel(label));
       await t.pumpAndSettle();
     }
 
@@ -130,20 +139,27 @@ void main() {  testWidgets(
       ),
     );
     await t.pumpAndSettle();
-    expect(englishTextContaining('In transit'), findsOneWidget);
-    expect(englishTextContaining('Customer outstanding'), findsOneWidget);
-    expect(englishTextContaining('Settlements due'), findsOneWidget);
-    expect(englishTextContaining('Draft trips'), findsOneWidget);
-    expect(englishTextContaining('PKR 95,000.00'), findsOneWidget);
+    expect(kpiLabel('In transit'), findsOneWidget);
+    expect(kpiLabel('Customer outstanding'), findsOneWidget);
+    expect(kpiLabel('Settlements due'), findsOneWidget);
+    expect(kpiLabel('Draft trips'), findsOneWidget);
+    expect(englishTextContaining('PKR 95,000.00'), findsWidgets);
 
     // Dispatched drill-down lists the dispatched trips behind the figure.
     await tapKpi('In transit');
     expect(find.text('T14-DISPATCHED-1'), findsOneWidget);
     expect(find.text('T14-DISPATCHED-2'), findsOneWidget);
 
-    // Draft drill-down lists the draft trips.
+    // Draft drill-down lists the draft trips (the attention list shows the
+    // same draft, so scope to the drill panel card).
     await tapKpi('Draft trips');
-    expect(find.text('T14-DRAFT-1'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(Card),
+        matching: find.text('T14-DRAFT-1'),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('T14-DISPATCHED-1'), findsNothing);
 
     // Outstanding drill-down shows the claims breakdown for the same scope.

@@ -8248,5 +8248,41 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "todaysMovements",
+  "semantic_key": "ui.todaysMovements",
+  "en": "Today's movements",
+  "ur": "آج کی نقل و حرکت",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "needsAttention",
+  "semantic_key": "ui.needsAttention",
+  "en": "Needs attention",
+  "ur": "توجہ درکار ہے",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "nothingNeedsAttention",
+  "semantic_key": "ui.nothingNeedsAttention",
+  "en": "Nothing needs attention",
+  "ur": "کسی چیز پر توجہ درکار نہیں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "noMovementsToday",
+  "semantic_key": "ui.noMovementsToday",
+  "en": "No movements today",
+  "ur": "آج کوئی نقل و حرکت نہیں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]
