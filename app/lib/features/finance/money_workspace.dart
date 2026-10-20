@@ -72,7 +72,7 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
 
   Widget _band(Map<String, dynamic> totals, double cardWidth) => Wrap(
     spacing: 12,
-    runSpacing: 12,
+    runSpacing: 8,
     children: [
       for (final (label, key) in [
         (L10n.customerOutstanding, 'customer_outstanding'),
@@ -192,9 +192,9 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
               return _band(totals, cardWidth);
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           const BilingualText(L10n.moneyWorkspacePurpose),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: FilledButton(
@@ -202,7 +202,7 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
               child: const BilingualCaption(L10n.viewTrips),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           BilingualText(
             L10n.parties,
             style: Theme.of(context).textTheme.titleMedium,

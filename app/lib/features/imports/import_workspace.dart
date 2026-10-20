@@ -350,272 +350,296 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.excelImports),
-    ),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        const BilingualText(L10n.templateV1NewRecordsOnly),
-        // The four steps, one line each (plan §5.9); the detailed rules
-        // stay in the collapsible panel below.
-        const _ImportStep(1, L10n.downloadTemplate),
-        const _ImportStep(2, L10n.fillTemplateStep),
-        const _ImportStep(3, L10n.chooseXLSX),
-        const _ImportStep(4, L10n.validateAndPreview),
-        ExpansionTile(
-          expansionAnimationStyle: AnimationStyle.noAnimation,
-          title: const BilingualText(L10n.howToFillTemplate),
-          children: const [
-            _TemplateRule(L10n.templateRuleDates),
-            _TemplateRule(L10n.templateRuleAmounts),
-            _TemplateRule(L10n.templateRuleCodes),
-            _TemplateRule(L10n.templateRuleMasters),
-            _TemplateRule(L10n.templateRuleDrafts),
-          ],
-        ),
-        if (busy) const LinearProgressIndicator(),
-        if (error != null) BilingualOwnedText(error!),
-        KarvaanSection(
-          title: L10n.excelImports,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              KarvaanChoiceField<String>(
-                initialValue: office,
-                decoration: bilingualDecoration(
-                  context,
-                  InputDecoration(
-                    label: BilingualCaption(L10n.recordingOffice),
-                  ),
-                ),
-                items: [
-                  for (final o in importOffices)
-                    DropdownMenuItem(
-                      value: o['code'] as String,
-                      child: Text('${o['name']} (${o['code']})'),
-                    ),
-                ],
-                onChanged: busy
-                    ? null
-                    : (v) => setState(() {
-                        office = v;
-                        command = null;
-                        preview = null;
-                        result = null;
-                      }),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _explained(
-                    enabled: _templateEnabled,
-                    whenEnabled: L10n.downloadTemplate,
-                    whenDisabled: L10n.importSetupNotLoadedYet,
-                    child: TextButton(
-                      onPressed: _templateEnabled ? template : null,
-                      child: const BilingualCaption(L10n.downloadTemplate),
-                    ),
-                  ),
-                  _explained(
-                    enabled: _chooseEnabled,
-                    whenEnabled: L10n.chooseXLSX,
-                    whenDisabled: L10n.importOfficeRequired,
-                    child: TextButton(
-                      onPressed: _chooseEnabled ? choose : null,
-                      child: const BilingualCaption(L10n.chooseXLSX),
-                    ),
-                  ),
-                  _explained(
-                    enabled: _validateEnabled,
-                    whenEnabled: L10n.validateAndPreview,
-                    whenDisabled: _validateDisabledReason(),
-                    child: TextButton(
-                      onPressed: _validateEnabled ? validate : null,
-                      child: const BilingualCaption(L10n.validateAndPreview),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        if (!busy && office == null)
-          const BilingualText(L10n.importOfficeRequired)
-        else if (!busy && command == null)
-          const BilingualText(L10n.importFileRequired)
-        else if (!busy && localErrors.isNotEmpty)
-          const BilingualText(L10n.importErrorsRequired)
-        else if (!busy && result != null)
-          const BilingualText(L10n.importAlreadyCommitted),
-        for (final e in localErrors)
-          BilingualText(L10n.row.withValues([e['kind'], e['row'], e['code']])),
-        if (command != null)
-          BilingualText(
-            L10n.readRows.withValues([(command!['rows'] as List).length]),
-          ),
-        if (preview != null) ...[
-          // Review queue heading: the count rides as a chip, not buried in
-          // a sentence (plan §5.9).
-          Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: BilingualText(
-                    L10n.reviewQueue,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: KarvaanDesign.muted,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    child: Text(
-                      displayCount((preview!['rows'] as List).length),
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          for (final e in preview!['errors'] as List)
-            Text('${e['kind']} ${e['row_key']}: ${e['code']}'),
-          for (final r in preview!['rows'] as List)
-            ExpansionTile(
-              expansionAnimationStyle: AnimationStyle.noAnimation,
-              title: BilingualText(
-                L10n.labelValues10866a.withValues([r['kind'], r['row_key']]),
-              ),
-              children: [
-                // Readable field lines — never a raw JSON dump (plan §1).
-                for (final entry in (r['values'] as Map).entries)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 2,
-                    ),
-                    child: Text(
-                      '${_importFieldLabel(entry.key)}: ${_importFieldValue(entry.value)}',
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-              ],
-            ),
-          if ((preview!['warnings'] as List).isNotEmpty)
-            CheckboxListTile(
-              value: overlaps,
-              onChanged: busy ? null : (v) => setState(() => overlaps = v!),
-              title: const BilingualText(
-                L10n.iReviewedTheActiveVehicleOverlapWarningsAndThe,
-              ),
-            ),
-          if (result == null) _confirmButton(),
+  Widget build(BuildContext context) {
+    // Density pass: on desktop the setup column sits beside the review
+    // results, so the review queue is reachable without page-scrolling;
+    // each column scrolls internally. On phones everything stacks in
+    // one scrolling list, as before.
+    final setup = <Widget>[
+      const BilingualText(L10n.templateV1NewRecordsOnly),
+      // The four steps, one line each (plan §5.9); the detailed rules
+      // stay in the collapsible panel below.
+      const _ImportStep(1, L10n.downloadTemplate),
+      const _ImportStep(2, L10n.fillTemplateStep),
+      const _ImportStep(3, L10n.chooseXLSX),
+      const _ImportStep(4, L10n.validateAndPreview),
+      ExpansionTile(
+        expansionAnimationStyle: AnimationStyle.noAnimation,
+        title: const BilingualText(L10n.howToFillTemplate),
+        children: const [
+          _TemplateRule(L10n.templateRuleDates),
+          _TemplateRule(L10n.templateRuleAmounts),
+          _TemplateRule(L10n.templateRuleCodes),
+          _TemplateRule(L10n.templateRuleMasters),
+          _TemplateRule(L10n.templateRuleDrafts),
         ],
-        if (result != null)
-          const BilingualText(
-            L10n.importCommittedUseTripsToReviewDispatchTripDrafts,
-          ),
-        ExpansionTile(
-          expansionAnimationStyle: AnimationStyle.noAnimation,
-          title: const BilingualText(L10n.expenseCategoryCodes),
+      ),
+      if (busy) const LinearProgressIndicator(),
+      if (error != null) BilingualOwnedText(error!),
+      KarvaanSection(
+        title: L10n.excelImports,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (categories.isEmpty)
-              const BilingualText(L10n.noExpenseCategoryCodesReturned)
-            else
-              for (final c in categories)
-                SelectableText('${c['code']}: ${c['name']}'),
+            KarvaanChoiceField<String>(
+              initialValue: office,
+              decoration: bilingualDecoration(
+                context,
+                InputDecoration(label: BilingualCaption(L10n.recordingOffice)),
+              ),
+              items: [
+                for (final o in importOffices)
+                  DropdownMenuItem(
+                    value: o['code'] as String,
+                    child: Text('${o['name']} (${o['code']})'),
+                  ),
+              ],
+              onChanged: busy
+                  ? null
+                  : (v) => setState(() {
+                      office = v;
+                      command = null;
+                      preview = null;
+                      result = null;
+                    }),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _explained(
+                  enabled: _templateEnabled,
+                  whenEnabled: L10n.downloadTemplate,
+                  whenDisabled: L10n.importSetupNotLoadedYet,
+                  child: TextButton(
+                    onPressed: _templateEnabled ? template : null,
+                    child: const BilingualCaption(L10n.downloadTemplate),
+                  ),
+                ),
+                _explained(
+                  enabled: _chooseEnabled,
+                  whenEnabled: L10n.chooseXLSX,
+                  whenDisabled: L10n.importOfficeRequired,
+                  child: TextButton(
+                    onPressed: _chooseEnabled ? choose : null,
+                    child: const BilingualCaption(L10n.chooseXLSX),
+                  ),
+                ),
+                _explained(
+                  enabled: _validateEnabled,
+                  whenEnabled: L10n.validateAndPreview,
+                  whenDisabled: _validateDisabledReason(),
+                  child: TextButton(
+                    onPressed: _validateEnabled ? validate : null,
+                    child: const BilingualCaption(L10n.validateAndPreview),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
-        KarvaanSection(
-          title: L10n.labelValues10866a.withValues([
-            L10n.importedExpenseDraftsAwaitingNormalReview,
-            Bilingual.data(displayCount(drafts.length)),
-          ]),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      ),
+      if (!busy && office == null)
+        const BilingualText(L10n.importOfficeRequired)
+      else if (!busy && command == null)
+        const BilingualText(L10n.importFileRequired)
+      else if (!busy && localErrors.isNotEmpty)
+        const BilingualText(L10n.importErrorsRequired)
+      else if (!busy && result != null)
+        const BilingualText(L10n.importAlreadyCommitted),
+      for (final e in localErrors)
+        BilingualText(L10n.row.withValues([e['kind'], e['row'], e['code']])),
+      if (command != null)
+        BilingualText(
+          L10n.readRows.withValues([(command!['rows'] as List).length]),
+        ),
+    ];
+    final results = <Widget>[
+      if (preview != null) ...[
+        // Review queue heading: the count rides as a chip, not buried in
+        // a sentence (plan §5.9).
+        Padding(
+          padding: const EdgeInsets.only(top: 16, bottom: 8),
+          child: Row(
             children: [
-              if (drafts.isEmpty && !busy)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const BilingualText(
-                        L10n.noExpenseDraftsAwaitingReview,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      _explained(
-                        enabled: _chooseEnabled,
-                        whenEnabled: L10n.chooseXLSX,
-                        whenDisabled: L10n.importOfficeRequired,
-                        child: FilledButton(
-                          onPressed: _chooseEnabled ? choose : null,
-                          child: const BilingualCaption(L10n.chooseXLSX),
-                        ),
-                      ),
-                    ],
+              Expanded(
+                child: BilingualText(
+                  L10n.reviewQueue,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: KarvaanDesign.muted,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
                   ),
-                )
-              else
-                for (final d in drafts)
-                  BilingualListTile(
-                    title: Text(
-                      displayMoney(d['payload']['amount']),
-                      style: KarvaanTypography.textTheme.headlineSmall,
-                      textDirection: TextDirection.ltr,
-                    ),
-                    subtitle: Text(
-                      '${d['payload']['effective_date']} | ${d['payload']['reason']}',
-                      style: KarvaanTypography.textTheme.bodySmall?.copyWith(
-                        color: KarvaanDesign.secondary,
-                      ),
-                    ),
-                    trailing: TextButton(
-                      onPressed: busy ? null : () => expense(d),
-                      child: const BilingualCaption(L10n.reviewExpenseDraft),
-                    ),
+                  child: Text(
+                    displayCount((preview!['rows'] as List).length),
+                    textDirection: TextDirection.ltr,
                   ),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: busy || draftOffset == 0
-                        ? null
-                        : () {
-                            draftOffset -= 50;
-                            load();
-                          },
-                    child: const BilingualCaption(L10n.previous),
-                  ),
-                  TextButton(
-                    onPressed: busy || drafts.length < 50
-                        ? null
-                        : () {
-                            draftOffset += 50;
-                            load();
-                          },
-                    child: const BilingualCaption(L10n.next),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
         ),
+        for (final e in preview!['errors'] as List)
+          Text('${e['kind']} ${e['row_key']}: ${e['code']}'),
+        for (final r in preview!['rows'] as List)
+          ExpansionTile(
+            expansionAnimationStyle: AnimationStyle.noAnimation,
+            title: BilingualText(
+              L10n.labelValues10866a.withValues([r['kind'], r['row_key']]),
+            ),
+            children: [
+              // Readable field lines — never a raw JSON dump (plan §1).
+              for (final entry in (r['values'] as Map).entries)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 2,
+                  ),
+                  child: Text(
+                    '${_importFieldLabel(entry.key)}: ${_importFieldValue(entry.value)}',
+                    textDirection: TextDirection.ltr,
+                  ),
+                ),
+            ],
+          ),
+        if ((preview!['warnings'] as List).isNotEmpty)
+          CheckboxListTile(
+            value: overlaps,
+            onChanged: busy ? null : (v) => setState(() => overlaps = v!),
+            title: const BilingualText(
+              L10n.iReviewedTheActiveVehicleOverlapWarningsAndThe,
+            ),
+          ),
+        if (result == null) _confirmButton(),
       ],
-    ),
-  );
+      if (result != null)
+        const BilingualText(
+          L10n.importCommittedUseTripsToReviewDispatchTripDrafts,
+        ),
+      ExpansionTile(
+        expansionAnimationStyle: AnimationStyle.noAnimation,
+        title: const BilingualText(L10n.expenseCategoryCodes),
+        children: [
+          if (categories.isEmpty)
+            const BilingualText(L10n.noExpenseCategoryCodesReturned)
+          else
+            for (final c in categories)
+              SelectableText('${c['code']}: ${c['name']}'),
+        ],
+      ),
+      KarvaanSection(
+        title: L10n.labelValues10866a.withValues([
+          L10n.importedExpenseDraftsAwaitingNormalReview,
+          Bilingual.data(displayCount(drafts.length)),
+        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (drafts.isEmpty && !busy)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const BilingualText(
+                      L10n.noExpenseDraftsAwaitingReview,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    _explained(
+                      enabled: _chooseEnabled,
+                      whenEnabled: L10n.chooseXLSX,
+                      whenDisabled: L10n.importOfficeRequired,
+                      child: FilledButton(
+                        onPressed: _chooseEnabled ? choose : null,
+                        child: const BilingualCaption(L10n.chooseXLSX),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              for (final d in drafts)
+                BilingualListTile(
+                  title: Text(
+                    displayMoney(d['payload']['amount']),
+                    style: KarvaanTypography.textTheme.headlineSmall,
+                    textDirection: TextDirection.ltr,
+                  ),
+                  subtitle: Text(
+                    '${d['payload']['effective_date']} | ${d['payload']['reason']}',
+                    style: KarvaanTypography.textTheme.bodySmall?.copyWith(
+                      color: KarvaanDesign.secondary,
+                    ),
+                  ),
+                  trailing: TextButton(
+                    onPressed: busy ? null : () => expense(d),
+                    child: const BilingualCaption(L10n.reviewExpenseDraft),
+                  ),
+                ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: busy || draftOffset == 0
+                      ? null
+                      : () {
+                          draftOffset -= 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.previous),
+                ),
+                TextButton(
+                  onPressed: busy || drafts.length < 50
+                      ? null
+                      : () {
+                          draftOffset += 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.next),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ];
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: const BilingualText(L10n.excelImports),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 900) {
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [...setup, ...results],
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 400, child: ListView(children: setup)),
+                const SizedBox(width: 16),
+                Expanded(child: ListView(children: results)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _DraftExpenseCommands implements ExpenseCommands {

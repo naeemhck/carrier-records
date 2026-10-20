@@ -322,17 +322,10 @@ void main() {
     await tester.pumpAndSettle();
     // Hero carries the outstanding cell alongside the three quote cells.
     expect(cardText('PKR 165,000.00'), findsWidgets);
-    final scroller = find
-        .descendant(
-          of: find.byType(CustomScrollView),
-          matching: find.byType(Scrollable),
-        )
-        .first;
-    final moneyTab = find.byKey(
-      const ValueKey('detail-tab-1'),
-      skipOffstage: false,
-    );
-    await tester.scrollUntilVisible(moneyTab, 300, scrollable: scroller);
+    // Density pass: the tab bar is always visible — no page scroll to
+    // reach it (there is no CustomScrollView anymore).
+    final moneyTab = find.byKey(const ValueKey('detail-tab-1'));
+    await tester.ensureVisible(moneyTab);
     await tester.pumpAndSettle();
     await tester.tap(moneyTab);
     await tester.pumpAndSettle();

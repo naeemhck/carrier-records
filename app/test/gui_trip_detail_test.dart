@@ -102,12 +102,14 @@ void main() {
         expect(repo.histories, 0);
         // Redesign §5.4: the consignment money block is the ledger strip —
         // fare -> −commission -> =net, each amount shown once.
+        // Density pass: tab content scrolls in its own ListView below the
+        // always-visible tab bar (no page-level CustomScrollView anymore).
         await tester.scrollUntilVisible(
           find.byType(LedgerStrip),
           250,
           scrollable: find
               .descendant(
-                of: find.byType(CustomScrollView),
+                of: find.byType(ListView),
                 matching: find.byType(Scrollable),
               )
               .first,
@@ -140,17 +142,11 @@ void main() {
         );
 
         expect(find.text('Dispatch'), findsNothing);
-        final scroller = find
-            .descendant(
-              of: find.byType(CustomScrollView),
-              matching: find.byType(Scrollable),
-            )
-            .first;
-        await tester.scrollUntilVisible(
-          find.byKey(const ValueKey('detail-tab-0')),
-          300,
-          scrollable: scroller,
-          maxScrolls: 40,
+        // The tab bar is always visible (density pass) — no scrolling to
+        // reach it, at any width or text scale.
+        expect(
+          tester.getRect(find.byKey(const ValueKey('detail-tab-0'))).top,
+          lessThan(1000),
         );
         // Horizontal tab strip remains reachable at narrow width and200% scale.
         await tester.ensureVisible(find.byKey(const ValueKey('detail-tab-2')));
@@ -176,15 +172,12 @@ void main() {
           ),
         );
         final tabs = tester.getRect(
-          find.descendant(
-            of: find.byType(SliverPersistentHeader),
-            matching: find.byType(KarvaanGlass),
-          ),
+          find.byKey(const ValueKey('detail-tabs')),
         );
         expect(
           notice.top,
           greaterThanOrEqualTo(tabs.bottom),
-          reason: 'Selected tab content stays below pinned tabs',
+          reason: 'Selected tab content stays below the tab bar',
         );
         expect(
           notice.top,

@@ -2,6 +2,7 @@ import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/karvaan_components.dart';
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_patterns.dart';
 
@@ -266,127 +267,151 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     }
   }
 
-  /// KPI-first dashboard: four headline cards answering "what needs me right
-  /// now" on one viewport. The report builder is one tap away on its own page.
-  Widget dashboardBody() => ListView(
+  /// KPI-first dashboard (density pass): a compact header toolbar, the
+  /// four headline cards, then movements and attention in an internally
+  /// scrolling region — the page itself fits the desktop viewport.
+  Widget dashboardBody() => Padding(
     padding: const EdgeInsets.all(16),
-    children: [
-      if (widget.backupStatus != null) widget.backupStatus!,
-      Align(
-        alignment: AlignmentDirectional.centerEnd,
-        child: OutlinedButton.icon(
-          onPressed: openReportBuilder,
-          icon: const Icon(Icons.assessment_outlined),
-          label: const BilingualCaption(L10n.reports),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: widget.backupStatus ?? const SizedBox.shrink()),
+            OutlinedButton.icon(
+              onPressed: openReportBuilder,
+              icon: const Icon(Icons.assessment_outlined),
+              label: const BilingualCaption(L10n.reports),
+            ),
+          ],
         ),
-      ),
-      const SizedBox(height: 16),
-      FutureBuilder<List<dynamic>>(
-        future: kpis,
-        builder: (_, s) {
-          if (s.connectionState != ConnectionState.done) {
-            return const LinearProgressIndicator();
-          }
-          if (s.hasError || !s.hasData) {
-            return const BilingualText(
-              L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
-            );
-          }
-          final data = s.data![0] as Map<String, dynamic>;
-          final totals = Map<String, dynamic>.from(data['totals'] as Map);
-          final dispatched = (s.data![1] as TripPage).rows;
-          final drafts = (s.data![2] as TripPage).rows;
-          final arrived = (s.data![3] as TripPage).rows;
-          final now = DateTime.now();
-          final today =
-              '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-          final period = '${from.text.trim()} — ${to.text.trim()}';
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LayoutBuilder(
-                builder: (_, c) {
-                  final width = (c.maxWidth - 3 * 12) / 4;
-                  Widget card(Widget child) => SizedBox(
-                    width: width < 240 ? c.maxWidth : width,
-                    child: child,
-                  );
-                  return Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      card(
-                        KpiCard(
-                          label: L10n.dispatchedNow,
-                          figure: displayCount(dispatched.length),
-                          period: today,
-                          filled: true,
-                          onTap: () => selectDrill(0),
-                        ),
-                      ),
-                      card(
-                        KpiCard(
-                          label: L10n.customerOutstanding,
-                          figure: displayField(
-                            'MONEY',
-                            totals['customer_outstanding'],
+        const SizedBox(height: 12),
+        Expanded(
+          child: FutureBuilder<List<dynamic>>(
+            future: kpis,
+            builder: (_, s) {
+              if (s.connectionState != ConnectionState.done) {
+                return const LinearProgressIndicator();
+              }
+              if (s.hasError || !s.hasData) {
+                return const BilingualText(
+                  L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+                );
+              }
+              final data = s.data![0] as Map<String, dynamic>;
+              final totals = Map<String, dynamic>.from(data['totals'] as Map);
+              final dispatched = (s.data![1] as TripPage).rows;
+              final drafts = (s.data![2] as TripPage).rows;
+              final arrived = (s.data![3] as TripPage).rows;
+              final now = DateTime.now();
+              final today =
+                  '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+              final period = '${from.text.trim()} — ${to.text.trim()}';
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (_, c) {
+                      final width = (c.maxWidth - 3 * 12) / 4;
+                      Widget card(Widget child) => SizedBox(
+                        width: width < 240 ? c.maxWidth : width,
+                        child: child,
+                      );
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          card(
+                            KpiCard(
+                              label: L10n.dispatchedNow,
+                              figure: displayCount(dispatched.length),
+                              period: today,
+                              filled: true,
+                              onTap: () => selectDrill(0),
+                            ),
                           ),
-                          period: period,
-                          onTap: () => selectDrill(1),
+                          card(
+                            KpiCard(
+                              label: L10n.customerOutstanding,
+                              figure: displayField(
+                                'MONEY',
+                                totals['customer_outstanding'],
+                              ),
+                              period: period,
+                              onTap: () => selectDrill(1),
+                            ),
+                          ),
+                          card(
+                            KpiCard(
+                              label: L10n.settlementsDue,
+                              figure: displayField(
+                                'MONEY',
+                                totals['owner_due'],
+                              ),
+                              period: period,
+                              onTap: () => selectDrill(2),
+                            ),
+                          ),
+                          card(
+                            KpiCard(
+                              label: L10n.draftTrips,
+                              figure: displayCount(drafts.length),
+                              period: today,
+                              onTap: () => selectDrill(3),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  BilingualOwnedText(
+                    data['scope'] as String,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  BilingualInlineLine(
+                    L10n.generatedAt,
+                    value: Bilingual.data(
+                      displayTimestamp(data['generated_at']),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Movements and attention scroll inside this region so the
+                  // dashboard page itself never scrolls on desktop.
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        if (drill != null) ...[
+                          drillPanel(
+                            totals,
+                            dispatched: dispatched,
+                            drafts: drafts,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        BilingualText(
+                          L10n.todaysMovements,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      ),
-                      card(
-                        KpiCard(
-                          label: L10n.settlementsDue,
-                          figure: displayField('MONEY', totals['owner_due']),
-                          period: period,
-                          onTap: () => selectDrill(2),
+                        const SizedBox(height: 8),
+                        movementsList(dispatched, arrived, today),
+                        const SizedBox(height: 16),
+                        BilingualText(
+                          L10n.needsAttention,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      ),
-                      card(
-                        KpiCard(
-                          label: L10n.draftTrips,
-                          figure: displayCount(drafts.length),
-                          period: today,
-                          onTap: () => selectDrill(3),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              BilingualOwnedText(
-                data['scope'] as String,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              BilingualInlineLine(
-                L10n.generatedAt,
-                value: Bilingual.data(displayTimestamp(data['generated_at'])),
-              ),
-              if (drill != null) ...[
-                const SizedBox(height: 16),
-                drillPanel(totals, dispatched: dispatched, drafts: drafts),
-              ],
-              const SizedBox(height: 24),
-              BilingualText(
-                L10n.todaysMovements,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              movementsList(dispatched, arrived, today),
-              const SizedBox(height: 24),
-              BilingualText(
-                L10n.needsAttention,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              attentionList(totals, drafts),
-            ],
-          );
-        },
-      ),
-    ],
+                        const SizedBox(height: 8),
+                        attentionList(totals, drafts),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    ),
   );
 
   /// The drill-down panel: the records behind the tapped KPI figure.
@@ -645,290 +670,313 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
         },
       );
 
-  Widget reportBuilderBody() => SingleChildScrollView(
+  /// Density pass: the controls stay fixed in a compact section and the
+  /// results scroll inside their own region, so the Reports page fits
+  /// the desktop viewport instead of page-scrolling. On short windows
+  /// the controls section scrolls internally (owner-approved panel
+  /// scroll) rather than overflowing.
+  Widget reportBuilderBody() => Padding(
     padding: const EdgeInsets.all(16),
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        KarvaanSection(
-          title: L10n.reportPeriod,
-          child: Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 220,
-                child: KarvaanChoiceField<String>(
-                  initialValue: kind,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(label: BilingualCaption(L10n.report)),
+        Flexible(
+          child: SingleChildScrollView(
+            child: KarvaanSection(
+              padding: const EdgeInsets.all(16),
+              title: L10n.reportPeriod,
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  SizedBox(
+                    width: 220,
+                    child: KarvaanChoiceField<String>(
+                      initialValue: kind,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(label: BilingualCaption(L10n.report)),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'MONTHLY_VEHICLE',
+                          child: BilingualText(L10n.vehicleMonthly),
+                        ),
+                        DropdownMenuItem(
+                          value: 'MONTHLY_OWNER',
+                          child: BilingualText(L10n.ownerMonthly),
+                        ),
+                        DropdownMenuItem(
+                          value: 'CLAIMS',
+                          child: BilingualText(L10n.partyClaimsAndHeldMoney),
+                        ),
+                        DropdownMenuItem(
+                          value: 'TRIP_PROFIT',
+                          child: BilingualText(L10n.lifetimeTripProfit),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        setState(() {
+                          kind = v!;
+                        });
+                      },
+                    ),
                   ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'MONTHLY_VEHICLE',
-                      child: BilingualText(L10n.vehicleMonthly),
+                  SizedBox(
+                    width: 190,
+                    child: KarvaanDateField(
+                      controller: from,
+                      label: L10n.dateFrom,
                     ),
-                    DropdownMenuItem(
-                      value: 'MONTHLY_OWNER',
-                      child: BilingualText(L10n.ownerMonthly),
-                    ),
-                    DropdownMenuItem(
-                      value: 'CLAIMS',
-                      child: BilingualText(L10n.partyClaimsAndHeldMoney),
-                    ),
-                    DropdownMenuItem(
-                      value: 'TRIP_PROFIT',
-                      child: BilingualText(L10n.lifetimeTripProfit),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    setState(() {
-                      kind = v!;
-                    });
-                  },
-                ),
-              ),
-              for (final entry in <(Object, TextEditingController)>[
-                ('From (YYYY-MM-DD)', from),
-                ('To (YYYY-MM-DD)', to),
-                (L10n.tripVehicleSearch, search),
-              ])
-                SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: entry.$2,
-                    decoration: bilingualDecoration(
-                      context,
-                      InputDecoration(
-                        label: entry.$1 is Bilingual
-                            ? BilingualCaption(entry.$1 as Bilingual)
-                            : BilingualOwnedCaption(entry.$1),
+                  ),
+                  SizedBox(
+                    width: 190,
+                    child: KarvaanDateField(controller: to, label: L10n.dateTo),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: search,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(L10n.tripVehicleSearch),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              SizedBox(
-                width: 230,
-                child: KarvaanChoiceField<String>(
-                  initialValue: office,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(label: BilingualCaption(L10n.officeScope)),
-                  ),
-                  items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: BilingualText(L10n.allPermittedOffices),
-                    ),
-                    for (final o in widget.offices)
-                      DropdownMenuItem(
-                        value: o['id'] as String,
-                        child: Text(o['name'] as String),
+                  SizedBox(
+                    width: 230,
+                    child: KarvaanChoiceField<String>(
+                      initialValue: office,
+                      decoration: bilingualDecoration(
+                        context,
+                        InputDecoration(
+                          label: BilingualCaption(L10n.officeScope),
+                        ),
                       ),
-                  ],
-                  onChanged: (v) => setState(() => office = v),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () => pick('VEHICLE'),
-                child: BilingualCaption(
-                  (vehicleName != null
-                      ? Bilingual.data(vehicleName)
-                      : L10n.selectVehicle),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () => pick('OWNER'),
-                child: BilingualCaption(
-                  (ownerName != null
-                      ? Bilingual.data(ownerName)
-                      : L10n.selectHistoricalOwner),
-                ),
-              ),
-              if (kind == 'TRIP_PROFIT')
-                OutlinedButton(
-                  onPressed: () => pick('TRIP'),
-                  child: BilingualCaption(
-                    (tripName != null
-                        ? Bilingual.data(tripName)
-                        : L10n.selectTrip),
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: BilingualText(L10n.allPermittedOffices),
+                        ),
+                        for (final o in widget.offices)
+                          DropdownMenuItem(
+                            value: o['id'] as String,
+                            child: Text(o['name'] as String),
+                          ),
+                      ],
+                      onChanged: (v) => setState(() => office = v),
+                    ),
                   ),
-                ),
-              TextButton(
-                onPressed: () => setState(() {
-                  vehicle = owner = trip = null;
-                  vehicleName = ownerName = tripName = null;
-                  search.clear();
-                }),
-                child: const BilingualCaption(L10n.clearRecordFilters),
+                  OutlinedButton(
+                    onPressed: () => pick('VEHICLE'),
+                    child: BilingualCaption(
+                      (vehicleName != null
+                          ? Bilingual.data(vehicleName)
+                          : L10n.selectVehicle),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => pick('OWNER'),
+                    child: BilingualCaption(
+                      (ownerName != null
+                          ? Bilingual.data(ownerName)
+                          : L10n.selectHistoricalOwner),
+                    ),
+                  ),
+                  if (kind == 'TRIP_PROFIT')
+                    OutlinedButton(
+                      onPressed: () => pick('TRIP'),
+                      child: BilingualCaption(
+                        (tripName != null
+                            ? Bilingual.data(tripName)
+                            : L10n.selectTrip),
+                      ),
+                    ),
+                  TextButton(
+                    onPressed: () => setState(() {
+                      vehicle = owner = trip = null;
+                      vehicleName = ownerName = tripName = null;
+                      search.clear();
+                    }),
+                    child: const BilingualCaption(L10n.clearRecordFilters),
+                  ),
+                  FilledButton(
+                    onPressed: () => reload(),
+                    child: const BilingualCaption(L10n.runReport),
+                  ),
+                ],
               ),
-              FilledButton(
-                onPressed: () => reload(),
-                child: const BilingualCaption(L10n.runReport),
-              ),
-            ],
+            ),
           ),
         ),
-        const SizedBox(height: 16),
-        FutureBuilder<Map<String, dynamic>>(
-          future: page,
-          builder: (_, s) {
-            if (s.connectionState != ConnectionState.done) {
-              return const LinearProgressIndicator();
-            }
-            if (s.hasError) {
-              return const BilingualText(
-                L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
-              );
-            }
-            final data = s.data!;
-            final totals = Map<String, dynamic>.from(data['totals'] as Map);
-            final rows = data['rows'] as List;
-            final lifetime = data['lifetime'] == true;
-            final primary = switch (kind) {
-              'MONTHLY_OWNER' || 'TRIP_PROFIT' => 'owner_profit',
-              'CLAIMS' => 'customer_outstanding',
-              _ => 'operating_profit',
-            };
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BilingualOwnedText(
-                  data['scope'] as String,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                BilingualText(
-                  L10n.offices024b84.withValues([
-                    (data['offices'] as List).join(', '),
-                  ]),
-                ),
-                BilingualText(
-                  (lifetime
-                      ? L10n.lifetimeTripAllLinkedDatesCurrentBalances
-                      : L10n.to.withValues([
-                          (data['period'] as Map)['from'],
-                          (data['period'] as Map)['to'],
-                        ])),
-                ),
-                BilingualInlineLine(
-                  L10n.generatedAt,
-                  value: Bilingual.data(displayTimestamp(data['generated_at'])),
-                ),
-                if (rows.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: BilingualText(L10n.noRecordsInThisPeriodScope),
-                  ),
-                // One hero figure per report (plan §5.7); the remaining
-                // metrics sit in themed groups, zero values behind the
-                // Show-all toggle.
-                SizedBox(
-                  width: 310,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: value(
-                        primary,
-                        totals[primary],
-                        lifetime: lifetime,
-                        hero: true,
-                        plainLabel: true,
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
+        const SizedBox(height: 12),
+        Expanded(
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: page,
+            builder: (_, s) {
+              if (s.connectionState != ConnectionState.done) {
+                return const LinearProgressIndicator();
+              }
+              if (s.hasError) {
+                return const BilingualText(
+                  L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+                );
+              }
+              final data = s.data!;
+              final totals = Map<String, dynamic>.from(data['totals'] as Map);
+              final rows = data['rows'] as List;
+              final lifetime = data['lifetime'] == true;
+              final primary = switch (kind) {
+                'MONTHLY_OWNER' || 'TRIP_PROFIT' => 'owner_profit',
+                'CLAIMS' => 'customer_outstanding',
+                _ => 'operating_profit',
+              };
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Switch(
-                      value: showAllKpis,
-                      onChanged: (v) => setState(() => showAllKpis = v),
+                    BilingualOwnedText(
+                      data['scope'] as String,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    const BilingualText(L10n.showAll),
-                  ],
-                ),
-                for (final (heading, keys) in _kpiGroups)
-                  if (keys.any(
-                    (key) =>
-                        key != primary &&
-                        (showAllKpis || !_isZeroKpi(key, totals[key])),
-                  )) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 8),
-                      child: BilingualText(
-                        heading,
-                        style: Theme.of(context).textTheme.titleMedium,
+                    BilingualText(
+                      L10n.offices024b84.withValues([
+                        (data['offices'] as List).join(', '),
+                      ]),
+                    ),
+                    BilingualText(
+                      (lifetime
+                          ? L10n.lifetimeTripAllLinkedDatesCurrentBalances
+                          : L10n.to.withValues([
+                              (data['period'] as Map)['from'],
+                              (data['period'] as Map)['to'],
+                            ])),
+                    ),
+                    BilingualInlineLine(
+                      L10n.generatedAt,
+                      value: Bilingual.data(
+                        displayTimestamp(data['generated_at']),
                       ),
                     ),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                    if (rows.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: BilingualText(L10n.noRecordsInThisPeriodScope),
+                      ),
+                    // One hero figure per report (plan §5.7); the remaining
+                    // metrics sit in themed groups, zero values behind the
+                    // Show-all toggle.
+                    SizedBox(
+                      width: 280,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: value(
+                            primary,
+                            totals[primary],
+                            lifetime: lifetime,
+                            hero: true,
+                            plainLabel: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Row(
                       children: [
-                        for (final key in keys)
-                          if (key != primary &&
-                              (showAllKpis || !_isZeroKpi(key, totals[key])))
-                            SizedBox(
-                              width: 310,
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: value(
-                                    key,
-                                    totals[key],
-                                    lifetime: lifetime,
-                                    plainLabel: true,
+                        Switch(
+                          value: showAllKpis,
+                          onChanged: (v) => setState(() => showAllKpis = v),
+                        ),
+                        const BilingualText(L10n.showAll),
+                      ],
+                    ),
+                    for (final (heading, keys) in _kpiGroups)
+                      if (keys.any(
+                        (key) =>
+                            key != primary &&
+                            (showAllKpis || !_isZeroKpi(key, totals[key])),
+                      )) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16, bottom: 8),
+                          child: BilingualText(
+                            heading,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            for (final key in keys)
+                              if (key != primary &&
+                                  (showAllKpis ||
+                                      !_isZeroKpi(key, totals[key])))
+                                SizedBox(
+                                  width: 280,
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: value(
+                                        key,
+                                        totals[key],
+                                        lifetime: lifetime,
+                                        plainLabel: true,
+                                      ),
+                                    ),
                                   ),
                                 ),
+                          ],
+                        ),
+                      ],
+                    BilingualText(
+                      L10n.groupsRowsPerPage.withValues([data['row_count']]),
+                    ),
+                    for (final row in rows)
+                      ExpansionTile(
+                        expansionAnimationStyle: AnimationStyle.noAnimation,
+                        title: Text(row['name'] as String),
+                        children: [
+                          for (final key in reportLabels.keys)
+                            BilingualListTile(
+                              dense: true,
+                              title: value(
+                                key,
+                                (row['values'] as Map)[key],
+                                lifetime: lifetime,
+                                compact: true,
                               ),
                             ),
+                        ],
+                      ),
+                    // Wrap, not Row: at 200% text scale the bilingual buttons
+                    // plus the page label exceed a phone-width row.
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: offset > 0
+                              ? () => reload(start: offset - 50)
+                              : null,
+                          child: const BilingualCaption(L10n.previous),
+                        ),
+                        BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
+                        TextButton(
+                          onPressed: data['has_more'] == true
+                              ? () => reload(start: offset + 50)
+                              : null,
+                          child: const BilingualCaption(L10n.next),
+                        ),
                       ],
                     ),
                   ],
-                BilingualText(
-                  L10n.groupsRowsPerPage.withValues([data['row_count']]),
                 ),
-                for (final row in rows)
-                  ExpansionTile(
-                    expansionAnimationStyle: AnimationStyle.noAnimation,
-                    title: Text(row['name'] as String),
-                    children: [
-                      for (final key in reportLabels.keys)
-                        BilingualListTile(
-                          dense: true,
-                          title: value(
-                            key,
-                            (row['values'] as Map)[key],
-                            lifetime: lifetime,
-                            compact: true,
-                          ),
-                        ),
-                    ],
-                  ),
-                // Wrap, not Row: at 200% text scale the bilingual buttons
-                // plus the page label exceed a phone-width row.
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: offset > 0
-                          ? () => reload(start: offset - 50)
-                          : null,
-                      child: const BilingualCaption(L10n.previous),
-                    ),
-                    BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
-                    TextButton(
-                      onPressed: data['has_more'] == true
-                          ? () => reload(start: offset + 50)
-                          : null,
-                      child: const BilingualCaption(L10n.next),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          },
+              );
+            },
+          ),
         ),
       ],
     ),

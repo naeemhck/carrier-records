@@ -82,31 +82,21 @@ void main() {
         ),
       );
       await tester.scrollUntilVisible(
-        find.widgetWithText(ListTile, 'Destination office: None'),
+        find.byKey(const ValueKey('trip-picker-destination-choose')),
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.ensureVisible(
-        find.descendant(
-          of: find.widgetWithText(ListTile, 'Destination office: None'),
-          matching: find.text('Choose'),
-        ),
-      );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.descendant(
-          of: find.widgetWithText(ListTile, 'Destination office: None'),
-          matching: find.text('Choose'),
-        ),
+        find.byKey(const ValueKey('trip-picker-destination-choose')),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Authorized destination'));
       await tester.pumpAndSettle();
-      expect(
-        find.text('Destination office: Authorized destination'),
-        findsOneWidget,
-      );
-      expect(find.text('Destination office: destination'), findsNothing);
+      // Density pass picker: label and value are separate widgets; the
+      // value shows the authorized office's name, never its raw id.
+      expect(find.text('Authorized destination'), findsOneWidget);
+      expect(find.text('destination'), findsNothing);
     },
   );
 

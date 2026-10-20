@@ -374,58 +374,46 @@ class TripStatusBadge extends StatelessWidget {
   }
 }
 
-class KarvaanPinnedTabs extends SliverPersistentHeaderDelegate {
-  KarvaanPinnedTabs({
+/// The detail tab bar (density pass): the same glass pill row the pinned
+/// sliver header used to render, but a plain widget — the detail layout
+/// keeps it permanently visible above the scrolling tab content instead
+/// of pinning it inside a page scroll view.
+class KarvaanTabBar extends StatelessWidget {
+  const KarvaanTabBar({
+    super.key,
     required this.labels,
     required this.selected,
     required this.onSelected,
-    required this.height,
   });
   final List<Bilingual> labels;
   final int selected;
   final ValueChanged<int> onSelected;
-  final double height;
   @override
-  double get minExtent => height;
-  @override
-  double get maxExtent => height;
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) => SizedBox(
-    height: height,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: KarvaanGlass(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var i = 0; i < labels.length; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: TextButton(
-                    key: ValueKey('detail-tab-$i'),
-                    style: TextButton.styleFrom(
-                      backgroundColor: selected == i
-                          ? KarvaanDesign.borderColor
-                          : Colors.transparent,
-                    ),
-                    onPressed: () => onSelected(i),
-                    child: BilingualText(labels[i]),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    child: KarvaanGlass(
+      key: const ValueKey('detail-tabs'),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var i = 0; i < labels.length; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: TextButton(
+                  key: ValueKey('detail-tab-$i'),
+                  style: TextButton.styleFrom(
+                    backgroundColor: selected == i
+                        ? KarvaanDesign.borderColor
+                        : Colors.transparent,
                   ),
+                  onPressed: () => onSelected(i),
+                  child: BilingualText(labels[i]),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     ),
   );
-  @override
-  bool shouldRebuild(KarvaanPinnedTabs oldDelegate) =>
-      oldDelegate.selected != selected ||
-      oldDelegate.height != height ||
-      oldDelegate.labels != labels;
 }
