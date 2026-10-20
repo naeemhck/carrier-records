@@ -89,7 +89,7 @@ class BackupSummary extends StatelessWidget {
           status['last_verified_success_at'] == null
               ? L10n.noVerifiedBackupYet
               : L10n.lastVerifiedBackupSuccessUTC.withValues([
-                  status['last_verified_success_at'],
+                  displayTimestamp(status['last_verified_success_at']),
                 ]),
           style: KarvaanTypography.textTheme.titleSmall,
         ),
@@ -103,7 +103,7 @@ class BackupSummary extends StatelessWidget {
                 status['last_attempt_at'] == null
                     ? L10n.noBackupAttemptYet
                     : L10n.lastAttempt.withValues([
-                        status['last_attempt_at'],
+                        displayTimestamp(status['last_attempt_at']),
                         backupOutcomeLabel(status['outcome']),
                       ]),
               ),
@@ -119,9 +119,7 @@ class BackupSummary extends StatelessWidget {
                   ]),
                 ),
               if (status['interrupted'] == true)
-                const BilingualText(
-                  L10n.theLastRunMayHaveBeenInterruptedItHas,
-                ),
+                const BilingualText(L10n.theLastRunMayHaveBeenInterruptedItHas),
               BilingualText(
                 L10n.pendingReceiptCopies.withValues([
                   status['pending_receipt_count'] ?? 0,

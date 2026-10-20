@@ -53,25 +53,28 @@ class WorkspaceRouteObserver extends NavigatorObserver {
   }
 }
 
+/// Rail groups follow the plan (§4): Operations / Records / Manage.
+/// Outputs is a tool, not a destination — it lives in the top bar of the
+/// Dashboard and Reports screens.
 enum WorkspaceDestination {
-  dashboard(Icons.dashboard_outlined, L10n.dashboard, L10n.workspaceGroup),
-  trips(Icons.local_shipping_outlined, L10n.trips, L10n.workspaceGroup),
-  expenses(
-    Icons.receipt_long_outlined,
-    L10n.expensesAndReimbursements,
-    L10n.workspaceGroup,
-  ),
+  dashboard(Icons.dashboard_outlined, L10n.dashboard, L10n.operationsGroup),
+  trips(Icons.local_shipping_outlined, L10n.trips, L10n.operationsGroup),
   money(
     Icons.account_balance_wallet_outlined,
     L10n.moneyNavigation,
-    L10n.workspaceGroup,
+    L10n.operationsGroup,
   ),
-  reports(Icons.assessment_outlined, L10n.reports, L10n.outputsGroup),
+  expenses(
+    Icons.receipt_long_outlined,
+    L10n.expensesAndReimbursements,
+    L10n.recordsGroup,
+  ),
   documents(
     Icons.description_outlined,
     L10n.issuedDocuments,
-    L10n.outputsGroup,
+    L10n.recordsGroup,
   ),
+  reports(Icons.assessment_outlined, L10n.reports, L10n.recordsGroup),
   masters(
     Icons.settings_outlined,
     L10n.companyAndMasterRecords,

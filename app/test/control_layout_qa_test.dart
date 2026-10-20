@@ -125,7 +125,9 @@ void main() {
               lessThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),
             );
           } else {
-            final heading = find.textContaining('Signed in as Synthetic QA');
+            // Rule 4 layout: the username stands on its own LTR line
+            // under the "Signed in as" label.
+            final heading = find.text('Synthetic QA');
             expect(
               tester.getRect(heading).top,
               greaterThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),

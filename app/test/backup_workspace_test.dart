@@ -91,7 +91,9 @@ void main() {
         findsOneWidget,
       );
       expect(find.textContaining('Helper finished'), findsNothing);
-      expect(englishTextContaining('2026-10-10T12:00:00Z'), findsOneWidget);
+      // Rule 3: timestamps render short, never raw ISO.
+      expect(englishTextContaining('2026-10-10 12:00'), findsOneWidget);
+      expect(englishTextContaining('2026-10-10T12:00:00Z'), findsNothing);
       expect(
         englishTextContaining('Archive creation does not verify restoration'),
         findsOneWidget,

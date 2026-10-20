@@ -8374,5 +8374,95 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "dateLabel",
+  "semantic_key": "ui.dateLabel",
+  "en": "Date",
+  "ur": "تاریخ",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "amountLabel",
+  "semantic_key": "ui.amountLabel",
+  "en": "Amount",
+  "ur": "رقم",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "scopeLabel",
+  "semantic_key": "ui.scopeLabel",
+  "en": "Scope",
+  "ur": "دائرہ",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "noCategoriesYet",
+  "semantic_key": "ui.noCategoriesYet",
+  "en": "No categories yet — add the first one",
+  "ur": "ابھی کوئی زمرہ نہیں — پہلا شامل کریں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "fillTemplateStep",
+  "semantic_key": "ui.fillTemplateStep",
+  "en": "Fill it — dates as YYYY-MM-DD, amounts as text",
+  "ur": "اسے بھریں — تاریخیں YYYY-MM-DD کے طور پر، رقوم متن کے طور پر",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "reviewQueue",
+  "semantic_key": "ui.reviewQueue",
+  "en": "Review queue",
+  "ur": "جائزہ قطار",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "signedInAsLabel",
+  "semantic_key": "ui.signedInAsLabel",
+  "en": "Signed in as",
+  "ur": "بطور سائن اِن",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "assignedOfficesLabel",
+  "semantic_key": "ui.assignedOfficesLabel",
+  "en": "Assigned offices",
+  "ur": "مقررہ دفاتر",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "operationsGroup",
+  "semantic_key": "ui.operationsGroup",
+  "en": "Operations",
+  "ur": "کارروائیاں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "recordsGroup",
+  "semantic_key": "ui.recordsGroup",
+  "en": "Records",
+  "ur": "ریکارڈز",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

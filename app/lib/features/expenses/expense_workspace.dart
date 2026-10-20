@@ -2,6 +2,7 @@ import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/karvaan_components.dart';
 import '../../app/karvaan_design.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -63,14 +64,14 @@ abstract final class PickerUsage {
     MasterKind kind,
     List<MasterRecord> rows,
   ) {
-    final used = rows
-        .where((r) => _count(_masters, '${kind.code}:${r.id}') > 0)
-        .toList()
-      ..sort(
-        (a, b) => _count(_masters, '${kind.code}:${b.id}').compareTo(
-          _count(_masters, '${kind.code}:${a.id}'),
-        ),
-      );
+    final used =
+        rows.where((r) => _count(_masters, '${kind.code}:${r.id}') > 0).toList()
+          ..sort(
+            (a, b) => _count(
+              _masters,
+              '${kind.code}:${b.id}',
+            ).compareTo(_count(_masters, '${kind.code}:${a.id}')),
+          );
     final promoted = used.take(promotedLimit).toList();
     final ids = promoted.map((r) => r.id).toSet();
     return (
@@ -181,10 +182,8 @@ class _MasterPickerState extends State<_MasterPicker> {
     Navigator.pop(context, row);
   }
 
-  Widget tile(MasterRecord row) => BilingualListTile(
-    title: Text(row.label),
-    onTap: () => select(row),
-  );
+  Widget tile(MasterRecord row) =>
+      BilingualListTile(title: Text(row.label), onTap: () => select(row));
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -226,8 +225,7 @@ class _MasterPickerState extends State<_MasterPicker> {
                   )
                 : ListView(
                     children: [
-                      if (promoted > 0)
-                        const BilingualCaption(L10n.mostUsed),
+                      if (promoted > 0) const BilingualCaption(L10n.mostUsed),
                       for (final row in rows.take(promoted)) tile(row),
                       if (promoted > 0 && rows.length > promoted)
                         const Divider(),
@@ -235,7 +233,10 @@ class _MasterPickerState extends State<_MasterPicker> {
                     ],
                   ),
           ),
-          Row(
+          // Wrap: bilingual buttons overflow a fixed Row at 200%.
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
             children: [
               TextButton(
                 onPressed: busy || offset == 0
@@ -370,15 +371,149 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                 displayCount(rows.length),
                 displayCount(page),
               ]),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: KarvaanDesign.secondary,
-              ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: KarvaanDesign.secondary),
             ),
           ],
         ),
       ),
     );
   }
+
+  /// One expense as a card (narrow layouts). The wide table renders the
+  /// same rows; both share the settle/receipt actions.
+  Widget _expenseCard(Map<String, dynamic> row) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: BilingualText(
+                  L10n.labelValuesfb62fe.withValues([
+                    row['expense_date'],
+                    row['trip_id'] == null
+                        ? L10n.standaloneMaintenance
+                        : L10n.tripCost,
+                  ]),
+                ),
+              ),
+              ExpenseStatusChip(effective: row['effective'] != false),
+            ],
+          ),
+          KarvaanAmount(
+            label: ownedMessage('Expense amount (PKR)'),
+            value: row['amount'] as String,
+          ),
+          Text((row['notes']).toString()),
+          BilingualOwnedText(row['funding_source']),
+          if (row['effective'] == false)
+            const BilingualText(
+              L10n.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts,
+            ),
+          if (row['replaces_expense_id'] != null)
+            BilingualText(
+              L10n.replacesOriginalExpense.withValues([
+                row['replaces_expense_id'],
+                row['correction_reason'],
+              ]),
+            ),
+          Wrap(
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () => open(
+                        ExpenseSettlement(
+                          expense: row,
+                          expenses: widget.expenses,
+                          finance: widget.finance,
+                          masters: widget.masters,
+                          guard: widget.guard,
+                        ),
+                      ),
+                child: const BilingualCaption(L10n.claimsReimburseRecover),
+              ),
+              TextButton(
+                onPressed: busy ? null : () => receipt(row),
+                child: const BilingualCaption(L10n.privateReceipt),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  /// Table-first rendering for wide layouts (plan §5.6): date, scope,
+  /// funding, amount and status, with the same actions as the cards. The
+  /// list payload carries no category name, so none is invented.
+  Widget _expensesTable() => KarvaanDataTable(
+    columns: const [
+      DataColumn(label: BilingualText(L10n.dateLabel)),
+      DataColumn(label: BilingualText(L10n.scopeLabel)),
+      DataColumn(label: BilingualText(L10n.fundingSource)),
+      DataColumn(label: BilingualText(L10n.amountLabel), numeric: true),
+      DataColumn(label: BilingualText(L10n.historyFieldStatus)),
+      DataColumn(label: BilingualText(L10n.claimsReimburseRecover)),
+    ],
+    rows: [
+      for (final row in rows)
+        DataRow(
+          cells: [
+            DataCell(
+              Text(
+                displayTimestamp(row['expense_date']),
+                textDirection: TextDirection.ltr,
+              ),
+            ),
+            DataCell(
+              BilingualText(
+                row['trip_id'] == null
+                    ? L10n.standaloneMaintenance
+                    : L10n.tripCost,
+              ),
+            ),
+            DataCell(BilingualOwnedText(row['funding_source'])),
+            DataCell(
+              Text(
+                displayMoney(row['amount']),
+                textDirection: TextDirection.ltr,
+              ),
+            ),
+            DataCell(ExpenseStatusChip(effective: row['effective'] != false)),
+            DataCell(
+              Wrap(
+                spacing: 4,
+                children: [
+                  TextButton(
+                    onPressed: busy
+                        ? null
+                        : () => open(
+                            ExpenseSettlement(
+                              expense: row,
+                              expenses: widget.expenses,
+                              finance: widget.finance,
+                              masters: widget.masters,
+                              guard: widget.guard,
+                            ),
+                          ),
+                    child: const BilingualCaption(L10n.claimsReimburseRecover),
+                  ),
+                  TextButton(
+                    onPressed: busy ? null : () => receipt(row),
+                    child: const BilingualCaption(L10n.privateReceipt),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+    ],
+  );
 
   Future<void> receipt(Map<String, dynamic> row) async {
     setState(() => busy = true);
@@ -522,76 +657,10 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
                 ),
               ],
             ),
-          for (final row in rows)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: BilingualText(
-                            L10n.labelValuesfb62fe.withValues([
-                              row['expense_date'],
-                              row['trip_id'] == null
-                                  ? L10n.standaloneMaintenance
-                                  : L10n.tripCost,
-                            ]),
-                          ),
-                        ),
-                        ExpenseStatusChip(
-                          effective: row['effective'] != false,
-                        ),
-                      ],
-                    ),
-                    KarvaanAmount(
-                      label: ownedMessage('Expense amount (PKR)'),
-                      value: row['amount'] as String,
-                    ),
-                    Text((row['notes']).toString()),
-                    BilingualOwnedText(row['funding_source']),
-                    if (row['effective'] == false)
-                      const BilingualText(
-                        L10n.historicalExpenseVoidedOrReplacedExcludedFromCurrentCosts,
-                      ),
-                    if (row['replaces_expense_id'] != null)
-                      BilingualText(
-                        L10n.replacesOriginalExpense.withValues([
-                          row['replaces_expense_id'],
-                          row['correction_reason'],
-                        ]),
-                      ),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        TextButton(
-                          onPressed: busy
-                              ? null
-                              : () => open(
-                                  ExpenseSettlement(
-                                    expense: row,
-                                    expenses: widget.expenses,
-                                    finance: widget.finance,
-                                    masters: widget.masters,
-                                    guard: widget.guard,
-                                  ),
-                                ),
-                          child: const BilingualCaption(
-                            L10n.claimsReimburseRecover,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: busy ? null : () => receipt(row),
-                          child: const BilingualCaption(L10n.privateReceipt),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          if (constraints.maxWidth >= 768 && rows.isNotEmpty)
+            _expensesTable()
+          else
+            for (final row in rows) _expenseCard(row),
           Row(
             children: [
               TextButton(
@@ -964,12 +1033,12 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
       child: Text(
         formatted,
         textDirection: TextDirection.ltr,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: KarvaanDesign.secondary,
-        ),
+        style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(color: KarvaanDesign.secondary),
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: !busy,
@@ -1345,8 +1414,7 @@ class _TripPickerState extends State<_TripPicker> {
                   )
                 : ListView(
                     children: [
-                      if (promoted > 0)
-                        const BilingualCaption(L10n.mostUsed),
+                      if (promoted > 0) const BilingualCaption(L10n.mostUsed),
                       for (final t in rows.take(promoted)) tile(t),
                       if (promoted > 0 && rows.length > promoted)
                         const Divider(),

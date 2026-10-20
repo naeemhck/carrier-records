@@ -286,7 +286,14 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const BilingualText(L10n.noRecordsFound, textAlign: TextAlign.center),
+        BilingualText(
+          // The empty categories master gets its own first-run wording
+          // (plan §5.9); every other kind keeps the generic line.
+          kind == MasterKind.category
+              ? L10n.noCategoriesYet
+              : L10n.noRecordsFound,
+          textAlign: TextAlign.center,
+        ),
         if (kind != MasterKind.company) ...[
           const SizedBox(height: 12),
           FilledButton(

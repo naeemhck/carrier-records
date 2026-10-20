@@ -142,7 +142,7 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                     title: Text('${d['permanent_number']} - ${d['recipient']}'),
                     subtitle: BilingualText(
                       L10n.issuedBy.withValues([
-                        d['issued_at'],
+                        displayTimestamp(d['issued_at']),
                         d['issuer'],
                         d['superseded'] == true
                             ? 'Superseded'

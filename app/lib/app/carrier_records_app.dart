@@ -341,19 +341,45 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                       // Session/refresh errors surface here too, so they render
                       // at the top of the card instead of below the fold.
                       feedback(),
-                      BilingualText(
-                        L10n.signedInAs.withValues([p['display_name']]),
-                        style: KarvaanTypography.screenTitle,
+                      // Rule 4 (plan §3/§5.9): the label stands alone and
+                      // the username follows on its own LTR line — never
+                      // one mirrored sentence. Offices render as chips.
+                      const BilingualText(L10n.signedInAsLabel),
+                      Text(
+                        p['display_name'].toString(),
+                        textDirection: TextDirection.ltr,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      BilingualText(
-                        (p['role'] == 'ADMIN'
-                            ? L10n.administratorAllOffices
-                            : L10n.assignedOffices.withValues([
-                                (p['offices'] as List)
-                                    .map((o) => o['name'])
-                                    .join(', '),
-                              ])),
-                      ),
+                      const SizedBox(height: 12),
+                      if (p['role'] == 'ADMIN')
+                        const BilingualText(L10n.administratorAllOffices)
+                      else ...[
+                        const BilingualText(L10n.assignedOfficesLabel),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final o in p['offices'] as List)
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: KarvaanDesign.muted,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  child: Text(
+                                    (o as Map)['name'].toString(),
+                                    textDirection: TextDirection.ltr,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       if (p['role'] == 'ADMIN')
                         AccountsPanel(session: widget.session),

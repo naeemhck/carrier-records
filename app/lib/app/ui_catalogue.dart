@@ -5757,6 +5757,76 @@ abstract final class L10n {
   );
   static const documentHeaderFieldsAccessibility =
       "Document header fields. دستاویز کے سرخی خانے";
+  static const dateLabel = Bilingual(
+    "ui.dateLabel",
+    "Date",
+    "تاریخ",
+  );
+  static const dateLabelAccessibility =
+      "Date. تاریخ";
+  static const amountLabel = Bilingual(
+    "ui.amountLabel",
+    "Amount",
+    "رقم",
+  );
+  static const amountLabelAccessibility =
+      "Amount. رقم";
+  static const scopeLabel = Bilingual(
+    "ui.scopeLabel",
+    "Scope",
+    "دائرہ",
+  );
+  static const scopeLabelAccessibility =
+      "Scope. دائرہ";
+  static const noCategoriesYet = Bilingual(
+    "ui.noCategoriesYet",
+    "No categories yet — add the first one",
+    "ابھی کوئی زمرہ نہیں — پہلا شامل کریں",
+  );
+  static const noCategoriesYetAccessibility =
+      "No categories yet — add the first one. ابھی کوئی زمرہ نہیں — پہلا شامل کریں";
+  static const fillTemplateStep = Bilingual(
+    "ui.fillTemplateStep",
+    "Fill it — dates as YYYY-MM-DD, amounts as text",
+    "اسے بھریں — تاریخیں YYYY-MM-DD کے طور پر، رقوم متن کے طور پر",
+  );
+  static const fillTemplateStepAccessibility =
+      "Fill it — dates as YYYY-MM-DD, amounts as text. اسے بھریں — تاریخیں YYYY-MM-DD کے طور پر، رقوم متن کے طور پر";
+  static const reviewQueue = Bilingual(
+    "ui.reviewQueue",
+    "Review queue",
+    "جائزہ قطار",
+  );
+  static const reviewQueueAccessibility =
+      "Review queue. جائزہ قطار";
+  static const signedInAsLabel = Bilingual(
+    "ui.signedInAsLabel",
+    "Signed in as",
+    "بطور سائن اِن",
+  );
+  static const signedInAsLabelAccessibility =
+      "Signed in as. بطور سائن اِن";
+  static const assignedOfficesLabel = Bilingual(
+    "ui.assignedOfficesLabel",
+    "Assigned offices",
+    "مقررہ دفاتر",
+  );
+  static const assignedOfficesLabelAccessibility =
+      "Assigned offices. مقررہ دفاتر";
+  static const operationsGroup = Bilingual(
+    "ui.operationsGroup",
+    "Operations",
+    "کارروائیاں",
+  );
+  static const operationsGroupAccessibility =
+      "Operations. کارروائیاں";
+  static const recordsGroup = Bilingual(
+    "ui.recordsGroup",
+    "Records",
+    "ریکارڈز",
+  );
+  static const recordsGroupAccessibility =
+      "Records. ریکارڈز";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6679,5 +6749,15 @@ abstract final class L10n {
     activityGroup,
     showAll,
     documentHeaderFields,
+    dateLabel,
+    amountLabel,
+    scopeLabel,
+    noCategoriesYet,
+    fillTemplateStep,
+    reviewQueue,
+    signedInAsLabel,
+    assignedOfficesLabel,
+    operationsGroup,
+    recordsGroup,
   ];
 }

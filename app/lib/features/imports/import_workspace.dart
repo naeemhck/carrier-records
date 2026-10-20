@@ -1,8 +1,6 @@
 import 'package:carrier_records/app/karvaan_choice_field.dart';
 import 'package:carrier_records/app/bilingual.dart';
 
-import 'dart:convert';
-
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -341,10 +339,9 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
         (preview!['errors'] as List).isNotEmpty ||
         ((preview!['warnings'] as List).isNotEmpty && !overlaps);
     return Tooltip(
-      message: (blocked
-              ? L10n.confirmImportBlocked
-              : L10n.confirmReviewedImport)
-          .inline,
+      message:
+          (blocked ? L10n.confirmImportBlocked : L10n.confirmReviewedImport)
+              .inline,
       child: FilledButton(
         onPressed: blocked ? null : confirm,
         child: const BilingualCaption(L10n.confirmReviewedImport),
@@ -362,6 +359,12 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
       padding: const EdgeInsets.all(16),
       children: [
         const BilingualText(L10n.templateV1NewRecordsOnly),
+        // The four steps, one line each (plan §5.9); the detailed rules
+        // stay in the collapsible panel below.
+        const _ImportStep(1, L10n.downloadTemplate),
+        const _ImportStep(2, L10n.fillTemplateStep),
+        const _ImportStep(3, L10n.chooseXLSX),
+        const _ImportStep(4, L10n.validateAndPreview),
         ExpansionTile(
           expansionAnimationStyle: AnimationStyle.noAnimation,
           title: const BilingualText(L10n.howToFillTemplate),
@@ -456,6 +459,37 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
             L10n.readRows.withValues([(command!['rows'] as List).length]),
           ),
         if (preview != null) ...[
+          // Review queue heading: the count rides as a chip, not buried in
+          // a sentence (plan §5.9).
+          Padding(
+            padding: const EdgeInsets.only(top: 16, bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: BilingualText(
+                    L10n.reviewQueue,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: KarvaanDesign.muted,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    child: Text(
+                      displayCount((preview!['rows'] as List).length),
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           for (final e in preview!['errors'] as List)
             Text('${e['kind']} ${e['row_key']}: ${e['code']}'),
           for (final r in preview!['rows'] as List)
@@ -465,9 +499,18 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
                 L10n.labelValues10866a.withValues([r['kind'], r['row_key']]),
               ),
               children: [
-                SelectableText(
-                  const JsonEncoder.withIndent('  ').convert(r['values']),
-                ),
+                // Readable field lines — never a raw JSON dump (plan §1).
+                for (final entry in (r['values'] as Map).entries)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 2,
+                    ),
+                    child: Text(
+                      '${_importFieldLabel(entry.key)}: ${_importFieldValue(entry.value)}',
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ),
               ],
             ),
           if ((preview!['warnings'] as List).isNotEmpty)
@@ -611,6 +654,60 @@ class _DraftExpenseCommands implements ExpenseCommands {
   Future<Uint8List?> download(String expense) => base.download(expense);
   @override
   Future<int> cleanup() => base.cleanup();
+}
+
+/// Human field label for the import review queue: snake_case internals
+/// become plain words instead of raw field names.
+String _importFieldLabel(Object? key) => (key ?? '')
+    .toString()
+    .split('_')
+    .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
+    .join(' ');
+
+/// Human field value for the review queue: timestamps use the one short
+/// date-time format (rule 3); everything else is the recorded value itself.
+String _importFieldValue(Object? value) {
+  if (value == null) return '—';
+  final text = value.toString();
+  return RegExp(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T').hasMatch(text)
+      ? displayTimestamp(text)
+      : text;
+}
+
+/// One numbered step of the import checklist (plan §5.9).
+class _ImportStep extends StatelessWidget {
+  const _ImportStep(this.number, this.label);
+  final int number;
+  final Bilingual label;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            color: KarvaanDesign.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              '$number',
+              textDirection: TextDirection.ltr,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(child: BilingualText(label)),
+      ],
+    ),
+  );
 }
 
 /// One numbered checklist row inside the "How to fill the template" guide.
