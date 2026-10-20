@@ -295,6 +295,10 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
   int offset = 0;
   bool busy = false;
   String? error;
+
+  /// Register sort (reports pass): page-local, over the loaded rows.
+  int? _expenseSortColumn;
+  bool _expenseSortAscending = true;
   @override
   void initState() {
     super.initState();
@@ -451,69 +455,123 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
   /// Table-first rendering for wide layouts (plan §5.6): date, scope,
   /// funding, amount and status, with the same actions as the cards. The
   /// list payload carries no category name, so none is invented.
-  Widget _expensesTable() => KarvaanDataTable(
-    columns: const [
-      DataColumn(label: BilingualText(L10n.dateLabel)),
-      DataColumn(label: BilingualText(L10n.scopeLabel)),
-      DataColumn(label: BilingualText(L10n.fundingSource)),
-      DataColumn(label: BilingualText(L10n.amountLabel), numeric: true),
-      DataColumn(label: BilingualText(L10n.historyFieldStatus)),
-      DataColumn(label: BilingualText(L10n.claimsReimburseRecover)),
-    ],
-    rows: [
-      for (final row in rows)
-        DataRow(
-          cells: [
-            DataCell(
-              Text(
-                displayTimestamp(row['expense_date']),
-                textDirection: TextDirection.ltr,
-              ),
-            ),
-            DataCell(
-              BilingualText(
-                row['trip_id'] == null
-                    ? L10n.standaloneMaintenance
-                    : L10n.tripCost,
-              ),
-            ),
-            DataCell(BilingualOwnedText(row['funding_source'])),
-            DataCell(
-              Text(
-                displayMoney(row['amount']),
-                textDirection: TextDirection.ltr,
-              ),
-            ),
-            DataCell(ExpenseStatusChip(effective: row['effective'] != false)),
-            DataCell(
-              Wrap(
-                spacing: 4,
-                children: [
-                  TextButton(
-                    onPressed: busy
-                        ? null
-                        : () => open(
-                            ExpenseSettlement(
-                              expense: row,
-                              expenses: widget.expenses,
-                              finance: widget.finance,
-                              masters: widget.masters,
-                              guard: widget.guard,
-                            ),
-                          ),
-                    child: const BilingualCaption(L10n.claimsReimburseRecover),
-                  ),
-                  TextButton(
-                    onPressed: busy ? null : () => receipt(row),
-                    child: const BilingualCaption(L10n.privateReceipt),
-                  ),
-                ],
-              ),
-            ),
-          ],
+  /// Register pattern (reports pass): the expenses table sorts by the
+  /// columns its rows actually carry — date, scope, funding source,
+  /// amount (exact paisa), status. Sorting is page-local.
+  Widget _expensesTable() {
+    String field(Map<String, dynamic> r, String key) =>
+        (r[key] ?? '').toString();
+    int moneyCompare(Object? a, Object? b) {
+      try {
+        return LedgerAmount.fromJson(a ?? '0.00').paisa
+            .compareTo(LedgerAmount.fromJson(b ?? '0.00').paisa);
+      } on FormatException {
+        return (a ?? '').toString().compareTo((b ?? '').toString());
+      }
+    }
+
+    int compare(Map<String, dynamic> a, Map<String, dynamic> b, int column) =>
+        switch (column) {
+          0 => field(a, 'expense_date').compareTo(field(b, 'expense_date')),
+          1 => (a['trip_id'] == null ? 0 : 1).compareTo(
+            b['trip_id'] == null ? 0 : 1,
+          ),
+          2 => field(a, 'funding_source').compareTo(field(b, 'funding_source')),
+          3 => moneyCompare(a['amount'], b['amount']),
+          _ => ((a['effective'] != false) ? 1 : 0).compareTo(
+            (b['effective'] != false) ? 1 : 0,
+          ),
+        };
+    final sorted = List.of(rows);
+    final sortColumn = _expenseSortColumn;
+    if (sortColumn != null) {
+      sorted.sort((a, b) {
+        final order = compare(a, b, sortColumn);
+        return _expenseSortAscending ? order : -order;
+      });
+    }
+    void onSort(int column, bool ascending) => setState(() {
+      _expenseSortColumn = column;
+      _expenseSortAscending = ascending;
+    });
+    return KarvaanDataTable(
+      sortColumnIndex: sortColumn,
+      sortAscending: _expenseSortAscending,
+      columns: [
+        DataColumn(label: const BilingualText(L10n.dateLabel), onSort: onSort),
+        DataColumn(label: const BilingualText(L10n.scopeLabel), onSort: onSort),
+        DataColumn(
+          label: const BilingualText(L10n.fundingSource),
+          onSort: onSort,
         ),
-    ],
-  );
+        DataColumn(
+          label: const BilingualText(L10n.amountLabel),
+          numeric: true,
+          onSort: onSort,
+        ),
+        DataColumn(
+          label: const BilingualText(L10n.historyFieldStatus),
+          onSort: onSort,
+        ),
+        const DataColumn(label: BilingualText(L10n.claimsReimburseRecover)),
+      ],
+      rows: [
+        for (final row in sorted)
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  displayTimestamp(row['expense_date']),
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              DataCell(
+                BilingualText(
+                  row['trip_id'] == null
+                      ? L10n.standaloneMaintenance
+                      : L10n.tripCost,
+                ),
+              ),
+              DataCell(BilingualOwnedText(row['funding_source'])),
+              DataCell(
+                Text(
+                  displayMoney(row['amount']),
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              DataCell(ExpenseStatusChip(effective: row['effective'] != false)),
+              DataCell(
+                Wrap(
+                  spacing: 4,
+                  children: [
+                    TextButton(
+                      onPressed: busy
+                          ? null
+                          : () => open(
+                              ExpenseSettlement(
+                                expense: row,
+                                expenses: widget.expenses,
+                                finance: widget.finance,
+                                masters: widget.masters,
+                                guard: widget.guard,
+                              ),
+                            ),
+                      child: const BilingualCaption(
+                        L10n.claimsReimburseRecover,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: busy ? null : () => receipt(row),
+                      child: const BilingualCaption(L10n.privateReceipt),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
 
   Future<void> receipt(Map<String, dynamic> row) async {
     setState(() => busy = true);

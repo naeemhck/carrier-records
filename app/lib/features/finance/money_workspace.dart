@@ -28,6 +28,10 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
   late Future<Map<String, dynamic>> monthly;
   late Future<Map<String, dynamic>> claims;
 
+  /// Party-table sort (reports pass): page-local over the loaded rows.
+  int? _partySortColumn;
+  bool _partySortAscending = true;
+
   Map<String, dynamic> get _filters {
     final now = DateTime.now();
     String two(int v) => v.toString().padLeft(2, '0');
@@ -111,22 +115,64 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
       if (rows.isEmpty) {
         return const EmptyState(message: L10n.noRecordsInThisPeriodScope);
       }
+      // Register pattern (reports pass): sort by party or by any of the
+      // three balances, compared as exact paisa.
+      const moneyKeys = ['customer_outstanding', 'owner_due', 'custody'];
+      BigInt paisaOf(Map r, String key) {
+        try {
+          return LedgerAmount.fromJson((r['values'] as Map?)?[key] ?? '0.00')
+              .paisa;
+        } on FormatException {
+          return BigInt.zero;
+        }
+      }
+
+      final sorted = List.of(rows);
+      final sortColumn = _partySortColumn;
+      if (sortColumn != null) {
+        sorted.sort((a, b) {
+          final order = sortColumn == 0
+              ? (a['name'] ?? '').toString().compareTo(
+                  (b['name'] ?? '').toString(),
+                )
+              : paisaOf(
+                  a,
+                  moneyKeys[sortColumn - 1],
+                ).compareTo(paisaOf(b, moneyKeys[sortColumn - 1]));
+          return _partySortAscending ? order : -order;
+        });
+      }
+      void onSort(int column, bool ascending) => setState(() {
+        _partySortColumn = column;
+        _partySortAscending = ascending;
+      });
       return SingleChildScrollView(
         child: KarvaanDataTable(
-          columns: const [
-            DataColumn(label: BilingualText(L10n.parties)),
+          sortColumnIndex: sortColumn,
+          sortAscending: _partySortAscending,
+          columns: [
             DataColumn(
-              label: BilingualText(L10n.customerOutstanding),
-              numeric: true,
+              label: const BilingualText(L10n.parties),
+              onSort: onSort,
             ),
             DataColumn(
-              label: BilingualText(L10n.settlementsDue),
+              label: const BilingualText(L10n.customerOutstanding),
               numeric: true,
+              onSort: onSort,
             ),
-            DataColumn(label: BilingualText(L10n.moneyHeld), numeric: true),
+            DataColumn(
+              label: const BilingualText(L10n.settlementsDue),
+              numeric: true,
+              onSort: onSort,
+            ),
+            DataColumn(
+              label: const BilingualText(L10n.moneyHeld),
+              numeric: true,
+              onSort: onSort,
+            ),
           ],
           rows: [
-            for (final r in rows)
+            for (final r in sorted)
               DataRow(
                 cells: [
                   DataCell(

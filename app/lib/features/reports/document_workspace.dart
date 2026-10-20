@@ -1,6 +1,7 @@
 import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/karvaan_choice_field.dart';
 import 'document_repository.dart';
 import '../masters/master_repository.dart';
 import 'output_workspace.dart';
@@ -26,6 +27,11 @@ class DocumentWorkspace extends StatefulWidget {
 class _DocumentWorkspaceState extends State<DocumentWorkspace> {
   final search = TextEditingController();
   int offset = 0;
+
+  /// Register sort (reports pass): client-side over the loaded page —
+  /// 'newest' | 'oldest' | 'number'. The list payload carries no
+  /// server-side sort control.
+  String docSort = 'newest';
   late Future<Map<String, dynamic>> rows;
   @override
   void initState() {
@@ -126,10 +132,59 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
             if (!result.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
-            final data = result.data!, list = data['rows'] as List;
+            final data = result.data!;
+            final list = List.of(data['rows'] as List);
+            int byIssued(dynamic a, dynamic b) => (a['issued_at'] ?? '')
+                .toString()
+                .compareTo((b['issued_at'] ?? '').toString());
+            switch (docSort) {
+              case 'oldest':
+                list.sort(byIssued);
+              case 'number':
+                list.sort(
+                  (a, b) => (a['permanent_number'] ?? '').toString().compareTo(
+                    (b['permanent_number'] ?? '').toString(),
+                  ),
+                );
+              default:
+                list.sort((a, b) => byIssued(b, a));
+            }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (list.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: 240,
+                        child: KarvaanChoiceField<String>(
+                          key: ValueKey('documents-sort-$docSort'),
+                          initialValue: docSort,
+                          decoration: bilingualDecoration(
+                            context,
+                            const InputDecoration(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'newest',
+                              child: BilingualText(L10n.sortNewestFirst),
+                            ),
+                            DropdownMenuItem(
+                              value: 'oldest',
+                              child: BilingualText(L10n.sortOldestFirst),
+                            ),
+                            DropdownMenuItem(
+                              value: 'number',
+                              child: BilingualText(L10n.sortByNumber),
+                            ),
+                          ],
+                          onChanged: (v) => setState(() => docSort = v!),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (list.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(16),
@@ -187,6 +242,20 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
             );
           },
         ),
+        // Report history (reports pass): generated reports and issued
+        // documents stay distinct groups. The register above is the
+        // permanent, numbered record; ad-hoc generations are working
+        // copies and are not persisted anywhere, so this group states
+        // that plainly — the Outputs button at the top is where reports
+        // are generated and issued — instead of inventing history rows.
+        const SizedBox(height: 24),
+        const Divider(),
+        BilingualText(
+          L10n.generatedReportsGroup,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 4),
+        const BilingualText(L10n.generatedReportsHint),
       ],
     ),
   );

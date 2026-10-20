@@ -32,6 +32,35 @@ class DocumentFake implements DocumentCommands {
   ) async => {'rows': [], 'has_more': false};
 }
 
+/// Two issued documents, newest first in service order (reports pass).
+class RegisterDocumentFake extends DocumentFake {
+  @override
+  Future<Map<String, dynamic>> list(
+    Map<String, dynamic> filters,
+    int offset,
+  ) async => {
+    'rows': [
+      {
+        'id': 'a',
+        'permanent_number': 'DOC-2026-0002',
+        'recipient': 'Second recipient',
+        'issued_at': '2026-10-12T09:00:00Z',
+        'issuer': 'Office',
+        'superseded': false,
+      },
+      {
+        'id': 'b',
+        'permanent_number': 'DOC-2026-0001',
+        'recipient': 'First recipient',
+        'issued_at': '2026-10-10T09:00:00Z',
+        'issuer': 'Office',
+        'superseded': false,
+      },
+    ],
+    'has_more': false,
+  };
+}
+
 void main() {
   testWidgets('document list keeps configuration reachable at320px and200%', (
     tester,
@@ -134,4 +163,50 @@ void main() {
       expect(t.takeException(), isNull);
     },
   );
+  testWidgets('issued register sorts and shows the generated group', (t) async {
+    await t.pumpWidget(
+      MaterialApp(
+        theme: KarvaanDesign.theme(),
+        home: DocumentWorkspace(
+          commands: RegisterDocumentFake(),
+          onSupersede: (_, _) {},
+          guard: (w) => w,
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    double rowY(String title) => t.getTopLeft(find.text(title)).dy;
+    // Default: newest first.
+    expect(
+      rowY('DOC-2026-0002 - Second recipient') <
+          rowY('DOC-2026-0001 - First recipient'),
+      isTrue,
+    );
+    // Sort by document number flips the register.
+    await t.tap(find.byKey(const ValueKey('documents-sort-newest')));
+    await t.pumpAndSettle();
+    await t.tap(find.text(L10n.sortByNumber.en).last);
+    await t.pumpAndSettle();
+    expect(
+      rowY('DOC-2026-0001 - First recipient') <
+          rowY('DOC-2026-0002 - Second recipient'),
+      isTrue,
+    );
+    // Report history: the generated-reports group sits below the register
+    // and explains that ad-hoc generations are not persisted.
+    await t.scrollUntilVisible(
+      find.text(L10n.generatedReportsGroup.en),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await t.pumpAndSettle();
+    expect(find.text(L10n.generatedReportsGroup.en), findsOneWidget);
+    expect(find.text(L10n.generatedReportsHint.en), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
 }

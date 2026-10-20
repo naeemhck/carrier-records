@@ -470,24 +470,32 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
     // record -> 3 Preview. Everything else — fields, order, orientation,
     // presets — lives under the collapsed Customize section, so the long
     // always-open settings panel and its crowded bottom bar are gone.
-    Widget stepChip(int number, Bilingual label, {bool active = false}) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 11,
-          backgroundColor: active ? KarvaanDesign.primary : KarvaanDesign.muted,
-          child: Text(
-            '$number',
-            style: TextStyle(
-              fontSize: 11,
-              color: active ? Colors.white : KarvaanDesign.ink,
-            ),
+    Widget stepChip(int number, Bilingual label, {bool active = false}) =>
+        ConstrainedBox(
+          // At phone widths and 200% text the bilingual step label wraps
+          // inside the chip instead of overflowing the stepper row.
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 11,
+                backgroundColor: active
+                    ? KarvaanDesign.primary
+                    : KarvaanDesign.muted,
+                child: Text(
+                  '$number',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: active ? Colors.white : KarvaanDesign.ink,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Flexible(child: BilingualCaption(label)),
+            ],
           ),
-        ),
-        const SizedBox(width: 6),
-        BilingualCaption(label),
-      ],
-    );
+        );
     final steps = Wrap(
       spacing: 12,
       runSpacing: 8,

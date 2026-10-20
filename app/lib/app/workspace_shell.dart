@@ -269,7 +269,8 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
           VoidCallback? dismiss,
         }) => KarvaanGlass(
           child: SizedBox(
-            width: compact ? 88 : 264,
+            // Rail narrowed toward the mockup (reports pass): 264 -> 208.
+            width: compact ? 88 : 208,
             child: Column(
               children: [
                 Padding(
