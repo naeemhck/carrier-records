@@ -211,15 +211,20 @@ class EmptyState extends StatelessWidget {
 }
 
 /// The app's one data-table wrapper (plan §6): muted header, theme tabular
-/// figures, horizontal scroll at narrow widths.
+/// figures, horizontal scroll at narrow widths. Register tables (reports
+/// pass) pass [sortColumnIndex]/[sortAscending] and per-column `onSort`.
 class KarvaanDataTable extends StatelessWidget {
   const KarvaanDataTable({
     super.key,
     required this.columns,
     required this.rows,
+    this.sortColumnIndex,
+    this.sortAscending = true,
   });
   final List<DataColumn> columns;
   final List<DataRow> rows;
+  final int? sortColumnIndex;
+  final bool sortAscending;
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
@@ -228,8 +233,10 @@ class KarvaanDataTable extends StatelessWidget {
       // Stacked bilingual headers and status chips are taller than the
       // Material default row heights; let rows size to their content.
       headingRowHeight: 64,
-      dataRowMinHeight: 52,
+      dataRowMinHeight: 48,
       dataRowMaxHeight: double.infinity,
+      sortColumnIndex: sortColumnIndex,
+      sortAscending: sortAscending,
       columns: columns,
       rows: rows,
     ),

@@ -252,6 +252,98 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     );
   }
 
+  /// Traceable totals (reports pass): a KPI card for a figure the CLAIMS
+  /// report breaks down by party becomes tappable and opens that
+  /// breakdown for the same filters — the records composing the total,
+  /// without leaving the builder. Other figures stay plain cards: the
+  /// payload carries no per-record drill-down for them.
+  Widget _reportKpiCard(
+    String key,
+    Object? amount, {
+    required bool lifetime,
+    bool hero = false,
+  }) {
+    final card = Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: value(
+          key,
+          amount,
+          lifetime: lifetime,
+          hero: hero,
+          plainLabel: true,
+        ),
+      ),
+    );
+    final traceable =
+        (key == 'customer_outstanding' || key == 'owner_due') &&
+        kind != 'CLAIMS';
+    if (!traceable) return card;
+    return InkWell(
+      key: ValueKey('report-trace-$key'),
+      onTap: () => _claimsBreakdown(key),
+      borderRadius: BorderRadius.circular(10),
+      child: card,
+    );
+  }
+
+  Future<void> _claimsBreakdown(String key) async {
+    final future = widget.reports.report('CLAIMS', filters);
+    await showDialog<void>(
+      animationStyle: AnimationStyle.noAnimation,
+      context: context,
+      builder: (dialogContext) => widget.guard(
+        AlertDialog(
+          title: BilingualText(
+            _valueLabel(key, lifetime: false, plainLabel: false),
+          ),
+          content: SizedBox(
+            width: 420,
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: future,
+              builder: (_, s) {
+                if (s.connectionState != ConnectionState.done) {
+                  return const LinearProgressIndicator();
+                }
+                if (s.hasError || !s.hasData) {
+                  return const BilingualText(
+                    L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+                  );
+                }
+                final rows = s.data!['rows'] as List;
+                if (rows.isEmpty) {
+                  return const BilingualText(L10n.noRecordsInThisPeriodScope);
+                }
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final row in rows)
+                        BilingualListTile(
+                          dense: true,
+                          title: Text(row['name'] as String),
+                          trailing: Text(
+                            displayField('MONEY', (row['values'] as Map)[key]),
+                            textDirection: TextDirection.ltr,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const BilingualCaption(L10n.close),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Zero-value KPI cards are hidden to keep the grid scannable; the primary
   /// card always shows.
   bool _isZeroKpi(String key, Object? amount) {
@@ -870,17 +962,11 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                     // Show-all toggle.
                     SizedBox(
                       width: 280,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: value(
-                            primary,
-                            totals[primary],
-                            lifetime: lifetime,
-                            hero: true,
-                            plainLabel: true,
-                          ),
-                        ),
+                      child: _reportKpiCard(
+                        primary,
+                        totals[primary],
+                        lifetime: lifetime,
+                        hero: true,
                       ),
                     ),
                     Row(
@@ -915,16 +1001,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                                       !_isZeroKpi(key, totals[key])))
                                 SizedBox(
                                   width: 280,
-                                  child: Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: value(
-                                        key,
-                                        totals[key],
-                                        lifetime: lifetime,
-                                        plainLabel: true,
-                                      ),
-                                    ),
+                                  child: _reportKpiCard(
+                                    key,
+                                    totals[key],
+                                    lifetime: lifetime,
                                   ),
                                 ),
                           ],

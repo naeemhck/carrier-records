@@ -171,4 +171,41 @@ void main() {  testWidgets(
     await tapKpi('Reports');
     expect(englishTextContaining('Report period'), findsOneWidget);
   });
+  testWidgets('Builder settlement total traces to its party breakdown', (
+    t,
+  ) async {
+    final fake = ReportsFake();
+    await t.pumpWidget(
+      MaterialApp(
+        home: ReportWorkspace(
+          reports: fake,
+          trips: FakeTrips(),
+          masters: FakeMasters(),
+          offices: const [],
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    // The owner-due KPI (PKR 95,000.00 in the fake totals) is traceable:
+    // tapping it opens the CLAIMS party breakdown behind the figure.
+    final trace = find.byKey(const ValueKey('report-trace-owner_due'));
+    expect(trace, findsOneWidget);
+    await t.ensureVisible(trace);
+    await t.tap(trace);
+    await t.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('First vehicle'),
+      ),
+      findsOneWidget,
+    );
+    // The breakdown ran with the builder's own filters.
+    expect(fake.filters.last, fake.filters.first);
+    await t.tap(find.text('Close'));
+    await t.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(t.takeException(), isNull);
+  });
 }

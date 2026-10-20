@@ -153,6 +153,12 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   /// Filters toggle so results start immediately (density pass).
   bool filtersOpen = false;
 
+  /// Register sort (reports pass): column index into the trips table, or
+  /// null to keep the service's own order. Sorting is page-local — the
+  /// list payload carries no server-side sort control.
+  int? _registerSortColumn;
+  bool _registerSortAscending = true;
+
   /// Per-trip get_trip_financials futures, memoized so list rebuilds do not
   /// refetch. Cleared on every reload; entries are presentation-only reads.
   final _moneyFutures = <String, Future<Map<String, dynamic>>>{};
@@ -215,6 +221,101 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     if (saved != null) await detail(saved['id'] as String, saved: true);
   }
 
+  /// The trip detail widget, shared by the full-page route and the
+  /// register's side panel (reports pass) so both presentations carry the
+  /// exact same content and callbacks.
+  Widget _tripDetailWidget(
+    String id, {
+    bool saved = false,
+    int initialTab = 0,
+    bool embedded = false,
+    VoidCallback? onClose,
+  }) => TripDetail(
+    repository: widget.repository,
+    id: id,
+    saved: saved,
+    initialTab: initialTab,
+    finance: widget.finance,
+    canReturn: (o) => widget.offices.any((a) => a['id'] == o),
+    onEdit: edit,
+    onExpenses: widget.onExpenses,
+    guard: widget.guard,
+    embedded: embedded,
+    onClose: onClose,
+    onCorrections: widget.corrections == null
+        ? null
+        : () => Navigator.push<void>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => widget.guard(
+                CorrectionWorkspace(
+                  commands: widget.corrections!,
+                  trips: widget.repository,
+                  guard: widget.guard,
+                  initialTrip: id,
+                ),
+              ),
+            ),
+          ),
+    onPayments: widget.finance == null
+        ? null
+        : () => Navigator.push<void>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => widget.guard(
+                PaymentWorkspace(
+                  guard: widget.guard,
+                  finance: widget.finance!,
+                  trips: widget.repository,
+                  masters: widget.masters,
+                  offices: widget.offices,
+                  initialTrip: id,
+                ),
+              ),
+            ),
+          ),
+  );
+
+  /// Record detail as a side panel (reports pass): the register stays on
+  /// screen behind a right-anchored sheet on desktop; on phones the sheet
+  /// takes the full width. Money mode keeps its payment-workspace route,
+  /// and the editor's just-saved flow keeps the full-page route.
+  Future<void> openRecord(String id, {int initialTab = 0}) async {
+    if (widget.moneyMode) {
+      await detail(id, initialTab: initialTab);
+      return;
+    }
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: Duration.zero,
+      pageBuilder: (dialogContext, _, _) {
+        final width = MediaQuery.sizeOf(dialogContext).width;
+        return Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            width: width < 760 ? width : 460,
+            height: double.infinity,
+            child: Material(
+              elevation: 8,
+              child: widget.guard(
+                _tripDetailWidget(
+                  id,
+                  initialTab: initialTab,
+                  embedded: true,
+                  onClose: () => Navigator.of(dialogContext).pop(),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (mounted) reload();
+  }
+
   Future<void> detail(
     String id, {
     bool saved = false,
@@ -243,49 +344,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
       context,
       MaterialPageRoute(
         builder: (_) => widget.guard(
-          TripDetail(
-            repository: widget.repository,
-            id: id,
-            saved: saved,
-            initialTab: initialTab,
-            finance: widget.finance,
-            canReturn: (o) => widget.offices.any((a) => a['id'] == o),
-            onEdit: edit,
-            onExpenses: widget.onExpenses,
-            guard: widget.guard,
-            onCorrections: widget.corrections == null
-                ? null
-                : () => Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => widget.guard(
-                        CorrectionWorkspace(
-                          commands: widget.corrections!,
-                          trips: widget.repository,
-                          guard: widget.guard,
-                          initialTrip: id,
-                        ),
-                      ),
-                    ),
-                  ),
-            onPayments: widget.finance == null
-                ? null
-                : () => Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => widget.guard(
-                        PaymentWorkspace(
-                          guard: widget.guard,
-                          finance: widget.finance!,
-                          trips: widget.repository,
-                          masters: widget.masters,
-                          offices: widget.offices,
-                          initialTrip: id,
-                        ),
-                      ),
-                    ),
-                  ),
-          ),
+          _tripDetailWidget(id, saved: saved, initialTab: initialTab),
         ),
       ),
     );
@@ -320,7 +379,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     return Card(
       key: ValueKey('trip:$id'),
       child: InkWell(
-        onTap: () => detail(id),
+        onTap: () => openRecord(id),
         borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -388,47 +447,91 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   /// a guessed figure.
   /// Dense table rendering of the same page of trips for wide layouts
   /// (plan §5.3): same rows and tap targets as the route cards.
-  Widget _tripsTable(List<Map<String, dynamic>> rows) => KarvaanDataTable(
-    columns: [
-      const DataColumn(label: BilingualText(L10n.trips)),
-      const DataColumn(label: BilingualText(L10n.routeLabel)),
-      const DataColumn(label: BilingualText(L10n.vehicle)),
-      const DataColumn(label: BilingualText(L10n.ownerName)),
-      const DataColumn(label: BilingualText(L10n.historyFieldStatus)),
-      if (widget.moneyMode)
-        const DataColumn(label: BilingualText(L10n.customerOutstanding)),
-    ],
-    rows: [
-      for (final r in rows)
-        DataRow(
-          cells: [
-            DataCell(
-              Text(
-                (r['trip_number'] ?? '').toString(),
-                textDirection: TextDirection.ltr,
-              ),
-              onTap: () => detail((r['id'] ?? '').toString()),
-            ),
-            DataCell(
-              Text(
-                '${r['origin_name'] ?? ''} → ${r['destination_name'] ?? ''}',
-                textDirection: TextDirection.ltr,
-              ),
-            ),
-            DataCell(
-              Text(
-                (r['registration'] ?? '').toString(),
-                textDirection: TextDirection.ltr,
-              ),
-            ),
-            DataCell(Text((r['owner_name'] ?? '').toString())),
-            DataCell(TripStatusBadge((r['state'] ?? '').toString())),
-            if (widget.moneyMode)
-              DataCell(_outstandingFigure((r['id'] ?? '').toString())),
-          ],
+  /// Records register (reports pass): the trips table gains a date column
+  /// and client-side sorting over the loaded page — number, date, route,
+  /// vehicle, owner, status. The outstanding column stays unsortable: its
+  /// figures come from per-trip financial calls, not the list rows, so
+  /// there is nothing honest to sort by here. A row tap opens the record
+  /// in the side panel.
+  Widget _tripsTable(List<Map<String, dynamic>> rows) {
+    String field(Map<String, dynamic> r, String key) =>
+        (r[key] ?? '').toString();
+    String legDate(Map<String, dynamic> r) {
+      final dispatch = field(r, 'dispatch_date');
+      return dispatch.isNotEmpty ? dispatch : field(r, 'planned_dispatch_date');
+    }
+
+    int compare(Map<String, dynamic> a, Map<String, dynamic> b, int column) =>
+        switch (column) {
+          0 => field(a, 'trip_number').compareTo(field(b, 'trip_number')),
+          1 => legDate(a).compareTo(legDate(b)),
+          2 =>
+            '${field(a, 'origin_name')} ${field(a, 'destination_name')}'
+                .compareTo(
+                  '${field(b, 'origin_name')} ${field(b, 'destination_name')}',
+                ),
+          3 => field(a, 'registration').compareTo(field(b, 'registration')),
+          4 => field(a, 'owner_name').compareTo(field(b, 'owner_name')),
+          _ => field(a, 'state').compareTo(field(b, 'state')),
+        };
+    final sorted = List.of(rows);
+    final sortColumn = _registerSortColumn;
+    if (sortColumn != null) {
+      sorted.sort((a, b) {
+        final order = compare(a, b, sortColumn);
+        return _registerSortAscending ? order : -order;
+      });
+    }
+    void onSort(int column, bool ascending) => setState(() {
+      _registerSortColumn = column;
+      _registerSortAscending = ascending;
+    });
+    return KarvaanDataTable(
+      sortColumnIndex: sortColumn,
+      sortAscending: _registerSortAscending,
+      columns: [
+        DataColumn(label: const BilingualText(L10n.trips), onSort: onSort),
+        DataColumn(label: const BilingualText(L10n.dateLabel), onSort: onSort),
+        DataColumn(label: const BilingualText(L10n.routeLabel), onSort: onSort),
+        DataColumn(label: const BilingualText(L10n.vehicle), onSort: onSort),
+        DataColumn(label: const BilingualText(L10n.ownerName), onSort: onSort),
+        DataColumn(
+          label: const BilingualText(L10n.historyFieldStatus),
+          onSort: onSort,
         ),
-    ],
-  );
+        if (widget.moneyMode)
+          const DataColumn(label: BilingualText(L10n.customerOutstanding)),
+      ],
+      rows: [
+        for (final r in sorted)
+          DataRow(
+            onSelectChanged: (_) => openRecord(field(r, 'id')),
+            cells: [
+              DataCell(
+                Text(field(r, 'trip_number'), textDirection: TextDirection.ltr),
+              ),
+              DataCell(Text(legDate(r), textDirection: TextDirection.ltr)),
+              DataCell(
+                Text(
+                  '${r['origin_name'] ?? ''} → ${r['destination_name'] ?? ''}',
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              DataCell(
+                Text(
+                  field(r, 'registration'),
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              DataCell(Text(field(r, 'owner_name'))),
+              DataCell(TripStatusBadge(field(r, 'state'))),
+              if (widget.moneyMode)
+                DataCell(_outstandingFigure(field(r, 'id'))),
+            ],
+          ),
+      ],
+    );
+  }
 
   Widget _outstandingFigure(String id) {
     if (widget.finance == null) return const SizedBox.shrink();
@@ -458,7 +561,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
             else
               PaperTrailAmount(
                 formatted: displayMoney(outstanding),
-                onTap: () => detail(id, initialTab: 1),
+                onTap: () => openRecord(id, initialTab: 1),
                 semanticLabel:
                     '${L10n.customerOutstandingAccessibility} ${displayMoney(outstanding)}',
               ),
@@ -2150,6 +2253,8 @@ class TripDetail extends StatefulWidget {
     this.onPayments,
     this.onCorrections,
     this.onExpenses,
+    this.embedded = false,
+    this.onClose,
   });
   final TripRepository repository;
   final Future<void> Function()? onPayments, onCorrections, onExpenses;
@@ -2160,6 +2265,12 @@ class TripDetail extends StatefulWidget {
   final FinancialCommands? finance;
   final bool Function(String) canReturn;
   final Future<void> Function(TripDraft) onEdit;
+
+  /// Side-panel presentation (reports pass): no Scaffold/AppBar of its
+  /// own — the register's panel supplies the frame and the close action.
+  /// The tab content is identical in both presentations.
+  final bool embedded;
+  final VoidCallback? onClose;
   @override
   State<TripDetail> createState() => _TripDetailState();
 }
@@ -2384,19 +2495,8 @@ class _TripDetailState extends State<TripDetail> {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.tripDetails),
-      actions: [
-        IconButton(
-          onPressed: reload,
-          icon: const Icon(Icons.refresh),
-          tooltip: L10n.searchRefreshAccessibility,
-        ),
-      ],
-    ),
-    body: FutureBuilder<Map<String, dynamic>>(
+  Widget build(BuildContext context) {
+    final detailBody = FutureBuilder<Map<String, dynamic>>(
       future: data,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -2887,8 +2987,55 @@ class _TripDetailState extends State<TripDetail> {
           ),
         );
       },
-    ),
-  );
+    );
+    if (widget.embedded) {
+      // Side-panel frame (reports pass): the panel owns the chrome; the
+      // detail content below is the same as the full page's.
+      return ColoredBox(
+        color: KarvaanDesign.background,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+              child: Row(
+                children: [
+                  const Expanded(child: BilingualText(L10n.tripDetails)),
+                  IconButton(
+                    onPressed: reload,
+                    icon: const Icon(Icons.refresh),
+                    tooltip: L10n.searchRefreshAccessibility,
+                  ),
+                  if (widget.onClose != null)
+                    IconButton(
+                      onPressed: widget.onClose,
+                      icon: const Icon(Icons.close),
+                      tooltip: L10n.close.inline,
+                    ),
+                ],
+              ),
+            ),
+            Expanded(child: detailBody),
+          ],
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
+        title: const BilingualText(L10n.tripDetails),
+        actions: [
+          IconButton(
+            onPressed: reload,
+            icon: const Icon(Icons.refresh),
+            tooltip: L10n.searchRefreshAccessibility,
+          ),
+        ],
+      ),
+      body: detailBody,
+    );
+  }
+
   Future<void> openLinked(String id) => Navigator.push<void>(
     context,
     MaterialPageRoute(
