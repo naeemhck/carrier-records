@@ -8203,5 +8203,14 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "details",
+  "semantic_key": "ui.details",
+  "en": "Details",
+  "ur": "تفصیلات",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

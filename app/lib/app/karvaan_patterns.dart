@@ -20,8 +20,12 @@ class TripRouteLine extends StatelessWidget {
     required this.originMeta,
     required this.destination,
     required this.destinationMeta,
+    this.stopDots = 0,
   });
   final String origin, originMeta, destination, destinationMeta;
+
+  /// Intermediate stops drawn as small dots along the line (plan §5.4).
+  final int stopDots;
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
@@ -29,22 +33,14 @@ class TripRouteLine extends StatelessWidget {
       Row(
         textDirection: TextDirection.ltr,
         children: [
-          const Icon(
-            Icons.location_on,
-            color: Color(0xFF0B57D0),
-            size: 20,
-          ),
-          const Expanded(
+          const Icon(Icons.location_on, color: KarvaanDesign.primary, size: 20),
+          Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: SizedBox(height: 20, child: _DashedLine()),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: SizedBox(height: 20, child: _DashedLine(stops: stopDots)),
             ),
           ),
-          const Icon(
-            Icons.location_on,
-            color: KarvaanDesign.accent,
-            size: 20,
-          ),
+          const Icon(Icons.location_on, color: KarvaanDesign.accent, size: 20),
         ],
       ),
       const SizedBox(height: 4),
@@ -104,15 +100,16 @@ class TripRouteLine extends StatelessWidget {
 }
 
 class _DashedLine extends StatelessWidget {
-  const _DashedLine();
+  const _DashedLine({this.stops = 0});
+  final int stops;
   @override
-  Widget build(BuildContext context) => CustomPaint(
-    painter: _DashedLinePainter(),
-    size: Size.infinite,
-  );
+  Widget build(BuildContext context) =>
+      CustomPaint(painter: _DashedLinePainter(stops), size: Size.infinite);
 }
 
 class _DashedLinePainter extends CustomPainter {
+  const _DashedLinePainter(this.stops);
+  final int stops;
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -125,15 +122,22 @@ class _DashedLinePainter extends CustomPainter {
       canvas.drawLine(Offset(x, y), Offset(x + 5, y), paint);
       x += 11;
     }
+    if (stops > 0) {
+      final dot = Paint()..color = KarvaanDesign.secondary;
+      for (var i = 1; i <= stops; i++) {
+        canvas.drawCircle(Offset(size.width * i / (stops + 1), y), 3, dot);
+      }
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      oldDelegate.stops != stops;
 }
 
 /// One headline tabular figure with a quiet stacked caption and an optional
 /// period tag. Tapping drills into the underlying filtered list. The live-state
-/// card renders filled in brand green.
+/// (in-transit) card renders filled in movement blue — green is money only.
 class KpiCard extends StatelessWidget {
   const KpiCard({
     super.key,
@@ -155,13 +159,15 @@ class KpiCard extends StatelessWidget {
       color: filled ? onFilled : KarvaanDesign.ink,
     );
     final captionStyle = KarvaanTypography.textTheme.bodySmall?.copyWith(
-      color: filled ? onFilled.withValues(alpha: 0.85) : KarvaanDesign.secondary,
+      color: filled
+          ? onFilled.withValues(alpha: 0.85)
+          : KarvaanDesign.secondary,
     );
     return Card(
-      color: filled ? KarvaanDesign.accent : Colors.white,
+      color: filled ? KarvaanDesign.primary : Colors.white,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -332,11 +338,10 @@ class PaperTrailAmount extends StatelessWidget {
       child: Text(
         formatted,
         textDirection: TextDirection.ltr,
-        style:
-            (style ?? KarvaanTypography.textTheme.headlineSmall)?.copyWith(
-              color: KarvaanDesign.accent,
-              fontFeatures: KarvaanTypography.figureFeatures,
-            ),
+        style: (style ?? KarvaanTypography.textTheme.headlineSmall)?.copyWith(
+          color: KarvaanDesign.accent,
+          fontFeatures: KarvaanTypography.figureFeatures,
+        ),
       ),
     ),
   );

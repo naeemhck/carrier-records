@@ -5646,6 +5646,8 @@ abstract final class L10n {
     "پاس ورڈ چھپائیں",
   );
   static const hidePasswordAccessibility = "Hide password. پاس ورڈ چھپائیں";
+  static const details = Bilingual("ui.details", "Details", "تفصیلات");
+  static const detailsAccessibility = "Details. تفصیلات";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6549,5 +6551,6 @@ abstract final class L10n {
     signInFailed,
     showPassword,
     hidePassword,
+    details,
   ];
 }
