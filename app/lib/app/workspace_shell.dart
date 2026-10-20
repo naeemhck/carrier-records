@@ -8,6 +8,7 @@ import '../features/expenses/expense_repository.dart';
 import '../features/expenses/expense_workspace.dart';
 import '../features/finance/correction_repository.dart';
 import '../features/finance/financial_repository.dart';
+import '../features/finance/money_workspace.dart';
 import '../features/imports/import_workspace.dart';
 import '../features/masters/master_repository.dart';
 import '../features/masters/master_workspace.dart';
@@ -172,17 +173,26 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       offices: offices,
       guard: guard,
     );
+    Widget tripsPage({bool moneyMode = false}) => TripWorkspace(
+      repository: trips,
+      masters: masters,
+      offices: offices,
+      guard: guard,
+      corrections: CorrectionRepository(client),
+      finance: FinancialRepository(client),
+      moneyMode: moneyMode,
+      onExpenses: () => widget.navigatorKey.currentState!.push<void>(
+        MaterialPageRoute(builder: (_) => guard(expensesPage())),
+      ),
+    );
     final page = switch (destination) {
-      WorkspaceDestination.trips || WorkspaceDestination.money => TripWorkspace(
-        repository: trips,
-        masters: masters,
-        offices: offices,
-        guard: guard,
-        corrections: CorrectionRepository(client),
-        finance: FinancialRepository(client),
-        moneyMode: destination == WorkspaceDestination.money,
-        onExpenses: () => widget.navigatorKey.currentState!.push<void>(
-          MaterialPageRoute(builder: (_) => guard(expensesPage())),
+      WorkspaceDestination.trips => tripsPage(),
+      // Money is balances-first (plan §5.5): party balances up front, the
+      // money-mode trip list one tap away inside it.
+      WorkspaceDestination.money => MoneyWorkspace(
+        reports: ReportRepository(client),
+        onViewTrips: () => widget.navigatorKey.currentState!.push<void>(
+          MaterialPageRoute(builder: (_) => guard(tripsPage(moneyMode: true))),
         ),
       ),
       WorkspaceDestination.expenses => expensesPage(),

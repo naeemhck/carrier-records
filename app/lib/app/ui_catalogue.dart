@@ -5687,6 +5687,13 @@ abstract final class L10n {
   );
   static const noMovementsTodayAccessibility =
       "No movements today. آج کوئی نقل و حرکت نہیں";
+  static const viewTrips = Bilingual(
+    "ui.viewTrips",
+    "View trips",
+    "دورے دیکھیں",
+  );
+  static const viewTripsAccessibility =
+      "View trips. دورے دیکھیں";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6599,5 +6606,6 @@ abstract final class L10n {
     needsAttention,
     nothingNeedsAttention,
     noMovementsToday,
+    viewTrips,
   ];
 }

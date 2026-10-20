@@ -8284,5 +8284,14 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "viewTrips",
+  "semantic_key": "ui.viewTrips",
+  "en": "View trips",
+  "ur": "دورے دیکھیں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]
