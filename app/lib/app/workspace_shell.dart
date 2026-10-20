@@ -273,7 +273,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: compact
                       ? const Icon(Icons.route, color: KarvaanDesign.accent)
                       : const BilingualText(
@@ -290,7 +290,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                 destinations[i].group !=
                                     destinations[i - 1].group))
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
                             // Section headers are uppercase and non-interactive
                             // so they are never mistaken for navigation items.
                             child: BilingualText(
@@ -309,7 +309,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
-                            vertical: 4,
+                            vertical: 2,
                           ),
                           child: Material(
                             color: selected == destinations[i]
@@ -321,7 +321,9 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                     key: ValueKey(
                                       'nav:${destinations[i].name}',
                                     ),
-                                    tooltip: destinations[i].label.inline,
+                                    tooltip: destinations[i].label.inMode(
+                                      LanguageModeStore.instance.mode.value,
+                                    ),
                                     icon: Icon(destinations[i].icon),
                                     isSelected: selected == destinations[i],
                                     onPressed: () {
@@ -342,12 +344,22 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                       button: true,
                                       selected: selected == destinations[i],
                                       child: Padding(
-                                        padding: const EdgeInsets.all(12),
+                                        // Density pass: rows land at ~44–48px
+                                        // in single-language modes and stay
+                                        // visibly shorter than the old ~78px
+                                        // in bilingual mode.
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 9,
+                                        ),
                                         child: Row(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                              CrossAxisAlignment.center,
                                           children: [
-                                            Icon(destinations[i].icon),
+                                            Icon(
+                                              destinations[i].icon,
+                                              size: 22,
+                                            ),
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: BilingualText(
@@ -371,7 +383,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                       (compact
                               ? L10n.expandNavigation
                               : L10n.collapseNavigation)
-                          .inline,
+                          .inMode(LanguageModeStore.instance.mode.value),
                   icon: Icon(
                     compact ? Icons.chevron_right : Icons.chevron_left,
                   ),
@@ -382,7 +394,9 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         );
         final account = PopupMenuButton<String>(
           popUpAnimationStyle: AnimationStyle.noAnimation,
-          tooltip: L10n.accountNavigation.inline,
+          tooltip: L10n.accountNavigation.inMode(
+            LanguageModeStore.instance.mode.value,
+          ),
           icon: const Icon(Icons.account_circle_outlined),
           onSelected: (value) async {
             if (widget.canReturnHome?.call() == false) return;
@@ -425,7 +439,9 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                   if (narrow)
                                     Builder(
                                       builder: (context) => IconButton(
-                                        tooltip: L10n.expandNavigation.inline,
+                                        tooltip: L10n.expandNavigation.inMode(
+                                          LanguageModeStore.instance.mode.value,
+                                        ),
                                         icon: const Icon(Icons.menu),
                                         onPressed: () => showDialog<void>(
                                           animationStyle:
@@ -443,13 +459,17 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                     ),
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
                                       child: Text(
                                         p['display_name'].toString(),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ),
+                                  const LanguageModeMenuButton(),
                                   account,
                                 ],
                               ),

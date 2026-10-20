@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'bilingual_message.dart';
+import 'language_mode.dart';
 import 'owned_presentation.dart';
 import 'karvaan_typography.dart';
 
@@ -35,7 +36,15 @@ TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
   );
 }
 
+/// Public entry to the Urdu run styling (see [_urduStyle]); the language
+/// switch labels its Urdu segment with it.
+TextStyle karvaanUrduStyle(BuildContext context, TextStyle? requested) =>
+    _urduStyle(context, requested);
+
 /// Intrinsic-safe wrapping in dialogs/tables; RTL only for the Urdu run.
+///
+/// Renders per the app-wide [KarvaanLanguageMode]: English only, Urdu only,
+/// or the stacked pair (the default). Layout stays LTR in every mode.
 class BilingualText extends StatelessWidget {
   const BilingualText(
     this.text, {
@@ -54,38 +63,56 @@ class BilingualText extends StatelessWidget {
   final TextOverflow? overflow;
   final bool? softWrap;
   @override
-  Widget build(BuildContext context) {
-    final english = Text(
-      text.en,
-      style: style,
-      textAlign: textAlign ?? TextAlign.left,
-      textDirection: TextDirection.ltr,
-      maxLines: maxLines,
-      overflow: overflow ?? TextOverflow.clip,
-      softWrap: softWrap ?? true,
-    );
-    if (text.ur.isEmpty) return english;
-    return Semantics(
-      label: '${text.en}. ${text.ur}',
-      excludeSemantics: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          english,
-          Text(
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) {
+      final english = Text(
+        text.en,
+        style: style,
+        textAlign: textAlign ?? TextAlign.left,
+        textDirection: TextDirection.ltr,
+        maxLines: maxLines,
+        overflow: overflow ?? TextOverflow.clip,
+        softWrap: softWrap ?? true,
+      );
+      if (text.ur.isEmpty || mode == KarvaanLanguageMode.english) {
+        return english;
+      }
+      final urdu = Text(
+        text.ur,
+        style: _urduStyle(context, urStyle ?? style),
+        textAlign: textAlign ?? TextAlign.right,
+        textDirection: TextDirection.rtl,
+        maxLines: maxLines,
+        overflow: overflow ?? TextOverflow.clip,
+        softWrap: softWrap ?? true,
+      );
+      if (mode == KarvaanLanguageMode.urdu) {
+        // The layout stays LTR; only the run itself is Urdu.
+        return Semantics(
+          label: '${text.en}. ${text.ur}',
+          excludeSemantics: true,
+          child: Text(
             text.ur,
             style: _urduStyle(context, urStyle ?? style),
-            textAlign: textAlign ?? TextAlign.right,
+            textAlign: textAlign ?? TextAlign.left,
             textDirection: TextDirection.rtl,
             maxLines: maxLines,
             overflow: overflow ?? TextOverflow.clip,
             softWrap: softWrap ?? true,
           ),
-        ],
-      ),
-    );
-  }
+        );
+      }
+      return Semantics(
+        label: '${text.en}. ${text.ur}',
+        excludeSemantics: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [english, urdu],
+        ),
+      );
+    },
+  );
 }
 
 /// One-line bilingual label/value row: "English / اردو: value", overall LTR.
@@ -103,28 +130,47 @@ class BilingualInlineLine extends StatelessWidget {
   final Bilingual value;
   final TextStyle? style;
   @override
-  Widget build(BuildContext context) {
-    final latin = style ?? DefaultTextStyle.of(context).style;
-    final urdu = _urduStyle(context, latin);
-    return Semantics(
-      label: '${label.en}. ${label.ur}: ${value.en}',
-      excludeSemantics: true,
-      child: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(text: label.en),
-            const TextSpan(text: ' / '),
-            TextSpan(text: label.ur, style: urdu),
-            TextSpan(text: ': ${value.en}'),
-            if (value.ur.isNotEmpty)
-              TextSpan(text: ' / ${value.ur}', style: urdu),
-          ],
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) {
+      final latin = style ?? DefaultTextStyle.of(context).style;
+      final urdu = _urduStyle(context, latin);
+      final valueText = switch (mode) {
+        KarvaanLanguageMode.urdu when value.ur.isNotEmpty => value.ur,
+        _ => value.en,
+      };
+      return Semantics(
+        label: '${label.en}. ${label.ur}: ${value.en}',
+        excludeSemantics: true,
+        child: Text.rich(
+          TextSpan(
+            children: switch (mode) {
+              KarvaanLanguageMode.english => [
+                TextSpan(text: label.en),
+                TextSpan(text: ': $valueText'),
+              ],
+              KarvaanLanguageMode.urdu => [
+                if (label.ur.isNotEmpty)
+                  TextSpan(text: label.ur, style: urdu)
+                else
+                  TextSpan(text: label.en),
+                TextSpan(text: ': $valueText'),
+              ],
+              KarvaanLanguageMode.bilingual => [
+                TextSpan(text: label.en),
+                const TextSpan(text: ' / '),
+                TextSpan(text: label.ur, style: urdu),
+                TextSpan(text: ': ${value.en}'),
+                if (value.ur.isNotEmpty)
+                  TextSpan(text: ' / ${value.ur}', style: urdu),
+              ],
+            },
+          ),
+          style: latin,
+          textDirection: TextDirection.ltr,
         ),
-        style: latin,
-        textDirection: TextDirection.ltr,
-      ),
-    );
-  }
+      );
+    },
+  );
 }
 
 class BilingualCaption extends StatelessWidget {
@@ -132,30 +178,51 @@ class BilingualCaption extends StatelessWidget {
   final Bilingual text;
   final TextStyle? style;
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: '${text.en}. ${text.ur}',
-    excludeSemantics: true,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          text.en,
-          style: style ?? KarvaanTypography.textTheme.bodySmall,
-          textDirection: TextDirection.ltr,
-        ),
-        if (text.ur.isNotEmpty)
-          Text(
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) {
+      final effective = style ?? KarvaanTypography.textTheme.bodySmall;
+      final english = Text(
+        text.en,
+        style: effective,
+        textDirection: TextDirection.ltr,
+      );
+      if (text.ur.isEmpty || mode == KarvaanLanguageMode.english) {
+        return Semantics(
+          label: '${text.en}. ${text.ur}',
+          excludeSemantics: true,
+          child: english,
+        );
+      }
+      if (mode == KarvaanLanguageMode.urdu) {
+        return Semantics(
+          label: '${text.en}. ${text.ur}',
+          excludeSemantics: true,
+          child: Text(
             text.ur,
-            style: _urduStyle(
-              context,
-              style ?? KarvaanTypography.textTheme.bodySmall,
-            ),
+            style: _urduStyle(context, effective),
             textDirection: TextDirection.rtl,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.left,
           ),
-      ],
-    ),
+        );
+      }
+      return Semantics(
+        label: '${text.en}. ${text.ur}',
+        excludeSemantics: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            english,
+            Text(
+              text.ur,
+              style: _urduStyle(context, effective),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 
@@ -182,16 +249,26 @@ class BilingualFloatingLabel extends StatelessWidget {
   const BilingualFloatingLabel(this.message, {super.key});
   final Bilingual message;
   @override
-  Widget build(BuildContext context) => Tooltip(
-    message: message.inline,
-    child: Semantics(
-      label: '${message.en}. ${message.ur}',
-      excludeSemantics: true,
-      child: Text(
-        message.en,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        textDirection: TextDirection.ltr,
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) => Tooltip(
+      message: message.inMode(mode),
+      child: Semantics(
+        label: '${message.en}. ${message.ur}',
+        excludeSemantics: true,
+        child: mode == KarvaanLanguageMode.urdu && message.ur.isNotEmpty
+            ? Text(
+                message.ur,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textDirection: TextDirection.rtl,
+                style: _urduStyle(context, null),
+              )
+            : Text(
+                message.en,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textDirection: TextDirection.ltr,
+              ),
       ),
     ),
   );
@@ -211,6 +288,11 @@ InputDecoration bilingualDecoration(
       ? ownedMessage(label.source)
       : null;
   if (message == null || message.ur.isEmpty) return source;
+  // The Urdu companion line rides in the helper slot only in bilingual
+  // mode; single-language modes keep the field to one line (density pass).
+  if (LanguageModeStore.instance.mode.value != KarvaanLanguageMode.bilingual) {
+    return source.copyWith(label: BilingualFloatingLabel(message));
+  }
   return source.copyWith(
     label: BilingualFloatingLabel(message),
     helper: Column(
@@ -336,12 +418,31 @@ double bilingualToolbarHeight(
     return height;
   }
 
-  return (measure(
-            title.en,
-            style.copyWith(fontWeight: FontWeight.w600),
-            TextDirection.ltr,
-          ) +
-          measure(title.ur, _urduStyle(context, style), TextDirection.rtl) +
-          16)
-      .clamp(88 * MediaQuery.textScalerOf(context).scale(1), double.infinity);
+  final mode = LanguageModeStore.instance.mode.value;
+  final englishHeight = measure(
+    title.en,
+    style.copyWith(fontWeight: FontWeight.w600),
+    TextDirection.ltr,
+  );
+  if (mode == KarvaanLanguageMode.english || title.ur.isEmpty) {
+    return (englishHeight + 16).clamp(
+      56 * MediaQuery.textScalerOf(context).scale(1),
+      double.infinity,
+    );
+  }
+  final urduHeight = measure(
+    title.ur,
+    _urduStyle(context, style),
+    TextDirection.rtl,
+  );
+  if (mode == KarvaanLanguageMode.urdu) {
+    return (urduHeight + 16).clamp(
+      56 * MediaQuery.textScalerOf(context).scale(1),
+      double.infinity,
+    );
+  }
+  return (englishHeight + urduHeight + 16).clamp(
+    88 * MediaQuery.textScalerOf(context).scale(1),
+    double.infinity,
+  );
 }

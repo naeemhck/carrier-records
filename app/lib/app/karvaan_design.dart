@@ -214,13 +214,19 @@ class KarvaanGlass extends StatelessWidget {
 }
 
 class KarvaanSection extends StatelessWidget {
-  const KarvaanSection({super.key, required this.title, required this.child});
+  const KarvaanSection({
+    super.key,
+    required this.title,
+    required this.child,
+    this.padding = const EdgeInsets.all(24),
+  });
   final Bilingual title;
   final Widget child;
+  final EdgeInsetsGeometry padding;
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

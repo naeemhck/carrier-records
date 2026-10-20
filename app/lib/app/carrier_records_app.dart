@@ -381,6 +381,13 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                         ),
                       ],
                       const SizedBox(height: 16),
+                      // Display language (owner directive, density pass):
+                      // English only, Urdu only, or stacked bilingual.
+                      // Persisted on this device only; layout stays LTR.
+                      const BilingualText(L10n.language),
+                      const SizedBox(height: 8),
+                      const LanguageModePicker(),
+                      const SizedBox(height: 16),
                       if (p['role'] == 'ADMIN')
                         AccountsPanel(session: widget.session),
                       OutlinedButton(

@@ -5692,64 +5692,39 @@ abstract final class L10n {
     "View trips",
     "دورے دیکھیں",
   );
-  static const viewTripsAccessibility =
-      "View trips. دورے دیکھیں";
-  static const newTrip = Bilingual(
-    "ui.newTrip",
-    "New trip",
-    "نیا دورہ",
-  );
-  static const newTripAccessibility =
-      "New trip. نیا دورہ";
-  static const cardsView = Bilingual(
-    "ui.cardsView",
-    "Cards view",
-    "کارڈ منظر",
-  );
-  static const cardsViewAccessibility =
-      "Cards view. کارڈ منظر";
-  static const tableView = Bilingual(
-    "ui.tableView",
-    "Table view",
-    "جدول منظر",
-  );
-  static const tableViewAccessibility =
-      "Table view. جدول منظر";
+  static const viewTripsAccessibility = "View trips. دورے دیکھیں";
+  static const newTrip = Bilingual("ui.newTrip", "New trip", "نیا دورہ");
+  static const newTripAccessibility = "New trip. نیا دورہ";
+  static const cardsView = Bilingual("ui.cardsView", "Cards view", "کارڈ منظر");
+  static const cardsViewAccessibility = "Cards view. کارڈ منظر";
+  static const tableView = Bilingual("ui.tableView", "Table view", "جدول منظر");
+  static const tableViewAccessibility = "Table view. جدول منظر";
   static const earningsGroup = Bilingual(
     "ui.earningsGroup",
     "Earnings",
     "آمدن",
   );
-  static const earningsGroupAccessibility =
-      "Earnings. آمدن";
+  static const earningsGroupAccessibility = "Earnings. آمدن";
   static const moneyOwedGroup = Bilingual(
     "ui.moneyOwedGroup",
     "Money owed",
     "واجب الادا رقم",
   );
-  static const moneyOwedGroupAccessibility =
-      "Money owed. واجب الادا رقم";
+  static const moneyOwedGroupAccessibility = "Money owed. واجب الادا رقم";
   static const moneyHeldGroup = Bilingual(
     "ui.moneyHeldGroup",
     "Money held",
     "زیر تحویل رقم",
   );
-  static const moneyHeldGroupAccessibility =
-      "Money held. زیر تحویل رقم";
+  static const moneyHeldGroupAccessibility = "Money held. زیر تحویل رقم";
   static const activityGroup = Bilingual(
     "ui.activityGroup",
     "Activity",
     "سرگرمی",
   );
-  static const activityGroupAccessibility =
-      "Activity. سرگرمی";
-  static const showAll = Bilingual(
-    "ui.showAll",
-    "Show all",
-    "سب دکھائیں",
-  );
-  static const showAllAccessibility =
-      "Show all. سب دکھائیں";
+  static const activityGroupAccessibility = "Activity. سرگرمی";
+  static const showAll = Bilingual("ui.showAll", "Show all", "سب دکھائیں");
+  static const showAllAccessibility = "Show all. سب دکھائیں";
   static const documentHeaderFields = Bilingual(
     "ui.documentHeaderFields",
     "Document header fields",
@@ -5757,27 +5732,12 @@ abstract final class L10n {
   );
   static const documentHeaderFieldsAccessibility =
       "Document header fields. دستاویز کے سرخی خانے";
-  static const dateLabel = Bilingual(
-    "ui.dateLabel",
-    "Date",
-    "تاریخ",
-  );
-  static const dateLabelAccessibility =
-      "Date. تاریخ";
-  static const amountLabel = Bilingual(
-    "ui.amountLabel",
-    "Amount",
-    "رقم",
-  );
-  static const amountLabelAccessibility =
-      "Amount. رقم";
-  static const scopeLabel = Bilingual(
-    "ui.scopeLabel",
-    "Scope",
-    "دائرہ",
-  );
-  static const scopeLabelAccessibility =
-      "Scope. دائرہ";
+  static const dateLabel = Bilingual("ui.dateLabel", "Date", "تاریخ");
+  static const dateLabelAccessibility = "Date. تاریخ";
+  static const amountLabel = Bilingual("ui.amountLabel", "Amount", "رقم");
+  static const amountLabelAccessibility = "Amount. رقم";
+  static const scopeLabel = Bilingual("ui.scopeLabel", "Scope", "دائرہ");
+  static const scopeLabelAccessibility = "Scope. دائرہ";
   static const noCategoriesYet = Bilingual(
     "ui.noCategoriesYet",
     "No categories yet — add the first one",
@@ -5797,15 +5757,13 @@ abstract final class L10n {
     "Review queue",
     "جائزہ قطار",
   );
-  static const reviewQueueAccessibility =
-      "Review queue. جائزہ قطار";
+  static const reviewQueueAccessibility = "Review queue. جائزہ قطار";
   static const signedInAsLabel = Bilingual(
     "ui.signedInAsLabel",
     "Signed in as",
     "بطور سائن اِن",
   );
-  static const signedInAsLabelAccessibility =
-      "Signed in as. بطور سائن اِن";
+  static const signedInAsLabelAccessibility = "Signed in as. بطور سائن اِن";
   static const assignedOfficesLabel = Bilingual(
     "ui.assignedOfficesLabel",
     "Assigned offices",
@@ -5818,15 +5776,35 @@ abstract final class L10n {
     "Operations",
     "کارروائیاں",
   );
-  static const operationsGroupAccessibility =
-      "Operations. کارروائیاں";
+  static const operationsGroupAccessibility = "Operations. کارروائیاں";
   static const recordsGroup = Bilingual(
     "ui.recordsGroup",
     "Records",
     "ریکارڈز",
   );
-  static const recordsGroupAccessibility =
-      "Records. ریکارڈز";
+  static const recordsGroupAccessibility = "Records. ریکارڈز";
+  static const filters = Bilingual("ui.filters", "Filters", "فلٹر");
+  static const filtersAccessibility = "Filters. فلٹر";
+  static const dateFrom = Bilingual("ui.dateFrom", "From", "سے");
+  static const dateFromAccessibility = "From. سے";
+  static const dateTo = Bilingual("ui.dateTo", "To", "تک");
+  static const dateToAccessibility = "To. تک";
+  static const language = Bilingual("ui.language", "Language", "زبان");
+  static const languageAccessibility = "Language. زبان";
+  static const languageEnglish = Bilingual(
+    "ui.languageEnglish",
+    "English",
+    "انگریزی",
+  );
+  static const languageEnglishAccessibility = "English. انگریزی";
+  static const languageUrdu = Bilingual("ui.languageUrdu", "Urdu", "اردو");
+  static const languageUrduAccessibility = "Urdu. اردو";
+  static const languageBilingual = Bilingual(
+    "ui.languageBilingual",
+    "Bilingual",
+    "دو لسانی",
+  );
+  static const languageBilingualAccessibility = "Bilingual. دو لسانی";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6759,5 +6737,12 @@ abstract final class L10n {
     assignedOfficesLabel,
     operationsGroup,
     recordsGroup,
+    filters,
+    dateFrom,
+    dateTo,
+    language,
+    languageEnglish,
+    languageUrdu,
+    languageBilingual,
   ];
 }

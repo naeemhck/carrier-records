@@ -236,6 +236,67 @@ class KarvaanDataTable extends StatelessWidget {
   );
 }
 
+/// Compact date filter field (density pass): a short "From" / "To" label, a
+/// read-only box showing the ISO date, and a calendar picker — no truncated
+/// labels, no free-typed dates. The controller keeps the canonical
+/// YYYY-MM-DD text the existing queries already use.
+class KarvaanDateField extends StatelessWidget {
+  const KarvaanDateField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.onChanged,
+  });
+  final TextEditingController controller;
+  final Bilingual label;
+  final VoidCallback? onChanged;
+
+  DateTime? get _current {
+    final text = controller.text.trim();
+    return text.isEmpty ? null : DateTime.tryParse(text);
+  }
+
+  String _iso(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _pick(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _current ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked == null) return;
+    controller.text = _iso(picked);
+    onChanged?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) => TextField(
+    controller: controller,
+    readOnly: true,
+    onTap: () => _pick(context),
+    decoration: bilingualDecoration(
+      context,
+      InputDecoration(
+        label: BilingualCaption(label),
+        suffixIcon: controller.text.trim().isEmpty
+            ? const Icon(Icons.calendar_month_outlined)
+            : IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                tooltip: L10n.clear.inMode(
+                  LanguageModeStore.instance.mode.value,
+                ),
+                onPressed: () {
+                  controller.clear();
+                  onChanged?.call();
+                },
+              ),
+      ),
+    ),
+  );
+}
+
 /// Standard layout for a screen's filter controls (plan §6 FilterBar).
 class FilterBar extends StatelessWidget {
   const FilterBar({super.key, required this.children});

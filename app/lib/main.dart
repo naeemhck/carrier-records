@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/carrier_records_app.dart';
+import 'app/language_mode.dart';
 import 'features/auth/public_config.dart';
 import 'features/auth/installed_config.dart';
 import 'features/auth/secure_session_storage.dart';
@@ -14,6 +15,8 @@ import 'features/auth/qa_preview_policy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Restore the saved display-language choice (presentation state only).
+  await LanguageModeStore.instance.load();
   try {
     final compiled = PublicConfig.fromEnvironment();
     final config = (karvaanQaPreview || karvaanLocalOnly)
