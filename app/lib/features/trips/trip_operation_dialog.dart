@@ -1,4 +1,5 @@
 import 'package:carrier_records/app/bilingual.dart';
+import 'package:carrier_records/app/karvaan_components.dart';
 
 import 'dart:convert';
 
@@ -433,6 +434,38 @@ Bilingual _historyFieldLabel(String key) => switch (key) {
   _ => Bilingual.data(_prettifyKey(key)),
 };
 
+/// Keys whose value actually changed in a history event, excluding the
+/// hidden internal fields.
+List<String> _historyChangedKeys(Map<String, dynamic> h) => [
+  for (final k in (h['after'] as Map).keys)
+    if ((h['before'] as Map)[k] != (h['after'] as Map)[k] &&
+        !_historyHiddenFields.contains(k))
+      k as String,
+];
+
+/// Timeline dot kind for a history action (plan §5.4 colors).
+TimelineKind _historyKind(Object? action) {
+  final a = (action ?? '').toString().toUpperCase();
+  if (a.contains('CREATE')) return TimelineKind.create;
+  if (a.contains('DISPATCH') || a.contains('ARRIV')) {
+    return TimelineKind.dispatch;
+  }
+  if (const [
+    'PAYMENT',
+    'CHARGE',
+    'COMMISSION',
+    'SETTLEMENT',
+    'RECEIPT',
+    'REFUND',
+    'ALLOCATION',
+    'CREDIT',
+    'EXPENSE',
+  ].any(a.contains)) {
+    return TimelineKind.money;
+  }
+  return TimelineKind.edit;
+}
+
 /// Human value for the history feed: state/load codes become their labels,
 /// timestamps become short date-times, nulls become "None".
 Object _historyFieldValue(String key, Object? value) {
@@ -484,46 +517,34 @@ class _TripHistoryState extends State<TripHistory> {
           children: [
             if (history.isEmpty)
               const BilingualText(L10n.noRecordedHistoryInThisScope),
-            for (final h in history)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BilingualText(
-                        L10n.auditEventIdentity.withValues([
-                          _historyActionLabel(h['action']),
-                          h['actor_name'],
-                          displayTimestamp(h['recorded_at']),
-                        ]),
-                      ),
-                      Text((h['reason'] ?? '').toString()),
-                      for (final k in [
-                        for (final k in (h['after'] as Map).keys)
-                          if ((h['before'] as Map)[k] !=
-                                  (h['after'] as Map)[k] &&
-                              !_historyHiddenFields.contains(k))
-                            k,
-                      ])
-                        BilingualText(
-                          L10n.labelValuesbeea2b.withValues([
-                            _historyFieldLabel(k),
-                            ownedMessage(LifecycleStrings.before),
-                            _historyFieldValue(k, (h['before'] as Map)[k]),
-                            ownedMessage(LifecycleStrings.after),
-                            _historyFieldValue(k, (h['after'] as Map)[k]),
-                          ]),
-                        ),
-                      if ((h['after'] as Map).keys.every(
-                        (k) =>
-                            (h['before'] as Map)[k] == (h['after'] as Map)[k] ||
-                            _historyHiddenFields.contains(k),
-                      ))
-                        const BilingualText(L10n.historyNoChanges),
-                    ],
-                  ),
-                ),
+            if (history.isNotEmpty)
+              TimelineFeed(
+                entries: [
+                  for (final h in history)
+                    TimelineEntry(
+                      kind: _historyKind(h['action']),
+                      title: _historyActionLabel(h['action']),
+                      actor: (h['actor_name'] ?? '').toString(),
+                      timestamp: displayTimestamp(h['recorded_at']),
+                      note: (h['reason'] ?? '').toString().isNotEmpty
+                          ? Bilingual.data((h['reason'] ?? '').toString())
+                          : _historyChangedKeys(h).isEmpty
+                          ? L10n.historyNoChanges
+                          : null,
+                      details: [
+                        for (final k in _historyChangedKeys(h))
+                          BilingualText(
+                            L10n.labelValuesbeea2b.withValues([
+                              _historyFieldLabel(k),
+                              ownedMessage(LifecycleStrings.before),
+                              _historyFieldValue(k, (h['before'] as Map)[k]),
+                              ownedMessage(LifecycleStrings.after),
+                              _historyFieldValue(k, (h['after'] as Map)[k]),
+                            ]),
+                          ),
+                      ],
+                    ),
+                ],
               ),
             // Wrap: bilingual buttons overflow a fixed Row at 200%.
             Wrap(

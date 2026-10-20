@@ -70,12 +70,16 @@ class TimelineEntry {
     required this.title,
     this.actor = '',
     this.timestamp = '',
+    this.note,
     this.details = const [],
   });
   final TimelineKind kind;
   final Bilingual title;
   final String actor;
   final String timestamp;
+
+  /// One short line under the title (an event reason, or "no changes").
+  final Bilingual? note;
   final List<Widget> details;
 
   Color get dotColor => switch (kind) {
@@ -134,6 +138,11 @@ class TimelineFeed extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         BilingualText(entries[i].title, style: type.labelLarge),
+                        if (entries[i].note != null)
+                          BilingualText(
+                            entries[i].note!,
+                            style: type.bodyMedium,
+                          ),
                         if (entries[i].actor.isNotEmpty ||
                             entries[i].timestamp.isNotEmpty)
                           Text(
