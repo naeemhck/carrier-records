@@ -8320,5 +8320,50 @@
   "origins": [
    "redesign-2026-10-20"
   ]
+ },
+ {
+  "key": "earningsGroup",
+  "semantic_key": "ui.earningsGroup",
+  "en": "Earnings",
+  "ur": "آمدن",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "moneyOwedGroup",
+  "semantic_key": "ui.moneyOwedGroup",
+  "en": "Money owed",
+  "ur": "واجب الادا رقم",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "moneyHeldGroup",
+  "semantic_key": "ui.moneyHeldGroup",
+  "en": "Money held",
+  "ur": "زیر تحویل رقم",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "activityGroup",
+  "semantic_key": "ui.activityGroup",
+  "en": "Activity",
+  "ur": "سرگرمی",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
+ },
+ {
+  "key": "showAll",
+  "semantic_key": "ui.showAll",
+  "en": "Show all",
+  "ur": "سب دکھائیں",
+  "origins": [
+   "redesign-2026-10-20"
+  ]
  }
 ]

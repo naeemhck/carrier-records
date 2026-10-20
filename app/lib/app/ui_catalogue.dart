@@ -5715,6 +5715,41 @@ abstract final class L10n {
   );
   static const tableViewAccessibility =
       "Table view. جدول منظر";
+  static const earningsGroup = Bilingual(
+    "ui.earningsGroup",
+    "Earnings",
+    "آمدن",
+  );
+  static const earningsGroupAccessibility =
+      "Earnings. آمدن";
+  static const moneyOwedGroup = Bilingual(
+    "ui.moneyOwedGroup",
+    "Money owed",
+    "واجب الادا رقم",
+  );
+  static const moneyOwedGroupAccessibility =
+      "Money owed. واجب الادا رقم";
+  static const moneyHeldGroup = Bilingual(
+    "ui.moneyHeldGroup",
+    "Money held",
+    "زیر تحویل رقم",
+  );
+  static const moneyHeldGroupAccessibility =
+      "Money held. زیر تحویل رقم";
+  static const activityGroup = Bilingual(
+    "ui.activityGroup",
+    "Activity",
+    "سرگرمی",
+  );
+  static const activityGroupAccessibility =
+      "Activity. سرگرمی";
+  static const showAll = Bilingual(
+    "ui.showAll",
+    "Show all",
+    "سب دکھائیں",
+  );
+  static const showAllAccessibility =
+      "Show all. سب دکھائیں";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6631,5 +6666,10 @@ abstract final class L10n {
     newTrip,
     cardsView,
     tableView,
+    earningsGroup,
+    moneyOwedGroup,
+    moneyHeldGroup,
+    activityGroup,
+    showAll,
   ];
 }

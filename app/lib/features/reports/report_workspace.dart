@@ -11,6 +11,49 @@ import '../trips/trip_workspace.dart';
 import '../finance/financial_repository.dart';
 import 'report_repository.dart';
 
+/// Report KPI groupings (plan §5.7): every reportLabels key belongs to
+/// exactly one themed section.
+const _kpiGroups = <(Bilingual, List<String>)>[
+  (
+    L10n.earningsGroup,
+    [
+      'customer_fare',
+      'owner_earnings',
+      'brokerage',
+      'vehicle_cost',
+      'owner_cost',
+      'operating_profit',
+      'owner_profit',
+    ],
+  ),
+  (
+    L10n.payments,
+    [
+      'receipts',
+      'refunds',
+      'owner_settled',
+      'commission_settled',
+      'credit_created',
+      'credit_applied',
+    ],
+  ),
+  (
+    L10n.moneyOwedGroup,
+    [
+      'customer_outstanding',
+      'owner_due',
+      'brokerage_due',
+      'funding_due',
+      'reimbursement_due',
+      'owner_recovery',
+      'brokerage_recovery',
+      'cost_recovery',
+    ],
+  ),
+  (L10n.moneyHeldGroup, ['customer_credit', 'custody']),
+  (L10n.activityGroup, ['dispatched', 'arrived']),
+];
+
 class ReportWorkspace extends StatefulWidget {
   const ReportWorkspace({
     super.key,
@@ -62,6 +105,10 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   /// Selected KPI drill-down: 0 dispatched, 1 outstanding, 2 settlements,
   /// 3 drafts. Null shows the four cards only.
   int? drill;
+
+  /// Zero-value report cards stay hidden until the user asks for all of
+  /// them (plan §5.7).
+  bool showAllKpis = false;
 
   @override
   void initState() {
@@ -167,23 +214,42 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     bool lifetime = false,
     bool hero = false,
     bool compact = false,
+    bool plainLabel = false,
   }) => KarvaanMetric(
     key: hero ? ValueKey('report-hero-$key') : null,
     hero: hero,
     compact: compact,
-    label: ownedMessage(
+    label: _valueLabel(key, lifetime: lifetime, plainLabel: plainLabel),
+    formattedValue: displayField(
+      ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
+      amount,
+    ),
+  );
+
+  /// Card labels drop the per-card date-basis suffix (plan §5.7: the period
+  /// shows once in the header); both language sides carry the same ' — '
+  /// separator, so both strip together and the pair stays bilingual. Drill
+  /// rows keep the full label, basis included.
+  Bilingual _valueLabel(
+    String key, {
+    required bool lifetime,
+    required bool plainLabel,
+  }) {
+    final full = ownedMessage(
       lifetime
           ? reportLabels[key]
                 ?.replaceAll('period end', 'current lifetime')
                 .replaceAll('period costs', 'all linked costs')
                 .replaceAll('expense date', 'all linked expense dates')
           : reportLabels[key],
-    ),
-    formattedValue: displayField(
-      ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
-      amount,
-    ),
-  );
+    );
+    if (!plainLabel || lifetime) return full;
+    return Bilingual(
+      '${full.key}.short',
+      full.en.split(' — ').first,
+      full.ur.split(' — ').first,
+    );
+  }
 
   /// Zero-value KPI cards are hidden to keep the grid scannable; the primary
   /// card always shows.
@@ -745,41 +811,79 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
                           (data['period'] as Map)['to'],
                         ])),
                 ),
-                BilingualText(
-                  L10n.generatedCurrentEffectiveRecordsCorrectionsCanChangeEarlierPeriods
-                      .withValues([displayTimestamp(data['generated_at'])]),
-                  style: Theme.of(context).textTheme.labelSmall,
+                BilingualInlineLine(
+                  L10n.generatedAt,
+                  value: Bilingual.data(displayTimestamp(data['generated_at'])),
                 ),
                 if (rows.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(16),
                     child: BilingualText(L10n.noRecordsInThisPeriodScope),
                   ),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                // One hero figure per report (plan §5.7); the remaining
+                // metrics sit in themed groups, zero values behind the
+                // Show-all toggle.
+                SizedBox(
+                  width: 310,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: value(
+                        primary,
+                        totals[primary],
+                        lifetime: lifetime,
+                        hero: true,
+                        plainLabel: true,
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
                   children: [
-                    for (final key in [
-                      primary,
-                      ...reportLabels.keys.where((key) => key != primary),
-                    ])
-                      if (key == primary || !_isZeroKpi(key, totals[key]))
-                        SizedBox(
-                          width: 310,
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: value(
-                                key,
-                                totals[key],
-                                lifetime: lifetime,
-                                hero: key == primary,
-                              ),
-                            ),
-                          ),
-                        ),
+                    Switch(
+                      value: showAllKpis,
+                      onChanged: (v) => setState(() => showAllKpis = v),
+                    ),
+                    const BilingualText(L10n.showAll),
                   ],
                 ),
+                for (final (heading, keys) in _kpiGroups)
+                  if (keys.any(
+                    (key) =>
+                        key != primary &&
+                        (showAllKpis || !_isZeroKpi(key, totals[key])),
+                  )) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 8),
+                      child: BilingualText(
+                        heading,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        for (final key in keys)
+                          if (key != primary &&
+                              (showAllKpis || !_isZeroKpi(key, totals[key])))
+                            SizedBox(
+                              width: 310,
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: value(
+                                    key,
+                                    totals[key],
+                                    lifetime: lifetime,
+                                    plainLabel: true,
+                                  ),
+                                ),
+                              ),
+                            ),
+                      ],
+                    ),
+                  ],
                 BilingualText(
                   L10n.groupsRowsPerPage.withValues([data['row_count']]),
                 ),
