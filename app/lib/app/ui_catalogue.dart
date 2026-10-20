@@ -5805,6 +5805,86 @@ abstract final class L10n {
     "دو لسانی",
   );
   static const languageBilingualAccessibility = "Bilingual. دو لسانی";
+  static const chooseReportStep = Bilingual(
+    "ui.chooseReportStep",
+    "Choose report",
+    "رپورٹ منتخب کریں",
+  );
+  static const chooseReportStepAccessibility =
+      "Choose report. رپورٹ منتخب کریں";
+  static const setPeriodRecordStep = Bilingual(
+    "ui.setPeriodRecordStep",
+    "Set period & record",
+    "مدت اور ریکارڈ مقرر کریں",
+  );
+  static const setPeriodRecordStepAccessibility =
+      "Set period & record. مدت اور ریکارڈ مقرر کریں";
+  static const customizeSection = Bilingual(
+    "ui.customizeSection",
+    "Customize",
+    "اپنی پسند کے مطابق ترتیب",
+  );
+  static const customizeSectionAccessibility =
+      "Customize. اپنی پسند کے مطابق ترتیب";
+  static const customizeHint = Bilingual(
+    "ui.customizeHint",
+    "Fields, order, orientation and presets",
+    "فیلڈز، ترتیب، سمت اور پیش سیٹ",
+  );
+  static const customizeHintAccessibility =
+      "Fields, order, orientation and presets. فیلڈز، ترتیب، سمت اور پیش سیٹ";
+  static const expensesProfitGroup = Bilingual(
+    "ui.expensesProfitGroup",
+    "Expenses & profit",
+    "اخراجات اور منافع",
+  );
+  static const expensesProfitGroupAccessibility =
+      "Expenses & profit. اخراجات اور منافع";
+  static const ownerSettlementGroup = Bilingual(
+    "ui.ownerSettlementGroup",
+    "Owner settlement",
+    "مالک کا تصفیہ",
+  );
+  static const ownerSettlementGroupAccessibility =
+      "Owner settlement. مالک کا تصفیہ";
+  static const generatedReportsGroup = Bilingual(
+    "ui.generatedReportsGroup",
+    "Generated reports",
+    "تیار کردہ رپورٹس",
+  );
+  static const generatedReportsGroupAccessibility =
+      "Generated reports. تیار کردہ رپورٹس";
+  static const generatedReportsHint = Bilingual(
+    "ui.generatedReportsHint",
+    "Generated reports are working copies. They receive a permanent number only when issued as documents.",
+    "تیار کردہ رپورٹس ورکنگ کاپیاں ہیں۔ انہیں مستقل نمبر صرف دستاویز کے طور پر جاری ہونے پر ملتا ہے۔",
+  );
+  static const generatedReportsHintAccessibility =
+      "Generated reports are working copies. They receive a permanent number only when issued as documents.. تیار کردہ رپورٹس ورکنگ کاپیاں ہیں۔ انہیں مستقل نمبر صرف دستاویز کے طور پر جاری ہونے پر ملتا ہے۔";
+  static const sortNewestFirst = Bilingual(
+    "ui.sortNewestFirst",
+    "Newest first",
+    "تازہ ترین پہلے",
+  );
+  static const sortNewestFirstAccessibility = "Newest first. تازہ ترین پہلے";
+  static const sortOldestFirst = Bilingual(
+    "ui.sortOldestFirst",
+    "Oldest first",
+    "پرانے پہلے",
+  );
+  static const sortOldestFirstAccessibility = "Oldest first. پرانے پہلے";
+  static const sortByNumber = Bilingual(
+    "ui.sortByNumber",
+    "Document number",
+    "دستاویز نمبر",
+  );
+  static const sortByNumberAccessibility = "Document number. دستاویز نمبر";
+  static const otherTotalsGroup = Bilingual(
+    "ui.otherTotalsGroup",
+    "Other totals",
+    "دیگر کُل",
+  );
+  static const otherTotalsGroupAccessibility = "Other totals. دیگر کُل";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6744,5 +6824,17 @@ abstract final class L10n {
     languageEnglish,
     languageUrdu,
     languageBilingual,
+    chooseReportStep,
+    setPeriodRecordStep,
+    customizeSection,
+    customizeHint,
+    expensesProfitGroup,
+    ownerSettlementGroup,
+    generatedReportsGroup,
+    generatedReportsHint,
+    sortNewestFirst,
+    sortOldestFirst,
+    sortByNumber,
+    otherTotalsGroup,
   ];
 }

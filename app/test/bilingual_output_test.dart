@@ -131,6 +131,11 @@ void main() {
       expect(xml, contains('<v>95000.00</v>'));
       expect(xml, contains('مالک'));
       expect(xml, contains('readingOrder="1"'));
+      // Reports pass: no date-bases block in the workbook, and the
+      // generated-at header is human — never the raw ISO stamp.
+      expect(xml, isNot(contains('Date bases')));
+      expect(xml, isNot(contains('2026-10-11T12:00:00Z')));
+      expect(xml, contains('11 Oct 2026, 12:00'));
       expect(
         zip.files.where((f) => f.name.startsWith('xl/worksheets/')).length,
         1,

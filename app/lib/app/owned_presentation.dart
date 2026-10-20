@@ -142,11 +142,19 @@ String displayMoney(Object? value) {
 /// "2026-10-15 23:27". Raw ISO stamps with microseconds never reach the UI.
 String displayTimestamp(Object? value) {
   final text = value?.toString().trim() ?? '';
-  final match = RegExp(
-    r'^([0-9]{4}-[0-9]{2}-[0-9]{2})[T ]([0-9]{2}:[0-9]{2})',
-  ).firstMatch(text);
+  final match = RegExp(r'^([0-9]{4}-[0-9]{2}-[0-9]{2})[T ]([0-9]{2}:[0-9]{2})')
+      .firstMatch(text);
   if (match != null) return '${match[1]} ${match[2]}';
   return text;
+}
+
+/// Human date-time for UI surfaces: an ISO timestamp becomes
+/// "20 Oct 2026, 13:16" — never the raw ISO string with microseconds.
+String displayDateTime(Object? value) {
+  final text = value?.toString().trim() ?? '';
+  if (text.isEmpty) return '';
+  final human = humanTimestampText(text);
+  return human != text ? human : displayTimestamp(text);
 }
 
 String displayMoneyDigits(Object? value) => displayMoney(value).substring(4);

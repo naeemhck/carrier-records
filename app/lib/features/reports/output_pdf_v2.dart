@@ -52,21 +52,18 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
   const green = PdfColor.fromInt(0xFF0E7A3D);
   const dueHighlight = PdfColor.fromInt(0xFFEAF4ED);
   const hairline = PdfColors.grey400;
-  pw.Widget latin(
-    String value, {
-    bool heading = false,
-    PdfColor? color,
-  }) => pw.Text(
-    value,
-    textDirection: pw.TextDirection.ltr,
-    style: pw.TextStyle(
-      font: heading ? bold : regular,
-      fontFallback: [arabic, math],
-      fontSize: heading ? 10 : 9,
-      color: color,
-    ),
-    softWrap: true,
-  );
+  pw.Widget latin(String value, {bool heading = false, PdfColor? color}) =>
+      pw.Text(
+        value,
+        textDirection: pw.TextDirection.ltr,
+        style: pw.TextStyle(
+          font: heading ? bold : regular,
+          fontFallback: [arabic, math],
+          fontSize: heading ? 10 : 9,
+          color: color,
+        ),
+        softWrap: true,
+      );
   final urduRuns = RegExp(
     r'[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]+(?:\s+[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]+)*',
   );
@@ -102,30 +99,27 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
     return pw.Wrap(children: children, runSpacing: 2);
   }
 
-  pw.Widget label(
-    FrozenLabel value, {
-    bool heading = false,
-    PdfColor? color,
-  }) => pw.Inseparable(
-    child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        data(value.en, heading: heading, color: color),
-        pw.Text(
-          value.ur,
-          textDirection: pw.TextDirection.rtl,
-          style: pw.TextStyle(
-            font: heading ? arabicBold : arabic,
-            fontFallback: [regular, math],
-            fontSize: heading ? 10 : 9,
-            height: 1.4,
-            color: color,
-          ),
-          softWrap: true,
+  pw.Widget label(FrozenLabel value, {bool heading = false, PdfColor? color}) =>
+      pw.Inseparable(
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            data(value.en, heading: heading, color: color),
+            pw.Text(
+              value.ur,
+              textDirection: pw.TextDirection.rtl,
+              style: pw.TextStyle(
+                font: heading ? arabicBold : arabic,
+                fontFallback: [regular, math],
+                fontSize: heading ? 10 : 9,
+                height: 1.4,
+                color: color,
+              ),
+              softWrap: true,
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
   pw.Widget metadata(FrozenLabel name, String value) => pw.Inseparable(
     child: pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 6),
@@ -142,7 +136,9 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
 
   /// Display text of a header field, or null when absent/empty.
   String? headerText(String key) {
-    final field = base.fields.where((f) => f.header && f.key == key).firstOrNull;
+    final field = base.fields
+        .where((f) => f.header && f.key == key)
+        .firstOrNull;
     if (field == null) return null;
     final text = displayValue(field.type, base.metadata[field.key]);
     return text.isEmpty ? null : text;
@@ -152,7 +148,12 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
     if (base.offices.join(', ').isNotEmpty) base.offices.join(', '),
     if (headerText('period') != null) headerText('period')!,
   ];
-  final generatedAt = headerText('generated_at');
+  // Human date-time on the document ("20 Oct 2026, 13:16") — the raw ISO
+  // stamp with microseconds never prints.
+  final generatedRaw = headerText('generated_at');
+  final generatedAt = generatedRaw == null
+      ? null
+      : humanTimestampText(generatedRaw);
   final generatedLabel = output.labels['generated_at'];
 
   final document = pw.Document(
@@ -264,10 +265,11 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
         footer: (context) {
           final issuer =
               base.metadata['issuer_name'] as String? ?? output.brand.en;
-          final when =
+          final whenRaw =
               base.metadata['issued_at'] as String? ??
               base.metadata['generated_at'] as String? ??
               '';
+          final when = humanTimestampText(whenRaw);
           return pw.Padding(
             padding: const pw.EdgeInsets.only(top: 8),
             child: pw.Column(
@@ -307,8 +309,8 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
                 ))
                   metadata(output.labels[field.key]!, chunk),
             metadata(output.frames['offices']!, base.offices.join(', ')),
-            label(output.frames['date_bases']!),
-            for (final basis in output.dates.values) label(basis),
+            // No date-bases block in the document body (owner directive,
+            // reports pass): basis descriptors are internal metadata.
             if (base.metadata['supersedes_number'] != null) ...[
               metadata(
                 output.frames['supersedes']!,

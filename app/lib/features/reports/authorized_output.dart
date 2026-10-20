@@ -357,6 +357,19 @@ String displayValue(String type, dynamic value) {
   return value.toString();
 }
 
+/// Human rendering of an ISO timestamp for document surfaces:
+/// "2026-10-20T13:16:18.795661+00:00" becomes "20 Oct 2026, 13:16".
+/// Raw ISO stamps with microseconds never reach a document or preview.
+/// Unrecognized values pass through unchanged.
+String humanTimestampText(String value) {
+  final match = RegExp(
+    r'^([0-9]{4})-([0-9]{2})-([0-9]{2})[T ]([0-9]{2}):([0-9]{2})',
+  ).firstMatch(value.trim());
+  if (match == null) return value;
+  final date = displayValue('DATE', '${match[1]}-${match[2]}-${match[3]}');
+  return '$date, ${match[4]}:${match[5]}';
+}
+
 List<String> textChunks(String text, int size) {
   if (text.isEmpty) {
     return [''];

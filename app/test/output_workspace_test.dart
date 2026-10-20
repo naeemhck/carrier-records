@@ -58,6 +58,10 @@ class OutputsFake implements OutputCommands {
       bodies = <Map<String, dynamic>>[],
       preparations = <Map<String, dynamic>>[];
   Completer<Map<String, dynamic>> pending = Completer();
+
+  /// The generated-at stamp the fake preview carries; the hygiene test
+  /// overrides it with a raw ISO value.
+  String generatedAt = 'now';
   @override
   Future<Map<String, dynamic>> catalogue(String r, String p) async =>
       Map.from(outputCatalogue);
@@ -73,9 +77,9 @@ class OutputsFake implements OutputCommands {
         .toList();
     return {
       'metadata': {
-        'scope': 'Assigned-office records — not a complete business balance',
+        'scope': "Your office's records — not the full business balance",
         'period': '2026-01-01 to 2026-04-30',
-        'generated_at': 'now',
+        'generated_at': generatedAt,
         'recipient_name': 'Internal',
         'date_bases': {'earnings': 'Dispatch date'},
       },
@@ -125,6 +129,18 @@ class OutputsFake implements OutputCommands {
   ) async => [];
 }
 
+/// The sticky-bar Preview action (the step chip and the preview badge
+/// also carry the word, so find the button itself).
+Finder previewButton() => find.widgetWithText(FilledButton, 'Preview');
+
+/// Presets and field settings live under the collapsed Customize section
+/// (reports pass); open it before reaching for them.
+Future<void> openCustomize(WidgetTester t) async {
+  await t.ensureVisible(find.text('Customize'));
+  await t.tap(find.text('Customize'));
+  await t.pumpAndSettle();
+}
+
 void main() {
   test(
     'Required fields, select all, defaults and ordering use server catalogue',
@@ -160,10 +176,12 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    await t.ensureVisible(find.text('Preview'));
-    await t.tap(find.text('Preview'));
+    await t.ensureVisible(previewButton());
+    await t.tap(previewButton());
     await t.pumpAndSettle();
-    expect(find.text('Authorized preview'), findsOneWidget);
+    // The preview is a document: paired report title, not a generic banner.
+    expect(find.text('Vehicle monthly report'), findsOneWidget);
+    await openCustomize(t);
     expect(find.text('Save named preset'), findsOneWidget);
     expect(find.text('Edit configuration'), findsNothing);
     expect(t.takeException(), isNull);
@@ -184,17 +202,22 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
-      await t.ensureVisible(find.text('Preview'));
-      await t.tap(find.text('Preview'));
+      await t.ensureVisible(previewButton());
+      await t.tap(previewButton());
       await t.pumpAndSettle();
       expect(find.text('Owner profit: PKR 85,000.00'), findsOneWidget);
       await t.tap(find.text('Edit configuration'));
       await t.pumpAndSettle();
+      await openCustomize(t);
+      // Field groups are collapsed inside Customize (reports pass).
+      await t.ensureVisible(find.text('Expenses'));
+      await t.tap(find.text('Expenses'));
+      await t.pumpAndSettle();
       await t.ensureVisible(find.byKey(const ValueKey('field-owner_cost')));
       await t.tap(find.byKey(const ValueKey('field-owner_cost')));
       await t.pumpAndSettle();
-      await t.ensureVisible(find.text('Preview'));
-      await t.tap(find.text('Preview'));
+      await t.ensureVisible(previewButton());
+      await t.tap(previewButton());
       await t.pumpAndSettle();
       expect(fake.preparations.length, 2);
       expect(fake.preparations[0]['filters'], fake.preparations[1]['filters']);
@@ -228,6 +251,7 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
+    await openCustomize(t);
     await t.ensureVisible(find.text('Save named preset'));
     await t.tap(find.text('Save named preset'));
     await t.pumpAndSettle();
@@ -276,6 +300,7 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
+      await openCustomize(t);
       await t.ensureVisible(find.text('Save named preset'));
       await t.tap(find.text('Save named preset'));
       await t.pumpAndSettle();
@@ -283,6 +308,37 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('Save preset'), findsNothing);
       expect(find.byType(TextField), findsNothing);
+    },
+  );
+  testWidgets(
+    'Preview document: human generated-at, no raw ISO stamp, no date-bases block',
+    (t) async {
+      final fake = OutputsFake()
+        ..generatedAt = '2026-10-20T13:16:18.795661+00:00';
+      await t.pumpWidget(
+        MaterialApp(
+          home: OutputWorkspace(
+            commands: fake,
+            masters: FakeMasters(),
+            trips: FakeTrips(),
+            offices: const [],
+            administrator: false,
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      await t.ensureVisible(previewButton());
+      await t.tap(previewButton());
+      await t.pumpAndSettle();
+      // The generated-at meta line renders human, in the document header
+      // (once per language line of the pair).
+      expect(find.textContaining('20 Oct 2026, 13:16'), findsWidgets);
+      // The raw ISO stamp (with microseconds) appears nowhere.
+      expect(find.textContaining('2026-10-20T13:16:18'), findsNothing);
+      expect(find.textContaining('795661'), findsNothing);
+      // The technical date-bases block never renders.
+      expect(find.textContaining('Date bases'), findsNothing);
+      expect(t.takeException(), isNull);
     },
   );
 }

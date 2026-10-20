@@ -8527,5 +8527,77 @@
     "origins": [
       "density-pass"
     ]
+  },
+  {
+    "key": "chooseReportStep",
+    "semantic_key": "ui.chooseReportStep",
+    "en": "Choose report",
+    "ur": "رپورٹ منتخب کریں"
+  },
+  {
+    "key": "setPeriodRecordStep",
+    "semantic_key": "ui.setPeriodRecordStep",
+    "en": "Set period & record",
+    "ur": "مدت اور ریکارڈ مقرر کریں"
+  },
+  {
+    "key": "customizeSection",
+    "semantic_key": "ui.customizeSection",
+    "en": "Customize",
+    "ur": "اپنی پسند کے مطابق ترتیب"
+  },
+  {
+    "key": "customizeHint",
+    "semantic_key": "ui.customizeHint",
+    "en": "Fields, order, orientation and presets",
+    "ur": "فیلڈز، ترتیب، سمت اور پیش سیٹ"
+  },
+  {
+    "key": "expensesProfitGroup",
+    "semantic_key": "ui.expensesProfitGroup",
+    "en": "Expenses & profit",
+    "ur": "اخراجات اور منافع"
+  },
+  {
+    "key": "ownerSettlementGroup",
+    "semantic_key": "ui.ownerSettlementGroup",
+    "en": "Owner settlement",
+    "ur": "مالک کا تصفیہ"
+  },
+  {
+    "key": "generatedReportsGroup",
+    "semantic_key": "ui.generatedReportsGroup",
+    "en": "Generated reports",
+    "ur": "تیار کردہ رپورٹس"
+  },
+  {
+    "key": "generatedReportsHint",
+    "semantic_key": "ui.generatedReportsHint",
+    "en": "Generated reports are working copies. They receive a permanent number only when issued as documents.",
+    "ur": "تیار کردہ رپورٹس ورکنگ کاپیاں ہیں۔ انہیں مستقل نمبر صرف دستاویز کے طور پر جاری ہونے پر ملتا ہے۔"
+  },
+  {
+    "key": "sortNewestFirst",
+    "semantic_key": "ui.sortNewestFirst",
+    "en": "Newest first",
+    "ur": "تازہ ترین پہلے"
+  },
+  {
+    "key": "sortOldestFirst",
+    "semantic_key": "ui.sortOldestFirst",
+    "en": "Oldest first",
+    "ur": "پرانے پہلے"
+  },
+  {
+    "key": "sortByNumber",
+    "semantic_key": "ui.sortByNumber",
+    "en": "Document number",
+    "ur": "دستاویز نمبر"
+  },
+  {
+    "key": "otherTotalsGroup",
+    "semantic_key": "ui.otherTotalsGroup",
+    "en": "Other totals",
+    "ur": "دیگر کُل"
   }
 ]

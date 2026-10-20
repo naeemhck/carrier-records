@@ -136,14 +136,16 @@ class BilingualOutput {
       (
         labels[f.key]!.combined,
         f.type,
-        displayValue(f.type, base.metadata[f.key]),
+        // The generated-at header renders as a human date-time
+        // ("20 Oct 2026, 13:16"), never the raw ISO stamp.
+        f.key == 'generated_at'
+            ? humanTimestampText(displayValue(f.type, base.metadata[f.key]))
+            : displayValue(f.type, base.metadata[f.key]),
       ),
     (frames['offices']!.combined, 'TEXT', base.offices.join(', ')),
-    (
-      frames['date_bases']!.combined,
-      'TEXT',
-      dates.values.map((v) => v.combined).join('\n'),
-    ),
+    // No date-bases block in exported documents: the basis descriptors are
+    // internal metadata, not document content (owner directive, reports
+    // pass). The frozen `dates` validation above still runs unchanged.
     if (base.metadata['supersedes_number'] != null)
       (
         frames['supersedes']!.combined,
