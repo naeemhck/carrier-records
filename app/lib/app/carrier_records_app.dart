@@ -11,6 +11,7 @@ import '../features/auth/staff_session.dart';
 import '../features/auth/account_error.dart';
 import 'strings.dart';
 import 'karvaan_design.dart';
+import 'shell_header.dart';
 import 'workspace_shell.dart';
 import '../features/auth/qa_preview_policy.dart';
 import 'qa_preview_frame.dart';
@@ -35,6 +36,14 @@ class CarrierRecordsApp extends StatefulWidget {
 class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
   final _workspaceNavigator = GlobalKey<NavigatorState>();
   final _workspaceObserver = WorkspaceRouteObserver();
+  final _headerRegistry = ShellHeaderRegistry();
+
+  @override
+  void initState() {
+    super.initState();
+    _workspaceObserver.onCurrentRouteChanged = _headerRegistry.setCurrentRoute;
+  }
+
   late final GoRouter _router = GoRouter(
     routes: [
       ShellRoute(
@@ -44,6 +53,7 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
           session: widget.session,
           navigatorKey: _workspaceNavigator,
           canReturnHome: () => _workspaceObserver.canReturnHome,
+          headerRegistry: _headerRegistry,
           child: child,
         ),
         routes: [
@@ -180,232 +190,237 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
               ),
             );
       return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-          title: BilingualText(
-            // Signed-in users are on their account screen, not a brand page.
-            p == null ? L10n.brand : L10n.accountNavigation,
-          ),
-          actions: [
-            if (p != null && p['must_change_password'] == true)
-              TextButton(
-                onPressed: busy ? null : () => run(widget.session.signOut),
-                child: const BilingualCaption(L10n.signOut),
-              ),
-          ],
-        ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680),
-            child: Card(
-              // The card sizes to its content and stays vertically centered
-              // (plan §5.1); scrolling exists only so extreme text scales on
-              // short viewports can still reach every control.
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (p == null) ...[
-                      const BilingualText(
-                        L10n.staffSignIn,
-                        style: KarvaanTypography.screenTitle,
-                      ),
-                      feedback(),
-                      const SizedBox(height: 8),
-                      const BilingualText(L10n.accountInstruction),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: username,
-                        enabled: !busy,
-                        autocorrect: false,
-                        decoration: bilingualDecoration(
-                          context,
-                          InputDecoration(
-                            label: BilingualCaption(L10n.username),
-                          ),
+        // The title moved into the shell's single header row (header
+        // compaction); in shell-less states (sign-in, forced password
+        // change) ShellHeader renders the same compact row in place.
+        body: ShellHeader(
+          // Signed-in users are on their account screen, not a brand page.
+          title: p == null ? L10n.brand : L10n.accountNavigation,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 680),
+              child: Card(
+                // The card sizes to its content and stays vertically centered
+                // (plan §5.1); scrolling exists only so extreme text scales on
+                // short viewports can still reach every control.
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (p == null) ...[
+                        const BilingualText(
+                          L10n.staffSignIn,
+                          style: KarvaanTypography.screenTitle,
                         ),
-                      ),
-                      TextField(
-                        controller: password,
-                        enabled: !busy,
-                        obscureText: !showPassword,
-                        autocorrect: false,
-                        enableSuggestions: false,
-                        decoration: bilingualDecoration(
-                          context,
-                          InputDecoration(
-                            label: BilingualCaption(L10n.password),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                showPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              tooltip:
-                                  (showPassword
-                                          ? L10n.hidePassword
-                                          : L10n.showPassword)
-                                      .inline,
-                              onPressed: busy
-                                  ? null
-                                  : () => setState(
-                                      () => showPassword = !showPassword,
-                                    ),
+                        feedback(),
+                        const SizedBox(height: 8),
+                        const BilingualText(L10n.accountInstruction),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: username,
+                          enabled: !busy,
+                          autocorrect: false,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.username),
                             ),
                           ),
                         ),
-                        onSubmitted: (_) {
-                          if (!busy) {
-                            run(
-                              () => widget.session.signIn(
-                                username.text,
-                                password.text,
+                        TextField(
+                          controller: password,
+                          enabled: !busy,
+                          obscureText: !showPassword,
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.password),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  showPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                tooltip:
+                                    (showPassword
+                                            ? L10n.hidePassword
+                                            : L10n.showPassword)
+                                        .inline,
+                                onPressed: busy
+                                    ? null
+                                    : () => setState(
+                                        () => showPassword = !showPassword,
+                                      ),
                               ),
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: busy
-                            ? null
-                            : () => run(
+                            ),
+                          ),
+                          onSubmitted: (_) {
+                            if (!busy) {
+                              run(
                                 () => widget.session.signIn(
                                   username.text,
                                   password.text,
                                 ),
-                              ),
-                        child: const BilingualCaption(L10n.signIn),
-                      ),
-                    ] else if (p['must_change_password'] == true) ...[
-                      const BilingualText(
-                        L10n.changeYourTemporaryPassword,
-                        style: KarvaanTypography.screenTitle,
-                      ),
-                      feedback(),
-                      const SizedBox(height: 8),
-                      const BilingualText(
-                        L10n.chooseANewPasswordOfToCharactersSignIn,
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: password,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        decoration: bilingualDecoration(
-                          context,
-                          InputDecoration(
-                            label: BilingualCaption(L10n.currentPassword),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: busy
+                              ? null
+                              : () => run(
+                                  () => widget.session.signIn(
+                                    username.text,
+                                    password.text,
+                                  ),
+                                ),
+                          child: const BilingualCaption(L10n.signIn),
+                        ),
+                      ] else if (p['must_change_password'] == true) ...[
+                        const BilingualText(
+                          L10n.changeYourTemporaryPassword,
+                          style: KarvaanTypography.screenTitle,
+                        ),
+                        feedback(),
+                        // Sign-out lived in the old AppBar for this state;
+                        // it stays reachable here in the card (header
+                        // compaction relocation, not a removal).
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: busy
+                                ? null
+                                : () => run(widget.session.signOut),
+                            child: const BilingualCaption(L10n.signOut),
                           ),
                         ),
-                      ),
-                      TextField(
-                        controller: next,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        decoration: bilingualDecoration(
-                          context,
-                          InputDecoration(
-                            label: BilingualCaption(L10n.newPassword),
-                          ),
-                        ),
-                      ),
-                      TextField(
-                        controller: confirm,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        decoration: bilingualDecoration(
-                          context,
-                          InputDecoration(
-                            label: BilingualCaption(L10n.confirmNewPassword),
-                          ),
-                        ),
-                      ),
-                      FilledButton(
-                        onPressed: busy
-                            ? null
-                            : () => run(() async {
-                                if (next.text != confirm.text ||
-                                    next.text.length < 12) {
-                                  throw const FormatException();
-                                }
-                                await widget.session.changePassword(
-                                  password.text,
-                                  next.text,
-                                );
-                              }),
-                        child: const BilingualCaption(L10n.changePassword),
-                      ),
-                    ] else ...[
-                      // Session/refresh errors surface here too, so they render
-                      // at the top of the card instead of below the fold.
-                      feedback(),
-                      // Rule 4 (plan §3/§5.9): the label stands alone and
-                      // the username follows on its own LTR line — never
-                      // one mirrored sentence. Offices render as chips.
-                      const BilingualText(L10n.signedInAsLabel),
-                      Text(
-                        p['display_name'].toString(),
-                        textDirection: TextDirection.ltr,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      if (p['role'] == 'ADMIN')
-                        const BilingualText(L10n.administratorAllOffices)
-                      else ...[
-                        const BilingualText(L10n.assignedOfficesLabel),
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (final o in p['offices'] as List)
-                              DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: KarvaanDesign.muted,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
+                        const BilingualText(
+                          L10n.chooseANewPasswordOfToCharactersSignIn,
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: password,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.currentPassword),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          controller: next,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.newPassword),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          controller: confirm,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          decoration: bilingualDecoration(
+                            context,
+                            InputDecoration(
+                              label: BilingualCaption(L10n.confirmNewPassword),
+                            ),
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: busy
+                              ? null
+                              : () => run(() async {
+                                  if (next.text != confirm.text ||
+                                      next.text.length < 12) {
+                                    throw const FormatException();
+                                  }
+                                  await widget.session.changePassword(
+                                    password.text,
+                                    next.text,
+                                  );
+                                }),
+                          child: const BilingualCaption(L10n.changePassword),
+                        ),
+                      ] else ...[
+                        // Session/refresh errors surface here too, so they render
+                        // at the top of the card instead of below the fold.
+                        feedback(),
+                        // Rule 4 (plan §3/§5.9): the label stands alone and
+                        // the username follows on its own LTR line — never
+                        // one mirrored sentence. Offices render as chips.
+                        const BilingualText(L10n.signedInAsLabel),
+                        Text(
+                          p['display_name'].toString(),
+                          textDirection: TextDirection.ltr,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        if (p['role'] == 'ADMIN')
+                          const BilingualText(L10n.administratorAllOffices)
+                        else ...[
+                          const BilingualText(L10n.assignedOfficesLabel),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final o in p['offices'] as List)
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: KarvaanDesign.muted,
+                                    borderRadius: BorderRadius.circular(999),
                                   ),
-                                  child: Text(
-                                    (o as Map)['name'].toString(),
-                                    textDirection: TextDirection.ltr,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    child: Text(
+                                      (o as Map)['name'].toString(),
+                                      textDirection: TextDirection.ltr,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        // Display language (owner directive, density pass):
+                        // English only, Urdu only, or stacked bilingual.
+                        // Persisted on this device only; layout stays LTR.
+                        const BilingualText(L10n.language),
+                        const SizedBox(height: 8),
+                        const LanguageModePicker(),
+                        const SizedBox(height: 16),
+                        if (p['role'] == 'ADMIN')
+                          AccountsPanel(session: widget.session),
+                        OutlinedButton(
+                          onPressed: busy
+                              ? null
+                              : () => run(() async {
+                                  await showDialog<void>(
+                                    animationStyle: AnimationStyle.noAnimation,
+                                    context: context,
+                                    builder: (context) =>
+                                        PasswordDialog(session: widget.session),
+                                  );
+                                }),
+                          child: const BilingualCaption(L10n.changeMyPassword),
                         ),
                       ],
-                      const SizedBox(height: 16),
-                      // Display language (owner directive, density pass):
-                      // English only, Urdu only, or stacked bilingual.
-                      // Persisted on this device only; layout stays LTR.
-                      const BilingualText(L10n.language),
-                      const SizedBox(height: 8),
-                      const LanguageModePicker(),
-                      const SizedBox(height: 16),
-                      if (p['role'] == 'ADMIN')
-                        AccountsPanel(session: widget.session),
-                      OutlinedButton(
-                        onPressed: busy
-                            ? null
-                            : () => run(() async {
-                                await showDialog<void>(
-                                  animationStyle: AnimationStyle.noAnimation,
-                                  context: context,
-                                  builder: (context) =>
-                                      PasswordDialog(session: widget.session),
-                                );
-                              }),
-                        child: const BilingualCaption(L10n.changeMyPassword),
-                      ),
+                      if (busy) const LinearProgressIndicator(),
                     ],
-                    if (busy) const LinearProgressIndicator(),
-                  ],
+                  ),
                 ),
               ),
             ),

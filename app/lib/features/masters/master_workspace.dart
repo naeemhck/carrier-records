@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_typography.dart';
+import '../../app/shell_header.dart';
 import 'master_repository.dart';
 
 Bilingual masterRecordSummary(MasterKind kind, MasterRecord row) {
@@ -97,185 +98,187 @@ class _MasterWorkspaceState extends State<MasterWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.companyAndMasterRecords),
-    ),
-    body: ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        KarvaanSection(
-          title: L10n.masterRecordTypeSection,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final item in MasterKind.values)
-                    ChoiceChip(
-                      label: BilingualOwnedText(item.label),
-                      selected: item == kind,
-                      onSelected: (_) {
-                        kind = item;
-                        offset = 0;
-                        search.clear();
-                        reload();
-                      },
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              if (kind == MasterKind.company)
-                const BilingualText(
-                  L10n.enterYourActualCompanyIdentitySaveItBeforeIssuing,
-                ),
-              if (kind == MasterKind.office)
-                const BilingualText(
-                  L10n.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual,
-                ),
-              if (kind == MasterKind.category)
-                const BilingualText(
-                  L10n.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres,
-                ),
-              if (kind == MasterKind.vehicle || kind == MasterKind.route)
-                const BilingualText(
-                  L10n.ownerChangesApplyToNewTripsSavedTripOwners,
-                ),
-            ],
-          ),
-        ),
-        if (kind != MasterKind.company)
+  Widget build(BuildContext context) => ShellHeader(
+    // Title lives in the shell's single header row (header compaction).
+    title: L10n.companyAndMasterRecords,
+    child: Scaffold(
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        children: [
           KarvaanSection(
-            title: L10n.findRecordsSection,
+            title: L10n.masterRecordTypeSection,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextField(
-                  controller: search,
-                  maxLength: 100,
-                  decoration: bilingualDecoration(
-                    context,
-                    InputDecoration(
-                      label: BilingualCaption(L10n.searchNamesCodes),
-                      suffixIcon: const Icon(Icons.search),
-                    ),
-                  ),
-                  onSubmitted: (_) {
-                    offset = 0;
-                    reload();
-                  },
-                ),
-                const SizedBox(height: 12),
                 Wrap(
-                  spacing: 12,
+                  spacing: 8,
                   runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    FilledButton(
-                      onPressed: () => edit(),
-                      child: const BilingualCaption(L10n.newRecord),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        offset = 0;
-                        reload();
-                      },
-                      child: const BilingualCaption(L10n.searchRefresh),
-                    ),
-                    FilterChip(
-                      label: const BilingualText(L10n.includeArchived),
-                      selected: archived,
-                      onSelected: (v) {
-                        archived = v;
-                        offset = 0;
-                        reload();
-                      },
-                    ),
+                    for (final item in MasterKind.values)
+                      ChoiceChip(
+                        label: BilingualOwnedText(item.label),
+                        selected: item == kind,
+                        onSelected: (_) {
+                          kind = item;
+                          offset = 0;
+                          search.clear();
+                          reload();
+                        },
+                      ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                if (kind == MasterKind.company)
+                  const BilingualText(
+                    L10n.enterYourActualCompanyIdentitySaveItBeforeIssuing,
+                  ),
+                if (kind == MasterKind.office)
+                  const BilingualText(
+                    L10n.suggestedOfficeNamesKarachiAndIslamabadEnterYourActual,
+                  ),
+                if (kind == MasterKind.category)
+                  const BilingualText(
+                    L10n.suggestionsDieselOilChangeTollsDriverAllowanceRepairsTyres,
+                  ),
+                if (kind == MasterKind.vehicle || kind == MasterKind.route)
+                  const BilingualText(
+                    L10n.ownerChangesApplyToNewTripsSavedTripOwners,
+                  ),
               ],
             ),
           ),
-        FutureBuilder<List<MasterRecord>>(
-          future: records,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  child: TextButton(
-                    onPressed: reload,
-                    child: const BilingualCaption(L10n.recordsUnavailableRetry),
+          if (kind != MasterKind.company)
+            KarvaanSection(
+              title: L10n.findRecordsSection,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: search,
+                    maxLength: 100,
+                    decoration: bilingualDecoration(
+                      context,
+                      InputDecoration(
+                        label: BilingualCaption(L10n.searchNamesCodes),
+                        suffixIcon: const Icon(Icons.search),
+                      ),
+                    ),
+                    onSubmitted: (_) {
+                      offset = 0;
+                      reload();
+                    },
                   ),
-                ),
-              );
-            }
-            if (!snapshot.hasData) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-            final rows = snapshot.data!;
-            if (rows.isEmpty) return _emptyRecords();
-            return Column(
-              children: [
-                const SizedBox(height: 8),
-                for (final row in rows)
-                  Card(
-                    child: BilingualListTile(
-                      title: Text(row.label),
-                      subtitle: BilingualText(masterRecordSummary(kind, row)),
-                      trailing: TextButton(
-                        onPressed: () => edit(row),
-                        child: const BilingualCaption(L10n.edit),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      FilledButton(
+                        onPressed: () => edit(),
+                        child: const BilingualCaption(L10n.newRecord),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          offset = 0;
+                          reload();
+                        },
+                        child: const BilingualCaption(L10n.searchRefresh),
+                      ),
+                      FilterChip(
+                        label: const BilingualText(L10n.includeArchived),
+                        selected: archived,
+                        onSelected: (v) {
+                          archived = v;
+                          offset = 0;
+                          reload();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          FutureBuilder<List<MasterRecord>>(
+            future: records,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: TextButton(
+                      onPressed: reload,
+                      child: const BilingualCaption(
+                        L10n.recordsUnavailableRetry,
                       ),
                     ),
                   ),
-                if (kind != MasterKind.company)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: offset == 0
-                              ? null
-                              : () {
-                                  offset -= 50;
-                                  reload();
-                                },
-                          child: const BilingualCaption(L10n.previous),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            '${displayCount(offset + 1)}–${displayCount(offset + rows.length)}',
-                            style: KarvaanTypography.textTheme.bodyMedium,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: rows.length < 50
-                              ? null
-                              : () {
-                                  offset += 50;
-                                  reload();
-                                },
-                          child: const BilingualCaption(L10n.next),
-                        ),
-                      ],
-                    ),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: CircularProgressIndicator(),
                   ),
-              ],
-            );
-          },
-        ),
-      ],
+                );
+              }
+              final rows = snapshot.data!;
+              if (rows.isEmpty) return _emptyRecords();
+              return Column(
+                children: [
+                  const SizedBox(height: 8),
+                  for (final row in rows)
+                    Card(
+                      child: BilingualListTile(
+                        title: Text(row.label),
+                        subtitle: BilingualText(masterRecordSummary(kind, row)),
+                        trailing: TextButton(
+                          onPressed: () => edit(row),
+                          child: const BilingualCaption(L10n.edit),
+                        ),
+                      ),
+                    ),
+                  if (kind != MasterKind.company)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: offset == 0
+                                ? null
+                                : () {
+                                    offset -= 50;
+                                    reload();
+                                  },
+                            child: const BilingualCaption(L10n.previous),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              '${displayCount(offset + 1)}–${displayCount(offset + rows.length)}',
+                              style: KarvaanTypography.textTheme.bodyMedium,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: rows.length < 50
+                                ? null
+                                : () {
+                                    offset += 50;
+                                    reload();
+                                  },
+                            child: const BilingualCaption(L10n.next),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     ),
   );
 

@@ -5,6 +5,7 @@ import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
+import '../../app/shell_header.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -966,16 +967,15 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
         ),
       ],
     );
-    // Header (GUI handoff groups 3 + 9): the page is "Create report" —
-    // "Outputs" named nothing the user does here. The title wraps on its
-    // own row at its measured bilingual height (no competing AppBar
-    // action, so nothing clips at 390px); Issued documents moves to the
-    // full-width flow bar under the AppBar, beside the step chips.
+    // Header (GUI handoff groups 3 + 9; header compaction): the page is
+    // "Create report" — "Outputs" named nothing the user does here. The
+    // title now lives in the shell's single header row; Issued documents
+    // stays in the slim flow bar directly under it, beside the steps.
     final pageTitle = widget.supersedesId == null
         ? L10n.createReport
         : L10n.supersedingDocument;
     final flowBar = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1042,19 +1042,9 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
               ),
             ],
           );
-    // The toolbar height measures the title against the REAL layout
-    // width (LayoutBuilder constraints) — MediaQuery.sizeOf can be a
-    // placeholder in some hosts, which would wrap the title per glyph.
-    return LayoutBuilder(
-      builder: (context, constraints) => Scaffold(
-        appBar: AppBar(
-          toolbarHeight: bilingualToolbarHeight(
-            context,
-            pageTitle,
-            constraints.maxWidth - 72,
-          ),
-          title: BilingualText(pageTitle),
-        ),
+    return ShellHeader(
+      title: pageTitle,
+      child: Scaffold(
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

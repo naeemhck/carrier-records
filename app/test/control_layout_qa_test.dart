@@ -118,19 +118,31 @@ void main() {
                   .didExceedMaxLines,
               isFalse,
             );
+            // Header compaction: no AppBar — the title lives in the
+            // compact ShellHeader row. It must stay inside that row's
+            // height budget (the old 88px bar) at this text scale.
+            expect(
+              tester.getRect(find.byType(BilingualHeaderTitle)).height,
+              lessThanOrEqualTo(88 * scale + 8),
+            );
             expect(
               tester
                   .getRect(find.text(L10n.expensesAndReimbursements.ur))
                   .bottom,
-              lessThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),
+              lessThanOrEqualTo(
+                tester.getRect(find.byType(BilingualHeaderTitle)).bottom,
+              ),
             );
           } else {
             // Rule 4 layout: the username stands on its own LTR line
-            // under the "Signed in as" label.
+            // under the "Signed in as" label. Header compaction: the
+            // anchor is the compact ShellHeader row, not an AppBar.
             final heading = find.text('Synthetic QA');
             expect(
               tester.getRect(heading).top,
-              greaterThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),
+              greaterThanOrEqualTo(
+                tester.getRect(find.byType(BilingualHeaderTitle)).bottom,
+              ),
             );
           }
           expect(tester.takeException(), isNull);

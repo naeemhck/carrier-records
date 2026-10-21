@@ -118,7 +118,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(L10n.issuedDocuments.en), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await tester.tap(find.text(L10n.createReport.en));
+    // Header compaction: at this narrow width the header's Create
+    // report action takes its compact icon form (tooltip carries the
+    // label); tapping it must still reach the configuration flow.
+    await tester.tap(find.byIcon(Icons.post_add));
     await tester.pumpAndSettle();
     expect(configured, isTrue);
     final empty = find.text(L10n.noIssuedDocumentsInYourCurrentScope.ur);

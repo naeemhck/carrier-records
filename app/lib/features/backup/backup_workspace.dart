@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_typography.dart';
+import '../../app/shell_header.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -277,59 +278,62 @@ class _BackupWorkspaceState extends State<BackupWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.administratorBackups),
-    ),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (busy) const LinearProgressIndicator(),
-        if (message != null) BilingualOwnedText(message!),
-        if (status != null) BackupSummary(status: status!),
-        if (karvaanLocalOnly)
-          const BilingualText(
-            L10n.administratorHelperIsDisabledInThisIsolatedCandidate,
-          )
-        else if (kIsWeb || !Platform.isWindows)
-          const BilingualText(
-            L10n.runBackupsOnTheConfiguredAdministratorWindowsPC,
-          ),
-        KarvaanSection(
-          title: L10n.manualBackup,
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              // Disabled here for a named reason, never silently: the
-              // stacked caption above names it, and the tooltip repeats it
-              // in both languages for hover and focus users.
-              Tooltip(
-                message:
-                    (karvaanLocalOnly
-                            ? L10n.administratorHelperIsDisabledInThisIsolatedCandidate
-                            : L10n.runBackupsOnTheConfiguredAdministratorWindowsPC)
-                        .inline,
-                child: FilledButton(
-                  onPressed:
-                      busy || karvaanLocalOnly || kIsWeb || !Platform.isWindows
-                      ? null
-                      : manual,
-                  child: const BilingualCaption(L10n.runManualWindowsBackup),
+  Widget build(BuildContext context) => ShellHeader(
+    // Title lives in the shell's single header row (header compaction).
+    title: L10n.administratorBackups,
+    child: Scaffold(
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        children: [
+          if (busy) const LinearProgressIndicator(),
+          if (message != null) BilingualOwnedText(message!),
+          if (status != null) BackupSummary(status: status!),
+          if (karvaanLocalOnly)
+            const BilingualText(
+              L10n.administratorHelperIsDisabledInThisIsolatedCandidate,
+            )
+          else if (kIsWeb || !Platform.isWindows)
+            const BilingualText(
+              L10n.runBackupsOnTheConfiguredAdministratorWindowsPC,
+            ),
+          KarvaanSection(
+            title: L10n.manualBackup,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                // Disabled here for a named reason, never silently: the
+                // stacked caption above names it, and the tooltip repeats it
+                // in both languages for hover and focus users.
+                Tooltip(
+                  message:
+                      (karvaanLocalOnly
+                              ? L10n.administratorHelperIsDisabledInThisIsolatedCandidate
+                              : L10n.runBackupsOnTheConfiguredAdministratorWindowsPC)
+                          .inline,
+                  child: FilledButton(
+                    onPressed:
+                        busy ||
+                            karvaanLocalOnly ||
+                            kIsWeb ||
+                            !Platform.isWindows
+                        ? null
+                        : manual,
+                    child: const BilingualCaption(L10n.runManualWindowsBackup),
+                  ),
                 ),
-              ),
-              TextButton(
-                onPressed: busy ? null : load,
-                child: const BilingualCaption(L10n.refreshVerifiedStatus),
-              ),
-            ],
+                TextButton(
+                  onPressed: busy ? null : load,
+                  child: const BilingualCaption(L10n.refreshVerifiedStatus),
+                ),
+              ],
+            ),
           ),
-        ),
-        const BilingualText(
-          L10n.privilegedCredentialsAndEncryptionKeysAreConfiguredInThe,
-        ),
-      ],
+          const BilingualText(
+            L10n.privilegedCredentialsAndEncryptionKeysAreConfiguredInThe,
+          ),
+        ],
+      ),
     ),
   );
 }

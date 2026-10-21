@@ -57,9 +57,14 @@ void main() {
                 .en,
           );
           expect(feedback, findsOneWidget);
+          // Header compaction: the sign-in screen has no AppBar — its
+          // title is the compact ShellHeader row. The feedback must sit
+          // below that header row, as it sat below the AppBar before.
           expect(
             tester.getRect(feedback).top,
-            greaterThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),
+            greaterThanOrEqualTo(
+              tester.getRect(find.byType(BilingualHeaderTitle)).bottom,
+            ),
           );
           expect(tester.getRect(feedback).bottom, lessThanOrEqualTo(1100));
           expect(

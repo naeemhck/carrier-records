@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../app/karvaan_components.dart';
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_patterns.dart';
+import '../../app/shell_header.dart';
 
 import '../masters/master_repository.dart';
 import '../trips/trip_repository.dart';
@@ -359,25 +360,23 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     }
   }
 
-  /// KPI-first dashboard (density pass): a compact header toolbar, the
-  /// four headline cards, then movements and attention in an internally
-  /// scrolling region — the page itself fits the desktop viewport.
+  /// KPI-first dashboard (density pass): the four headline cards first
+  /// (title + actions are in the shell header now), then movements and
+  /// attention in an internally scrolling region — the page itself fits
+  /// the desktop viewport.
   Widget dashboardBody() => Padding(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(child: widget.backupStatus ?? const SizedBox.shrink()),
-            OutlinedButton.icon(
-              onPressed: openReportBuilder,
-              icon: const Icon(Icons.assessment_outlined),
-              label: const BilingualCaption(L10n.reports),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
+        // The old toolbar row (Reports button) is gone — the action
+        // lives in the shell header now. A supplied backup status keeps
+        // a slim strip above the cards rather than a full row.
+        if (widget.backupStatus != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: widget.backupStatus!,
+          ),
         Expanded(
           child: FutureBuilder<List<dynamic>>(
             future: kpis,
@@ -768,7 +767,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   /// the controls section scrolls internally (owner-approved panel
   /// scroll) rather than overflowing.
   Widget reportBuilderBody() => Padding(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1063,22 +1062,48 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: BilingualText((widget.dashboard ? L10n.dashboard : L10n.reports)),
-      actions: [
-        if (widget.outputs != null)
-          TextButton(
+  Widget build(BuildContext context) => ShellHeader(
+    // Title + actions live in the shell's single header row (header
+    // compaction); the Dashboard's Reports action moved up beside
+    // Create report and its old in-body button row is deleted.
+    title: widget.dashboard ? L10n.dashboard : L10n.reports,
+    actions: [
+      if (widget.dashboard)
+        ShellHeaderAction(
+          // A shortcut to the same destination the rail's Reports item
+          // opens; on phone bars it yields its room to the title (the
+          // rail/menu keeps it reachable) rather than crushing it.
+          hideOnNarrow: true,
+          child: TextButton.icon(
+            onPressed: openReportBuilder,
+            icon: const Icon(Icons.assessment_outlined),
+            label: const BilingualCaption(L10n.reports),
+          ),
+        ),
+      if (widget.outputs != null)
+        ShellHeaderAction(
+          child: TextButton(
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => widget.guard(widget.outputs!)),
             ),
             child: const BilingualCaption(L10n.createReport),
           ),
-      ],
+          compactChild: IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => widget.guard(widget.outputs!)),
+            ),
+            icon: const Icon(Icons.post_add_outlined),
+            tooltip: L10n.createReport.inMode(
+              LanguageModeStore.instance.mode.value,
+            ),
+          ),
+        ),
+    ],
+    child: Scaffold(
+      body: widget.dashboard ? dashboardBody() : reportBuilderBody(),
     ),
-    body: widget.dashboard ? dashboardBody() : reportBuilderBody(),
   );
 }
 

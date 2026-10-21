@@ -230,9 +230,11 @@ void main() {
     await t.tap(find.text('TRIP-002'));
     await t.pumpAndSettle();
     // The panel hosts the real trip detail (tabs included) without a
-    // second page/AppBar: the register stays mounted behind it.
+    // second page/AppBar: the register stays mounted behind it. Header
+    // compaction removed the register's own AppBar too (its title lives
+    // in the shell header row), so no AppBar exists at all now.
     expect(find.byType(TripDetail), findsOneWidget);
-    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(AppBar), findsNothing);
     expect(find.text(L10n.consignmentsStep.en), findsWidgets);
     expect(find.byIcon(Icons.close), findsOneWidget);
     await t.tap(find.byIcon(Icons.close));

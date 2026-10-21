@@ -38,7 +38,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('trip panel: compact header, tabs high, one scroll area', (    tester,
+  testWidgets('trip panel: compact header, tabs high, one scroll area', (
+    tester,
   ) async {
     setView(tester, 1440, 900);
     await tester.pumpWidget(
@@ -92,9 +93,7 @@ void main() {
       maxScrolls: 10,
     );
     await tester.pumpAndSettle();
-    final tabRect = tester.getRect(
-      find.byKey(const ValueKey('detail-tab-0')),
-    );
+    final tabRect = tester.getRect(find.byKey(const ValueKey('detail-tab-0')));
     expect(tabRect.top, lessThan(900));
     expect(tabRect.bottom, greaterThan(0));
   });
@@ -125,14 +124,18 @@ void main() {
           : L10n.createReport.en;
       final titleRect = tester.getRect(find.text(titleText).first);
       expect(titleRect.top, greaterThanOrEqualTo(0));
-      final appBarBottom = tester.getRect(find.byType(AppBar)).bottom;
-      expect(titleRect.bottom, lessThanOrEqualTo(appBarBottom + 1));
-      // Issued documents is a body header action below the AppBar now.
+      // Header compaction: no AppBar — the title sits in the compact
+      // ShellHeader row; it must end inside that row, and the flow bar's
+      // Issued documents action must start below it.
+      final headerBottom = tester
+          .getRect(find.byType(BilingualHeaderTitle))
+          .bottom;
+      expect(titleRect.bottom, lessThanOrEqualTo(headerBottom + 1));
       final actionText = mode == KarvaanLanguageMode.urdu
           ? L10n.issuedDocuments.ur
           : L10n.issuedDocuments.en;
       final actionRect = tester.getRect(find.text(actionText).first);
-      expect(actionRect.top, greaterThanOrEqualTo(appBarBottom - 1));
+      expect(actionRect.top, greaterThanOrEqualTo(headerBottom - 1));
     });
   }
 
@@ -177,10 +180,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(L10n.noTripsInThisScope.en), findsOneWidget);
     expect(find.text(L10n.noMatchesForFilters.en), findsNothing);
-    expect(
-      find.widgetWithText(TextButton, L10n.previous.en),
-      findsNothing,
-    );
+    expect(find.widgetWithText(TextButton, L10n.previous.en), findsNothing);
     await tester.tap(find.byKey(const ValueKey('trip-filter-DRAFT')));
     await tester.pumpAndSettle();
     expect(find.text(L10n.noMatchesForFilters.en), findsOneWidget);
@@ -218,10 +218,7 @@ void main() {
     // in the empty state itself; the header "New expense" button is
     // suppressed while the list is empty (they competed — group 9).
     expect(find.text(L10n.recordExpense.en), findsOneWidget);
-    expect(
-      find.widgetWithText(FilledButton, L10n.newExpense.en),
-      findsNothing,
-    );
+    expect(find.widgetWithText(FilledButton, L10n.newExpense.en), findsNothing);
     expect(find.widgetWithText(TextButton, L10n.previous.en), findsNothing);
   });
 

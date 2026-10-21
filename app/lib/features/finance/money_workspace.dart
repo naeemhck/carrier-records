@@ -4,6 +4,7 @@ import '../../app/bilingual.dart';
 import '../../app/karvaan_components.dart';
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_patterns.dart';
+import '../../app/shell_header.dart';
 import '../reports/report_repository.dart';
 import 'financial_repository.dart' show LedgerAmount;
 
@@ -199,82 +200,85 @@ class _MoneyWorkspaceState extends State<MoneyWorkspace> {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.moneyNavigation),
-      actions: [
-        IconButton(
+  Widget build(BuildContext context) => ShellHeader(
+    // Title + refresh live in the shell's single header row (header
+    // compaction); no stacked AppBar title block any more.
+    title: L10n.moneyNavigation,
+    actions: [
+      ShellHeaderAction(
+        child: IconButton(
           onPressed: reload,
           icon: const Icon(Icons.refresh),
           tooltip: L10n.searchRefreshAccessibility,
         ),
-      ],
-    ),
-    body: LayoutBuilder(
-      builder: (context, constraints) {
-        // Desktop (plan §4): the page never scrolls — the party table owns
-        // the remaining height and scrolls internally. Phone widths scroll
-        // the page inside the fixed shell instead.
-        final wide = constraints.maxWidth >= 760;
-        final header = <Widget>[
-          FutureBuilder<Map<String, dynamic>>(
-            future: monthly,
-            builder: (context, s) {
-              if (s.connectionState != ConnectionState.done) {
-                return const LinearProgressIndicator();
-              }
-              if (s.hasError || !s.hasData) {
-                return const BilingualText(
-                  L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+      ),
+    ],
+    child: Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Desktop (plan §4): the page never scrolls — the party table owns
+          // the remaining height and scrolls internally. Phone widths scroll
+          // the page inside the fixed shell instead.
+          final wide = constraints.maxWidth >= 760;
+          final header = <Widget>[
+            FutureBuilder<Map<String, dynamic>>(
+              future: monthly,
+              builder: (context, s) {
+                if (s.connectionState != ConnectionState.done) {
+                  return const LinearProgressIndicator();
+                }
+                if (s.hasError || !s.hasData) {
+                  return const BilingualText(
+                    L10n.reportUnavailableCheckDatesTripSelectionAndCurrentOffice,
+                  );
+                }
+                final totals = Map<String, dynamic>.from(
+                  s.data!['totals'] as Map,
                 );
-              }
-              final totals = Map<String, dynamic>.from(
-                s.data!['totals'] as Map,
-              );
-              final cardWidth = wide
-                  ? (constraints.maxWidth - 32 - 24) / 3
-                  : constraints.maxWidth - 32;
-              return _band(totals, cardWidth);
-            },
-          ),
-          const SizedBox(height: 8),
-          const BilingualText(L10n.moneyWorkspacePurpose),
-          const SizedBox(height: 8),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: FilledButton(
-              onPressed: widget.onViewTrips,
-              child: const BilingualCaption(L10n.viewTrips),
+                final cardWidth = wide
+                    ? (constraints.maxWidth - 32 - 24) / 3
+                    : constraints.maxWidth - 32;
+                return _band(totals, cardWidth);
+              },
             ),
-          ),
-          const SizedBox(height: 12),
-          BilingualText(
-            L10n.parties,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-        ];
-        if (!wide) {
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              ...header,
-              SizedBox(height: 420, child: _partyTable()),
-            ],
+            const SizedBox(height: 8),
+            const BilingualText(L10n.moneyWorkspacePurpose),
+            const SizedBox(height: 8),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FilledButton(
+                onPressed: widget.onViewTrips,
+                child: const BilingualCaption(L10n.viewTrips),
+              ),
+            ),
+            const SizedBox(height: 12),
+            BilingualText(
+              L10n.parties,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+          ];
+          if (!wide) {
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              children: [
+                ...header,
+                SizedBox(height: 420, child: _partyTable()),
+              ],
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...header,
+                Expanded(child: _partyTable()),
+              ],
+            ),
           );
-        }
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ...header,
-              Expanded(child: _partyTable()),
-            ],
-          ),
-        );
-      },
+        },
+      ),
     ),
   );
 }

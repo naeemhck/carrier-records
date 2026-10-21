@@ -141,9 +141,12 @@ void main() {
       );
       await tester.pumpAndSettle();
       // QA text fixes 2026-10-20: scope header is now "Your office's trips".
+      // Header compaction 2026-10-21: the scope line renders in the
+      // one-line floating-label form, not a stacked BilingualText.
       final scopeFinder = find.byWidgetPredicate(
         (w) =>
-            w is BilingualText && w.text.en == L10n.assignedOfficeTrips.en,
+            w is BilingualFloatingLabel &&
+            w.message.en == L10n.assignedOfficeTrips.en,
       );
       await tester.scrollUntilVisible(
         scopeFinder,

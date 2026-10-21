@@ -399,6 +399,135 @@ class RouteLabel extends StatelessWidget {
   );
 }
 
+/// One-line screen title for the single shell header row (header
+/// compaction pass): in bilingual mode the English and Urdu runs sit on
+/// the SAME line at the owner's 20px heading size instead of stacking
+/// into a two-line title block. The pair is measured first; when both
+/// runs cannot fit the available width at natural size (very narrow
+/// screens, 200% text), the title falls back to the stacked pair so the
+/// header grows rather than clipping. Layout stays LTR; only the Urdu
+/// run itself is RTL.
+class BilingualHeaderTitle extends StatelessWidget {
+  const BilingualHeaderTitle(this.text, {super.key, this.style});
+  final Bilingual text;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) {
+      final base =
+          style ??
+          Theme.of(context).textTheme.headlineSmall ??
+          const TextStyle(fontSize: 20, fontWeight: FontWeight.w600);
+      final english = Text(
+        text.en,
+        style: base,
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+      );
+      if (text.ur.isEmpty || mode == KarvaanLanguageMode.english) {
+        return english;
+      }
+      final urduStyle = _urduStyle(context, base);
+      if (mode == KarvaanLanguageMode.urdu) {
+        return Semantics(
+          label: '${text.en}. ${text.ur}',
+          excludeSemantics: true,
+          child: Text(
+            text.ur,
+            style: urduStyle,
+            textDirection: TextDirection.rtl,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
+          ),
+        );
+      }
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.hasBoundedWidth && constraints.maxWidth < 64) {
+            // Degenerate sliver (can occur transiently in dense bars):
+            // one ellipsized English line, never a vertical explosion.
+            return english;
+          }
+          double measure(String value, TextStyle s, TextDirection dir) {
+            final painter = TextPainter(
+              text: TextSpan(text: value, style: s),
+              textDirection: dir,
+              textScaler: MediaQuery.textScalerOf(context),
+            )..layout();
+            final width = painter.width;
+            painter.dispose();
+            return width;
+          }
+
+          final fits =
+              !constraints.hasBoundedWidth ||
+              measure(text.en, base, TextDirection.ltr) +
+                      12 +
+                      measure(text.ur, urduStyle, TextDirection.rtl) <=
+                  constraints.maxWidth;
+          if (!fits) {
+            // Grow, never clip — but bounded: the stacked pair, each run
+            // on its own single line, fitted down when the pair is wider
+            // than the slot (long titles on phone widths). Two lines at
+            // most, so the header grows to ~2 line-heights, never to a
+            // wrapped paragraph.
+            return FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: AlignmentDirectional.centerStart,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    text.en,
+                    style: base,
+                    textDirection: TextDirection.ltr,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                  Text(
+                    text.ur,
+                    style: urduStyle,
+                    textDirection: TextDirection.rtl,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                ],
+              ),
+            );
+          }
+          return Semantics(
+            label: '${text.en}. ${text.ur}',
+            excludeSemantics: true,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(child: english),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    text.ur,
+                    style: urduStyle,
+                    textDirection: TextDirection.rtl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 /// Measure the same wrapping styles used by a complete stacked toolbar title.
 /// The caller supplies actual parent width after navigation/action reservations.
 double bilingualToolbarHeight(

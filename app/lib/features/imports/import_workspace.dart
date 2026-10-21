@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/karvaan_design.dart';
 import '../../app/karvaan_typography.dart';
+import '../../app/shell_header.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -612,31 +613,31 @@ class _ImportWorkspaceState extends State<ImportWorkspace> {
         ),
       ),
     ];
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-        title: const BilingualText(L10n.excelImports),
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 900) {
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [...setup, ...results],
+    return ShellHeader(
+      // Title lives in the shell's single header row (header compaction).
+      title: L10n.excelImports,
+      child: Scaffold(
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 900) {
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                children: [...setup, ...results],
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: 400, child: ListView(children: setup)),
+                  const SizedBox(width: 16),
+                  Expanded(child: ListView(children: results)),
+                ],
+              ),
             );
-          }
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: 400, child: ListView(children: setup)),
-                const SizedBox(width: 16),
-                Expanded(child: ListView(children: results)),
-              ],
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }

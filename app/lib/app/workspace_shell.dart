@@ -24,6 +24,7 @@ import '../features/trips/trip_repository.dart';
 import '../features/trips/trip_workspace.dart';
 import 'bilingual.dart';
 import 'karvaan_design.dart';
+import 'shell_header.dart';
 
 /// Account/root navigation must not circumvent any pending child PopScope.
 class WorkspaceRouteObserver extends NavigatorObserver {
@@ -31,15 +32,30 @@ class WorkspaceRouteObserver extends NavigatorObserver {
   bool get canReturnHome => !_routes.any(
     (route) => route.popDisposition == RoutePopDisposition.doNotPop,
   );
+
+  /// Reports the workspace navigator's current route so the shell
+  /// header can show the spec registered for it (header compaction).
+  void Function(Route<dynamic>? current)? onCurrentRouteChanged;
+  void _reportCurrent() =>
+      onCurrentRouteChanged?.call(_routes.isEmpty ? null : _routes.last);
   @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) =>
-      _routes.add(route);
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.add(route);
+    _reportCurrent();
+  }
+
   @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) =>
-      _routes.remove(route);
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.remove(route);
+    _reportCurrent();
+  }
+
   @override
-  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
-      _routes.remove(route);
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.remove(route);
+    _reportCurrent();
+  }
+
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     final index = oldRoute == null ? -1 : _routes.indexOf(oldRoute);
@@ -50,6 +66,7 @@ class WorkspaceRouteObserver extends NavigatorObserver {
         _routes[index] = newRoute;
       }
     }
+    _reportCurrent();
   }
 }
 
@@ -98,11 +115,17 @@ class WorkspaceShell extends StatefulWidget {
     required this.navigatorKey,
     required this.child,
     this.canReturnHome,
+    this.headerRegistry,
   });
   final StaffSession? session;
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget child;
   final bool Function()? canReturnHome;
+
+  /// Shared with the route observer so the header tracks the current
+  /// workspace route. When omitted the shell owns a private registry
+  /// (unit hosts); the most recent registration then wins.
+  final ShellHeaderRegistry? headerRegistry;
   @override
   State<WorkspaceShell> createState() => _WorkspaceShellState();
 }
@@ -110,6 +133,8 @@ class WorkspaceShell extends StatefulWidget {
 class _WorkspaceShellState extends State<WorkspaceShell> {
   bool collapsed = false;
   WorkspaceDestination? selected;
+  late final ShellHeaderRegistry _headers =
+      widget.headerRegistry ?? ShellHeaderRegistry();
   String scope(Map<String, dynamic>? p) {
     final offices =
         (p?['offices'] as List? ?? []).map((o) => o['id'].toString()).toList()
@@ -417,80 +442,192 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
             PopupMenuItem(value: 'logout', child: BilingualText(L10n.signOut)),
           ],
         );
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            final narrow = width < 760;
-            // Tablet band (GUI handoff group 8): between 760 and 1024
-            // the rail is always the compact icon rail — the full 208px
-            // rail left too little room for content at 768–1023px. The
-            // manual collapse toggle still applies at desktop widths.
-            final compactRail = collapsed || (!narrow && width < 1024);
-            return Scaffold(
-              body: SafeArea(
-                child: Row(
-                  children: [
-                    if (!narrow)
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: navigation(compactRail),
-                      ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: KarvaanGlass(
-                              child: Row(
-                                children: [
-                                  if (narrow)
-                                    Builder(
-                                      builder: (context) => IconButton(
-                                        tooltip: L10n.expandNavigation.inMode(
-                                          LanguageModeStore.instance.mode.value,
-                                        ),
-                                        icon: const Icon(Icons.menu),
-                                        onPressed: () => showDialog<void>(
-                                          animationStyle:
-                                              AnimationStyle.noAnimation,
-                                          context: context,
-                                          builder: (overlay) => Dialog(
-                                            child: navigation(
-                                              false,
-                                              dismiss: () =>
-                                                  Navigator.pop(overlay),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  Expanded(
+        return ShellHeaderScope(
+          registry: _headers,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final narrow = width < 760;
+              // Tablet band (GUI handoff group 8): between 760 and 1024
+              // the rail is always the compact icon rail — the full 208px
+              // rail left too little room for content at 768–1023px. The
+              // manual collapse toggle still applies at desktop widths.
+              final compactRail = collapsed || (!narrow && width < 1024);
+              return Scaffold(
+                body: SafeArea(
+                  child: Row(
+                    children: [
+                      if (!narrow)
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: navigation(compactRail),
+                        ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            // ONE header row (header compaction pass): the
+                            // current screen's one-line title + its primary
+                            // actions live here, beside the language menu
+                            // and account control. The signed-in name is a
+                            // compact chip, never a full-width bar of its
+                            // own; screens register their spec through
+                            // ShellHeader instead of stacking an AppBar.
+                            ListenableBuilder(
+                              listenable: _headers,
+                              builder: (context, _) {
+                                final spec = _headers.current;
+                                final canPop =
+                                    widget.navigatorKey.currentState
+                                        ?.canPop() ??
+                                    false;
+                                return Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    8,
+                                    6,
+                                    8,
+                                    6,
+                                  ),
+                                  child: KarvaanGlass(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
+                                        horizontal: 8,
+                                        vertical: 2,
                                       ),
-                                      child: Text(
-                                        p['display_name'].toString(),
-                                        overflow: TextOverflow.ellipsis,
+                                      child: Row(
+                                        children: [
+                                          if (narrow)
+                                            Builder(
+                                              builder: (context) => IconButton(
+                                                tooltip: L10n.expandNavigation
+                                                    .inMode(
+                                                      LanguageModeStore
+                                                          .instance
+                                                          .mode
+                                                          .value,
+                                                    ),
+                                                icon: const Icon(Icons.menu),
+                                                onPressed: () =>
+                                                    showDialog<void>(
+                                                      animationStyle:
+                                                          AnimationStyle
+                                                              .noAnimation,
+                                                      context: context,
+                                                      builder: (overlay) =>
+                                                          Dialog(
+                                                            child: navigation(
+                                                              false,
+                                                              dismiss: () =>
+                                                                  Navigator.pop(
+                                                                    overlay,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                    ),
+                                              ),
+                                            ),
+                                          if (spec != null && canPop)
+                                            IconButton(
+                                              tooltip: MaterialLocalizations.of(
+                                                context,
+                                              ).backButtonTooltip,
+                                              icon: const Icon(
+                                                Icons.arrow_back,
+                                              ),
+                                              onPressed: () => widget
+                                                  .navigatorKey
+                                                  .currentState
+                                                  ?.maybePop(),
+                                            ),
+                                          Expanded(
+                                            child: spec == null
+                                                ? const SizedBox.shrink()
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 4,
+                                                        ),
+                                                    child: BilingualHeaderTitle(
+                                                      spec.title,
+                                                      key: const ValueKey(
+                                                        'shell-header-title',
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ),
+                                          if (spec != null)
+                                            for (final action in spec.actions)
+                                              if (action.form(narrow) != null)
+                                                action.form(narrow)!,
+                                          if (!narrow)
+                                            Padding(
+                                              key: const ValueKey(
+                                                'shell-user-chip',
+                                              ),
+                                              padding: const EdgeInsets.only(
+                                                left: 8,
+                                              ),
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  color: KarvaanDesign.muted,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6,
+                                                      ),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.person_outline,
+                                                        size: 16,
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      ConstrainedBox(
+                                                        constraints:
+                                                            const BoxConstraints(
+                                                              maxWidth: 160,
+                                                            ),
+                                                        child: Text(
+                                                          p['display_name']
+                                                              .toString(),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                          textDirection:
+                                                              TextDirection.ltr,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          const LanguageModeMenuButton(),
+                                          account,
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  const LanguageModeMenuButton(),
-                                  account,
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          ),
-                          Expanded(child: widget.child),
-                        ],
+                            Expanded(child: widget.child),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

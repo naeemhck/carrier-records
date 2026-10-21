@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/karvaan_components.dart';
 import '../../app/karvaan_design.dart';
+import '../../app/shell_header.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -631,127 +632,125 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => Scaffold(
-      appBar: AppBar(
-        toolbarHeight: bilingualToolbarHeight(
-          context,
-          L10n.expensesAndReimbursements,
-          constraints.maxWidth - kToolbarHeight - kMinInteractiveDimension - 32,
+  Widget build(BuildContext context) => ShellHeader(
+    // Title + refresh live in the shell's single header row (header
+    // compaction); no stacked AppBar title block any more.
+    title: L10n.expensesAndReimbursements,
+    actions: [
+      ShellHeaderAction(
+        child: IconButton(
+          onPressed: busy ? null : load,
+          icon: const Icon(Icons.refresh),
         ),
-        title: DefaultTextStyle(
-          style: Theme.of(context).textTheme.titleLarge!,
-          child: const BilingualText(L10n.expensesAndReimbursements),
-        ),
-        actions: [
-          IconButton(
-            onPressed: busy ? null : load,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const BilingualText(
-            L10n.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless,
-          ),
-          if (busy) const LinearProgressIndicator(),
-          if (error != null) BilingualOwnedText(error!),
-          if (!busy && error == null && rows.isNotEmpty) totalsStrip(),
-          // One create action per state (handoff group 9): while the
-          // list is empty, the empty state below carries the action
-          // ("Record expense"); this header button serves the populated
-          // and loading states.
-          if (busy || error != null || rows.isNotEmpty)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton.icon(
-                onPressed: busy ? null : () => open(newEntry()),
-                icon: const Icon(Icons.add),
-                label: const BilingualText(L10n.newExpense),
-              ),
+    ],
+    child: LayoutBuilder(
+      builder: (context, constraints) => Scaffold(
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          children: [
+            const BilingualText(
+              L10n.permittedOfficeAndTripExpensesMaintenanceRemainsUnlinkedUnless,
             ),
-          if (widget.corrections != null)
-            TextButton(
-              onPressed: () => open(
-                CorrectionWorkspace(
-                  commands: widget.corrections!,
-                  trips: widget.trips,
-                  guard: widget.guard,
-                ),
-              ),
-              child: const BilingualCaption(L10n.correctionsAndHistory),
-            ),
-          if (widget.administrator)
-            TextButton(
-              onPressed: busy
-                  ? null
-                  : () async {
-                      setState(() => busy = true);
-                      try {
-                        final n = await widget.expenses.cleanup();
-                        if (mounted) {
-                          setState(
-                            () => error =
-                                'Removed $n abandoned uploads older than 24 hours. Referenced receipts are retained.',
-                          );
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          setState(
-                            () => error = 'Cleanup failed. Referenced receipts are retained.',
-                          );
-                        }
-                      } finally {
-                        if (mounted) setState(() => busy = false);
-                      }
-                    },
-              child: const BilingualCaption(L10n.cleanAbandonedReceiptUploads),
-            ),
-          if (!busy && error == null && rows.isEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Scope-specific empty wording, matching the registers
-                // (GPT QA F05): the main list is scope-bound, unlike the
-                // search pickers, which keep the generic line.
-                const BilingualText(L10n.noExpensesInYourCurrentScope),
-                TextButton(
+            if (busy) const LinearProgressIndicator(),
+            if (error != null) BilingualOwnedText(error!),
+            if (!busy && error == null && rows.isNotEmpty) totalsStrip(),
+            // One create action per state (handoff group 9): while the
+            // list is empty, the empty state below carries the action
+            // ("Record expense"); this header button serves the populated
+            // and loading states.
+            if (busy || error != null || rows.isNotEmpty)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.icon(
                   onPressed: busy ? null : () => open(newEntry()),
-                  child: const BilingualCaption(L10n.recordExpense),
+                  icon: const Icon(Icons.add),
+                  label: const BilingualText(L10n.newExpense),
                 ),
-              ],
-            ),
-          if (constraints.maxWidth >= 768 && rows.isNotEmpty)
-            _expensesTable()
-          else
-            for (final row in rows) _expenseCard(row),
-          // Pagination hides when there is nothing to page through.
-          if (rows.isNotEmpty || offset > 0)
-            Row(
-              children: [
-                TextButton(
-                  onPressed: busy || offset == 0
-                      ? null
-                      : () {
-                          offset -= 50;
-                          load();
-                        },
-                  child: const BilingualCaption(L10n.previous),
+              ),
+            if (widget.corrections != null)
+              TextButton(
+                onPressed: () => open(
+                  CorrectionWorkspace(
+                    commands: widget.corrections!,
+                    trips: widget.trips,
+                    guard: widget.guard,
+                  ),
                 ),
-                TextButton(
-                  onPressed: busy || rows.length < 50
-                      ? null
-                      : () {
-                          offset += 50;
-                          load();
-                        },
-                  child: const BilingualCaption(L10n.next),
+                child: const BilingualCaption(L10n.correctionsAndHistory),
+              ),
+            if (widget.administrator)
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () async {
+                        setState(() => busy = true);
+                        try {
+                          final n = await widget.expenses.cleanup();
+                          if (mounted) {
+                            setState(
+                              () => error =
+                                  'Removed $n abandoned uploads older than 24 hours. Referenced receipts are retained.',
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            setState(
+                              () => error = 'Cleanup failed. Referenced receipts are retained.',
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => busy = false);
+                        }
+                      },
+                child: const BilingualCaption(
+                  L10n.cleanAbandonedReceiptUploads,
                 ),
-              ],
-            ),
-        ],
+              ),
+            if (!busy && error == null && rows.isEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Scope-specific empty wording, matching the registers
+                  // (GPT QA F05): the main list is scope-bound, unlike the
+                  // search pickers, which keep the generic line.
+                  const BilingualText(L10n.noExpensesInYourCurrentScope),
+                  TextButton(
+                    onPressed: busy ? null : () => open(newEntry()),
+                    child: const BilingualCaption(L10n.recordExpense),
+                  ),
+                ],
+              ),
+            if (constraints.maxWidth >= 768 && rows.isNotEmpty)
+              _expensesTable()
+            else
+              for (final row in rows) _expenseCard(row),
+            // Pagination hides when there is nothing to page through.
+            if (rows.isNotEmpty || offset > 0)
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: busy || offset == 0
+                        ? null
+                        : () {
+                            offset -= 50;
+                            load();
+                          },
+                    child: const BilingualCaption(L10n.previous),
+                  ),
+                  TextButton(
+                    onPressed: busy || rows.length < 50
+                        ? null
+                        : () {
+                            offset += 50;
+                            load();
+                          },
+                    child: const BilingualCaption(L10n.next),
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
     ),
   );

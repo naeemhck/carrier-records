@@ -2,6 +2,7 @@ import 'package:carrier_records/app/bilingual.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/karvaan_choice_field.dart';
+import '../../app/shell_header.dart';
 import 'document_repository.dart';
 import '../masters/master_repository.dart';
 import 'output_workspace.dart';
@@ -90,39 +91,34 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => Scaffold(
-      appBar: AppBar(
-        // Measure the title against the real layout width, not
-        // MediaQuery.sizeOf (a placeholder in some hosts would wrap
-        // the title per glyph and inflate the bar).
-        toolbarHeight: bilingualToolbarHeight(
-          context,
-          L10n.issuedDocuments,
-          constraints.maxWidth - 72,
+  Widget build(BuildContext context) => ShellHeader(
+    // Title + Create report live in the shell's single header row
+    // (header compaction); the Create report action was a lone body row
+    // here and is a header action now — same destination, same label.
+    title: L10n.issuedDocuments,
+    actions: [
+      if (widget.onConfigure != null)
+        ShellHeaderAction(
+          child: TextButton.icon(
+            onPressed: widget.onConfigure,
+            icon: const Icon(Icons.post_add),
+            label: const BilingualCaption(L10n.createReport),
+          ),
+          compactChild: IconButton(
+            onPressed: widget.onConfigure,
+            icon: const Icon(Icons.post_add),
+            tooltip: L10n.createReport.inMode(
+              LanguageModeStore.instance.mode.value,
+            ),
+          ),
         ),
-        title: const BilingualText(L10n.issuedDocuments),
-      ),
+    ],
+    child: Scaffold(
       // One scroll flow gives large text its natural height; pagination cannot
       // squeeze an empty-state viewport to zero or paint over its Urdu lines.
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         children: [
-          if (widget.onConfigure != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              // A normal header action at its natural width, labelled by
-              // what it does (GUI handoff group 6) — not a full-width
-              // "Outputs and presets" strip.
-              child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: OutlinedButton.icon(
-                  onPressed: widget.onConfigure,
-                  icon: const Icon(Icons.post_add),
-                  label: const BilingualCaption(L10n.createReport),
-                ),
-              ),
-            ),
           TextField(
             controller: search,
             decoration: bilingualDecoration(
@@ -293,8 +289,9 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
           // documents stay distinct groups. The register above is the
           // permanent, numbered record; ad-hoc generations are working
           // copies and are not persisted anywhere, so this group states
-          // that plainly — the Outputs button at the top is where reports
-          // are generated and issued — instead of inventing history rows.
+          // that plainly — the Create report header action is where
+          // reports are generated and issued — instead of inventing
+          // history rows.
           const SizedBox(height: 24),
           const Divider(),
           BilingualText(

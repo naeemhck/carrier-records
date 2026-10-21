@@ -7,6 +7,7 @@ import 'package:carrier_records/core/domain/record_context.dart';
 import 'dart:convert';
 
 import '../../app/karvaan_design.dart';
+import '../../app/shell_header.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -604,424 +605,431 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: BilingualText(
-        widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
-      ),
-    ),
-    body: LayoutBuilder(
-      builder: (context, constraints) {
-        final wide = constraints.maxWidth > 768;
-        // Desktop defaults to the table, phone to compact cards; the
-        // toolbar toggle overrides the default for the session.
-        final showTable = wide && (tableViewOverride ?? true);
-        // On phones the search field's Urdu companion line moves out of
-        // the helper slot so the first record starts higher (handoff
-        // group 8); the floating label still carries the active
-        // language. Wide layouts keep the full bilingual decoration.
-        final fullSearchDecoration = bilingualDecoration(
-          context,
-          InputDecoration(
-            label: BilingualCaption(L10n.searchTripVehicleOrParty),
-          ),
-        );
-        final searchDecoration = wide
-            ? fullSearchDecoration
-            : fullSearchDecoration.copyWith(helper: const SizedBox.shrink());
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // One heading (the AppBar) and one toolbar: search stays
-              // visible, the remaining filters collapse behind Filters,
-              // and results start immediately below (density pass). A Wrap,
-              // not a Row: a decorated field inside a flex row mis-measures
-              // its bilingual helper at phone widths.
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  SizedBox(
-                    width: wide ? 360 : constraints.maxWidth - 32,
-                    child: TextField(
-                      controller: search,
-                      decoration: searchDecoration,
-                      onSubmitted: (_) => reload(start: 0),
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    key: const ValueKey('trips-filters-toggle'),
-                    onPressed: () => setState(() => filtersOpen = !filtersOpen),
-                    icon: Icon(
-                      filtersOpen
-                          ? Icons.filter_list_off_outlined
-                          : Icons.filter_list_outlined,
-                    ),
-                    label: const BilingualCaption(L10n.filters),
-                  ),
-                  if (wide) ...[
-                    IconButton(
-                      key: const ValueKey('trips-view-cards'),
-                      tooltip: L10n.cardsView.inMode(
-                        LanguageModeStore.instance.mode.value,
+  Widget build(BuildContext context) => ShellHeader(
+    // Title lives in the shell's single header row (header compaction);
+    // this screen has no separate AppBar title block any more.
+    title: widget.moneyMode ? L10n.moneyNavigation : L10n.trips,
+    child: Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth > 768;
+          // Desktop defaults to the table, phone to compact cards; the
+          // toolbar toggle overrides the default for the session.
+          final showTable = wide && (tableViewOverride ?? true);
+          // On phones the search field's Urdu companion line moves out of
+          // the helper slot so the first record starts higher (handoff
+          // group 8); the floating label still carries the active
+          // language. Wide layouts keep the full bilingual decoration.
+          final fullSearchDecoration = bilingualDecoration(
+            context,
+            InputDecoration(
+              label: BilingualCaption(L10n.searchTripVehicleOrParty),
+            ),
+          );
+          final searchDecoration = wide
+              ? fullSearchDecoration
+              : fullSearchDecoration.copyWith(helper: const SizedBox.shrink());
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // One heading (the shell header) and one toolbar: search stays
+                // visible, the remaining filters collapse behind Filters,
+                // and results start immediately below (density pass). A Wrap,
+                // not a Row: a decorated field inside a flex row mis-measures
+                // its bilingual helper at phone widths.
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: wide ? 360 : constraints.maxWidth - 32,
+                      child: TextField(
+                        controller: search,
+                        decoration: searchDecoration,
+                        onSubmitted: (_) => reload(start: 0),
                       ),
-                      isSelected: !showTable,
-                      style: IconButton.styleFrom(
-                        backgroundColor: !showTable
-                            ? KarvaanDesign.borderColor
-                            : null,
-                      ),
-                      icon: const Icon(Icons.view_agenda_outlined),
+                    ),
+                    OutlinedButton.icon(
+                      key: const ValueKey('trips-filters-toggle'),
                       onPressed: () =>
-                          setState(() => tableViewOverride = false),
-                    ),
-                    IconButton(
-                      key: const ValueKey('trips-view-table'),
-                      tooltip: L10n.tableView.inMode(
-                        LanguageModeStore.instance.mode.value,
+                          setState(() => filtersOpen = !filtersOpen),
+                      icon: Icon(
+                        filtersOpen
+                            ? Icons.filter_list_off_outlined
+                            : Icons.filter_list_outlined,
                       ),
-                      isSelected: showTable,
-                      style: IconButton.styleFrom(
-                        backgroundColor: showTable
-                            ? KarvaanDesign.borderColor
-                            : null,
-                      ),
-                      icon: const Icon(Icons.table_rows_outlined),
-                      onPressed: () => setState(() => tableViewOverride = true),
+                      label: const BilingualCaption(L10n.filters),
                     ),
+                    if (wide) ...[
+                      IconButton(
+                        key: const ValueKey('trips-view-cards'),
+                        tooltip: L10n.cardsView.inMode(
+                          LanguageModeStore.instance.mode.value,
+                        ),
+                        isSelected: !showTable,
+                        style: IconButton.styleFrom(
+                          backgroundColor: !showTable
+                              ? KarvaanDesign.borderColor
+                              : null,
+                        ),
+                        icon: const Icon(Icons.view_agenda_outlined),
+                        onPressed: () =>
+                            setState(() => tableViewOverride = false),
+                      ),
+                      IconButton(
+                        key: const ValueKey('trips-view-table'),
+                        tooltip: L10n.tableView.inMode(
+                          LanguageModeStore.instance.mode.value,
+                        ),
+                        isSelected: showTable,
+                        style: IconButton.styleFrom(
+                          backgroundColor: showTable
+                              ? KarvaanDesign.borderColor
+                              : null,
+                        ),
+                        icon: const Icon(Icons.table_rows_outlined),
+                        onPressed: () =>
+                            setState(() => tableViewOverride = true),
+                      ),
+                    ],
+                    if (!widget.moneyMode)
+                      FilledButton.icon(
+                        onPressed: () => edit(TripDraft()),
+                        icon: const Icon(Icons.add),
+                        label: const BilingualText(L10n.newTrip),
+                      ),
                   ],
-                  if (!widget.moneyMode)
-                    FilledButton.icon(
-                      onPressed: () => edit(TripDraft()),
-                      icon: const Icon(Icons.add),
-                      label: const BilingualText(L10n.newTrip),
-                    ),
-                ],
-              ),
-              if (widget.moneyMode) ...[
-                const SizedBox(height: 8),
-                const BilingualCaption(L10n.moneyWorkspacePurpose),
-                const BilingualCaption(
-                  L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
                 ),
-              ],
-              const SizedBox(height: 10),
-              // Status filter chips in one compact row (it scrolls
-              // sideways on phones / at 200% scale instead of stacking).
-              // "All" clears the filter; the remaining chips map 1:1 to
-              // the backend trip states, including Cancelled. Chip labels
-              // use the single-line floating-label form (the full pair
-              // stays in semantics/tooltip) so the row stays ~40px, and
-              // a chevron at the right edge makes the sideways scroll
-              // discoverable (GUI handoff group 8).
-              Stack(
-                children: [
-                  SingleChildScrollView(
-                    controller: chipScroll,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        for (final s in const [
-                          null,
-                          'DRAFT',
-                          'DISPATCHED',
-                          'ARRIVED',
-                          'CANCELLED',
-                        ])
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ChoiceChip(
-                              key: ValueKey('trip-filter-${s ?? 'ALL'}'),
-                              label: BilingualFloatingLabel(
-                                s == null ? L10n.all : tripStateLabel(s),
+                if (widget.moneyMode) ...[
+                  const SizedBox(height: 8),
+                  const BilingualCaption(L10n.moneyWorkspacePurpose),
+                  const BilingualCaption(
+                    L10n.permittedTripsOnlyNotACompletePartyOrBusiness,
+                  ),
+                ],
+                const SizedBox(height: 8),
+                // Status filter chips in one compact row (it scrolls
+                // sideways on phones / at 200% scale instead of stacking).
+                // "All" clears the filter; the remaining chips map 1:1 to
+                // the backend trip states, including Cancelled. Chip labels
+                // use the single-line floating-label form (the full pair
+                // stays in semantics/tooltip) so the row stays ~40px, and
+                // a chevron at the right edge makes the sideways scroll
+                // discoverable (GUI handoff group 8).
+                Stack(
+                  children: [
+                    SingleChildScrollView(
+                      controller: chipScroll,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final s in const [
+                            null,
+                            'DRAFT',
+                            'DISPATCHED',
+                            'ARRIVED',
+                            'CANCELLED',
+                          ])
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ChoiceChip(
+                                key: ValueKey('trip-filter-${s ?? 'ALL'}'),
+                                label: BilingualFloatingLabel(
+                                  s == null ? L10n.all : tripStateLabel(s),
+                                ),
+                                selected: status == s,
+                                showCheckmark: false,
+                                selectedColor: KarvaanDesign.borderColor,
+                                onSelected: (_) {
+                                  status = s;
+                                  reload(start: 0);
+                                },
                               ),
-                              selected: status == s,
-                              showCheckmark: false,
-                              selectedColor: KarvaanDesign.borderColor,
-                              onSelected: (_) {
-                                status = s;
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (!wide)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                KarvaanDesign.background.withValues(alpha: 0),
+                                KarvaanDesign.background,
+                              ],
+                            ),
+                          ),
+                          child: IconButton(
+                            iconSize: 18,
+                            tooltip: L10n.next.inMode(
+                              LanguageModeStore.instance.mode.value,
+                            ),
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: () => chipScroll.animateTo(
+                              (chipScroll.offset + 220).clamp(
+                                0,
+                                chipScroll.position.maxScrollExtent,
+                              ),
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeOut,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                if (filtersOpen) ...[
+                  const SizedBox(height: 10),
+                  Card(
+                    key: const ValueKey('trips-filters-panel'),
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 220,
+                            child: KarvaanChoiceField<String>(
+                              initialValue: office,
+                              decoration: bilingualDecoration(
+                                context,
+                                InputDecoration(
+                                  label: BilingualCaption(L10n.officeFilter),
+                                ),
+                              ),
+                              items: [
+                                const DropdownMenuItem(
+                                  value: null,
+                                  child: BilingualText(L10n.allOffices),
+                                ),
+                                for (final o in widget.offices)
+                                  DropdownMenuItem(
+                                    value: o['id'] as String,
+                                    child: Text(o['name'] as String),
+                                  ),
+                              ],
+                              onChanged: (v) {
+                                office = v;
                                 reload(start: 0);
                               },
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                  if (!wide)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              KarvaanDesign.background.withValues(alpha: 0),
-                              KarvaanDesign.background,
-                            ],
-                          ),
-                        ),
-                        child: IconButton(
-                          iconSize: 18,
-                          tooltip: L10n.next.inMode(
-                            LanguageModeStore.instance.mode.value,
-                          ),
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () => chipScroll.animateTo(
-                            (chipScroll.offset + 220).clamp(
-                              0,
-                              chipScroll.position.maxScrollExtent,
-                            ),
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              if (filtersOpen) ...[
-                const SizedBox(height: 10),
-                Card(
-                  key: const ValueKey('trips-filters-panel'),
-                  margin: EdgeInsets.zero,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 220,
-                          child: KarvaanChoiceField<String>(
-                            initialValue: office,
-                            decoration: bilingualDecoration(
-                              context,
-                              InputDecoration(
-                                label: BilingualCaption(L10n.officeFilter),
+                          SizedBox(
+                            width: 320,
+                            child: BilingualListTile(
+                              title: BilingualText(
+                                (vehicleName != null
+                                    ? Bilingual.data(vehicleName)
+                                    : L10n.vehicleFilterAll),
+                              ),
+                              trailing: Wrap(
+                                children: [
+                                  TextButton(
+                                    onPressed: () async {
+                                      final v = await chooseMaster(
+                                        context,
+                                        widget.masters,
+                                        MasterKind.vehicle,
+                                      );
+                                      if (v != null && mounted) {
+                                        vehicle = v.id;
+                                        vehicleName = v.label;
+                                        reload(start: 0);
+                                      }
+                                    },
+                                    child: const BilingualCaption(L10n.choose),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      vehicle = null;
+                                      vehicleName = null;
+                                      reload(start: 0);
+                                    },
+                                    child: const BilingualCaption(L10n.clear),
+                                  ),
+                                ],
                               ),
                             ),
-                            items: [
-                              const DropdownMenuItem(
-                                value: null,
-                                child: BilingualText(L10n.allOffices),
-                              ),
-                              for (final o in widget.offices)
-                                DropdownMenuItem(
-                                  value: o['id'] as String,
-                                  child: Text(o['name'] as String),
-                                ),
-                            ],
-                            onChanged: (v) {
-                              office = v;
+                          ),
+                          SizedBox(
+                            width: 170,
+                            child: KarvaanDateField(
+                              controller: from,
+                              label: L10n.dateFrom,
+                              onChanged: () => reload(start: 0),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 170,
+                            child: KarvaanDateField(
+                              controller: to,
+                              label: L10n.dateTo,
+                              onChanged: () => reload(start: 0),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => reload(start: 0),
+                            child: const BilingualCaption(L10n.searchRefresh),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                office = null;
+                                vehicle = null;
+                                vehicleName = null;
+                                from.clear();
+                                to.clear();
+                              });
                               reload(start: 0);
                             },
-                          ),
-                        ),
-                        SizedBox(
-                          width: 320,
-                          child: BilingualListTile(
-                            title: BilingualText(
-                              (vehicleName != null
-                                  ? Bilingual.data(vehicleName)
-                                  : L10n.vehicleFilterAll),
+                            child: const BilingualCaption(
+                              L10n.clearRecordFilters,
                             ),
-                            trailing: Wrap(
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                // Results own the remaining height and scroll internally;
+                // the page itself never scrolls on desktop (plan §4).
+                Expanded(
+                  child: FutureBuilder<TripPage>(
+                    future: page,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return BilingualOwnedText(tripError(snapshot.error!));
+                      }
+                      if (!snapshot.hasData) {
+                        return const LinearProgressIndicator();
+                      }
+                      final result = snapshot.data!;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // One-line scope caption (header compaction):
+                          // the floating-label form the status chips use —
+                          // one line at body size, the full pair stays in
+                          // semantics — instead of a stacked two-line block
+                          // above the register.
+                          BilingualFloatingLabel(
+                            result.scope == 'ALL_OFFICES'
+                                ? L10n.allOffices
+                                : widget.moneyMode
+                                ? L10n.tripsWithMoneyScope
+                                : L10n.assignedOfficeTrips,
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: result.rows.isEmpty
+                                ? ListView(
+                                    children: [
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(24),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // Empty states say WHICH kind
+                                              // of empty this is (handoff
+                                              // group 9): filtered-no-match
+                                              // offers filter recovery; a
+                                              // genuinely empty scope offers
+                                              // record creation.
+                                              if (search.text
+                                                      .trim()
+                                                      .isNotEmpty ||
+                                                  status != null ||
+                                                  office != null ||
+                                                  vehicle != null ||
+                                                  from.text.isNotEmpty ||
+                                                  to.text.isNotEmpty) ...[
+                                                const BilingualText(
+                                                  L10n.noMatchesForFilters,
+                                                ),
+                                                const SizedBox(height: 12),
+                                                TextButton(
+                                                  onPressed: clearAllFilters,
+                                                  child: const BilingualCaption(
+                                                    L10n.clearRecordFilters,
+                                                  ),
+                                                ),
+                                              ] else ...[
+                                                const BilingualText(
+                                                  L10n.noTripsInThisScope,
+                                                ),
+                                                if (!widget.moneyMode) ...[
+                                                  const SizedBox(height: 12),
+                                                  FilledButton.icon(
+                                                    onPressed: () =>
+                                                        edit(TripDraft()),
+                                                    icon: const Icon(Icons.add),
+                                                    label: const BilingualText(
+                                                      L10n.newTrip,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : showTable
+                                ? SingleChildScrollView(
+                                    child: _tripsTable(result.rows),
+                                  )
+                                : ListView(
+                                    children: [
+                                      for (final r in result.rows) _tripCard(r),
+                                    ],
+                                  ),
+                          ),
+                          // Pagination hides when there is nothing to
+                          // page through (handoff group 9).
+                          if (result.rows.isNotEmpty || offset > 0)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 TextButton(
-                                  onPressed: () async {
-                                    final v = await chooseMaster(
-                                      context,
-                                      widget.masters,
-                                      MasterKind.vehicle,
-                                    );
-                                    if (v != null && mounted) {
-                                      vehicle = v.id;
-                                      vehicleName = v.label;
-                                      reload(start: 0);
-                                    }
-                                  },
-                                  child: const BilingualCaption(L10n.choose),
+                                  onPressed: offset == 0
+                                      ? null
+                                      : () => reload(start: offset - 50),
+                                  child: const BilingualCaption(L10n.previous),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    vehicle = null;
-                                    vehicleName = null;
-                                    reload(start: 0);
-                                  },
-                                  child: const BilingualCaption(L10n.clear),
+                                  onPressed: result.rows.length < 50
+                                      ? null
+                                      : () => reload(start: offset + 50),
+                                  child: const BilingualCaption(L10n.next),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 170,
-                          child: KarvaanDateField(
-                            controller: from,
-                            label: L10n.dateFrom,
-                            onChanged: () => reload(start: 0),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 170,
-                          child: KarvaanDateField(
-                            controller: to,
-                            label: L10n.dateTo,
-                            onChanged: () => reload(start: 0),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => reload(start: 0),
-                          child: const BilingualCaption(L10n.searchRefresh),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              office = null;
-                              vehicle = null;
-                              vehicleName = null;
-                              from.clear();
-                              to.clear();
-                            });
-                            reload(start: 0);
-                          },
-                          child: const BilingualCaption(
-                            L10n.clearRecordFilters,
-                          ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
-              const SizedBox(height: 8),
-              // Results own the remaining height and scroll internally;
-              // the page itself never scrolls on desktop (plan §4).
-              Expanded(
-                child: FutureBuilder<TripPage>(
-                  future: page,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return BilingualOwnedText(tripError(snapshot.error!));
-                    }
-                    if (!snapshot.hasData) {
-                      return const LinearProgressIndicator();
-                    }
-                    final result = snapshot.data!;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        BilingualText(
-                          (result.scope == 'ALL_OFFICES'
-                              ? L10n.allOffices
-                              : widget.moneyMode
-                              ? L10n.tripsWithMoneyScope
-                              : L10n.assignedOfficeTrips),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: result.rows.isEmpty
-                              ? ListView(
-                                  children: [
-                                    Card(
-                                      margin: EdgeInsets.zero,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(24),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            // Empty states say WHICH kind
-                                            // of empty this is (handoff
-                                            // group 9): filtered-no-match
-                                            // offers filter recovery; a
-                                            // genuinely empty scope offers
-                                            // record creation.
-                                            if (search.text.trim().isNotEmpty ||
-                                                status != null ||
-                                                office != null ||
-                                                vehicle != null ||
-                                                from.text.isNotEmpty ||
-                                                to.text.isNotEmpty) ...[
-                                              const BilingualText(
-                                                L10n.noMatchesForFilters,
-                                              ),
-                                              const SizedBox(height: 12),
-                                              TextButton(
-                                                onPressed: clearAllFilters,
-                                                child: const BilingualCaption(
-                                                  L10n.clearRecordFilters,
-                                                ),
-                                              ),
-                                            ] else ...[
-                                              const BilingualText(
-                                                L10n.noTripsInThisScope,
-                                              ),
-                                              if (!widget.moneyMode) ...[
-                                                const SizedBox(height: 12),
-                                                FilledButton.icon(
-                                                  onPressed: () =>
-                                                      edit(TripDraft()),
-                                                  icon: const Icon(Icons.add),
-                                                  label: const BilingualText(
-                                                    L10n.newTrip,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : showTable
-                              ? SingleChildScrollView(
-                                  child: _tripsTable(result.rows),
-                                )
-                              : ListView(
-                                  children: [
-                                    for (final r in result.rows) _tripCard(r),
-                                  ],
-                                ),
-                        ),
-                        // Pagination hides when there is nothing to
-                        // page through (handoff group 9).
-                        if (result.rows.isNotEmpty || offset > 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                onPressed: offset == 0
-                                    ? null
-                                    : () => reload(start: offset - 50),
-                                child: const BilingualCaption(L10n.previous),
-                              ),
-                              TextButton(
-                                onPressed: result.rows.length < 50
-                                    ? null
-                                    : () => reload(start: offset + 50),
-                                child: const BilingualCaption(L10n.next),
-                              ),
-                            ],
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     ),
   );
 }
@@ -1585,9 +1593,9 @@ class _TripEditorState extends State<TripEditor> {
         // the threshold grows with the text scaler so enlarged text
         // stacks instead of overflowing; a phone column (~358) stays
         // below it at every scale and keeps stacking.
-        final textScale = MediaQuery.textScalerOf(
-          context,
-        ).scale(1).clamp(1.0, 2.0);
+        final textScale = MediaQuery.textScalerOf(context)
+            .scale(1)
+            .clamp(1.0, 2.0);
         if (constraints.maxWidth < 400 * textScale) {
           // Narrow: the label takes its own line and the actions wrap
           // below the value, so nothing squeezes off the right edge even
@@ -1948,9 +1956,9 @@ class _TripEditorState extends State<TripEditor> {
                   // a mid-word break.
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final scale = MediaQuery.textScalerOf(
-                        context,
-                      ).scale(1).clamp(1.0, 2.0);
+                      final scale = MediaQuery.textScalerOf(context)
+                          .scale(1)
+                          .clamp(1.0, 2.0);
                       final minStepWidth = 148 * scale;
                       Widget stepButton(int i) => OutlinedButton(
                         key: ValueKey('trip-step-$i'),
@@ -2025,9 +2033,7 @@ class _TripEditorState extends State<TripEditor> {
                                     0,
                                     stepScroll.position.maxScrollExtent,
                                   ),
-                                  duration: const Duration(
-                                    milliseconds: 200,
-                                  ),
+                                  duration: const Duration(milliseconds: 200),
                                   curve: Curves.easeOut,
                                 ),
                               ),
