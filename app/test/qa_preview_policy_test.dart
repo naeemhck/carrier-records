@@ -93,9 +93,10 @@ void main() {
       );
     }
   });
-  testWidgets('QA banner stays legible at narrow 200 percent scale', (
-    tester,
-  ) async {
+  // Owner directive (2026-10-21): the synthetic-data banner is removed.
+  // The QA frame is now a pass-through — the child renders with no
+  // banner above it, even at narrow width and 200 percent scale.
+  testWidgets('QA frame renders the child with no banner', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -108,8 +109,8 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Testing — synthetic data only'), findsOneWidget);
-    expect(find.text('آزمائش — صرف مصنوعی ڈیٹا'), findsOneWidget);
+    expect(find.text('Testing — synthetic data only'), findsNothing);
+    expect(find.text('آزمائش — صرف مصنوعی ڈیٹا'), findsNothing);
     expect(find.text('Sign in'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

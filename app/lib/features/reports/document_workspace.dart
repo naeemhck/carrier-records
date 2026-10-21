@@ -131,7 +131,12 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
                 label: BilingualCaption(L10n.documentNumberRecipient),
               ),
             ),
-            onSubmitted: (_) => setState(() {
+            // Apply as the user types (GPT QA F06): the register used to
+            // wait for Enter, so a typed no-match search kept showing the
+            // unfiltered scope empty state with no Clear action. Reloading
+            // on change also rebuilds the empty-state branch below, which
+            // keys off the current search text.
+            onChanged: (_) => setState(() {
               offset = 0;
               reload();
             }),

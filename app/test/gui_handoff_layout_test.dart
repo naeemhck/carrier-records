@@ -210,7 +210,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text(L10n.noRecordsFound.en), findsOneWidget);
+    // GPT QA F05: the main list's empty state names its scope; the
+    // generic "No records found." line remains only in search pickers.
+    expect(find.text(L10n.noExpensesInYourCurrentScope.en), findsOneWidget);
+    expect(find.text(L10n.noRecordsFound.en), findsNothing);
     // Exactly one create action in the empty state: "Record expense"
     // in the empty state itself; the header "New expense" button is
     // suppressed while the list is empty (they competed — group 9).

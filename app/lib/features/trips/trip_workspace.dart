@@ -1355,6 +1355,15 @@ class _TripEditorState extends State<TripEditor> {
     setState(() => step = value);
   }
 
+  /// Scrolls the step row when it switches to its sideways form on
+  /// narrow screens (GPT QA F07).
+  final stepScroll = ScrollController();
+  @override
+  void dispose() {
+    stepScroll.dispose();
+    super.dispose();
+  }
+
   Widget reviewSummary() {
     Widget totals;
     try {
@@ -1544,6 +1553,7 @@ class _TripEditorState extends State<TripEditor> {
     child: LayoutBuilder(
       builder: (context, constraints) {
         final labelWidget = BilingualText(
+          key: ValueKey('trip-picker-$key-label'),
           ownedMessage(TripStrings.labels[key]),
           style: Theme.of(context).textTheme.labelLarge,
         );
@@ -1562,10 +1572,23 @@ class _TripEditorState extends State<TripEditor> {
         ];
         final valueWidget = Text(
           label ?? TripStrings.none,
+          key: ValueKey('trip-picker-$key-value'),
           textDirection: TextDirection.ltr,
           overflow: TextOverflow.ellipsis,
         );
-        if (constraints.maxWidth < 560) {
+        // Beside/stack threshold (GPT QA F04): the old fixed 560 was
+        // measured against the picker's own width, but inside the
+        // two-column desktop form each picker only gets about half the
+        // form (~476 of the 968 usable pixels), so the beside layout
+        // never engaged on desktop. 400 at 100% text scale covers the
+        // content (128 label + value + Choose/Clear) with slack, and
+        // the threshold grows with the text scaler so enlarged text
+        // stacks instead of overflowing; a phone column (~358) stays
+        // below it at every scale and keeps stacking.
+        final textScale = MediaQuery.textScalerOf(
+          context,
+        ).scale(1).clamp(1.0, 2.0);
+        if (constraints.maxWidth < 400 * textScale) {
           // Narrow: the label takes its own line and the actions wrap
           // below the value, so nothing squeezes off the right edge even
           // at 200% text scale.
@@ -1916,31 +1939,103 @@ class _TripEditorState extends State<TripEditor> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    spacing: 8,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var i = 0; i < 3; i++)
-                        Expanded(
-                          child: OutlinedButton(
-                            key: ValueKey('trip-step-$i'),
-                            onPressed: busy ? null : () => moveStep(i),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.all(8),
-                              backgroundColor: step == i
-                                  ? KarvaanDesign.borderColor
-                                  : Colors.white,
-                            ),
-                            child: BilingualText(
-                              [
-                                L10n.journeyStep,
-                                L10n.consignmentsStep,
-                                L10n.reviewStep,
-                              ][i],
+                  // Step row (GPT QA F07): three equal buttons while
+                  // each step keeps a readable minimum width; below
+                  // that the row scrolls sideways at natural step
+                  // widths — with the same fade + chevron affordance
+                  // as the Trips status chips — so a long bilingual
+                  // label like "Consignments" is never squeezed into
+                  // a mid-word break.
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final scale = MediaQuery.textScalerOf(
+                        context,
+                      ).scale(1).clamp(1.0, 2.0);
+                      final minStepWidth = 148 * scale;
+                      Widget stepButton(int i) => OutlinedButton(
+                        key: ValueKey('trip-step-$i'),
+                        onPressed: busy ? null : () => moveStep(i),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                          backgroundColor: step == i
+                              ? KarvaanDesign.borderColor
+                              : Colors.white,
+                        ),
+                        child: BilingualText(
+                          [
+                            L10n.journeyStep,
+                            L10n.consignmentsStep,
+                            L10n.reviewStep,
+                          ][i],
+                        ),
+                      );
+                      if (constraints.maxWidth >= minStepWidth * 3 + 16) {
+                        return Row(
+                          spacing: 8,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var i = 0; i < 3; i++)
+                              Expanded(child: stepButton(i)),
+                          ],
+                        );
+                      }
+                      return Stack(
+                        children: [
+                          SingleChildScrollView(
+                            key: const ValueKey('trip-steps-scroll'),
+                            controller: stepScroll,
+                            scrollDirection: Axis.horizontal,
+                            // Buttons take their natural width here, so
+                            // a label always gets the room its longest
+                            // line needs — it can never wrap mid-word.
+                            child: Row(
+                              spacing: 8,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var i = 0; i < 3; i++) stepButton(i),
+                              ],
                             ),
                           ),
-                        ),
-                    ],
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    KarvaanDesign.background.withValues(
+                                      alpha: 0,
+                                    ),
+                                    KarvaanDesign.background,
+                                  ],
+                                ),
+                              ),
+                              child: IconButton(
+                                key: const ValueKey('trip-steps-next'),
+                                iconSize: 18,
+                                tooltip: L10n.next.inMode(
+                                  LanguageModeStore.instance.mode.value,
+                                ),
+                                icon: const Icon(Icons.chevron_right),
+                                onPressed: () => stepScroll.animateTo(
+                                  (stepScroll.offset + 220).clamp(
+                                    0,
+                                    stepScroll.position.maxScrollExtent,
+                                  ),
+                                  duration: const Duration(
+                                    milliseconds: 200,
+                                  ),
+                                  curve: Curves.easeOut,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 Expanded(

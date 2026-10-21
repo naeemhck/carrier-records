@@ -93,6 +93,18 @@ void karvaanScreenTests({bool native = false}) {
             ),
           );
           await tester.pumpAndSettle();
+          // The step-content list is the vertical scrollable inside
+          // the AnimatedSwitcher; since F07 the step row can add a
+          // horizontal one above it, and overlay/text-field scrollers
+          // must not be picked up either.
+          final contentScrollable = find.descendant(
+            of: find.byType(AnimatedSwitcher),
+            matching: find.byWidgetPredicate(
+              (widget) =>
+                  widget is Scrollable &&
+                  widget.axisDirection == AxisDirection.down,
+            ),
+          );
           expect(
             Directionality.of(tester.element(find.byType(TripEditor))),
             TextDirection.ltr,
@@ -108,7 +120,7 @@ void karvaanScreenTests({bool native = false}) {
           await tester.scrollUntilVisible(
             origin,
             200,
-            scrollable: find.byType(Scrollable).first,
+            scrollable: contentScrollable,
             maxScrolls: 40,
           );
           await tester.pumpAndSettle();
@@ -130,7 +142,7 @@ void karvaanScreenTests({bool native = false}) {
           await tester.scrollUntilVisible(
             kind,
             200,
-            scrollable: find.byType(Scrollable).first,
+            scrollable: contentScrollable,
             maxScrolls: 40,
           );
           await tester.pumpAndSettle();
@@ -140,13 +152,26 @@ void karvaanScreenTests({bool native = false}) {
           await tester.sendKeyEvent(LogicalKeyboardKey.escape);
           await tester.pumpAndSettle();
           expect(find.text(ownedMessage('LOADED').ur), findsNothing);
-          await tester.tap(find.byKey(const ValueKey('trip-step-2')));
+          // F07: at phone widths the step row scrolls sideways, so
+          // bring the Review step on screen via its chevron first
+          // (wider layouts show every step and have no chevron).
+          final step2 = find.byKey(const ValueKey('trip-step-2'));
+          final stepsNext = find.byKey(const ValueKey('trip-steps-next'));
+          if (stepsNext.evaluate().isNotEmpty) {
+            for (var n = 0; n < 5; n++) {
+              final r = tester.getRect(step2);
+              if (r.left >= 0 && r.right <= width) break;
+              await tester.tap(stepsNext);
+              await tester.pumpAndSettle();
+            }
+          }
+          await tester.tap(step2);
           await tester.pumpAndSettle();
           final review = find.text(TripStrings.save);
           await tester.scrollUntilVisible(
             review,
             250,
-            scrollable: find.byType(Scrollable).first,
+            scrollable: contentScrollable,
             maxScrolls: 40,
           );
           await tester.tap(review);

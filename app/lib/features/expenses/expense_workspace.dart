@@ -713,7 +713,10 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const BilingualText(L10n.noRecordsFound),
+                // Scope-specific empty wording, matching the registers
+                // (GPT QA F05): the main list is scope-bound, unlike the
+                // search pickers, which keep the generic line.
+                const BilingualText(L10n.noExpensesInYourCurrentScope),
                 TextButton(
                   onPressed: busy ? null : () => open(newEntry()),
                   child: const BilingualCaption(L10n.recordExpense),

@@ -8626,5 +8626,14 @@
     "origins": [
       "ui-gui-handoff"
     ]
+  },
+  {
+    "key": "noExpensesInYourCurrentScope",
+    "semantic_key": "ui.noExpensesInYourCurrentScope",
+    "en": "No expenses or reimbursements in your current scope.",
+    "ur": "آپ کے موجودہ دائرۂ رسائی میں کوئی اخراجات یا رقم کی واپسی نہیں۔",
+    "origins": [
+      "ui-qa-fix-round"
+    ]
   }
 ]

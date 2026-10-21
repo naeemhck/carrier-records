@@ -5904,6 +5904,13 @@ abstract final class L10n {
   );
   static const noMatchesForFiltersAccessibility =
       "No matches for these filters. ان فلٹرز سے کوئی ریکارڈ نہیں ملا";
+  static const noExpensesInYourCurrentScope = Bilingual(
+    "ui.noExpensesInYourCurrentScope",
+    "No expenses or reimbursements in your current scope.",
+    "آپ کے موجودہ دائرۂ رسائی میں کوئی اخراجات یا رقم کی واپسی نہیں۔",
+  );
+  static const noExpensesInYourCurrentScopeAccessibility =
+      "No expenses or reimbursements in your current scope.. آپ کے موجودہ دائرۂ رسائی میں کوئی اخراجات یا رقم کی واپسی نہیں۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6858,5 +6865,6 @@ abstract final class L10n {
     createReport,
     showDetails,
     noMatchesForFilters,
+    noExpensesInYourCurrentScope,
   ];
 }

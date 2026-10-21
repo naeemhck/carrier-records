@@ -203,7 +203,13 @@ void main() {
   ) async {
     await tester.pumpWidget(workspaceHarness());
     await tester.pumpAndSettle();
-    expect(find.text('No records found.'), findsOneWidget);
+    // GPT QA F05: the main list names its scope instead of the generic
+    // "No records found." line (which the search pickers still use).
+    expect(
+      find.text('No expenses or reimbursements in your current scope.'),
+      findsOneWidget,
+    );
+    expect(find.text('No records found.'), findsNothing);
     expect(find.text('Record expense'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

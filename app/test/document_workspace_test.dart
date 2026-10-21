@@ -61,6 +61,36 @@ class RegisterDocumentFake extends DocumentFake {
   };
 }
 
+/// Search-aware register fake (GPT QA F06): one document while the
+/// search is empty, none once any search text is applied. Records every
+/// search value the workspace sends, so the test can prove the reload
+/// came from typing alone.
+class SearchDocumentFake extends DocumentFake {
+  final searches = <String>[];
+  @override
+  Future<Map<String, dynamic>> list(
+    Map<String, dynamic> filters,
+    int offset,
+  ) async {
+    final s = (filters['search'] as String? ?? '');
+    searches.add(s);
+    if (s.isNotEmpty) return {'rows': [], 'has_more': false};
+    return {
+      'rows': [
+        {
+          'id': 'a',
+          'permanent_number': 'DOC-2026-0001',
+          'recipient': 'Only recipient',
+          'issued_at': '2026-10-10T09:00:00Z',
+          'issuer': 'Office',
+          'superseded': false,
+        },
+      ],
+      'has_more': false,
+    };
+  }
+}
+
 void main() {
   testWidgets('document list keeps configuration reachable at320px and200%', (
     tester,
@@ -206,6 +236,57 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text(L10n.generatedReportsGroup.en), findsOneWidget);
     expect(find.text(L10n.generatedReportsHint.en), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+
+  // GPT QA F06 regression: the Documents search must apply while typing.
+  // The previous pass only tested the rendered empty-state branch; this
+  // test drives the interaction — enterText, no submit action — and
+  // checks both the no-match state and recovery on clear.
+  testWidgets('documents search filters as you type, no Enter needed', (
+    t,
+  ) async {
+    final fake = SearchDocumentFake();
+    await t.pumpWidget(
+      MaterialApp(
+        theme: KarvaanDesign.theme(),
+        home: DocumentWorkspace(
+          commands: fake,
+          onSupersede: (_, _) {},
+          guard: (w) => w,
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    expect(find.text('DOC-2026-0001 - Only recipient'), findsOneWidget);
+
+    // Type a no-match string. enterText fires onChanged only — it never
+    // submits — so any reload observed comes from the typing path.
+    await t.enterText(find.byType(TextField), 'QA_NO_MATCH');
+    await t.pumpAndSettle();
+    expect(fake.searches, contains('QA_NO_MATCH'));
+    expect(find.text('DOC-2026-0001 - Only recipient'), findsNothing);
+    expect(find.text(L10n.noMatchesForFilters.en), findsOneWidget);
+    expect(
+      find.text(L10n.noIssuedDocumentsInYourCurrentScope.en),
+      findsNothing,
+    );
+    expect(find.text(L10n.clear.en), findsOneWidget);
+
+    // The Clear action restores the unfiltered register.
+    await t.tap(find.text(L10n.clear.en));
+    await t.pumpAndSettle();
+    expect(find.text('DOC-2026-0001 - Only recipient'), findsOneWidget);
+    expect(find.text(L10n.noMatchesForFilters.en), findsNothing);
+
+    // Clearing the field by typing back to empty also restores it.
+    await t.enterText(find.byType(TextField), 'ZZZ');
+    await t.pumpAndSettle();
+    expect(find.text(L10n.noMatchesForFilters.en), findsOneWidget);
+    await t.enterText(find.byType(TextField), '');
+    await t.pumpAndSettle();
+    expect(find.text('DOC-2026-0001 - Only recipient'), findsOneWidget);
+    expect(find.text(L10n.noMatchesForFilters.en), findsNothing);
     expect(t.takeException(), isNull);
   });
 }
