@@ -88,16 +88,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(L10n.issuedDocuments.en), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await tester.tap(find.text(L10n.outputsAndPresets.en));
+    await tester.tap(find.text(L10n.createReport.en));
     await tester.pumpAndSettle();
     expect(configured, isTrue);
     final empty = find.text(L10n.noIssuedDocumentsInYourCurrentScope.ur);
-    final previous = find.text(L10n.previousDocuments.en);
-    expect(
-      tester.getRect(empty).bottom,
-      lessThanOrEqualTo(tester.getRect(previous).top),
-      reason: 'Empty-state Urdu must not be painted under pagination',
-    );
+    expect(empty, findsOneWidget);
+    // GUI handoff group 9: pagination hides entirely while the list is
+    // empty, so nothing can paint over the empty-state Urdu lines.
+    expect(find.text(L10n.previousDocuments.en), findsNothing);
+    expect(find.text(L10n.nextDocuments.en), findsNothing);
 
     expect(commands.requests, isEmpty);
     expect(tester.takeException(), isNull);

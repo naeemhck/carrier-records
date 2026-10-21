@@ -419,7 +419,13 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         );
         return LayoutBuilder(
           builder: (context, constraints) {
-            final narrow = constraints.maxWidth < 760;
+            final width = constraints.maxWidth;
+            final narrow = width < 760;
+            // Tablet band (GUI handoff group 8): between 760 and 1024
+            // the rail is always the compact icon rail — the full 208px
+            // rail left too little room for content at 768–1023px. The
+            // manual collapse toggle still applies at desktop widths.
+            final compactRail = collapsed || (!narrow && width < 1024);
             return Scaffold(
               body: SafeArea(
                 child: Row(
@@ -427,7 +433,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                     if (!narrow)
                       Padding(
                         padding: const EdgeInsets.all(8),
-                        child: navigation(collapsed),
+                        child: navigation(compactRail),
                       ),
                     Expanded(
                       child: Column(

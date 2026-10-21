@@ -90,173 +90,216 @@ class _DocumentWorkspaceState extends State<DocumentWorkspace> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-      title: const BilingualText(L10n.issuedDocuments),
-    ),
-    // One scroll flow gives large text its natural height; pagination cannot
-    // squeeze an empty-state viewport to zero or paint over its Urdu lines.
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (widget.onConfigure != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: OutlinedButton.icon(
-              onPressed: widget.onConfigure,
-              icon: const Icon(Icons.tune),
-              label: const BilingualCaption(L10n.outputsAndPresets),
-            ),
-          ),
-        TextField(
-          controller: search,
-          decoration: bilingualDecoration(
-            context,
-            InputDecoration(
-              label: BilingualCaption(L10n.documentNumberRecipient),
-            ),
-          ),
-          onSubmitted: (_) => setState(() {
-            offset = 0;
-            reload();
-          }),
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => Scaffold(
+      appBar: AppBar(
+        // Measure the title against the real layout width, not
+        // MediaQuery.sizeOf (a placeholder in some hosts would wrap
+        // the title per glyph and inflate the bar).
+        toolbarHeight: bilingualToolbarHeight(
+          context,
+          L10n.issuedDocuments,
+          constraints.maxWidth - 72,
         ),
-        const SizedBox(height: 16),
-        FutureBuilder<Map<String, dynamic>>(
-          future: rows,
-          builder: (_, result) {
-            if (result.hasError) {
-              return const BilingualText(L10n.unableToLoadAuthorizedDocuments);
-            }
-            if (!result.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final data = result.data!;
-            final list = List.of(data['rows'] as List);
-            int byIssued(dynamic a, dynamic b) => (a['issued_at'] ?? '')
-                .toString()
-                .compareTo((b['issued_at'] ?? '').toString());
-            switch (docSort) {
-              case 'oldest':
-                list.sort(byIssued);
-              case 'number':
-                list.sort(
-                  (a, b) => (a['permanent_number'] ?? '').toString().compareTo(
-                    (b['permanent_number'] ?? '').toString(),
-                  ),
+        title: const BilingualText(L10n.issuedDocuments),
+      ),
+      // One scroll flow gives large text its natural height; pagination cannot
+      // squeeze an empty-state viewport to zero or paint over its Urdu lines.
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (widget.onConfigure != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              // A normal header action at its natural width, labelled by
+              // what it does (GUI handoff group 6) — not a full-width
+              // "Outputs and presets" strip.
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: OutlinedButton.icon(
+                  onPressed: widget.onConfigure,
+                  icon: const Icon(Icons.post_add),
+                  label: const BilingualCaption(L10n.createReport),
+                ),
+              ),
+            ),
+          TextField(
+            controller: search,
+            decoration: bilingualDecoration(
+              context,
+              InputDecoration(
+                label: BilingualCaption(L10n.documentNumberRecipient),
+              ),
+            ),
+            onSubmitted: (_) => setState(() {
+              offset = 0;
+              reload();
+            }),
+          ),
+          const SizedBox(height: 16),
+          FutureBuilder<Map<String, dynamic>>(
+            future: rows,
+            builder: (_, result) {
+              if (result.hasError) {
+                return const BilingualText(
+                  L10n.unableToLoadAuthorizedDocuments,
                 );
-              default:
-                list.sort((a, b) => byIssued(b, a));
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (list.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: SizedBox(
-                        width: 240,
-                        child: KarvaanChoiceField<String>(
-                          key: ValueKey('documents-sort-$docSort'),
-                          initialValue: docSort,
-                          decoration: bilingualDecoration(
-                            context,
-                            const InputDecoration(),
+              }
+              if (!result.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final data = result.data!;
+              final list = List.of(data['rows'] as List);
+              int byIssued(dynamic a, dynamic b) => (a['issued_at'] ?? '')
+                  .toString()
+                  .compareTo((b['issued_at'] ?? '').toString());
+              switch (docSort) {
+                case 'oldest':
+                  list.sort(byIssued);
+                case 'number':
+                  list.sort(
+                    (a, b) => (a['permanent_number'] ?? '')
+                        .toString()
+                        .compareTo((b['permanent_number'] ?? '').toString()),
+                  );
+                default:
+                  list.sort((a, b) => byIssued(b, a));
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (list.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: SizedBox(
+                          width: 240,
+                          child: KarvaanChoiceField<String>(
+                            key: ValueKey('documents-sort-$docSort'),
+                            initialValue: docSort,
+                            decoration: bilingualDecoration(
+                              context,
+                              const InputDecoration(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'newest',
+                                child: BilingualText(L10n.sortNewestFirst),
+                              ),
+                              DropdownMenuItem(
+                                value: 'oldest',
+                                child: BilingualText(L10n.sortOldestFirst),
+                              ),
+                              DropdownMenuItem(
+                                value: 'number',
+                                child: BilingualText(L10n.sortByNumber),
+                              ),
+                            ],
+                            onChanged: (v) => setState(() => docSort = v!),
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'newest',
-                              child: BilingualText(L10n.sortNewestFirst),
-                            ),
-                            DropdownMenuItem(
-                              value: 'oldest',
-                              child: BilingualText(L10n.sortOldestFirst),
-                            ),
-                            DropdownMenuItem(
-                              value: 'number',
-                              child: BilingualText(L10n.sortByNumber),
-                            ),
-                          ],
-                          onChanged: (v) => setState(() => docSort = v!),
                         ),
                       ),
                     ),
-                  ),
-                if (list.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: BilingualText(
-                      L10n.noIssuedDocumentsInYourCurrentScope,
+                  if (list.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: search.text.trim().isEmpty
+                          ? const BilingualText(
+                              L10n.noIssuedDocumentsInYourCurrentScope,
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const BilingualText(L10n.noMatchesForFilters),
+                                const SizedBox(height: 8),
+                                TextButton(
+                                  onPressed: () => setState(() {
+                                    search.clear();
+                                    offset = 0;
+                                    reload();
+                                  }),
+                                  child: const BilingualCaption(L10n.clear),
+                                ),
+                              ],
+                            ),
                     ),
-                  ),
-                for (final d in list)
-                  BilingualListTile(
-                    title: Text('${d['permanent_number']} - ${d['recipient']}'),
-                    subtitle: BilingualText(
-                      L10n.issuedBy.withValues([
-                        displayTimestamp(d['issued_at']),
-                        d['issuer'],
-                        d['superseded'] == true
-                            ? 'Superseded'
-                            : 'Original / current',
-                      ]),
+                  for (final d in list)
+                    BilingualListTile(
+                      title: Text(
+                        '${d['permanent_number']} - ${d['recipient']}',
+                      ),
+                      subtitle: BilingualText(
+                        L10n.issuedBy.withValues([
+                          displayTimestamp(d['issued_at']),
+                          d['issuer'],
+                          d['superseded'] == true
+                              ? 'Superseded'
+                              : 'Original / current',
+                        ]),
+                      ),
+                      trailing: const Icon(Icons.description_outlined),
+                      onTap: () => open(d['id'] as String),
                     ),
-                    trailing: const Icon(Icons.description_outlined),
-                    onTap: () => open(d['id'] as String),
-                  ),
-                const SizedBox(height: 16),
-                const Divider(),
-                SafeArea(
-                  top: false,
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: offset == 0
-                            ? null
-                            : () => setState(() {
-                                offset -= 50;
-                                reload();
-                              }),
-                        child: const BilingualCaption(L10n.previousDocuments),
+                  // Pagination sits adjacent to the list and hides when
+                  // there is nothing to page through (handoff group 9).
+                  if (list.isNotEmpty || offset > 0) ...[
+                    const SizedBox(height: 16),
+                    const Divider(),
+                    SafeArea(
+                      top: false,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: offset == 0
+                                ? null
+                                : () => setState(() {
+                                    offset -= 50;
+                                    reload();
+                                  }),
+                            child: const BilingualCaption(
+                              L10n.previousDocuments,
+                            ),
+                          ),
+                          BilingualText(
+                            L10n.page.withValues([offset ~/ 50 + 1]),
+                          ),
+                          TextButton(
+                            onPressed: data['has_more'] == true
+                                ? () => setState(() {
+                                    offset += 50;
+                                    reload();
+                                  })
+                                : null,
+                            child: const BilingualCaption(L10n.nextDocuments),
+                          ),
+                        ],
                       ),
-                      BilingualText(L10n.page.withValues([offset ~/ 50 + 1])),
-                      TextButton(
-                        onPressed: data['has_more'] == true
-                            ? () => setState(() {
-                                offset += 50;
-                                reload();
-                              })
-                            : null,
-                        child: const BilingualCaption(L10n.nextDocuments),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        // Report history (reports pass): generated reports and issued
-        // documents stay distinct groups. The register above is the
-        // permanent, numbered record; ad-hoc generations are working
-        // copies and are not persisted anywhere, so this group states
-        // that plainly — the Outputs button at the top is where reports
-        // are generated and issued — instead of inventing history rows.
-        const SizedBox(height: 24),
-        const Divider(),
-        BilingualText(
-          L10n.generatedReportsGroup,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 4),
-        const BilingualText(L10n.generatedReportsHint),
-      ],
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+          // Report history (reports pass): generated reports and issued
+          // documents stay distinct groups. The register above is the
+          // permanent, numbered record; ad-hoc generations are working
+          // copies and are not persisted anywhere, so this group states
+          // that plainly — the Outputs button at the top is where reports
+          // are generated and issued — instead of inventing history rows.
+          const SizedBox(height: 24),
+          const Divider(),
+          BilingualText(
+            L10n.generatedReportsGroup,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          const BilingualText(L10n.generatedReportsHint),
+        ],
+      ),
     ),
   );
 }

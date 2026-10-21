@@ -371,43 +371,61 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
   Widget previewPanel() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // The preview pane carries a badge, not a disclaimer paragraph
-      // (plan §5.8).
-      DecoratedBox(
-        decoration: BoxDecoration(
-          color: KarvaanDesign.muted,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: BilingualText(L10n.preview),
-        ),
+      // Preview header row: the badge (the preview's title) with the
+      // download/print actions beside it, not stacked above the document
+      // (GUI handoff group 4). The actions wrap under the badge on
+      // narrow widths.
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: KarvaanDesign.muted,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: BilingualText(L10n.preview),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.documents != null &&
+                    ['CUSTOMER_INVOICE', 'PAYMENT_RECEIPT'].contains(report) &&
+                    recipient != 'INTERNAL')
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: FilledButton(
+                      onPressed: busy ? null : issueDocument,
+                      child: const BilingualCaption(L10n.issueDocument),
+                    ),
+                  ),
+                if (widget.exporter != null)
+                  OutputFileActions(
+                    service: widget.exporter!,
+                    load: () => widget.exporter!.live({
+                      'report_kind': report,
+                      'recipient_kind': recipient,
+                      'recipient_id': party,
+                      'filters': filters,
+                      'field_order': List.of(selection!.order),
+                      'format_options': {
+                        'orientation': orientation,
+                        'sheet_name': sheet.text.trim(),
+                      },
+                      'preset_id': presetId,
+                      'event_id': event,
+                    }),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
       const SizedBox(height: 12),
-      if (widget.documents != null &&
-          ['CUSTOMER_INVOICE', 'PAYMENT_RECEIPT'].contains(report) &&
-          recipient != 'INTERNAL')
-        FilledButton(
-          onPressed: busy ? null : issueDocument,
-          child: const BilingualCaption(L10n.issueDocument),
-        ),
-      if (widget.exporter != null)
-        OutputFileActions(
-          service: widget.exporter!,
-          load: () => widget.exporter!.live({
-            'report_kind': report,
-            'recipient_kind': recipient,
-            'recipient_id': party,
-            'filters': filters,
-            'field_order': List.of(selection!.order),
-            'format_options': {
-              'orientation': orientation,
-              'sheet_name': sheet.text.trim(),
-            },
-            'preset_id': presetId,
-            'event_id': event,
-          }),
-        ),
       OutputPreview(
         data: preview!,
         onPage: (start) => prepare(start: start),
@@ -919,8 +937,6 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
-                steps,
-                const SizedBox(height: 12),
                 chooseReport,
                 const SizedBox(height: 12),
                 setPeriod,
@@ -950,17 +966,22 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
         ),
       ],
     );
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 88 * MediaQuery.textScalerOf(context).scale(1),
-        title: BilingualText(
-          (widget.supersedesId == null
-              ? L10n.outputsAndPresets
-              : L10n.supersedingDocument),
-        ),
-        actions: [
+    // Header (GUI handoff groups 3 + 9): the page is "Create report" —
+    // "Outputs" named nothing the user does here. The title wraps on its
+    // own row at its measured bilingual height (no competing AppBar
+    // action, so nothing clips at 390px); Issued documents moves to the
+    // full-width flow bar under the AppBar, beside the step chips.
+    final pageTitle = widget.supersedesId == null
+        ? L10n.createReport
+        : L10n.supersedingDocument;
+    final flowBar = Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: steps),
           if (widget.documents != null)
-            TextButton(
+            TextButton.icon(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => widget.guard(
@@ -979,46 +1000,69 @@ class _OutputWorkspaceState extends State<OutputWorkspace> {
                   ),
                 ),
               ),
-              child: const BilingualCaption(L10n.issuedDocuments),
+              icon: const Icon(Icons.description_outlined, size: 18),
+              label: const BilingualCaption(L10n.issuedDocuments),
             ),
         ],
       ),
-      body: wide
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: 480, child: configuration),
-                const VerticalDivider(),
-                Expanded(
-                  child: preview == null
-                      ? const Center(
-                          child: BilingualText(
-                            L10n.chooseFieldsAndPreviewTheAuthorizedReport,
-                          ),
-                        )
-                      : SingleChildScrollView(
-                          padding: const EdgeInsets.all(16),
-                          child: previewPanel(),
+    );
+    final content = wide
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 400, child: configuration),
+              const VerticalDivider(),
+              Expanded(
+                child: preview == null
+                    ? const Center(
+                        child: BilingualText(
+                          L10n.chooseFieldsAndPreviewTheAuthorizedReport,
                         ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: previewPanel(),
+                      ),
+              ),
+            ],
+          )
+        : preview == null
+        ? configuration
+        : Column(
+            children: [
+              TextButton(
+                onPressed: busy ? null : () => setState(() => preview = null),
+                child: const BilingualCaption(L10n.editConfiguration),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: previewPanel(),
                 ),
-              ],
-            )
-          : preview == null
-          ? configuration
-          : Column(
-              children: [
-                TextButton(
-                  onPressed: busy ? null : () => setState(() => preview = null),
-                  child: const BilingualCaption(L10n.editConfiguration),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: previewPanel(),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          );
+    // The toolbar height measures the title against the REAL layout
+    // width (LayoutBuilder constraints) — MediaQuery.sizeOf can be a
+    // placeholder in some hosts, which would wrap the title per glyph.
+    return LayoutBuilder(
+      builder: (context, constraints) => Scaffold(
+        appBar: AppBar(
+          toolbarHeight: bilingualToolbarHeight(
+            context,
+            pageTitle,
+            constraints.maxWidth - 72,
+          ),
+          title: BilingualText(pageTitle),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            flowBar,
+            Expanded(child: content),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1110,6 +1154,10 @@ class OutputPreview extends StatelessWidget {
           key,
     );
     Widget totalLine(String key) {
+      // The canonical "Label: value" pair — the same construction the
+      // preview has always used (findable as plain text in both
+      // languages; handoff group 7's repetition complaint targeted the
+      // metadata block, which uses the inline form above).
       final text = L10n.labelValuesfb62fe.withValues([
         summaryLabel(key),
         displayField(
@@ -1134,6 +1182,28 @@ class OutputPreview extends StatelessWidget {
         child: BilingualText(text),
       );
     }
+
+    bool isZeroTotal(String key) {
+      final v = totals[key];
+      if (v is num) return v == 0;
+      if (v is String) {
+        return RegExp(r'^-?0+(\.0+)?$').hasMatch(v.trim());
+      }
+      return v == null;
+    }
+
+    // Essential figures first (handoff group 4): the first five non-zero
+    // totals in section order; the complete grouped breakdown — zeros
+    // included — sits below the records table behind Show details.
+    final essentialKeys = <String>[
+      for (final (_, keys) in _previewTotalSections)
+        for (final key in keys)
+          if (totals.containsKey(key) && !isZeroTotal(key)) key,
+      for (final key in totals.keys.map((k) => k as String))
+        if (!{for (final s in _previewTotalSections) ...s.$2}.contains(key) &&
+            !isZeroTotal(key))
+          key,
+    ].take(5).toList();
 
     final sectionKeys = {for (final s in _previewTotalSections) ...s.$2};
     final ungrouped = totals.keys
@@ -1169,53 +1239,31 @@ class OutputPreview extends StatelessWidget {
                 textDirection: TextDirection.ltr,
               ),
             const Divider(),
-            // Meta block: one definition line per header field.
+            // Meta block: one inline label/value line per header field —
+            // the value prints once (handoff group 7).
             Wrap(
               spacing: 24,
               runSpacing: 8,
               children: [
                 for (final f in headerFields)
                   if (f['field_key'] != 'company_name')
-                    BilingualText(
-                      L10n.labelValuesfb62fe.withValues([
-                        ownedMessage(f['label']),
-                        _headerValue(f, meta),
-                      ]),
+                    BilingualInlineLine(
+                      ownedMessage(f['label']),
+                      value: Bilingual.data(_headerValue(f, meta)),
                     ),
               ],
             ),
             const Divider(),
-            // Totals block: financial sections kept separate.
-            for (final (heading, keys) in _previewTotalSections)
-              if (keys.any(totals.containsKey)) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 4),
-                  child: BilingualText(heading, style: type.titleSmall),
-                ),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: [
-                    for (final key in keys)
-                      if (totals.containsKey(key)) totalLine(key),
-                  ],
-                ),
-              ],
-            if (ungrouped.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 4),
-                child: BilingualText(
-                  L10n.otherTotalsGroup,
-                  style: type.titleSmall,
-                ),
-              ),
+            // Essential figures (up to five non-zero totals), then the
+            // records table; the full breakdown follows below it.
+            if (essentialKeys.isNotEmpty) ...[
               Wrap(
                 spacing: 12,
                 runSpacing: 8,
-                children: [for (final key in ungrouped) totalLine(key)],
+                children: [for (final key in essentialKeys) totalLine(key)],
               ),
+              const SizedBox(height: 12),
             ],
-            const SizedBox(height: 12),
             if ((data['rows'] as List).isEmpty)
               const BilingualText(L10n.noRecordsInThisPeriodScope),
             SingleChildScrollView(
@@ -1254,6 +1302,57 @@ class OutputPreview extends StatelessWidget {
                 ],
               ),
             ),
+            // Full totals breakdown below the records table, collapsed
+            // behind Show details: every total in its financial section,
+            // zeros included — nothing is dropped, it is just not all
+            // stacked above the table (handoff group 4).
+            if (totals.isNotEmpty)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: const BilingualText(L10n.showDetails),
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final (heading, keys) in _previewTotalSections)
+                        if (keys.any(totals.containsKey)) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10, bottom: 4),
+                            child: BilingualText(
+                              heading,
+                              style: type.titleSmall,
+                            ),
+                          ),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 8,
+                            children: [
+                              for (final key in keys)
+                                if (totals.containsKey(key)) totalLine(key),
+                            ],
+                          ),
+                        ],
+                      if (ungrouped.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, bottom: 4),
+                          child: BilingualText(
+                            L10n.otherTotalsGroup,
+                            style: type.titleSmall,
+                          ),
+                        ),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            for (final key in ungrouped) totalLine(key),
+                          ],
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ],
+              ),
             const Divider(),
             // Document footer: the audit note as one caption line, then
             // the records/page line with its page controls.

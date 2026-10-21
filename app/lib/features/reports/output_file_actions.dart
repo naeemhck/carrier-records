@@ -67,7 +67,7 @@ class OutputFileActions extends StatefulWidget {
 
 class _OutputFileActionsState extends State<OutputFileActions> {
   bool busy = false;
-  String? status;
+  Bilingual? status;
   Future<void> run(String operation) async {
     setState(() {
       busy = true;
@@ -90,21 +90,22 @@ class _OutputFileActionsState extends State<OutputFileActions> {
           ? await destination.print(bytes, name)
           : await destination.save(bytes, format, name);
       if (mounted) {
+        // Statuses use the existing catalogue entries directly — the
+        // same strings previously resolved through ownedMessage
+        // (GUI handoff group 7 keeps them explicit and typed).
         setState(
           () => status = done
               ? operation == 'print'
-                    ? 'Print job submitted. Check printer status.'
+                    ? L10n.printJobSubmittedCheckPrinterStatus
                     : defaultTargetPlatform == TargetPlatform.android
-                    ? 'Share completed.'
-                    : 'File saved.'
-              : 'Save/share/print cancelled or not confirmed.',
+                    ? L10n.shareCompleted
+                    : L10n.fileSaved
+              : L10n.saveSharePrintCancelledOrNotConfirmed,
         );
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () => status = 'Unable to export or print. Current access and a complete authorized payload are required. Retry after checking the connection.',
-        );
+        setState(() => status = L10n.unableToExportOrPrintCurrentAccessAndA);
       }
     } finally {
       if (mounted) {
@@ -135,7 +136,7 @@ class _OutputFileActionsState extends State<OutputFileActions> {
         ],
       ),
       if (busy) const LinearProgressIndicator(),
-      if (status != null) BilingualOwnedText(status!),
+      if (status != null) BilingualText(status!),
     ],
   );
 }

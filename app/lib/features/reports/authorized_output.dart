@@ -358,16 +358,25 @@ String displayValue(String type, dynamic value) {
 }
 
 /// Human rendering of an ISO timestamp for document surfaces:
-/// "2026-10-20T13:16:18.795661+00:00" becomes "20 Oct 2026, 13:16".
-/// Raw ISO stamps with microseconds never reach a document or preview.
-/// Unrecognized values pass through unchanged.
+/// "2026-10-20T13:16:18.795661+00:00" becomes "20 Oct 2026, 13:16 UTC".
+/// The declared zone is part of the rendering — an offset is never
+/// dropped silently. Raw ISO stamps with microseconds never reach a
+/// document or preview. Unrecognized values pass through unchanged.
 String humanTimestampText(String value) {
   final match = RegExp(
     r'^([0-9]{4})-([0-9]{2})-([0-9]{2})[T ]([0-9]{2}):([0-9]{2})',
   ).firstMatch(value.trim());
   if (match == null) return value;
   final date = displayValue('DATE', '${match[1]}-${match[2]}-${match[3]}');
-  return '$date, ${match[4]}:${match[5]}';
+  final zone = RegExp(
+    r'(Z|[+-][0-9]{2}:?[0-9]{2})\s*$',
+  ).firstMatch(value.trim())?[1];
+  final zoneText = switch (zone) {
+    null => '',
+    'Z' || '+00:00' || '+0000' => ' UTC',
+    _ => ' UTC$zone',
+  };
+  return '$date, ${match[4]}:${match[5]}$zoneText';
 }
 
 List<String> textChunks(String text, int size) {

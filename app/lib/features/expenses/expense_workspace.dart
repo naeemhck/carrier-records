@@ -659,14 +659,19 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
           if (busy) const LinearProgressIndicator(),
           if (error != null) BilingualOwnedText(error!),
           if (!busy && error == null && rows.isNotEmpty) totalsStrip(),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FilledButton.icon(
-              onPressed: busy ? null : () => open(newEntry()),
-              icon: const Icon(Icons.add),
-              label: const BilingualText(L10n.newExpense),
+          // One create action per state (handoff group 9): while the
+          // list is empty, the empty state below carries the action
+          // ("Record expense"); this header button serves the populated
+          // and loading states.
+          if (busy || error != null || rows.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                onPressed: busy ? null : () => open(newEntry()),
+                icon: const Icon(Icons.add),
+                label: const BilingualText(L10n.newExpense),
+              ),
             ),
-          ),
           if (widget.corrections != null)
             TextButton(
               onPressed: () => open(
@@ -719,28 +724,30 @@ class _ExpenseWorkspaceState extends State<ExpenseWorkspace> {
             _expensesTable()
           else
             for (final row in rows) _expenseCard(row),
-          Row(
-            children: [
-              TextButton(
-                onPressed: busy || offset == 0
-                    ? null
-                    : () {
-                        offset -= 50;
-                        load();
-                      },
-                child: const BilingualCaption(L10n.previous),
-              ),
-              TextButton(
-                onPressed: busy || rows.length < 50
-                    ? null
-                    : () {
-                        offset += 50;
-                        load();
-                      },
-                child: const BilingualCaption(L10n.next),
-              ),
-            ],
-          ),
+          // Pagination hides when there is nothing to page through.
+          if (rows.isNotEmpty || offset > 0)
+            Row(
+              children: [
+                TextButton(
+                  onPressed: busy || offset == 0
+                      ? null
+                      : () {
+                          offset -= 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.previous),
+                ),
+                TextButton(
+                  onPressed: busy || rows.length < 50
+                      ? null
+                      : () {
+                          offset += 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.next),
+                ),
+              ],
+            ),
         ],
       ),
     ),
@@ -1480,28 +1487,29 @@ class _TripPickerState extends State<_TripPicker> {
                     ],
                   ),
           ),
-          Row(
-            children: [
-              TextButton(
-                onPressed: busy || offset == 0
-                    ? null
-                    : () {
-                        offset -= 50;
-                        load();
-                      },
-                child: const BilingualCaption(L10n.previous),
-              ),
-              TextButton(
-                onPressed: busy || rows.length < 50
-                    ? null
-                    : () {
-                        offset += 50;
-                        load();
-                      },
-                child: const BilingualCaption(L10n.next),
-              ),
-            ],
-          ),
+          if (rows.isNotEmpty || offset > 0)
+            Row(
+              children: [
+                TextButton(
+                  onPressed: busy || offset == 0
+                      ? null
+                      : () {
+                          offset -= 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.previous),
+                ),
+                TextButton(
+                  onPressed: busy || rows.length < 50
+                      ? null
+                      : () {
+                          offset += 50;
+                          load();
+                        },
+                  child: const BilingualCaption(L10n.next),
+                ),
+              ],
+            ),
         ],
       ),
     ),

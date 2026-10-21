@@ -88,7 +88,11 @@ void main() {
               isFalse,
             );
           } else if (page == 'expenses') {
-            final label = find.text(L10n.newExpense.en);
+            // GUI handoff group 9 contract: with an empty list the one
+            // create control is the empty state's "Record expense"
+            // action; the header "New expense" button appears once the
+            // list has rows, so the two never compete.
+            final label = find.text(L10n.recordExpense.en);
             await tester.scrollUntilVisible(
               label,
               250,
@@ -97,7 +101,7 @@ void main() {
             );
             await tester.ensureVisible(label);
             await tester.pumpAndSettle();
-            final icon = find.byIcon(Icons.add);
+            expect(find.text(L10n.newExpense.en), findsNothing);
             expect(
               tester
                   .renderObject<RenderParagraph>(
@@ -113,10 +117,6 @@ void main() {
                   )
                   .didExceedMaxLines,
               isFalse,
-            );
-            expect(
-              tester.getRect(icon).right,
-              lessThan(tester.getRect(label).left),
             );
             expect(
               tester

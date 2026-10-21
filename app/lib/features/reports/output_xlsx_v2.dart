@@ -145,6 +145,9 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
         (values[i], output.columns[i].type, _dataStyle(output.columns[i].type)),
     ], height: math.min(390, math.max(24, lines * 15 + 10)));
   }
+  // The record table ends here: AutoFilter covers the heading row plus
+  // the data rows only — never the totals strip below (handoff group 5).
+  final dataEnd = rowNumber;
   if (output.rows.isEmpty) {
     add([(output.frames['no_records']!.combined, 'TEXT', 0)], merged: true);
   }
@@ -157,6 +160,9 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
       e,
   ];
   if (totals.isNotEmpty) {
+    // A blank separator row keeps the totals strip visually and
+    // structurally separate from the record table.
+    add(const [], height: 10);
     add(
       [(output.frames['totals']!.values([output.recordCount]).combined, 'TEXT', 2)],
       merged: true,
@@ -199,7 +205,7 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
   );
   file(
     'xl/workbook.xml',
-    '''<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets><sheet name="${_xml(output.sheetName)}" sheetId="1" r:id="rId1"/></sheets><definedNames><definedName name="_xlnm.Print_Titles" localSheetId="0">'${_xml(output.sheetName.replaceAll("'", "''"))}'!\$$heading:\$$heading</definedName></definedNames><calcPr calcId="191029"/></workbook>''',
+    '''<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets><sheet name="${_xml(output.sheetName)}" sheetId="1" r:id="rId1"/></sheets><definedNames><definedName name="_xlnm.Print_Titles" localSheetId="0">'${_xml(output.sheetName.replaceAll("'", "''"))}'!\$$heading:\$$heading</definedName><definedName name="_xlnm.Print_Area" localSheetId="0">'${_xml(output.sheetName.replaceAll("'", "''"))}'!\$A\$1:\$$last\$$rowNumber</definedName></definedNames><calcPr calcId="191029"/></workbook>''',
   );
   file(
     'xl/_rels/workbook.xml.rels',
@@ -211,7 +217,7 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
   );
   file(
     'xl/worksheets/sheet1.xml',
-    '''<?xml version="1.0"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:$last$rowNumber"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="$heading" topLeftCell="A${heading + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="22"/><cols>${[for (var i = 0; i < width; i++) '<col min="${i + 1}" max="${i + 1}" width="${i < output.columns.length && output.columns[i].type == 'MONEY' ? 23 : 32}" customWidth="1"/>'].join()}</cols><sheetData>${rows.join()}</sheetData><autoFilter ref="A$heading:${_column(output.columns.length - 1)}$rowNumber"/><mergeCells count="${merges.length}">${merges.join()}</mergeCells><pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="${output.landscape ? 'landscape' : 'portrait'}" scale="100" fitToWidth="0" fitToHeight="0"/></worksheet>''',
+    '''<?xml version="1.0"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:$last$rowNumber"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="$heading" topLeftCell="A${heading + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="22"/><cols>${[for (var i = 0; i < width; i++) '<col min="${i + 1}" max="${i + 1}" width="${i < output.columns.length && output.columns[i].type == 'MONEY' ? 23 : 32}" customWidth="1"/>'].join()}</cols><sheetData>${rows.join()}</sheetData><autoFilter ref="A$heading:${_column(output.columns.length - 1)}$dataEnd"/><mergeCells count="${merges.length}">${merges.join()}</mergeCells><pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="${output.landscape ? 'landscape' : 'portrait'}" scale="100" fitToWidth="0" fitToHeight="0"/></worksheet>''',
   );
   return Uint8List.fromList(ZipEncoder().encode(archive));
 }

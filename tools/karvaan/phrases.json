@@ -8599,5 +8599,32 @@
     "semantic_key": "ui.otherTotalsGroup",
     "en": "Other totals",
     "ur": "دیگر کُل"
+  },
+  {
+    "key": "createReport",
+    "semantic_key": "ui.createReport",
+    "en": "Create report",
+    "ur": "رپورٹ بنائیں",
+    "origins": [
+      "ui-gui-handoff"
+    ]
+  },
+  {
+    "key": "showDetails",
+    "semantic_key": "ui.showDetails",
+    "en": "Show details",
+    "ur": "تفصیلات دکھائیں",
+    "origins": [
+      "ui-gui-handoff"
+    ]
+  },
+  {
+    "key": "noMatchesForFilters",
+    "semantic_key": "ui.noMatchesForFilters",
+    "en": "No matches for these filters",
+    "ur": "ان فلٹرز سے کوئی ریکارڈ نہیں ملا",
+    "origins": [
+      "ui-gui-handoff"
+    ]
   }
 ]

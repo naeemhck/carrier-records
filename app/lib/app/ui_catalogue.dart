@@ -5885,6 +5885,25 @@ abstract final class L10n {
     "دیگر کُل",
   );
   static const otherTotalsGroupAccessibility = "Other totals. دیگر کُل";
+  static const createReport = Bilingual(
+    "ui.createReport",
+    "Create report",
+    "رپورٹ بنائیں",
+  );
+  static const createReportAccessibility = "Create report. رپورٹ بنائیں";
+  static const showDetails = Bilingual(
+    "ui.showDetails",
+    "Show details",
+    "تفصیلات دکھائیں",
+  );
+  static const showDetailsAccessibility = "Show details. تفصیلات دکھائیں";
+  static const noMatchesForFilters = Bilingual(
+    "ui.noMatchesForFilters",
+    "No matches for these filters",
+    "ان فلٹرز سے کوئی ریکارڈ نہیں ملا",
+  );
+  static const noMatchesForFiltersAccessibility =
+      "No matches for these filters. ان فلٹرز سے کوئی ریکارڈ نہیں ملا";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6836,5 +6855,8 @@ abstract final class L10n {
     sortOldestFirst,
     sortByNumber,
     otherTotalsGroup,
+    createReport,
+    showDetails,
+    noMatchesForFilters,
   ];
 }

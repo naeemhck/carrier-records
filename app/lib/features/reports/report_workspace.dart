@@ -1074,7 +1074,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               context,
               MaterialPageRoute(builder: (_) => widget.guard(widget.outputs!)),
             ),
-            child: const BilingualCaption(L10n.outputs),
+            child: const BilingualCaption(L10n.createReport),
           ),
       ],
     ),

@@ -140,6 +140,10 @@ class _TripWorkspaceState extends State<TripWorkspace> {
   final search = TextEditingController(),
       from = TextEditingController(),
       to = TextEditingController();
+
+  /// Scrolls the status-chip row; drives the overflow affordance
+  /// (GUI handoff group 8).
+  final chipScroll = ScrollController();
   late Future<TripPage> page;
   String? office, vehicle, vehicleName, status;
   int offset = 0;
@@ -199,7 +203,23 @@ class _TripWorkspaceState extends State<TripWorkspace> {
     search.dispose();
     from.dispose();
     to.dispose();
+    chipScroll.dispose();
     super.dispose();
+  }
+
+  /// Clears every list filter (search, status, office, vehicle, dates)
+  /// and reloads from the first page — the empty-state recovery action.
+  void clearAllFilters() {
+    setState(() {
+      search.clear();
+      status = null;
+      office = null;
+      vehicle = null;
+      vehicleName = null;
+      from.clear();
+      to.clear();
+    });
+    reload(start: 0);
   }
 
   Future<void> edit(TripDraft draft) async {
@@ -296,7 +316,13 @@ class _TripWorkspaceState extends State<TripWorkspace> {
         return Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: width < 760 ? width : 460,
+            // Wider desktop workspace (handoff group 2): 640px on wide
+            // screens, 460px in the tablet band, full width on phones.
+            width: width < 760
+                ? width
+                : width >= 1100
+                ? 640
+                : 460,
             height: double.infinity,
             child: Material(
               elevation: 8,
@@ -591,6 +617,19 @@ class _TripWorkspaceState extends State<TripWorkspace> {
         // Desktop defaults to the table, phone to compact cards; the
         // toolbar toggle overrides the default for the session.
         final showTable = wide && (tableViewOverride ?? true);
+        // On phones the search field's Urdu companion line moves out of
+        // the helper slot so the first record starts higher (handoff
+        // group 8); the floating label still carries the active
+        // language. Wide layouts keep the full bilingual decoration.
+        final fullSearchDecoration = bilingualDecoration(
+          context,
+          InputDecoration(
+            label: BilingualCaption(L10n.searchTripVehicleOrParty),
+          ),
+        );
+        final searchDecoration = wide
+            ? fullSearchDecoration
+            : fullSearchDecoration.copyWith(helper: const SizedBox.shrink());
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -610,14 +649,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                     width: wide ? 360 : constraints.maxWidth - 32,
                     child: TextField(
                       controller: search,
-                      decoration: bilingualDecoration(
-                        context,
-                        InputDecoration(
-                          label: BilingualCaption(
-                            L10n.searchTripVehicleOrParty,
-                          ),
-                        ),
-                      ),
+                      decoration: searchDecoration,
                       onSubmitted: (_) => reload(start: 0),
                     ),
                   ),
@@ -681,36 +713,78 @@ class _TripWorkspaceState extends State<TripWorkspace> {
               // Status filter chips in one compact row (it scrolls
               // sideways on phones / at 200% scale instead of stacking).
               // "All" clears the filter; the remaining chips map 1:1 to
-              // the backend trip states, including Cancelled.
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (final s in const [
-                      null,
-                      'DRAFT',
-                      'DISPATCHED',
-                      'ARRIVED',
-                      'CANCELLED',
-                    ])
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          key: ValueKey('trip-filter-${s ?? 'ALL'}'),
-                          label: BilingualText(
-                            s == null ? L10n.all : tripStateLabel(s),
+              // the backend trip states, including Cancelled. Chip labels
+              // use the single-line floating-label form (the full pair
+              // stays in semantics/tooltip) so the row stays ~40px, and
+              // a chevron at the right edge makes the sideways scroll
+              // discoverable (GUI handoff group 8).
+              Stack(
+                children: [
+                  SingleChildScrollView(
+                    controller: chipScroll,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final s in const [
+                          null,
+                          'DRAFT',
+                          'DISPATCHED',
+                          'ARRIVED',
+                          'CANCELLED',
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              key: ValueKey('trip-filter-${s ?? 'ALL'}'),
+                              label: BilingualFloatingLabel(
+                                s == null ? L10n.all : tripStateLabel(s),
+                              ),
+                              selected: status == s,
+                              showCheckmark: false,
+                              selectedColor: KarvaanDesign.borderColor,
+                              onSelected: (_) {
+                                status = s;
+                                reload(start: 0);
+                              },
+                            ),
                           ),
-                          selected: status == s,
-                          showCheckmark: false,
-                          selectedColor: KarvaanDesign.borderColor,
-                          onSelected: (_) {
-                            status = s;
-                            reload(start: 0);
-                          },
+                      ],
+                    ),
+                  ),
+                  if (!wide)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              KarvaanDesign.background.withValues(alpha: 0),
+                              KarvaanDesign.background,
+                            ],
+                          ),
+                        ),
+                        child: IconButton(
+                          iconSize: 18,
+                          tooltip: L10n.next.inMode(
+                            LanguageModeStore.instance.mode.value,
+                          ),
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: () => chipScroll.animateTo(
+                            (chipScroll.offset + 220).clamp(
+                              0,
+                              chipScroll.position.maxScrollExtent,
+                            ),
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                          ),
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
               if (filtersOpen) ...[
                 const SizedBox(height: 10),
@@ -865,19 +939,43 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const BilingualText(
-                                              L10n.noTripsInThisScope,
-                                            ),
-                                            if (!widget.moneyMode) ...[
+                                            // Empty states say WHICH kind
+                                            // of empty this is (handoff
+                                            // group 9): filtered-no-match
+                                            // offers filter recovery; a
+                                            // genuinely empty scope offers
+                                            // record creation.
+                                            if (search.text.trim().isNotEmpty ||
+                                                status != null ||
+                                                office != null ||
+                                                vehicle != null ||
+                                                from.text.isNotEmpty ||
+                                                to.text.isNotEmpty) ...[
+                                              const BilingualText(
+                                                L10n.noMatchesForFilters,
+                                              ),
                                               const SizedBox(height: 12),
-                                              FilledButton.icon(
-                                                onPressed: () =>
-                                                    edit(TripDraft()),
-                                                icon: const Icon(Icons.add),
-                                                label: const BilingualText(
-                                                  L10n.newTrip,
+                                              TextButton(
+                                                onPressed: clearAllFilters,
+                                                child: const BilingualCaption(
+                                                  L10n.clearRecordFilters,
                                                 ),
                                               ),
+                                            ] else ...[
+                                              const BilingualText(
+                                                L10n.noTripsInThisScope,
+                                              ),
+                                              if (!widget.moneyMode) ...[
+                                                const SizedBox(height: 12),
+                                                FilledButton.icon(
+                                                  onPressed: () =>
+                                                      edit(TripDraft()),
+                                                  icon: const Icon(Icons.add),
+                                                  label: const BilingualText(
+                                                    L10n.newTrip,
+                                                  ),
+                                                ),
+                                              ],
                                             ],
                                           ],
                                         ),
@@ -895,23 +993,26 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                                   ],
                                 ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton(
-                              onPressed: offset == 0
-                                  ? null
-                                  : () => reload(start: offset - 50),
-                              child: const BilingualCaption(L10n.previous),
-                            ),
-                            TextButton(
-                              onPressed: result.rows.length < 50
-                                  ? null
-                                  : () => reload(start: offset + 50),
-                              child: const BilingualCaption(L10n.next),
-                            ),
-                          ],
-                        ),
+                        // Pagination hides when there is nothing to
+                        // page through (handoff group 9).
+                        if (result.rows.isNotEmpty || offset > 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                onPressed: offset == 0
+                                    ? null
+                                    : () => reload(start: offset - 50),
+                                child: const BilingualCaption(L10n.previous),
+                              ),
+                              TextButton(
+                                onPressed: result.rows.length < 50
+                                    ? null
+                                    : () => reload(start: offset + 50),
+                                child: const BilingualCaption(L10n.next),
+                              ),
+                            ],
+                          ),
                       ],
                     );
                   },
@@ -1103,18 +1204,17 @@ class _FactGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // One-line label/value pairs ("Owner / مالک: name") — the same
+        // inline form as the report meta lines. The stacked two-column
+        // definition rows made the detail header ~300px tall on their
+        // own (GUI handoff group 2).
         for (final (label, value) in rows)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: BilingualText(label, style: type.labelLarge),
-                ),
-                Expanded(child: BilingualText(value, style: type.bodyMedium)),
-              ],
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: BilingualInlineLine(
+              label,
+              value: value,
+              style: type.bodyMedium,
             ),
           ),
       ],
@@ -1126,7 +1226,8 @@ class _FactGrid extends StatelessWidget {
     builder: (context, constraints) {
       // Density pass: on desktop the facts pair up into two columns so
       // the hero stays compact enough for the tabs to stay on-screen.
-      if (constraints.maxWidth < 900) return _column(context, facts);
+      // The side panel pairs them from 560px (handoff group 2).
+      if (constraints.maxWidth < 560) return _column(context, facts);
       final half = (facts.length + 1) ~/ 2;
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1158,6 +1259,12 @@ class TripTotalsStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pending = outstanding;
+    // Fixed 250px cells in a Wrap: two-up wherever the host fits them
+    // (the 640px desktop panel does — handoff group 2), stacked in
+    // narrower hosts. Deliberately NOT a LayoutBuilder: the strip is
+    // also used inside intrinsic-sized form rows, where a LayoutBuilder
+    // cannot resolve its constraints.
+    const cellWidth = 250.0;
     return Wrap(
       spacing: 24,
       runSpacing: 12,
@@ -1168,7 +1275,7 @@ class TripTotalsStrip extends StatelessWidget {
           'owner_entitlement',
         ])
           SizedBox(
-            width: 250,
+            width: cellWidth,
             child: KarvaanMetric(
               key: ValueKey('trip-total-$key'),
               label: ownedMessage(TripStrings.labels[key]),
@@ -1178,7 +1285,7 @@ class TripTotalsStrip extends StatelessWidget {
           ),
         if (pending != null)
           SizedBox(
-            width: 250,
+            width: cellWidth,
             child: _OutstandingCell(value: pending, hero: hero),
           ),
       ],
@@ -2312,7 +2419,8 @@ class _TripDetailState extends State<TripDetail> {
   Widget _heroTotals(Map totals) {
     final financials = _financials;
     if (financials == null) {
-      return TripTotalsStrip(values: totals, hero: true);
+      // Compact figures in the side panel; hero size only full-page.
+      return TripTotalsStrip(values: totals, hero: !widget.embedded);
     }
     return FutureBuilder<Map<String, dynamic>>(
       future: financials,
@@ -2327,7 +2435,7 @@ class _TripDetailState extends State<TripDetail> {
         }
         return TripTotalsStrip(
           values: totals,
-          hero: true,
+          hero: !widget.embedded,
           outstanding: outstanding,
         );
       },
@@ -2514,10 +2622,415 @@ class _TripDetailState extends State<TripDetail> {
         }
 
         // Density pass: the hero no longer pushes the tabs off-screen.
-        // The hero sits in a height-capped region (it scrolls internally
-        // only on short screens), the tab bar is always visible, and the
-        // tab content scrolls in the remaining space — the page itself
-        // never scrolls on desktop.
+        // GUI handoff group 2: in the side panel (embedded) the header
+        // is compact by construction — two-up totals, two-column facts,
+        // no hero-size figures — and does NOT scroll: the tab bar sits
+        // immediately below it and the tab content is the panel's one
+        // scroll area. The full page keeps the capped, internally
+        // scrolling hero region from the density pass.
+        final heroCard = Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.saved)
+                  const BilingualText(
+                    L10n.draftSavedServerCalculatedAmountsShownBelow,
+                  ),
+                // Pure identifiers print once, LTR, with no Urdu mirror.
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      '${r['trip_number']} · ${r['registration']}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textDirection: TextDirection.ltr,
+                    ),
+                    TripStatusBadge(r['state'] as String),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _heroTotals(r['totals'] as Map),
+                const SizedBox(height: 12),
+                TripRouteLine(
+                  origin: (r['origin_name'] ?? '').toString(),
+                  originMeta: displayTimestamp(
+                    (r['dispatch_date'] ?? r['planned_dispatch_date'] ?? '')
+                        .toString(),
+                  ),
+                  destination: (r['destination_name'] ?? '').toString(),
+                  destinationMeta: displayTimestamp(
+                    (r['arrival_date'] ??
+                            r['dispatch_date'] ??
+                            r['planned_dispatch_date'] ??
+                            '')
+                        .toString(),
+                  ),
+                  stopDots: stops.length,
+                ),
+                const SizedBox(height: 12),
+                _FactGrid(
+                  facts: [
+                    (
+                      L10n.ownerName,
+                      Bilingual.data(
+                        (r['owner_snapshot'] as Map)['display_name'].toString(),
+                      ),
+                    ),
+                    (
+                      L10n.driverName,
+                      r['driver_name'] == null
+                          ? ownedMessage(TripStrings.none)
+                          : Bilingual.data(r['driver_name'].toString()),
+                    ),
+                    (
+                      L10n.vehicle,
+                      Bilingual.data((r['registration'] ?? '').toString()),
+                    ),
+                    (
+                      L10n.routeLabel,
+                      (r['route_snapshot'] as Map)['code'] == null
+                          ? ownedMessage(TripStrings.none)
+                          : Bilingual.data(
+                              (r['route_snapshot'] as Map)['code'].toString(),
+                            ),
+                    ),
+                    (L10n.historyFieldLoad, loadKindLabel(r['load_kind'])),
+                    (
+                      L10n.plannedDateLabel,
+                      _dateFact(r['planned_dispatch_date']),
+                    ),
+                    (L10n.dispatchDate, _dateFact(r['dispatch_date'])),
+                    (L10n.arrivalDate, _dateFact(r['arrival_date'])),
+                    (
+                      L10n.historyFieldCars,
+                      Bilingual.data('${(r['totals'] as Map)['car_count']}'),
+                    ),
+                  ],
+                ),
+                if (r['state'] == 'DRAFT')
+                  const BilingualText(
+                    L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
+                  ),
+                if (r['earnings_recognized'] == true)
+                  const BilingualText(
+                    L10n.dispatchPostsDebtShareBrokerageShort,
+                  ),
+                const BilingualText(L10n.arrivalSettlementIndependentShort),
+                ExpandableNote((r['notes'] ?? '').toString()),
+                if (r['overlap_confirmed'] == true)
+                  BilingualText(
+                    L10n.overlapReviewed.withValues([r['overlap_reason']]),
+                  ),
+                Wrap(
+                  children: [
+                    for (final action in [
+                      TripAction.dispatch,
+                      TripAction.arrive,
+                    ])
+                      if (r[action.permission] == true)
+                        FilledButton(
+                          onPressed: () => operate(action, r),
+                          child: BilingualOwnedCaption(action.label),
+                        ),
+                    if (widget.onCorrections != null ||
+                        TripAction.values.any(
+                          (a) =>
+                              a != TripAction.dispatch &&
+                              a != TripAction.arrive &&
+                              a != TripAction.cancelConsignment &&
+                              r[a.permission] == true,
+                        ))
+                      PopupMenuButton<String>(
+                        popUpAnimationStyle: AnimationStyle.noAnimation,
+                        tooltip: L10n.correctionsAndCancellationAccessibility,
+                        onSelected: (key) {
+                          if (key == 'financial') {
+                            widget.onCorrections?.call();
+                          } else {
+                            operate(
+                              TripAction.values.firstWhere((a) => a.key == key),
+                              r,
+                            );
+                          }
+                        },
+                        itemBuilder: (_) => [
+                          if (widget.onCorrections != null)
+                            const PopupMenuItem(
+                              value: 'financial',
+                              child: BilingualText(
+                                L10n.correctionsAndCancellation,
+                              ),
+                            ),
+                          for (final action in TripAction.values.where(
+                            (a) =>
+                                a != TripAction.dispatch &&
+                                a != TripAction.arrive &&
+                                a != TripAction.cancelConsignment,
+                          ))
+                            if (r[action.permission] == true)
+                              PopupMenuItem(
+                                value: action.key,
+                                child: BilingualOwnedText(action.label),
+                              ),
+                        ],
+                      ),
+                    TextButton(
+                      onPressed: history,
+                      child: const BilingualCaption(L10n.history),
+                    ),
+                    if (widget.onPayments != null)
+                      TextButton(
+                        onPressed: widget.onPayments,
+                        child: const BilingualCaption(
+                          L10n.paymentsAndAllocations,
+                        ),
+                      ),
+                    if (r['can_edit'] == true)
+                      TextButton(
+                        onPressed: () async {
+                          await widget.onEdit(TripDraft.fromDetail(r));
+                          if (mounted) reload();
+                        },
+                        child: const BilingualCaption(L10n.editDraft),
+                      ),
+                    if (r['state'] != 'CANCELLED' &&
+                        widget.canReturn(r['destination_office_id'] as String))
+                      TextButton(
+                        onPressed: () => widget.onEdit(TripDraft.returnFrom(r)),
+                        child: const BilingualCaption(L10n.createLinkedReturn),
+                      ),
+                  ],
+                ),
+                if (r['return_of_trip_id'] != null)
+                  TextButton(
+                    onPressed: () =>
+                        openLinked(r['return_of_trip_id'] as String),
+                    child: const BilingualCaption(L10n.originalTrip),
+                  ),
+                for (final t in r['linked_returns'] as List)
+                  TextButton(
+                    onPressed: () => openLinked(t['id'] as String),
+                    child: BilingualCaption(
+                      L10n.returnMessage.withValues([
+                        t['trip_number'],
+                        t['load_kind'],
+                      ]),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+        final tabBar = KarvaanTabBar(
+          labels: const [
+            L10n.consignmentsStep,
+            L10n.moneyNavigation,
+            L10n.expensesTab,
+            L10n.history,
+          ],
+          selected: tab,
+          onSelected: selectTab,
+        );
+        final tabContent = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (tab == 0) ...[
+              const BilingualText(L10n.pickupDropStops),
+              for (final s in stops)
+                BilingualText(
+                  L10n.stopRecordIdentity.withValues([
+                    s['position'],
+                    ownedMessage(s['kind']),
+                    s['address'],
+                  ]),
+                ),
+              for (final c in r['consignments'] as List)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              // Single bilingual line: values stay in
+                              // place, only the label is translated.
+                              child: BilingualInlineLine(
+                                L10n.customerLine,
+                                value: Bilingual.data(
+                                  '${c['customer_name']} · ${consignmentStateLabel(c['state']).en} · ${c['car_count']}',
+                                ),
+                              ),
+                            ),
+                            // Destructive actions never sit next to
+                            // ordinary buttons: cancellation lives in
+                            // an overflow menu whose confirmation
+                            // sheet narrates what will be reversed.
+                            if (r['can_cancel_consignment'] == true &&
+                                c['state'] == 'ACTIVE')
+                              PopupMenuButton<String>(
+                                key: ValueKey('consignment-menu-${c['id']}'),
+                                popUpAnimationStyle: AnimationStyle.noAnimation,
+                                tooltip: L10n
+                                    .correctionsAndCancellationAccessibility,
+                                onSelected: (_) => operate(
+                                  TripAction.cancelConsignment,
+                                  r,
+                                  consignment: c['id'] as String,
+                                ),
+                                itemBuilder: (_) => [
+                                  PopupMenuItem(
+                                    value: 'cancel',
+                                    child: BilingualOwnedCaption(
+                                      TripAction.cancelConsignment.label,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        BilingualInlineLine(
+                          L10n.brokerLine,
+                          value: c['broker_name'] == null
+                              ? ownedMessage(TripStrings.none)
+                              : Bilingual.data(c['broker_name'].toString()),
+                        ),
+                        // The ledger strip (plan §5.4): fare →
+                        // −commission → =net, each amount once.
+                        LedgerStrip(
+                          segments: [
+                            LedgerSegment(
+                              label: L10n.agreedFare,
+                              formattedValue: displayMoney(c['quoted_amount']),
+                            ),
+                            LedgerSegment(
+                              label: c['commission_method'] == 'FIXED'
+                                  ? L10n.brokerCommissionFixed
+                                  : L10n.brokerCommissionPercent,
+                              formattedValue:
+                                  '− ${displayMoney(c['commission'])}',
+                            ),
+                            LedgerSegment(
+                              label: L10n.netOwnerShare,
+                              formattedValue:
+                                  '= ${displayMoney(c['owner_entitlement'])}',
+                            ),
+                          ],
+                        ),
+                        BilingualText(
+                          L10n.pickupDrop.withValues([
+                            stopLabel(c['pickup_stop_id']),
+                            stopLabel(c['drop_stop_id']),
+                          ]),
+                        ),
+                        Text((c['notes']).toString()),
+                        for (final a in c['cars'] as List)
+                          BilingualText(
+                            L10n.pickupDrop68b36c.withValues([
+                              a['identifier'],
+                              stopLabel(a['pickup_stop_id']),
+                              stopLabel(a['drop_stop_id']),
+                            ]),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+            if (tab == 1)
+              KarvaanSection(
+                title: L10n.moneyNavigation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const BilingualText(L10n.moneySummaryHint),
+                    // Ledger strip on top (plan §5.4); the open
+                    // outstanding stays a separate green callout.
+                    LedgerStrip(
+                      segments: [
+                        LedgerSegment(
+                          label: ownedMessage(
+                            TripStrings.labels['customer_charge'],
+                          ),
+                          formattedValue: displayMoney(
+                            (r['totals'] as Map)['customer_charge'],
+                          ),
+                        ),
+                        LedgerSegment(
+                          label: ownedMessage(TripStrings.labels['commission']),
+                          formattedValue:
+                              '− ${displayMoney((r['totals'] as Map)['commission'])}',
+                        ),
+                        LedgerSegment(
+                          label: ownedMessage(
+                            TripStrings.labels['owner_entitlement'],
+                          ),
+                          formattedValue:
+                              '= ${displayMoney((r['totals'] as Map)['owner_entitlement'])}',
+                        ),
+                      ],
+                    ),
+                    _moneyOutstanding(r['consignments'] as List? ?? const []),
+                    if (widget.onPayments != null)
+                      OutlinedButton(
+                        onPressed: widget.onPayments,
+                        child: const BilingualCaption(
+                          L10n.paymentsAndAllocations,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            if (tab == 2)
+              KarvaanSection(
+                title: L10n.expensesTab,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const BilingualText(L10n.noTripExpensesRecorded),
+                    const BilingualText(L10n.openOfficeExpenseListHint),
+                    if (widget.onExpenses != null)
+                      OutlinedButton(
+                        onPressed: widget.onExpenses,
+                        child: const BilingualCaption(
+                          L10n.expensesAndReimbursements,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            if (tab == 3)
+              SizedBox(
+                height: 600 * MediaQuery.textScalerOf(context).scale(1),
+                child: TripHistory(
+                  repository: widget.repository,
+                  id: widget.id,
+                ),
+              ),
+          ],
+        );
+        // Wide desktop panel (handoff group 2): ONE scroll area —
+        // the compact header, the tab bar and the tab content flow
+        // in a single ListView; no nested capped scroll region.
+        if (widget.embedded && MediaQuery.sizeOf(context).width >= 1100) {
+          return ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: heroCard,
+              ),
+              tabBar,
+              Padding(padding: const EdgeInsets.all(16), child: tabContent),
+            ],
+          );
+        }
         return LayoutBuilder(
           builder: (context, constraints) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2528,459 +3041,17 @@ class _TripDetailState extends State<TripDetail> {
                 ),
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (widget.saved)
-                            const BilingualText(
-                              L10n.draftSavedServerCalculatedAmountsShownBelow,
-                            ),
-                          // Pure identifiers print once, LTR, with no Urdu mirror.
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(
-                                '${r['trip_number']} · ${r['registration']}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                textDirection: TextDirection.ltr,
-                              ),
-                              TripStatusBadge(r['state'] as String),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          _heroTotals(r['totals'] as Map),
-                          const SizedBox(height: 12),
-                          TripRouteLine(
-                            origin: (r['origin_name'] ?? '').toString(),
-                            originMeta: displayTimestamp(
-                              (r['dispatch_date'] ??
-                                      r['planned_dispatch_date'] ??
-                                      '')
-                                  .toString(),
-                            ),
-                            destination: (r['destination_name'] ?? '')
-                                .toString(),
-                            destinationMeta: displayTimestamp(
-                              (r['arrival_date'] ??
-                                      r['dispatch_date'] ??
-                                      r['planned_dispatch_date'] ??
-                                      '')
-                                  .toString(),
-                            ),
-                            stopDots: stops.length,
-                          ),
-                          const SizedBox(height: 12),
-                          _FactGrid(
-                            facts: [
-                              (
-                                L10n.ownerName,
-                                Bilingual.data(
-                                  (r['owner_snapshot'] as Map)['display_name']
-                                      .toString(),
-                                ),
-                              ),
-                              (
-                                L10n.driverName,
-                                r['driver_name'] == null
-                                    ? ownedMessage(TripStrings.none)
-                                    : Bilingual.data(
-                                        r['driver_name'].toString(),
-                                      ),
-                              ),
-                              (
-                                L10n.vehicle,
-                                Bilingual.data(
-                                  (r['registration'] ?? '').toString(),
-                                ),
-                              ),
-                              (
-                                L10n.routeLabel,
-                                (r['route_snapshot'] as Map)['code'] == null
-                                    ? ownedMessage(TripStrings.none)
-                                    : Bilingual.data(
-                                        (r['route_snapshot'] as Map)['code']
-                                            .toString(),
-                                      ),
-                              ),
-                              (
-                                L10n.historyFieldLoad,
-                                loadKindLabel(r['load_kind']),
-                              ),
-                              (
-                                L10n.plannedDateLabel,
-                                _dateFact(r['planned_dispatch_date']),
-                              ),
-                              (
-                                L10n.dispatchDate,
-                                _dateFact(r['dispatch_date']),
-                              ),
-                              (L10n.arrivalDate, _dateFact(r['arrival_date'])),
-                              (
-                                L10n.historyFieldCars,
-                                Bilingual.data(
-                                  '${(r['totals'] as Map)['car_count']}',
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (r['state'] == 'DRAFT')
-                            const BilingualText(
-                              L10n.draftQuotesArePotentialFareNoEarningsOrPayment,
-                            ),
-                          if (r['earnings_recognized'] == true)
-                            const BilingualText(
-                              L10n.dispatchPostsDebtShareBrokerageShort,
-                            ),
-                          const BilingualText(
-                            L10n.arrivalSettlementIndependentShort,
-                          ),
-                          ExpandableNote((r['notes'] ?? '').toString()),
-                          if (r['overlap_confirmed'] == true)
-                            BilingualText(
-                              L10n.overlapReviewed.withValues([
-                                r['overlap_reason'],
-                              ]),
-                            ),
-                          Wrap(
-                            children: [
-                              for (final action in [
-                                TripAction.dispatch,
-                                TripAction.arrive,
-                              ])
-                                if (r[action.permission] == true)
-                                  FilledButton(
-                                    onPressed: () => operate(action, r),
-                                    child: BilingualOwnedCaption(action.label),
-                                  ),
-                              if (widget.onCorrections != null ||
-                                  TripAction.values.any(
-                                    (a) =>
-                                        a != TripAction.dispatch &&
-                                        a != TripAction.arrive &&
-                                        a != TripAction.cancelConsignment &&
-                                        r[a.permission] == true,
-                                  ))
-                                PopupMenuButton<String>(
-                                  popUpAnimationStyle:
-                                      AnimationStyle.noAnimation,
-                                  tooltip: L10n
-                                      .correctionsAndCancellationAccessibility,
-                                  onSelected: (key) {
-                                    if (key == 'financial') {
-                                      widget.onCorrections?.call();
-                                    } else {
-                                      operate(
-                                        TripAction.values.firstWhere(
-                                          (a) => a.key == key,
-                                        ),
-                                        r,
-                                      );
-                                    }
-                                  },
-                                  itemBuilder: (_) => [
-                                    if (widget.onCorrections != null)
-                                      const PopupMenuItem(
-                                        value: 'financial',
-                                        child: BilingualText(
-                                          L10n.correctionsAndCancellation,
-                                        ),
-                                      ),
-                                    for (final action
-                                        in TripAction.values.where(
-                                          (a) =>
-                                              a != TripAction.dispatch &&
-                                              a != TripAction.arrive &&
-                                              a != TripAction.cancelConsignment,
-                                        ))
-                                      if (r[action.permission] == true)
-                                        PopupMenuItem(
-                                          value: action.key,
-                                          child: BilingualOwnedText(
-                                            action.label,
-                                          ),
-                                        ),
-                                  ],
-                                ),
-                              TextButton(
-                                onPressed: history,
-                                child: const BilingualCaption(L10n.history),
-                              ),
-                              if (widget.onPayments != null)
-                                TextButton(
-                                  onPressed: widget.onPayments,
-                                  child: const BilingualCaption(
-                                    L10n.paymentsAndAllocations,
-                                  ),
-                                ),
-                              if (r['can_edit'] == true)
-                                TextButton(
-                                  onPressed: () async {
-                                    await widget.onEdit(
-                                      TripDraft.fromDetail(r),
-                                    );
-                                    if (mounted) reload();
-                                  },
-                                  child: const BilingualCaption(L10n.editDraft),
-                                ),
-                              if (r['state'] != 'CANCELLED' &&
-                                  widget.canReturn(
-                                    r['destination_office_id'] as String,
-                                  ))
-                                TextButton(
-                                  onPressed: () =>
-                                      widget.onEdit(TripDraft.returnFrom(r)),
-                                  child: const BilingualCaption(
-                                    L10n.createLinkedReturn,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (r['return_of_trip_id'] != null)
-                            TextButton(
-                              onPressed: () =>
-                                  openLinked(r['return_of_trip_id'] as String),
-                              child: const BilingualCaption(L10n.originalTrip),
-                            ),
-                          for (final t in r['linked_returns'] as List)
-                            TextButton(
-                              onPressed: () => openLinked(t['id'] as String),
-                              child: BilingualCaption(
-                                L10n.returnMessage.withValues([
-                                  t['trip_number'],
-                                  t['load_kind'],
-                                ]),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: heroCard,
                 ),
               ),
-              KarvaanTabBar(
-                labels: const [
-                  L10n.consignmentsStep,
-                  L10n.moneyNavigation,
-                  L10n.expensesTab,
-                  L10n.history,
-                ],
-                selected: tab,
-                onSelected: selectTab,
-              ),
+              tabBar,
               Expanded(
                 child: ListView(
                   // Fresh scroll position per tab, matching the old
                   // jump-to-tabs behaviour when switching.
                   key: ValueKey('detail-content-$tab'),
                   padding: const EdgeInsets.all(16),
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (tab == 0) ...[
-                          const BilingualText(L10n.pickupDropStops),
-                          for (final s in stops)
-                            BilingualText(
-                              L10n.stopRecordIdentity.withValues([
-                                s['position'],
-                                ownedMessage(s['kind']),
-                                s['address'],
-                              ]),
-                            ),
-                          for (final c in r['consignments'] as List)
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          // Single bilingual line: values stay in
-                                          // place, only the label is translated.
-                                          child: BilingualInlineLine(
-                                            L10n.customerLine,
-                                            value: Bilingual.data(
-                                              '${c['customer_name']} · ${consignmentStateLabel(c['state']).en} · ${c['car_count']}',
-                                            ),
-                                          ),
-                                        ),
-                                        // Destructive actions never sit next to
-                                        // ordinary buttons: cancellation lives in
-                                        // an overflow menu whose confirmation
-                                        // sheet narrates what will be reversed.
-                                        if (r['can_cancel_consignment'] ==
-                                                true &&
-                                            c['state'] == 'ACTIVE')
-                                          PopupMenuButton<String>(
-                                            key: ValueKey(
-                                              'consignment-menu-${c['id']}',
-                                            ),
-                                            popUpAnimationStyle:
-                                                AnimationStyle.noAnimation,
-                                            tooltip: L10n
-                                                .correctionsAndCancellationAccessibility,
-                                            onSelected: (_) => operate(
-                                              TripAction.cancelConsignment,
-                                              r,
-                                              consignment: c['id'] as String,
-                                            ),
-                                            itemBuilder: (_) => [
-                                              PopupMenuItem(
-                                                value: 'cancel',
-                                                child: BilingualOwnedCaption(
-                                                  TripAction
-                                                      .cancelConsignment
-                                                      .label,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                      ],
-                                    ),
-                                    BilingualInlineLine(
-                                      L10n.brokerLine,
-                                      value: c['broker_name'] == null
-                                          ? ownedMessage(TripStrings.none)
-                                          : Bilingual.data(
-                                              c['broker_name'].toString(),
-                                            ),
-                                    ),
-                                    // The ledger strip (plan §5.4): fare →
-                                    // −commission → =net, each amount once.
-                                    LedgerStrip(
-                                      segments: [
-                                        LedgerSegment(
-                                          label: L10n.agreedFare,
-                                          formattedValue: displayMoney(
-                                            c['quoted_amount'],
-                                          ),
-                                        ),
-                                        LedgerSegment(
-                                          label:
-                                              c['commission_method'] == 'FIXED'
-                                              ? L10n.brokerCommissionFixed
-                                              : L10n.brokerCommissionPercent,
-                                          formattedValue:
-                                              '− ${displayMoney(c['commission'])}',
-                                        ),
-                                        LedgerSegment(
-                                          label: L10n.netOwnerShare,
-                                          formattedValue:
-                                              '= ${displayMoney(c['owner_entitlement'])}',
-                                        ),
-                                      ],
-                                    ),
-                                    BilingualText(
-                                      L10n.pickupDrop.withValues([
-                                        stopLabel(c['pickup_stop_id']),
-                                        stopLabel(c['drop_stop_id']),
-                                      ]),
-                                    ),
-                                    Text((c['notes']).toString()),
-                                    for (final a in c['cars'] as List)
-                                      BilingualText(
-                                        L10n.pickupDrop68b36c.withValues([
-                                          a['identifier'],
-                                          stopLabel(a['pickup_stop_id']),
-                                          stopLabel(a['drop_stop_id']),
-                                        ]),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                        if (tab == 1)
-                          KarvaanSection(
-                            title: L10n.moneyNavigation,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const BilingualText(L10n.moneySummaryHint),
-                                // Ledger strip on top (plan §5.4); the open
-                                // outstanding stays a separate green callout.
-                                LedgerStrip(
-                                  segments: [
-                                    LedgerSegment(
-                                      label: ownedMessage(
-                                        TripStrings.labels['customer_charge'],
-                                      ),
-                                      formattedValue: displayMoney(
-                                        (r['totals'] as Map)['customer_charge'],
-                                      ),
-                                    ),
-                                    LedgerSegment(
-                                      label: ownedMessage(
-                                        TripStrings.labels['commission'],
-                                      ),
-                                      formattedValue:
-                                          '− ${displayMoney((r['totals'] as Map)['commission'])}',
-                                    ),
-                                    LedgerSegment(
-                                      label: ownedMessage(
-                                        TripStrings.labels['owner_entitlement'],
-                                      ),
-                                      formattedValue:
-                                          '= ${displayMoney((r['totals'] as Map)['owner_entitlement'])}',
-                                    ),
-                                  ],
-                                ),
-                                _moneyOutstanding(
-                                  r['consignments'] as List? ?? const [],
-                                ),
-                                if (widget.onPayments != null)
-                                  OutlinedButton(
-                                    onPressed: widget.onPayments,
-                                    child: const BilingualCaption(
-                                      L10n.paymentsAndAllocations,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        if (tab == 2)
-                          KarvaanSection(
-                            title: L10n.expensesTab,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const BilingualText(
-                                  L10n.noTripExpensesRecorded,
-                                ),
-                                const BilingualText(
-                                  L10n.openOfficeExpenseListHint,
-                                ),
-                                if (widget.onExpenses != null)
-                                  OutlinedButton(
-                                    onPressed: widget.onExpenses,
-                                    child: const BilingualCaption(
-                                      L10n.expensesAndReimbursements,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        if (tab == 3)
-                          SizedBox(
-                            height:
-                                600 * MediaQuery.textScalerOf(context).scale(1),
-                            child: TripHistory(
-                              repository: widget.repository,
-                              id: widget.id,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
+                  children: [tabContent],
                 ),
               ),
             ],
