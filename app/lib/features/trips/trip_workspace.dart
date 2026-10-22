@@ -1960,6 +1960,13 @@ class _TripEditorState extends State<TripEditor> {
                           .scale(1)
                           .clamp(1.0, 2.0);
                       final minStepWidth = 148 * scale;
+                      // The step-row chevron overlay's footprint. The
+                      // scrollable row carries this same width as end
+                      // padding, so the final step can scroll completely
+                      // clear of the overlay and its centre stays
+                      // tappable (Q4: the overlay previously sat on top
+                      // of the Review step and intercepted its taps).
+                      const stepChevronFootprint = 48.0;
                       Widget stepButton(int i) => OutlinedButton(
                         key: ValueKey('trip-step-$i'),
                         onPressed: busy ? null : () => moveStep(i),
@@ -1996,45 +2003,57 @@ class _TripEditorState extends State<TripEditor> {
                             // Buttons take their natural width here, so
                             // a label always gets the room its longest
                             // line needs — it can never wrap mid-word.
-                            child: Row(
-                              spacing: 8,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (var i = 0; i < 3; i++) stepButton(i),
-                              ],
+                            // The end padding matches the chevron
+                            // overlay's footprint, so at full scroll the
+                            // last step sits entirely left of the overlay
+                            // instead of underneath it (Q4).
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: stepChevronFootprint,
+                              ),
+                              child: Row(
+                                spacing: 8,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  for (var i = 0; i < 3; i++) stepButton(i),
+                                ],
+                              ),
                             ),
                           ),
                           Positioned(
                             right: 0,
                             top: 0,
                             bottom: 0,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    KarvaanDesign.background.withValues(
-                                      alpha: 0,
-                                    ),
-                                    KarvaanDesign.background,
-                                  ],
-                                ),
-                              ),
-                              child: IconButton(
-                                key: const ValueKey('trip-steps-next'),
-                                iconSize: 18,
-                                tooltip: L10n.next.inMode(
-                                  LanguageModeStore.instance.mode.value,
-                                ),
-                                icon: const Icon(Icons.chevron_right),
-                                onPressed: () => stepScroll.animateTo(
-                                  (stepScroll.offset + 220).clamp(
-                                    0,
-                                    stepScroll.position.maxScrollExtent,
+                            child: SizedBox(
+                              width: stepChevronFootprint,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      KarvaanDesign.background.withValues(
+                                        alpha: 0,
+                                      ),
+                                      KarvaanDesign.background,
+                                    ],
                                   ),
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeOut,
+                                ),
+                                child: IconButton(
+                                  key: const ValueKey('trip-steps-next'),
+                                  iconSize: 18,
+                                  tooltip: L10n.next.inMode(
+                                    LanguageModeStore.instance.mode.value,
+                                  ),
+                                  icon: const Icon(Icons.chevron_right),
+                                  onPressed: () => stepScroll.animateTo(
+                                    (stepScroll.offset + 220).clamp(
+                                      0,
+                                      stepScroll.position.maxScrollExtent,
+                                    ),
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeOut,
+                                  ),
                                 ),
                               ),
                             ),

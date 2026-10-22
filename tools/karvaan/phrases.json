@@ -8635,5 +8635,14 @@
     "origins": [
       "ui-qa-fix-round"
     ]
+  },
+  {
+    "key": "enterYourUsernameAndPassword",
+    "semantic_key": "ui.enterYourUsernameAndPassword",
+    "en": "Enter your username and password.",
+    "ur": "اپنا صارف نام اور پاس ورڈ درج کریں۔",
+    "origins": [
+      "ui-small-fix-round"
+    ]
   }
 ]

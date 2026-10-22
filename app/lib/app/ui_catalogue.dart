@@ -5911,6 +5911,13 @@ abstract final class L10n {
   );
   static const noExpensesInYourCurrentScopeAccessibility =
       "No expenses or reimbursements in your current scope.. آپ کے موجودہ دائرۂ رسائی میں کوئی اخراجات یا رقم کی واپسی نہیں۔";
+  static const enterYourUsernameAndPassword = Bilingual(
+    "ui.enterYourUsernameAndPassword",
+    "Enter your username and password.",
+    "اپنا صارف نام اور پاس ورڈ درج کریں۔",
+  );
+  static const enterYourUsernameAndPasswordAccessibility =
+      "Enter your username and password.. اپنا صارف نام اور پاس ورڈ درج کریں۔";
   static const values = <Bilingual>[
     brand,
     askYourAdministratorToConfigureThisInstallationForStaff,
@@ -6866,5 +6873,6 @@ abstract final class L10n {
     showDetails,
     noMatchesForFilters,
     noExpensesInYourCurrentScope,
+    enterYourUsernameAndPassword,
   ];
 }

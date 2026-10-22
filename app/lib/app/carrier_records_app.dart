@@ -138,6 +138,21 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// Brings the feedback line into view once it is set — at extreme
+  /// text scales on short viewports it can sit off the card otherwise.
+  void revealFeedback() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = feedbackKey.currentContext;
+      if (mounted && target != null) {
+        Scrollable.ensureVisible(
+          target,
+          alignment: .1,
+          duration: Duration.zero,
+        );
+      }
+    });
+  }
+
   Future<void> run(Future<void> Function() action) async {
     setState(() {
       busy = true;
@@ -153,20 +168,26 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
     } finally {
       if (mounted) {
         setState(() => busy = false);
-        if (message != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final target = feedbackKey.currentContext;
-            if (mounted && target != null) {
-              Scrollable.ensureVisible(
-                target,
-                alignment: .1,
-                duration: Duration.zero,
-              );
-            }
-          });
-        }
+        if (message != null) revealFeedback();
       }
     }
+  }
+
+  /// Sign-in submit with local validation (small fix round): an empty
+  /// username or password never reaches the session. Without this, the
+  /// blank username is rejected locally by emailFor — no request is
+  /// sent — and the mapped fallback ("Request failed. Check your
+  /// credentials…") wrongly implies a connection or credential
+  /// failure. The specific catalogue message is shown through the same
+  /// feedback channel as mapped errors.
+  void submitSignIn() {
+    if (busy) return;
+    if (username.text.trim().isEmpty || password.text.isEmpty) {
+      setState(() => message = L10n.enterYourUsernameAndPassword.en);
+      revealFeedback();
+      return;
+    }
+    run(() => widget.session.signIn(username.text, password.text));
   }
 
   @override
@@ -257,27 +278,11 @@ class _StaffHomeState extends State<StaffHome> with WidgetsBindingObserver {
                               ),
                             ),
                           ),
-                          onSubmitted: (_) {
-                            if (!busy) {
-                              run(
-                                () => widget.session.signIn(
-                                  username.text,
-                                  password.text,
-                                ),
-                              );
-                            }
-                          },
+                          onSubmitted: (_) => submitSignIn(),
                         ),
                         const SizedBox(height: 16),
                         FilledButton(
-                          onPressed: busy
-                              ? null
-                              : () => run(
-                                  () => widget.session.signIn(
-                                    username.text,
-                                    password.text,
-                                  ),
-                                ),
+                          onPressed: busy ? null : submitSignIn,
                           child: const BilingualCaption(L10n.signIn),
                         ),
                       ] else if (p['must_change_password'] == true) ...[
