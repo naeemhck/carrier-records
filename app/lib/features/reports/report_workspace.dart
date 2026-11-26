@@ -109,6 +109,9 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
   /// 3 drafts. Null shows the four cards only.
   int? drill;
 
+  /// The measure the dashboard's by-vehicle bars rank.
+  String chartMetric = 'customer_fare';
+
   /// Zero-value report cards stay hidden until the user asks for all of
   /// them (plan §5.7).
   bool showAllKpis = false;
@@ -403,112 +406,150 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               final attention = attentionRows(totals, drafts);
               final caption = Theme.of(context).textTheme.bodySmall
                   ?.copyWith(color: KarvaanDesign.secondary);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  kpiGrid([
-                    KpiCard(
-                      label: L10n.dispatchedNow,
-                      figure: displayCount(dispatched.length),
-                      period: today,
-                      filled: true,
-                      onTap: () => selectDrill(0),
-                    ),
-                    KpiCard(
-                      label: L10n.customerOutstanding,
-                      figure: displayField(
-                        'MONEY',
-                        totals['customer_outstanding'],
-                      ),
-                      period: period,
-                      onTap: () => selectDrill(1),
-                    ),
-                    KpiCard(
-                      label: L10n.settlementsDue,
-                      figure: displayField('MONEY', totals['owner_due']),
-                      period: period,
-                      onTap: () => selectDrill(2),
-                    ),
-                    KpiCard(
-                      label: L10n.draftTrips,
-                      figure: displayCount(drafts.length),
-                      period: today,
-                      onTap: () => selectDrill(3),
-                    ),
-                  ]),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 16,
-                    runSpacing: 2,
-                    children: [
-                      BilingualOwnedText(
-                        data['scope'] as String,
-                        style: caption,
-                      ),
-                      BilingualInlineLine(
-                        L10n.generatedAt,
-                        style: caption,
-                        value: Bilingual.data(
-                          displayTimestamp(data['generated_at']),
-                        ),
-                      ),
-                    ],
+              final head = <Widget>[
+                kpiGrid([
+                  KpiCard(
+                    label: L10n.dispatchedNow,
+                    figure: displayCount(dispatched.length),
+                    detail: kpiDetail('dispatched', totals),
+                    period: period,
+                    selected: drill == 0,
+                    onTap: () => selectDrill(0),
                   ),
-                  const SizedBox(height: 12),
-                  // Movements and attention scroll inside this region so the
-                  // dashboard page itself never scrolls on desktop.
-                  Expanded(
-                    child: ListView(
+                  KpiCard(
+                    label: L10n.customerOutstanding,
+                    figure: displayField(
+                      'MONEY',
+                      totals['customer_outstanding'],
+                    ),
+                    detail: kpiDetail('receipts', totals),
+                    period: period,
+                    selected: drill == 1,
+                    onTap: () => selectDrill(1),
+                  ),
+                  KpiCard(
+                    label: L10n.settlementsDue,
+                    figure: displayField('MONEY', totals['owner_due']),
+                    detail: kpiDetail('owner_settled', totals),
+                    period: period,
+                    selected: drill == 2,
+                    onTap: () => selectDrill(2),
+                  ),
+                  KpiCard(
+                    label: L10n.draftTrips,
+                    figure: displayCount(drafts.length),
+                    period: today,
+                    selected: drill == 3,
+                    onTap: () => selectDrill(3),
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                LayoutBuilder(
+                  builder: (_, c) {
+                    final scope = BilingualOwnedText(
+                      data['scope'] as String,
+                      style: caption,
+                    );
+                    final generated = BilingualInlineLine(
+                      L10n.generatedAt,
+                      style: caption,
+                      value: Bilingual.data(
+                        displayTimestamp(data['generated_at']),
+                      ),
+                    );
+                    if (c.maxWidth < 720) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [scope, const SizedBox(height: 2), generated],
+                      );
+                    }
+                    return Row(
                       children: [
-                        if (drill != null) ...[
-                          drillPanel(
-                            totals,
-                            dispatched: dispatched,
-                            drafts: drafts,
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                        LayoutBuilder(
-                          builder: (_, c) {
-                            final movementsPanel = dashboardPanel(
-                              title: L10n.todaysMovements,
-                              rows: [
-                                for (final r in movements)
-                                  panelRow(movementRow(r)),
-                              ],
-                              empty: L10n.noMovementsToday,
-                            );
-                            final attentionPanel = dashboardPanel(
-                              title: L10n.needsAttention,
-                              rows: attention,
-                              empty: L10n.nothingNeedsAttention,
-                            );
-                            if (c.maxWidth < 720) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  movementsPanel,
-                                  const SizedBox(height: 12),
-                                  attentionPanel,
-                                ],
-                              );
-                            }
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: movementsPanel),
-                                const SizedBox(width: 12),
-                                Expanded(child: attentionPanel),
-                              ],
-                            );
-                          },
-                        ),
+                        Expanded(child: scope),
+                        const SizedBox(width: 16),
+                        generated,
                       ],
-                    ),
-                  ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ];
+              final body = <Widget>[
+                if (drill != null) ...[
+                  drillPanel(totals, dispatched: dispatched, drafts: drafts),
+                  const SizedBox(height: 12),
                 ],
+                LayoutBuilder(
+                  builder: (_, c) {
+                    final chart = vehicleChart(
+                      data['rows'] as List,
+                      period,
+                      inline: c.maxWidth >= 560,
+                    );
+                    final attentionPanel = dashboardPanel(
+                      title: L10n.needsAttention,
+                      rows: attention,
+                      empty: L10n.nothingNeedsAttention,
+                    );
+                    if (c.maxWidth < 860) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          chart,
+                          const SizedBox(height: 12),
+                          attentionPanel,
+                        ],
+                      );
+                    }
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 3, child: chart),
+                          const SizedBox(width: 12),
+                          Expanded(flex: 2, child: attentionPanel),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                LayoutBuilder(
+                  builder: (_, c) {
+                    final table = c.maxWidth >= 640;
+                    return dashboardPanel(
+                      title: L10n.todaysMovements,
+                      header: table ? movementHeader() : null,
+                      rows: [
+                        for (final r in movements)
+                          panelRow(table ? movementCells(r) : movementRow(r)),
+                      ],
+                      empty: L10n.noMovementsToday,
+                    );
+                  },
+                ),
+              ];
+              // With four cards across, the cards stay pinned and only the
+              // panels scroll. Once the cards stack they can outgrow the
+              // window, so the whole dashboard scrolls as one page instead.
+              return LayoutBuilder(
+                builder: (_, c) {
+                  if (c.maxWidth >= 996) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ...head,
+                        Expanded(child: ListView(children: body)),
+                      ],
+                    );
+                  }
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [...head, ...body],
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -561,6 +602,7 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
     required Bilingual title,
     required List<Widget> rows,
     required Bilingual empty,
+    Widget? header,
   }) {
     final type = Theme.of(context).textTheme;
     return KarvaanGlass(
@@ -602,6 +644,19 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
               ),
             ),
             const Divider(height: 1),
+            if (header != null && rows.isNotEmpty) ...[
+              ColoredBox(
+                color: KarvaanDesign.muted,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: header,
+                ),
+              ),
+              const Divider(height: 1),
+            ],
             if (rows.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -765,6 +820,241 @@ class _ReportWorkspaceState extends State<ReportWorkspace> {
         const SizedBox(width: 8),
         TripStatusBadge((r['state'] ?? '').toString()),
       ],
+    );
+  }
+
+  /// Column heads for the movements table; widths mirror [movementCells].
+  Widget movementHeader() {
+    final style = Theme.of(context).textTheme.labelSmall
+        ?.copyWith(color: KarvaanDesign.secondary);
+    return Row(
+      children: [
+        Expanded(flex: 3, child: BilingualText(L10n.trip, style: style)),
+        Expanded(flex: 4, child: BilingualText(L10n.routeLabel, style: style)),
+        Expanded(flex: 3, child: BilingualText(L10n.vehicle, style: style)),
+        Expanded(
+          flex: 3,
+          child: BilingualText(
+            L10n.historyFieldStatus,
+            style: style,
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// One movement as a table row: trip, route, vehicle, status.
+  Widget movementCells(Map<String, dynamic> r) {
+    final type = Theme.of(context).textTheme;
+    final origin = (r['origin_name'] ?? '').toString();
+    final destination = (r['destination_name'] ?? '').toString();
+    final route = [
+      if (origin.isNotEmpty) origin,
+      if (destination.isNotEmpty) destination,
+    ].join(' → ');
+    Widget cell(String text, TextStyle? style) => Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Text(
+        text.isEmpty ? '—' : text,
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: style,
+      ),
+    );
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: cell((r['trip_number'] ?? '').toString(), type.titleSmall),
+        ),
+        Expanded(flex: 4, child: cell(route, type.bodyMedium)),
+        Expanded(
+          flex: 3,
+          child: cell(
+            (r['registration'] ?? '').toString(),
+            type.bodyMedium?.copyWith(color: KarvaanDesign.secondary),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: TripStatusBadge((r['state'] ?? '').toString()),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The supporting fact on a headline card: a period figure the report
+  /// already carries, under its own catalogue label.
+  Widget kpiDetail(String key, Map<String, dynamic> totals) => Wrap(
+    spacing: 6,
+    crossAxisAlignment: WrapCrossAlignment.center,
+    children: [
+      BilingualText(_valueLabel(key, lifetime: false, plainLabel: true)),
+      Text(
+        displayField(
+          ['dispatched', 'arrived'].contains(key) ? 'INTEGER' : 'MONEY',
+          totals[key],
+        ),
+        textDirection: TextDirection.ltr,
+        style: const TextStyle(fontFeatures: KarvaanTypography.figureFeatures),
+      ),
+    ],
+  );
+
+  static const _chartMetrics = [
+    'customer_fare',
+    'vehicle_cost',
+    'operating_profit',
+  ];
+
+  BigInt _paisa(Object? amount) {
+    if (amount == null) return BigInt.zero;
+    try {
+      return LedgerAmount.fromJson(amount).paisa;
+    } on FormatException {
+      return BigInt.zero;
+    }
+  }
+
+  /// The period by vehicle: the six largest figures of the chosen measure
+  /// as bars scaled to the largest. Reads the report rows the dashboard
+  /// already fetched; vehicles with nothing for the measure are left out.
+  Widget vehicleChart(
+    List<dynamic> rows,
+    String period, {
+    required bool inline,
+  }) {
+    final type = Theme.of(context).textTheme;
+    final quiet = type.bodySmall?.copyWith(color: KarvaanDesign.secondary);
+    final ranked =
+        <(Map<dynamic, dynamic>, BigInt)>[
+            for (final row in rows)
+              (row as Map, _paisa((row['values'] as Map)[chartMetric])),
+          ]
+          ..removeWhere((entry) => entry.$2 == BigInt.zero)
+          ..sort((a, b) => b.$2.abs().compareTo(a.$2.abs()));
+    final shown = ranked.take(6).toList();
+    final peak = shown.isEmpty ? BigInt.one : shown.first.$2.abs();
+
+    Widget bar(BigInt amount) => Container(
+      height: 8,
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: KarvaanDesign.muted,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: FractionallySizedBox(
+        widthFactor: ((amount.abs() * BigInt.from(1000) ~/ peak).toInt() / 1000)
+            .clamp(0.02, 1.0),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: amount.isNegative
+                ? KarvaanDesign.destructive
+                : KarvaanDesign.primary,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+
+    Widget chartRow((Map<dynamic, dynamic>, BigInt) entry) {
+      final name = Text(
+        '${entry.$1['name']}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: type.bodyMedium,
+      );
+      final figure = Text(
+        displayField('MONEY', (entry.$1['values'] as Map)[chartMetric]),
+        textDirection: TextDirection.ltr,
+        style: type.bodyMedium?.copyWith(
+          fontFamily: KarvaanTypography.figureFamily,
+          fontFamilyFallback: KarvaanTypography.latinFallback,
+        ),
+      );
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: inline
+            ? Row(
+                children: [
+                  SizedBox(width: 150, child: name),
+                  const SizedBox(width: 12),
+                  Expanded(child: bar(entry.$2)),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 150,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: figure,
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: name),
+                      const SizedBox(width: 12),
+                      figure,
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  bar(entry.$2),
+                ],
+              ),
+      );
+    }
+
+    return KarvaanGlass(
+      child: Material(
+        type: MaterialType.transparency,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BilingualText(L10n.vehicles, style: type.titleSmall),
+              const SizedBox(height: 2),
+              Text(period, textDirection: TextDirection.ltr, style: quiet),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final key in _chartMetrics)
+                    ChoiceChip(
+                      key: ValueKey('dashboard-chart-$key'),
+                      label: BilingualText(
+                        _valueLabel(key, lifetime: false, plainLabel: true),
+                      ),
+                      selected: chartMetric == key,
+                      onSelected: (_) => setState(() => chartMetric = key),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (shown.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: BilingualText(
+                    L10n.noRecordsInThisPeriodScope,
+                    style: quiet,
+                  ),
+                ),
+              for (final entry in shown) chartRow(entry),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
