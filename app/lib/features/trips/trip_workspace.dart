@@ -672,7 +672,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                         isSelected: !showTable,
                         style: IconButton.styleFrom(
                           backgroundColor: !showTable
-                              ? KarvaanDesign.borderColor
+                              ? KarvaanDesign.primarySurface
                               : null,
                         ),
                         icon: const Icon(Icons.view_agenda_outlined),
@@ -687,7 +687,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                         isSelected: showTable,
                         style: IconButton.styleFrom(
                           backgroundColor: showTable
-                              ? KarvaanDesign.borderColor
+                              ? KarvaanDesign.primarySurface
                               : null,
                         ),
                         icon: const Icon(Icons.table_rows_outlined),
@@ -742,7 +742,7 @@ class _TripWorkspaceState extends State<TripWorkspace> {
                                 ),
                                 selected: status == s,
                                 showCheckmark: false,
-                                selectedColor: KarvaanDesign.borderColor,
+                                selectedColor: KarvaanDesign.primarySurface,
                                 onSelected: (_) {
                                   status = s;
                                   reload(start: 0);
@@ -1366,6 +1366,11 @@ class _TripEditorState extends State<TripEditor> {
   /// Scrolls the step row when it switches to its sideways form on
   /// narrow screens (GPT QA F07).
   final stepScroll = ScrollController();
+
+  /// Whether the step row is wider than its viewport. The fade and chevron
+  /// only appear then, so a row that already fits never shows a control
+  /// that does nothing.
+  bool stepsOverflow = false;
   @override
   void dispose() {
     stepScroll.dispose();
@@ -1973,7 +1978,7 @@ class _TripEditorState extends State<TripEditor> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.all(8),
                           backgroundColor: step == i
-                              ? KarvaanDesign.borderColor
+                              ? KarvaanDesign.primarySurface
                               : Colors.white,
                         ),
                         child: BilingualText(
@@ -1996,68 +2001,81 @@ class _TripEditorState extends State<TripEditor> {
                       }
                       return Stack(
                         children: [
-                          SingleChildScrollView(
-                            key: const ValueKey('trip-steps-scroll'),
-                            controller: stepScroll,
-                            scrollDirection: Axis.horizontal,
-                            // Buttons take their natural width here, so
-                            // a label always gets the room its longest
-                            // line needs — it can never wrap mid-word.
-                            // The end padding matches the chevron
-                            // overlay's footprint, so at full scroll the
-                            // last step sits entirely left of the overlay
-                            // instead of underneath it (Q4).
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                right: stepChevronFootprint,
-                              ),
-                              child: Row(
-                                spacing: 8,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for (var i = 0; i < 3; i++) stepButton(i),
-                                ],
+                          NotificationListener<ScrollMetricsNotification>(
+                            onNotification: (notification) {
+                              final overflow =
+                                  notification.metrics.maxScrollExtent > 0;
+                              if (overflow != stepsOverflow && mounted) {
+                                setState(() => stepsOverflow = overflow);
+                              }
+                              return false;
+                            },
+                            child: SingleChildScrollView(
+                              key: const ValueKey('trip-steps-scroll'),
+                              controller: stepScroll,
+                              scrollDirection: Axis.horizontal,
+                              // Buttons take their natural width here, so
+                              // a label always gets the room its longest
+                              // line needs — it can never wrap mid-word.
+                              // The end padding matches the chevron
+                              // overlay's footprint, so at full scroll the
+                              // last step sits entirely left of the overlay
+                              // instead of underneath it (Q4).
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  right: stepChevronFootprint,
+                                ),
+                                child: Row(
+                                  spacing: 8,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (var i = 0; i < 3; i++) stepButton(i),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: SizedBox(
-                              width: stepChevronFootprint,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      KarvaanDesign.background.withValues(
-                                        alpha: 0,
-                                      ),
-                                      KarvaanDesign.background,
-                                    ],
-                                  ),
-                                ),
-                                child: IconButton(
-                                  key: const ValueKey('trip-steps-next'),
-                                  iconSize: 18,
-                                  tooltip: L10n.next.inMode(
-                                    LanguageModeStore.instance.mode.value,
-                                  ),
-                                  icon: const Icon(Icons.chevron_right),
-                                  onPressed: () => stepScroll.animateTo(
-                                    (stepScroll.offset + 220).clamp(
-                                      0,
-                                      stepScroll.position.maxScrollExtent,
+                          if (stepsOverflow)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: SizedBox(
+                                width: stepChevronFootprint,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        KarvaanDesign.background.withValues(
+                                          alpha: 0,
+                                        ),
+                                        KarvaanDesign.background,
+                                      ],
                                     ),
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Curves.easeOut,
+                                  ),
+                                  child: IconButton(
+                                    key: const ValueKey('trip-steps-next'),
+                                    iconSize: 18,
+                                    tooltip: L10n.next.inMode(
+                                      LanguageModeStore.instance.mode.value,
+                                    ),
+                                    icon: const Icon(Icons.chevron_right),
+                                    onPressed: () => stepScroll.animateTo(
+                                      (stepScroll.offset + 220).clamp(
+                                        0,
+                                        stepScroll.position.maxScrollExtent,
+                                      ),
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      curve: Curves.easeOut,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
                         ],
                       );
                     },

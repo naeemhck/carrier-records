@@ -31,9 +31,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  Rect pickerRect(WidgetTester tester, String part) => tester.getRect(
-    find.byKey(ValueKey('trip-picker-vehicle-$part')),
-  );
+  Rect pickerRect(WidgetTester tester, String part) =>
+      tester.getRect(find.byKey(ValueKey('trip-picker-vehicle-$part')));
 
   testWidgets('F04: desktop two-column form puts picker value beside label', (
     tester,
@@ -94,10 +93,14 @@ void main() {
       tester.getRect(consignments).height,
       closeTo(tester.getRect(journey).height, 1.5),
     );
-    // Every step stays reachable: the chevron scrolls the row until
-    // the Review step is fully on screen, and it can be opened.
-    await tester.tap(find.byKey(const ValueKey('trip-steps-next')));
-    await tester.pumpAndSettle();
+    // Every step stays reachable: the Review step is fully on screen and
+    // can be opened. The chevron only exists when the row has to scroll;
+    // with the bundled faces the three steps fit this width outright.
+    final next = find.byKey(const ValueKey('trip-steps-next'));
+    if (next.evaluate().isNotEmpty) {
+      await tester.tap(next);
+      await tester.pumpAndSettle();
+    }
     final reviewRect = tester.getRect(
       find.byKey(const ValueKey('trip-step-2')),
     );
@@ -105,10 +108,7 @@ void main() {
     expect(reviewRect.left, greaterThanOrEqualTo(0));
     await tester.tap(find.byKey(const ValueKey('trip-step-2')));
     await tester.pumpAndSettle();
-    expect(
-      find.byKey(const ValueKey('trip-step-content-2')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('trip-step-content-2')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

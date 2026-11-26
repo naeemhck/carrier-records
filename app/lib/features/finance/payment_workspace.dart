@@ -471,9 +471,9 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
       }
     }
     lines.sort(
-      (a, b) => accountPurposeRank(a.purpose).compareTo(
-        accountPurposeRank(b.purpose),
-      ),
+      (a, b) =>
+          accountPurposeRank(a.purpose)
+              .compareTo(accountPurposeRank(b.purpose)),
     );
     return [
       for (final line in lines)
@@ -525,9 +525,11 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
     await load(tripId);
   }
 
-  /// Balances & custody summary: the intermediary-held figure leads as the
-  /// one hero amount per viewport; per-party balances follow with paper-trail
-  /// links to their source trips. Summary-first, tabular figures.
+  /// Balances & custody summary: the intermediary-held figure leads, then
+  /// per-party balances follow with paper-trail links to their source
+  /// trips. Summary-first, tabular figures. It is a headline figure, not a
+  /// hero: the explicit total field below shares its viewport on a desktop
+  /// window and is the page's one display-sized amount.
   Widget _balancesSummary() {
     // Don't flash a zero hero / "no records" before the first ledger load.
     if (busy && balances.isEmpty) return const SizedBox.shrink();
@@ -537,7 +539,6 @@ class _PaymentWorkspaceState extends State<PaymentWorkspace> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           KarvaanMetric(
-            hero: true,
             label: L10n.intermediaryHeldMoney,
             formattedValue: displayMoney(
               AllocationTotals.decimal(_heldPaisa()),
@@ -982,16 +983,18 @@ Bilingual accountPurposeLabel(String key) => switch (key) {
 
 /// Display order for money states: held funds first (the custody figure the
 /// balances view leads with), then receivables, credits, and payables.
-int accountPurposeRank(String key) => const {
-  'CUSTODY_RECEIVABLE': 0,
-  'CUSTOMER_RECEIVABLE': 1,
-  'CUSTOMER_ADVANCE_CREDIT': 2,
-  'OWNER_PAYABLE': 3,
-  'BROKER_COMMISSION_PAYABLE': 4,
-  'EXPENSE_REIMBURSEMENT_PAYABLE': 5,
-  'TRIP_FUNDING_PAYABLE': 6,
-  'PARTY_COST_RECOVERY': 7,
-}[key] ?? 99;
+int accountPurposeRank(String key) =>
+    const {
+      'CUSTODY_RECEIVABLE': 0,
+      'CUSTOMER_RECEIVABLE': 1,
+      'CUSTOMER_ADVANCE_CREDIT': 2,
+      'OWNER_PAYABLE': 3,
+      'BROKER_COMMISSION_PAYABLE': 4,
+      'EXPENSE_REIMBURSEMENT_PAYABLE': 5,
+      'TRIP_FUNDING_PAYABLE': 6,
+      'PARTY_COST_RECOVERY': 7,
+    }[key] ??
+    99;
 
 /// Money-state chip: stacked bilingual purpose label in the money-green
 /// family (blue is reserved for the physical/journey flow). Held funds render

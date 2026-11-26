@@ -93,6 +93,7 @@ class _CarrierRecordsAppState extends State<CarrierRecordsApp> {
   @override
   Widget build(BuildContext context) => MaterialApp.router(
     title: AppStrings.title,
+    debugShowCheckedModeBanner: false,
     theme: KarvaanDesign.theme(),
     builder: (context, child) => karvaanQaPreview
         ? QaPreviewFrame(child: child ?? const SizedBox.shrink())

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Pins the redesign tokens (plan §2) and the testable bilingual rules
-/// (plan §3) so later phases cannot silently drift from the spec.
+/// (plan §3) so later phases cannot silently drift from the spec. The
+/// 2026-11-26 GUI refresh (owner directive) superseded the neutrals, the
+/// stacked bilingual pair and the Urdu display face; those pins follow it.
 void main() {
-  test('color tokens match plan section 2.1 exactly', () {
+  test('color tokens match plan section 2.1 and the GUI refresh neutrals', () {
     expect(KarvaanDesign.primary, const Color(0xFF1E40AF));
     expect(KarvaanDesign.primaryBright, const Color(0xFF3B82F6));
     expect(KarvaanDesign.money, const Color(0xFF15803D));
@@ -15,13 +17,13 @@ void main() {
     expect(KarvaanDesign.moneySurface, const Color(0xFFF0FDF4));
     expect(KarvaanDesign.attention, const Color(0xFFD97706));
     expect(KarvaanDesign.destructive, const Color(0xFFDC2626));
-    expect(KarvaanDesign.background, const Color(0xFFF8FAFC));
+    expect(KarvaanDesign.background, const Color(0xFFF5F6F8));
     expect(KarvaanDesign.surface, const Color(0xFFFFFFFF));
-    expect(KarvaanDesign.headingInk, const Color(0xFF172554));
+    expect(KarvaanDesign.headingInk, const Color(0xFF0F172A));
     expect(KarvaanDesign.ink, const Color(0xFF1F2937));
-    expect(KarvaanDesign.muted, const Color(0xFFE9EEF6));
+    expect(KarvaanDesign.muted, const Color(0xFFEEF1F5));
     expect(KarvaanDesign.secondary, const Color(0xFF475569));
-    expect(KarvaanDesign.borderColor, const Color(0xFFDBEAFE));
+    expect(KarvaanDesign.borderColor, const Color(0xFFE3E7ED));
   });
 
   test('theme carries the tokens, families and radius system', () {
@@ -70,18 +72,40 @@ void main() {
     expect(ownedMessage('ڈیبٹ کی رند رقم').ur, 'گول ڈیبٹ رقم');
   });
 
-  testWidgets('rule 1: bilingual text stacks English above Urdu', (t) async {
-    await t.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: BilingualText(L10n.customerOutstanding)),
-      ),
-    );
-    final en = t.getTopLeft(find.text(L10n.customerOutstanding.en));
-    final ur = t.getTopLeft(find.text(L10n.customerOutstanding.ur));
-    expect(ur.dy, greaterThan(en.dy));
+  testWidgets('rule 1: English leads and its Urdu companion follows on the '
+      'same line, dropping beneath it only when the pair does not fit', (
+    t,
+  ) async {
+    Future<(Rect, Rect)> pairAt(double width) async {
+      await t.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: width,
+                child: const BilingualText(L10n.customerOutstanding),
+              ),
+            ),
+          ),
+        ),
+      );
+      return (
+        t.getRect(find.text(L10n.customerOutstanding.en)),
+        t.getRect(find.text(L10n.customerOutstanding.ur)),
+      );
+    }
+
+    final (en, ur) = await pairAt(600);
+    expect(ur.left, greaterThanOrEqualTo(en.right));
+    expect(ur.top, lessThan(en.bottom));
+    final (narrowEn, narrowUr) = await pairAt(150);
+    expect(narrowUr.top, greaterThanOrEqualTo(narrowEn.bottom));
   });
 
-  testWidgets('Urdu headings use Nastaliq, Urdu body uses Naskh', (t) async {
+  testWidgets('Urdu headings and body share one face at its natural leading', (
+    t,
+  ) async {
     await t.pumpWidget(
       MaterialApp(
         theme: KarvaanDesign.theme(),
@@ -102,8 +126,14 @@ void main() {
     expect(headingUrdu.style!.fontFamily, KarvaanTypography.urduDisplayFamily);
     final bodyUrdu = t.widget<Text>(find.text(L10n.customerOutstanding.ur));
     expect(bodyUrdu.style!.fontFamily, KarvaanTypography.urduBodyFamily);
-    // Plan §2.2: Urdu body leading is 14/26.
-    expect(bodyUrdu.style!.height, 26 / 14);
+    expect(
+      KarvaanTypography.urduDisplayFamily,
+      KarvaanTypography.urduBodyFamily,
+    );
+    // No forced leading: a line box shorter than the script's natural
+    // ascent and descent lets its marks be cut off at a panel edge.
+    expect(headingUrdu.style!.height, isNull);
+    expect(bodyUrdu.style!.height, isNull);
   });
 
   testWidgets('rules 2 and 5: inline line keeps the value once, LTR, '
@@ -126,7 +156,7 @@ void main() {
     expect('Synthetic broker'.allMatches(plain).length, 1);
     expect(
       plain,
-      '${L10n.brokerLine.en} / ${L10n.brokerLine.ur}: Synthetic broker',
+      '${L10n.brokerLine.en} / ${L10n.brokerLine.ur}\u200E: Synthetic broker',
     );
   });
 
@@ -177,7 +207,7 @@ void main() {
       ),
     );
     expect(bgOf('DRAFT'), KarvaanDesign.muted);
-    expect(bgOf('DISPATCHED'), KarvaanDesign.borderColor);
+    expect(bgOf('DISPATCHED'), KarvaanDesign.primarySurface);
     expect(bgOf('ARRIVED'), KarvaanDesign.moneySurface);
     expect(bgOf('CANCELLED'), KarvaanDesign.surface);
   });

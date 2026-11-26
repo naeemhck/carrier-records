@@ -163,10 +163,13 @@ Uint8List renderOutputXlsxV2(Map<String, dynamic> payload) {
     // A blank separator row keeps the totals strip visually and
     // structurally separate from the record table.
     add(const [], height: 10);
-    add(
-      [(output.frames['totals']!.values([output.recordCount]).combined, 'TEXT', 2)],
-      merged: true,
-    );
+    add([
+      (
+        output.frames['totals']!.values([output.recordCount]).combined,
+        'TEXT',
+        2,
+      ),
+    ], merged: true);
     for (final e in totals) {
       final type = integerKeys.contains(e.key) ? 'INTEGER' : 'MONEY';
       add([

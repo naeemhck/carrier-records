@@ -73,7 +73,8 @@ class ReportsFake implements ReportCommands {
   }
 }
 
-void main() {  testWidgets(
+void main() {
+  testWidgets(
     'Scoped report pagination retains filters and distinct server totals',
     (t) async {
       final fake = ReportsFake();
@@ -122,7 +123,9 @@ void main() {  testWidgets(
     );
 
     Future<void> tapKpi(String label) async {
-      await t.tap(label == 'Reports' ? englishTextContaining(label) : kpiLabel(label));
+      await t.tap(
+        label == 'Reports' ? englishTextContaining(label) : kpiLabel(label),
+      );
       await t.pumpAndSettle();
     }
 

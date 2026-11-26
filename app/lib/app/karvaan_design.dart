@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'bilingual.dart';
@@ -7,23 +5,35 @@ import 'karvaan_typography.dart';
 
 /// Presentation tokens only. No domain state or derived financial totals.
 ///
-/// Redesign tokens (frontend plan §2.1): color is semantic — blue always
-/// means movement, green always means money, amber means attention, red
-/// means error/overdue. Radius: cards 10, inputs/buttons 8, chips full-round.
+/// Color is semantic (frontend plan §2.1): blue always means movement and
+/// the primary action, green always means money, amber means attention,
+/// red means error/overdue. Everything else is a neutral: structure comes
+/// from one hairline grey and white surfaces, not from tinted borders.
+/// Radius: cards 10, inputs/buttons 8, chips full-round.
 abstract final class KarvaanDesign {
   static const primary = Color(0xFF1E40AF);
   static const primaryBright = Color(0xFF3B82F6);
+
+  /// Tinted fill for selected navigation, tabs, chips and the Dispatched
+  /// status. Never a border.
+  static const primarySurface = Color(0xFFE8EEFC);
   static const money = Color(0xFF15803D);
   static const moneySurface = Color(0xFFF0FDF4);
   static const attention = Color(0xFFD97706);
   static const destructive = Color(0xFFDC2626);
-  static const background = Color(0xFFF8FAFC);
+  static const background = Color(0xFFF5F6F8);
   static const surface = Color(0xFFFFFFFF);
-  static const headingInk = Color(0xFF172554);
+  static const headingInk = Color(0xFF0F172A);
   static const ink = Color(0xFF1F2937);
-  static const muted = Color(0xFFE9EEF6);
+  static const muted = Color(0xFFEEF1F5);
   static const secondary = Color(0xFF475569);
-  static const borderColor = Color(0xFFDBEAFE);
+
+  /// The one hairline: card, panel, table and divider edges.
+  static const borderColor = Color(0xFFE3E7ED);
+
+  /// Control outlines (inputs, outlined buttons) sit one step darker so
+  /// an empty field is still visibly a field.
+  static const outline = Color(0xFFC7CED8);
 
   /// Money green. Kept as the accent name existing screens reference; it
   /// marks money only — movement and primary actions use [primary].
@@ -34,23 +44,45 @@ abstract final class KarvaanDesign {
   );
 
   static ThemeData theme() {
-    final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
+    const radius = BorderRadius.all(Radius.circular(8));
+    const shape = RoundedRectangleBorder(borderRadius: radius);
+    final type = KarvaanTypography.textTheme;
+    final scheme = ColorScheme.fromSeed(seedColor: primary).copyWith(
+      primary: primary,
+      onPrimary: Colors.white,
+      primaryContainer: primarySurface,
+      onPrimaryContainer: primary,
+      secondaryContainer: primarySurface,
+      onSecondaryContainer: primary,
+      surface: surface,
+      onSurface: ink,
+      onSurfaceVariant: secondary,
+      surfaceTint: Colors.transparent,
+      surfaceContainerLowest: surface,
+      surfaceContainerLow: surface,
+      surfaceContainer: surface,
+      surfaceContainerHigh: muted,
+      surfaceContainerHighest: muted,
+      outline: outline,
+      outlineVariant: borderColor,
+      error: destructive,
     );
+    OutlineInputBorder inputBorder(Color color, [double width = 1]) =>
+        OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: color, width: width),
+        );
     return ThemeData(
       useMaterial3: true,
+      // One density on every platform: desktop otherwise shrinks buttons
+      // below the fields they sit beside.
+      visualDensity: VisualDensity.standard,
       splashFactory: NoSplash.splashFactory,
       fontFamily: KarvaanTypography.latinFamily,
-      textTheme: KarvaanTypography.textTheme,
+      textTheme: type,
       fontFamilyFallback: KarvaanTypography.latinFallback,
       scaffoldBackgroundColor: background,
-      colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
-        primary: primary,
-        onSurface: ink,
-        surface: surface,
-        onSurfaceVariant: secondary,
-        error: destructive,
-      ),
+      colorScheme: scheme,
       // Entry, focus, dropdown and navigation changes remain immediate.
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
@@ -62,60 +94,59 @@ abstract final class KarvaanDesign {
         },
       ),
       appBarTheme: AppBarTheme(
-        toolbarHeight: 88,
-        titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
+        toolbarHeight: 56,
+        titleTextStyle: type.titleMedium?.copyWith(
           color: headingInk,
           fontFamily: KarvaanTypography.latinFamily,
         ),
-        backgroundColor: background,
+        backgroundColor: surface,
+        foregroundColor: ink,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        shape: const Border(bottom: BorderSide(color: borderColor)),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         color: surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        margin: EdgeInsets.symmetric(vertical: 6),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: borderColor),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          side: BorderSide(color: borderColor),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        labelStyle: KarvaanTypography.textTheme.bodyMedium,
-        helperStyle: KarvaanTypography.textTheme.bodySmall,
-        errorStyle: KarvaanTypography.textTheme.bodySmall,
+        labelStyle: type.bodyMedium?.copyWith(color: secondary),
+        helperStyle: type.bodySmall?.copyWith(color: secondary),
+        errorStyle: type.bodySmall,
         // Avoid Material shrinking Urdu floating labels below the readable floor.
-        floatingLabelStyle: KarvaanTypography.textTheme.bodyMedium,
+        floatingLabelStyle: type.bodyMedium,
         filled: true,
         fillColor: surface,
-        contentPadding: const EdgeInsets.all(16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        border: inputBorder(outline),
+        enabledBorder: inputBorder(outline),
+        disabledBorder: inputBorder(borderColor),
+        focusedBorder: inputBorder(primary, 1.5),
+        errorBorder: inputBorder(destructive),
+        focusedErrorBorder: inputBorder(destructive, 1.5),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style:
             FilledButton.styleFrom(
-              minimumSize: const Size(48, 56),
+              backgroundColor: primary,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(48, 40),
               shape: shape,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: type.labelLarge,
               animationDuration: Duration.zero,
             ).copyWith(
-              backgroundBuilder: (context, states, child) =>
-                  states.contains(WidgetState.disabled)
-                  ? child ?? const SizedBox()
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: DecoratedBox(
-                        decoration: const BoxDecoration(
-                          gradient: primaryGradient,
-                        ),
-                        // Contrast overlay keeps both languages readable on the bright end.
-                        child: ColoredBox(
-                          color: const Color(0x33000000),
-                          child: child,
-                        ),
-                      ),
-                    ),
               side: WidgetStateProperty.resolveWith(
                 (states) => states.contains(WidgetState.focused)
                     ? const BorderSide(color: ink, width: 2)
@@ -125,45 +156,112 @@ abstract final class KarvaanDesign {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          foregroundColor: primary,
+          backgroundColor: surface,
           shape: shape,
-          minimumSize: const Size(48, 48),
-          padding: const EdgeInsets.all(12),
+          side: const BorderSide(color: outline),
+          minimumSize: const Size(48, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          textStyle: type.labelLarge,
           animationDuration: Duration.zero,
         ),
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          shape: shape,
+          minimumSize: const Size(48, 36),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          textStyle: type.labelLarge,
+          animationDuration: Duration.zero,
+        ),
+      ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          shape: const WidgetStatePropertyAll(shape),
+          side: const WidgetStatePropertyAll(BorderSide(color: outline)),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? primarySurface
+                : surface,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected) ? primary : ink,
+          ),
+          textStyle: WidgetStatePropertyAll(type.labelLarge),
+          animationDuration: Duration.zero,
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: surface,
+        selectedColor: primarySurface,
+        side: const BorderSide(color: outline),
+        shape: const StadiumBorder(),
+        labelStyle: type.bodySmall?.copyWith(
+          color: ink,
+          fontWeight: FontWeight.w600,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      ),
       listTileTheme: ListTileThemeData(
-        titleTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
+        titleTextStyle: type.bodyMedium?.copyWith(
           color: ink,
           fontFamily: KarvaanTypography.latinFamily,
         ),
-        subtitleTextStyle: KarvaanTypography.textTheme.bodySmall?.copyWith(
+        subtitleTextStyle: type.bodySmall?.copyWith(
           color: secondary,
           fontFamily: KarvaanTypography.latinFamily,
         ),
       ),
       dialogTheme: DialogThemeData(
-        titleTextStyle: KarvaanTypography.textTheme.titleLarge?.copyWith(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+        titleTextStyle: type.titleMedium?.copyWith(
           color: headingInk,
           fontFamily: KarvaanTypography.latinFamily,
         ),
-        contentTextStyle: KarvaanTypography.textTheme.bodyMedium?.copyWith(
+        contentTextStyle: type.bodyMedium?.copyWith(
           color: ink,
           fontFamily: KarvaanTypography.latinFamily,
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        textStyle: KarvaanTypography.textTheme.bodyMedium,
+        color: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 3,
+        shape: const RoundedRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(color: borderColor),
+        ),
+        textStyle: type.bodyMedium,
       ),
       tooltipTheme: TooltipThemeData(
-        textStyle: KarvaanTypography.textTheme.bodySmall?.copyWith(
-          color: Colors.white,
+        decoration: const BoxDecoration(
+          color: headingInk,
+          borderRadius: BorderRadius.all(Radius.circular(6)),
         ),
+        textStyle: type.bodySmall?.copyWith(color: Colors.white),
       ),
       dataTableTheme: DataTableThemeData(
-        headingTextStyle: KarvaanTypography.textTheme.labelLarge,
-        dataTextStyle: KarvaanTypography.textTheme.bodyMedium,
+        headingTextStyle: type.bodySmall?.copyWith(
+          color: secondary,
+          fontWeight: FontWeight.w600,
+        ),
+        dataTextStyle: type.bodyMedium?.copyWith(color: ink),
+        dividerThickness: 1,
+        decoration: const BoxDecoration(
+          color: surface,
+          border: Border.fromBorderSide(BorderSide(color: borderColor)),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
       ),
-      dividerTheme: const DividerThemeData(color: borderColor),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primary,
+        linearTrackColor: primarySurface,
+      ),
+      dividerTheme: const DividerThemeData(color: borderColor, thickness: 1),
     );
   }
 }
@@ -180,37 +278,28 @@ class _ImmediateTransition extends PageTransitionsBuilder {
   ) => child;
 }
 
-/// Bounded navigation/action material. Never apply to forms, rows or money.
+/// Bounded navigation/action panel: an opaque white surface with the one
+/// hairline edge. It replaced the blurred translucent material — a records
+/// tool reads better on solid surfaces, and it costs nothing to paint.
+/// Never apply to forms, rows or money.
 class KarvaanGlass extends StatelessWidget {
   const KarvaanGlass({super.key, required this.child, this.opaque = false});
   final Widget child;
+
+  /// Retained for callers; the panel is always opaque now.
   final bool opaque;
   @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final solid =
-        opaque ||
-        media.highContrast ||
-        media.accessibleNavigation ||
-        media.disableAnimations;
-    final panel = DecoratedBox(
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child: DecoratedBox(
       decoration: BoxDecoration(
-        color: solid ? Colors.white : const Color(0xE6FFFFFF),
+        color: KarvaanDesign.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: KarvaanDesign.borderColor),
       ),
       child: child,
-    );
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: solid
-          ? panel
-          : BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: panel,
-            ),
-    );
-  }
+    ),
+  );
 }
 
 class KarvaanSection extends StatelessWidget {
@@ -218,7 +307,7 @@ class KarvaanSection extends StatelessWidget {
     super.key,
     required this.title,
     required this.child,
-    this.padding = const EdgeInsets.all(24),
+    this.padding = const EdgeInsets.all(20),
   });
   final Bilingual title;
   final Widget child;
@@ -230,8 +319,8 @@ class KarvaanSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          BilingualText(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 16),
+          BilingualText(title, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 12),
           child,
         ],
       ),
@@ -350,7 +439,7 @@ class TripStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (foreground, background) = switch (state) {
       'DRAFT' => (KarvaanDesign.secondary, KarvaanDesign.muted),
-      'DISPATCHED' => (KarvaanDesign.primary, KarvaanDesign.borderColor),
+      'DISPATCHED' => (KarvaanDesign.primary, KarvaanDesign.primarySurface),
       'ARRIVED' => (KarvaanDesign.money, KarvaanDesign.moneySurface),
       'CANCELLED' => (KarvaanDesign.destructive, KarvaanDesign.surface),
       _ => (KarvaanDesign.secondary, KarvaanDesign.background),
@@ -364,10 +453,15 @@ class TripStatusBadge extends StatelessWidget {
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
         child: BilingualText(
           tripStateLabel(state),
-          style: TextStyle(color: foreground),
+          stacked: false,
+          style: TextStyle(
+            color: foreground,
+            fontSize: KarvaanTypography.caption,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -399,13 +493,16 @@ class KarvaanTabBar extends StatelessWidget {
           children: [
             for (var i = 0; i < labels.length; i++)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: TextButton(
                   key: ValueKey('detail-tab-$i'),
                   style: TextButton.styleFrom(
                     backgroundColor: selected == i
-                        ? KarvaanDesign.borderColor
+                        ? KarvaanDesign.primarySurface
                         : Colors.transparent,
+                    foregroundColor: selected == i
+                        ? KarvaanDesign.primary
+                        : KarvaanDesign.secondary,
                   ),
                   onPressed: () => onSelected(i),
                   child: BilingualText(labels[i]),

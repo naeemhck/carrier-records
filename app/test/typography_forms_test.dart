@@ -135,8 +135,13 @@ void main() {
               greaterThanOrEqualTo(KarvaanTypography.urduMinimum),
             );
             final box = element.renderObject as RenderParagraph;
+            // A field's single label line may shorten a run that does not
+            // fit (the tooltip carries the full pair); the line it does
+            // render still has to keep the font's natural height.
             final natural = TextPainter(
               text: box.text,
+              maxLines: box.maxLines,
+              ellipsis: box.overflow == TextOverflow.ellipsis ? '\u2026' : null,
               textDirection: box.textDirection,
               textScaler: box.textScaler,
               locale: box.locale,

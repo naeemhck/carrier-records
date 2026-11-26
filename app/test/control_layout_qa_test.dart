@@ -69,7 +69,9 @@ void main() {
               await tester.tap(find.byIcon(Icons.menu));
               await tester.pumpAndSettle();
             }
-            final label = find.text(L10n.expensesAndReimbursements.en);
+            // The rail shows the one-line label; the full name remains the
+            // row's accessible name and each screen's own title.
+            final label = find.text(WorkspaceDestination.expenses.railLabel.en);
             await tester.ensureVisible(label);
             await tester.pumpAndSettle();
             final semantics = tester.ensureSemantics();
@@ -129,8 +131,10 @@ void main() {
               tester
                   .getRect(find.text(L10n.expensesAndReimbursements.ur))
                   .bottom,
+              // Floating-point slack: the Urdu run can be exactly as tall
+              // as the title box.
               lessThanOrEqualTo(
-                tester.getRect(find.byType(BilingualHeaderTitle)).bottom,
+                tester.getRect(find.byType(BilingualHeaderTitle)).bottom + 0.01,
               ),
             );
           } else {

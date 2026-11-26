@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 /// Logical-pixel UI scale. Printed/snapshot typography is intentionally separate.
 ///
 /// Redesign tokens (frontend plan §2.2): Display 28/36, KPI figure 20/26,
-/// Title 18/24, Body 14/20, Caption 12/16. Latin UI is Fira Sans, figures and
-/// identifiers are Fira Code, Urdu headings are Noto Nastaliq Urdu and Urdu
-/// body is Noto Naskh Arabic — all loaded via Google Fonts at app start, with
-/// the bundled Noto fonts as the offline/test fallback.
+/// Title 18/24, Body 14/20, Caption 12/16. Every face is bundled, so the
+/// office PC renders identically offline: Latin UI is Fira Sans, figures and
+/// identifiers are Fira Mono, and Urdu is Noto Sans Arabic.
 abstract final class KarvaanTypography {
   static const display = 28.0;
   static const headline = 22.0;
@@ -14,16 +13,23 @@ abstract final class KarvaanTypography {
   static const body = 14.0;
   static const caption = 12.0;
   static const micro = 11.0;
-  // 11 typographic points at 96 logical pixels/inch. Never scale Urdu down
-  // to the Latin caption/micro size; accessibility scaling remains unrestricted.
-  static const urduMinimum = 44.0 / 3;
 
-  /// Google Fonts family names (no spaces), registered by the loaders in
-  /// main(). Tests never run main(); they render through the fallbacks.
+  /// Owner directive (2026-11-26 GUI refresh): Urdu stays on every label
+  /// but as a quiet companion to the English, never a second full-size
+  /// line. The companion run is sized from the English it accompanies and
+  /// held between these bounds; accessibility text scaling still applies
+  /// on top. This supersedes the earlier 11pt (44/3 px) Urdu floor.
+  static const urduMinimum = 13.0;
+  static const urduCompanionMaximum = 16.0;
+  static const urduCompanionRatio = 0.93;
+
   static const latinFamily = 'FiraSans';
-  static const figureFamily = 'FiraCode';
-  static const urduDisplayFamily = 'NotoNastaliqUrdu';
-  static const urduBodyFamily = 'NotoNaskhArabic';
+  static const figureFamily = 'FiraMono';
+  static const urduBodyFamily = 'NotoSansArabic';
+
+  /// Headings share the body face: a taller display script was the main
+  /// reason bilingual headings dominated the page.
+  static const urduDisplayFamily = urduBodyFamily;
   static const latinFallback = ['NotoSans', 'NotoSansArabic', 'NotoSansMath'];
   static const urduFallback = ['NotoSansArabic', 'NotoSans', 'NotoSansMath'];
 

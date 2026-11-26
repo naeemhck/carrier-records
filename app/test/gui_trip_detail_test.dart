@@ -171,9 +171,7 @@ void main() {
                 w.text.key == L10n.noTripExpensesRecorded.key,
           ),
         );
-        final tabs = tester.getRect(
-          find.byKey(const ValueKey('detail-tabs')),
-        );
+        final tabs = tester.getRect(find.byKey(const ValueKey('detail-tabs')));
         expect(
           notice.top,
           greaterThanOrEqualTo(tabs.bottom),

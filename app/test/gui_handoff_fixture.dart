@@ -32,20 +32,90 @@ Map<String, dynamic> monthlyVehicleFixture() {
       'owner_due',
     ],
     'fields': [
-      {'field_key': 'period', 'label': 'Report period', 'value_type': 'TEXT', 'header': true},
-      {'field_key': 'scope', 'label': 'Office scope', 'value_type': 'TEXT', 'header': true},
-      {'field_key': 'generated_at', 'label': 'Generated at', 'value_type': 'TEXT', 'header': true},
-      {'field_key': 'recipient_name', 'label': 'Recipient', 'value_type': 'TEXT', 'header': true},
-      {'field_key': 'record_name', 'label': 'Record', 'value_type': 'TEXT', 'header': false},
-      {'field_key': 'vehicle_registration', 'label': 'Vehicle', 'value_type': 'TEXT', 'header': false},
-      {'field_key': 'customer_fare', 'label': 'Customer charge', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'owner_earnings', 'label': 'Owner fare share', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'brokerage', 'label': 'Brokerage earned', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'vehicle_cost', 'label': 'All vehicle costs', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'operating_profit', 'label': 'Vehicle operating profit', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'customer_outstanding', 'label': 'Customer outstanding', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'custody', 'label': 'Intermediary-held money', 'value_type': 'MONEY', 'header': false},
-      {'field_key': 'owner_due', 'label': 'Owner settlement due', 'value_type': 'MONEY', 'header': false},
+      {
+        'field_key': 'period',
+        'label': 'Report period',
+        'value_type': 'TEXT',
+        'header': true,
+      },
+      {
+        'field_key': 'scope',
+        'label': 'Office scope',
+        'value_type': 'TEXT',
+        'header': true,
+      },
+      {
+        'field_key': 'generated_at',
+        'label': 'Generated at',
+        'value_type': 'TEXT',
+        'header': true,
+      },
+      {
+        'field_key': 'recipient_name',
+        'label': 'Recipient',
+        'value_type': 'TEXT',
+        'header': true,
+      },
+      {
+        'field_key': 'record_name',
+        'label': 'Record',
+        'value_type': 'TEXT',
+        'header': false,
+      },
+      {
+        'field_key': 'vehicle_registration',
+        'label': 'Vehicle',
+        'value_type': 'TEXT',
+        'header': false,
+      },
+      {
+        'field_key': 'customer_fare',
+        'label': 'Customer charge',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'owner_earnings',
+        'label': 'Owner fare share',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'brokerage',
+        'label': 'Brokerage earned',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'vehicle_cost',
+        'label': 'All vehicle costs',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'operating_profit',
+        'label': 'Vehicle operating profit',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'customer_outstanding',
+        'label': 'Customer outstanding',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'custody',
+        'label': 'Intermediary-held money',
+        'value_type': 'MONEY',
+        'header': false,
+      },
+      {
+        'field_key': 'owner_due',
+        'label': 'Owner settlement due',
+        'value_type': 'MONEY',
+        'header': false,
+      },
     ],
     'summary_fields': [
       {'field_key': 'arrived', 'label': 'Arrived trips'},
@@ -71,7 +141,10 @@ Map<String, dynamic> monthlyVehicleFixture() {
       {'field_key': 'operating_profit', 'label': 'Vehicle operating profit'},
       {'field_key': 'reimbursement_due', 'label': 'Expense reimbursement due'},
       {'field_key': 'brokerage_recovery', 'label': 'Broker recovery'},
-      {'field_key': 'commission_settled', 'label': 'Commission retained / paid'},
+      {
+        'field_key': 'commission_settled',
+        'label': 'Commission retained / paid',
+      },
       {'field_key': 'customer_outstanding', 'label': 'Customer outstanding'},
     ],
     'metadata': {
@@ -80,7 +153,10 @@ Map<String, dynamic> monthlyVehicleFixture() {
       'generated_at': '2026-10-20T18:33:33.010201+00:00',
       'recipient_name': 'Internal',
       'offices': ['Karachi — synthetic'],
-      'date_bases': {'claims': 'Customer claim date', 'earnings': 'Dispatch date'},
+      'date_bases': {
+        'claims': 'Customer claim date',
+        'earnings': 'Dispatch date',
+      },
     },
     'totals': {
       'arrived': 1,
@@ -140,7 +216,9 @@ Map<String, dynamic> monthlyVehicleFixture() {
     'brand': pair('Karvaan'),
     'title': {'en': parsed.title, 'ur': 'گاڑی کی ماہانہ رپورٹ - غیر جاری شدہ'},
     'fields': {for (final f in parsed.fields) f.key: pair(f.label)},
-    'summaries': {for (final e in parsed.summaries.entries) e.key: pair(e.value)},
+    'summaries': {
+      for (final e in parsed.summaries.entries) e.key: pair(e.value),
+    },
     'frames': {
       'offices': pair('Offices'),
       'date_bases': pair('Date bases'),
@@ -154,9 +232,15 @@ Map<String, dynamic> monthlyVehicleFixture() {
       'page': pair('Page {0} of {1}'),
       'issued': pair('Issued snapshot'),
       'live': pair('Current authorized records'),
-      'continuation': pair('Long text continues in visible rows; amounts appear once per source record.'),
-      'precision': pair('Amounts exceeding Excel numeric precision remain exact decimal text; PKR is the currency.'),
-      'totals': pair('Totals are server-calculated for all {0} authorized records.'),
+      'continuation': pair(
+        'Long text continues in visible rows; amounts appear once per source record.',
+      ),
+      'precision': pair(
+        'Amounts exceeding Excel numeric precision remain exact decimal text; PKR is the currency.',
+      ),
+      'totals': pair(
+        'Totals are server-calculated for all {0} authorized records.',
+      ),
     },
     'date_bases': {
       for (final e in parsed.bases.entries)

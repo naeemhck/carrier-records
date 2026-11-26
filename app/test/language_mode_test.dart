@@ -57,8 +57,10 @@ void main() {
     final urdu = t.widget<Text>(find.text(L10n.customerOutstanding.ur));
     expect(urdu.textDirection, TextDirection.rtl);
     // No ancestor flips the layout direction.
-    expect(Directionality.of(t.element(find.text(urdu.data!))),
-        TextDirection.ltr);
+    expect(
+      Directionality.of(t.element(find.text(urdu.data!))),
+      TextDirection.ltr,
+    );
   });
 
   testWidgets('switching mode rebuilds already-mounted bilingual text', (
@@ -95,16 +97,20 @@ void main() {
     expect(plain(), '${L10n.brokerLine.en}: Synthetic broker');
     store.mode.value = KarvaanLanguageMode.urdu;
     await t.pump();
-    expect(plain(), '${L10n.brokerLine.ur}: Synthetic broker');
+    // A left-to-right mark follows an Urdu label so a date or amount after
+    // it keeps its own order (GUI refresh).
+    expect(plain(), '${L10n.brokerLine.ur}\u200E: Synthetic broker');
     store.mode.value = KarvaanLanguageMode.bilingual;
     await t.pump();
     expect(
       plain(),
-      '${L10n.brokerLine.en} / ${L10n.brokerLine.ur}: Synthetic broker',
+      '${L10n.brokerLine.en} / ${L10n.brokerLine.ur}\u200E: Synthetic broker',
     );
   });
 
-  testWidgets('field helper carries the Urdu line only in bilingual mode', (
+  // GUI refresh: the Urdu companion shares the field's one label line; it
+  // no longer adds a helper row under every field in any mode.
+  testWidgets('field label carries both languages on one line, no helper', (
     t,
   ) async {
     late InputDecoration decorated;
@@ -122,7 +128,8 @@ void main() {
       ),
     );
     await pump();
-    expect(decorated.helper, isNotNull);
+    expect(decorated.helper, isNull);
+    expect(decorated.label, isA<BilingualFloatingLabel>());
     store.mode.value = KarvaanLanguageMode.english;
     await pump();
     expect(decorated.helper, isNull);
@@ -147,22 +154,24 @@ void main() {
     expect(store.mode.value, KarvaanLanguageMode.english);
   });
 
-  test('saved mode is restored on load; unknown values keep the default',
-      () async {
-    SharedPreferences.setMockInitialValues({
-      LanguageModeStore.storageKey: 'urdu',
-    });
-    await store.load();
-    expect(store.mode.value, KarvaanLanguageMode.urdu);
-    SharedPreferences.setMockInitialValues({
-      LanguageModeStore.storageKey: 'klingon',
-    });
-    store.mode.value = KarvaanLanguageMode.bilingual;
-    await store.load();
-    expect(store.mode.value, KarvaanLanguageMode.bilingual);
-  });
+  test(
+    'saved mode is restored on load; unknown values keep the default',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        LanguageModeStore.storageKey: 'urdu',
+      });
+      await store.load();
+      expect(store.mode.value, KarvaanLanguageMode.urdu);
+      SharedPreferences.setMockInitialValues({
+        LanguageModeStore.storageKey: 'klingon',
+      });
+      store.mode.value = KarvaanLanguageMode.bilingual;
+      await store.load();
+      expect(store.mode.value, KarvaanLanguageMode.bilingual);
+    },
+  );
 
-  testWidgets('nav rows are compact in single-language modes', (t) async {
+  testWidgets('nav rows are compact in every language mode', (t) async {
     t.view.physicalSize = const Size(1280, 1100);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.resetPhysicalSize);
@@ -195,8 +204,9 @@ void main() {
     await t.pumpAndSettle();
     final englishHeight = navHeight();
     expect(englishHeight, inInclusiveRange(40, 48));
-    expect(bilingualHeight, lessThan(70));
-    expect(bilingualHeight, greaterThan(englishHeight));
+    // GUI refresh: the Urdu companion shares the row's one line, so a
+    // bilingual row is as compact as a single-language one.
+    expect(bilingualHeight, inInclusiveRange(40, 48));
     // The top bar offers the language switch next to the account menu.
     expect(find.byIcon(Icons.language_outlined), findsOneWidget);
     await t.pumpWidget(const SizedBox());

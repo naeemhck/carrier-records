@@ -173,27 +173,27 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
           ],
         ),
       );
+
   /// One-line bilingual pair ("English · اردو") for compact rows: the
   /// label's two languages share one line instead of stacking, halving
   /// the row height versus [label].
-  pw.Widget inlineLabel(FrozenLabel value, {bool heading = false}) =>
-      pw.Wrap(
-        crossAxisAlignment: pw.WrapCrossAlignment.center,
-        children: [
-          data(value.en, heading: heading),
-          pw.Text(' · ', style: pw.TextStyle(font: regular, fontSize: 9)),
-          pw.Text(
-            value.ur,
-            textDirection: pw.TextDirection.rtl,
-            style: pw.TextStyle(
-              font: heading ? arabicBold : arabic,
-              fontFallback: [regular, math],
-              fontSize: 9,
-              height: 1.4,
-            ),
-          ),
-        ],
-      );
+  pw.Widget inlineLabel(FrozenLabel value, {bool heading = false}) => pw.Wrap(
+    crossAxisAlignment: pw.WrapCrossAlignment.center,
+    children: [
+      data(value.en, heading: heading),
+      pw.Text(' · ', style: pw.TextStyle(font: regular, fontSize: 9)),
+      pw.Text(
+        value.ur,
+        textDirection: pw.TextDirection.rtl,
+        style: pw.TextStyle(
+          font: heading ? arabicBold : arabic,
+          fontFallback: [regular, math],
+          fontSize: 9,
+          height: 1.4,
+        ),
+      ),
+    ],
+  );
 
   pw.Widget metadata(FrozenLabel name, String value) => pw.Inseparable(
     child: pw.Padding(
@@ -256,8 +256,7 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
   final moneyColumns = columns.where((c) => c.type == 'MONEY').length;
   final textColumns = columns.length - moneyColumns;
   final contentWidth =
-      (base.landscape ? PdfPageFormat.a4.height : PdfPageFormat.a4.width) -
-      56;
+      (base.landscape ? PdfPageFormat.a4.height : PdfPageFormat.a4.width) - 56;
   final singleTable =
       columns.length <= 12 &&
       contentWidth - 35 - moneyColumns * 76 >= textColumns * 64;
@@ -321,10 +320,7 @@ Future<Uint8List> renderOutputPdfV2(Map<String, dynamic> args) async {
       final heading = _pdfSectionLabel(s.$1);
       return pw.Padding(
         padding: const pw.EdgeInsets.only(top: 3, bottom: 1),
-        child: inlineLabel(
-          FrozenLabel(heading.en, heading.ur),
-          heading: true,
-        ),
+        child: inlineLabel(FrozenLabel(heading.en, heading.ur), heading: true),
       );
     }
 

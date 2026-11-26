@@ -103,6 +103,18 @@ enum WorkspaceDestination {
   const WorkspaceDestination(this.icon, this.label, this.group);
   final IconData icon;
   final Bilingual label, group;
+
+  /// One-line form for the rail, where the English and its Urdu companion
+  /// share a single row. The full [label] stays the tooltip and the
+  /// accessible name, and each screen keeps its own full title.
+  Bilingual get railLabel => switch (this) {
+    expenses => L10n.expenses,
+    documents => const Bilingual('nav.documents', 'Documents', 'دستاویزات'),
+    masters => L10n.company,
+    imports => const Bilingual('nav.imports', 'Imports', 'درآمد'),
+    backups => const Bilingual('nav.backups', 'Backups', 'بیک اپ'),
+    _ => label,
+  };
   bool allowed(bool admin) => admin || (this != masters && this != backups);
 }
 
@@ -289,26 +301,137 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
         final destinations = WorkspaceDestination.values
             .where((d) => d.allowed(admin))
             .toList();
-        Widget navigation(
-          bool compact, {
-          VoidCallback? dismiss,
-        }) => KarvaanGlass(
-          child: SizedBox(
-            // Rail narrowed toward the mockup (reports pass): 264 -> 208.
-            width: compact ? 88 : 208,
+        Widget navigation(bool compact, {VoidCallback? dismiss}) {
+          final mode = LanguageModeStore.instance.mode.value;
+          Widget item(WorkspaceDestination destination) {
+            final active = selected == destination;
+            void go() {
+              dismiss?.call();
+              open(destination);
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+              child: Material(
+                color: active
+                    ? KarvaanDesign.primarySurface
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                child: compact
+                    ? IconButton(
+                        key: ValueKey('nav:${destination.name}'),
+                        tooltip: destination.label.inMode(mode),
+                        icon: Icon(destination.icon, size: 20),
+                        color: active
+                            ? KarvaanDesign.primary
+                            : KarvaanDesign.secondary,
+                        isSelected: active,
+                        onPressed: go,
+                      )
+                    : InkWell(
+                        key: ValueKey('nav:${destination.name}'),
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: go,
+                        child: Semantics(
+                          button: true,
+                          selected: active,
+                          label:
+                              '${destination.label.en}. ${destination.label.ur}',
+                          excludeSemantics: true,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                // Holds a single-language row at the 40px
+                                // target; the Urdu companion's taller line
+                                // sets the height of a bilingual row.
+                                const SizedBox(height: 20),
+                                Icon(
+                                  destination.icon,
+                                  size: 18,
+                                  color: active
+                                      ? KarvaanDesign.primary
+                                      : KarvaanDesign.secondary,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _RailPair(
+                                    destination.railLabel,
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      height: 18 / 13.5,
+                                      fontWeight: active
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color: active
+                                          ? KarvaanDesign.primary
+                                          : KarvaanDesign.ink,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+            );
+          }
+
+          return Container(
+            width: compact ? 64 : 232,
+            decoration: const BoxDecoration(
+              color: KarvaanDesign.surface,
+              border: Border(
+                right: BorderSide(color: KarvaanDesign.borderColor),
+              ),
+            ),
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: compact
-                      ? const Icon(Icons.route, color: KarvaanDesign.accent)
-                      : const BilingualText(
-                          L10n.brand,
-                          style: KarvaanTypography.sectionTitle,
+                  padding: EdgeInsets.fromLTRB(compact ? 0 : 16, 14, 16, 10),
+                  child: Row(
+                    mainAxisAlignment: compact
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: [
+                      if (compact) const SizedBox(width: 16),
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: KarvaanDesign.primary,
+                          borderRadius: BorderRadius.all(Radius.circular(7)),
                         ),
+                        child: Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(
+                            Icons.route,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      if (!compact) ...[
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: BilingualText(
+                            L10n.brand,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: KarvaanDesign.headingInk,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: ListView(
+                    padding: const EdgeInsets.only(bottom: 8),
                     children: [
                       for (var i = 0; i < destinations.length; i++) ...[
                         if (!compact &&
@@ -316,108 +439,57 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                 destinations[i].group !=
                                     destinations[i - 1].group))
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                            padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),
                             // Section headers are uppercase and non-interactive
                             // so they are never mistaken for navigation items.
-                            child: BilingualText(
+                            child: _RailPair(
                               Bilingual(
                                 destinations[i].group.key,
                                 destinations[i].group.en.toUpperCase(),
                                 destinations[i].group.ur,
                               ),
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: KarvaanDesign.secondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: const TextStyle(
+                                fontSize: KarvaanTypography.micro,
+                                height: 16 / KarvaanTypography.micro,
+                                letterSpacing: 0.8,
+                                fontWeight: FontWeight.w600,
+                                color: KarvaanDesign.secondary,
+                              ),
                             ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          child: Material(
-                            color: selected == destinations[i]
-                                ? KarvaanDesign.borderColor
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            child: compact
-                                ? IconButton(
-                                    key: ValueKey(
-                                      'nav:${destinations[i].name}',
-                                    ),
-                                    tooltip: destinations[i].label.inMode(
-                                      LanguageModeStore.instance.mode.value,
-                                    ),
-                                    icon: Icon(destinations[i].icon),
-                                    isSelected: selected == destinations[i],
-                                    onPressed: () {
-                                      dismiss?.call();
-                                      open(destinations[i]);
-                                    },
-                                  )
-                                : InkWell(
-                                    key: ValueKey(
-                                      'nav:${destinations[i].name}',
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    onTap: () {
-                                      dismiss?.call();
-                                      open(destinations[i]);
-                                    },
-                                    child: Semantics(
-                                      button: true,
-                                      selected: selected == destinations[i],
-                                      child: Padding(
-                                        // Density pass: rows land at ~44–48px
-                                        // in single-language modes and stay
-                                        // visibly shorter than the old ~78px
-                                        // in bilingual mode.
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 9,
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              destinations[i].icon,
-                                              size: 22,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: BilingualText(
-                                                destinations[i].label,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                        ),
+                        if (compact &&
+                            i > 0 &&
+                            destinations[i].group != destinations[i - 1].group)
+                          const Divider(height: 13, indent: 16, endIndent: 16),
+                        item(destinations[i]),
                       ],
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => setState(() => collapsed = !collapsed),
-                  tooltip:
-                      (compact
-                              ? L10n.expandNavigation
-                              : L10n.collapseNavigation)
-                          .inMode(LanguageModeStore.instance.mode.value),
-                  icon: Icon(
-                    compact ? Icons.chevron_right : Icons.chevron_left,
+                const Divider(height: 1),
+                Align(
+                  alignment: compact ? Alignment.center : Alignment.centerRight,
+                  child: IconButton(
+                    onPressed: () => setState(() => collapsed = !collapsed),
+                    tooltip:
+                        (compact
+                                ? L10n.expandNavigation
+                                : L10n.collapseNavigation)
+                            .inMode(mode),
+                    iconSize: 18,
+                    color: KarvaanDesign.secondary,
+                    icon: Icon(
+                      compact
+                          ? Icons.keyboard_double_arrow_right
+                          : Icons.keyboard_double_arrow_left,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        );
+          );
+        }
+
         final account = PopupMenuButton<String>(
           popUpAnimationStyle: AnimationStyle.noAnimation,
           tooltip: L10n.accountNavigation.inMode(
@@ -457,11 +529,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                 body: SafeArea(
                   child: Row(
                     children: [
-                      if (!narrow)
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: navigation(compactRail),
-                        ),
+                      if (!narrow) navigation(compactRail),
                       Expanded(
                         child: Column(
                           children: [
@@ -480,18 +548,23 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                     widget.navigatorKey.currentState
                                         ?.canPop() ??
                                     false;
-                                return Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    8,
-                                    6,
-                                    8,
-                                    6,
+                                return DecoratedBox(
+                                  decoration: const BoxDecoration(
+                                    color: KarvaanDesign.surface,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: KarvaanDesign.borderColor,
+                                      ),
+                                    ),
                                   ),
-                                  child: KarvaanGlass(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      minHeight: 52,
+                                    ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
+                                        horizontal: 12,
+                                        vertical: 4,
                                       ),
                                       child: Row(
                                         children: [
@@ -544,7 +617,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                                                 : Padding(
                                                     padding:
                                                         const EdgeInsets.symmetric(
-                                                          horizontal: 4,
+                                                          horizontal: 8,
                                                         ),
                                                     child: BilingualHeaderTitle(
                                                       spec.title,
@@ -632,4 +705,61 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       },
     );
   }
+}
+
+/// A rail row's label: English on the left, its Urdu companion on the right
+/// of the same line. Single-language modes show just that language. The
+/// rail's width is fixed, so the pair is sized to always share one line; a
+/// long English label ellipsizes rather than pushing the Urdu to a new row.
+class _RailPair extends StatelessWidget {
+  const _RailPair(this.text, {required this.style});
+  final Bilingual text;
+  final TextStyle style;
+  @override
+  Widget build(BuildContext context) => LanguageModeBuilder(
+    builder: (context, mode) {
+      final english = Text(
+        text.en,
+        style: style,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textDirection: TextDirection.ltr,
+      );
+      if (text.ur.isEmpty || mode == KarvaanLanguageMode.english) {
+        return english;
+      }
+      // Sized from the row's body step, not from an uppercase micro header.
+      final base = style.copyWith(
+        fontSize: 13.5,
+        letterSpacing: 0,
+        height: null,
+      );
+      if (mode == KarvaanLanguageMode.urdu) {
+        return Text(
+          text.ur,
+          style: karvaanUrduStyle(context, base),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.left,
+        );
+      }
+      // Side by side while both fit; at a large text scale the Urdu drops
+      // beneath the English instead of squeezing it into an ellipsis.
+      return Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        children: [
+          english,
+          Text(
+            text.ur,
+            style: karvaanUrduStyle(context, base, companion: true),
+            maxLines: 1,
+            textDirection: TextDirection.rtl,
+          ),
+        ],
+      );
+    },
+  );
 }

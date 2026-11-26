@@ -97,7 +97,9 @@ void main() {
     await tester.pumpWidget(entryHarness());
     await tester.pumpAndSettle();
     final amount = find.byWidgetPredicate(
-      (w) => w is TextField && hasEnglishLabel(w.decoration, 'Expense amount (PKR)'),
+      (w) =>
+          w is TextField &&
+          hasEnglishLabel(w.decoration, 'Expense amount (PKR)'),
     );
     await tester.scrollUntilVisible(
       amount,
@@ -128,8 +130,7 @@ void main() {
 
   test('trip picker promotes the most-used trip first, capped at five', () {
     final rows = [
-      for (var i = 0; i < 8; i++)
-        {'id': 'cap-$i', 'trip_number': 'T-$i'},
+      for (var i = 0; i < 8; i++) {'id': 'cap-$i', 'trip_number': 'T-$i'},
     ];
     for (var i = 0; i < 8; i++) {
       for (var k = 0; k <= i; k++) {

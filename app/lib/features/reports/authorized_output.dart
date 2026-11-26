@@ -368,9 +368,8 @@ String humanTimestampText(String value) {
   ).firstMatch(value.trim());
   if (match == null) return value;
   final date = displayValue('DATE', '${match[1]}-${match[2]}-${match[3]}');
-  final zone = RegExp(
-    r'(Z|[+-][0-9]{2}:?[0-9]{2})\s*$',
-  ).firstMatch(value.trim())?[1];
+  final zone = RegExp(r'(Z|[+-][0-9]{2}:?[0-9]{2})\s*$')
+      .firstMatch(value.trim())?[1];
   final zoneText = switch (zone) {
     null => '',
     'Z' || '+00:00' || '+0000' => ' UTC',

@@ -255,7 +255,7 @@ class AgingBandStrip extends StatelessWidget {
           selected: i == selected,
           onSelected: (_) => onSelect(i),
           showCheckmark: false,
-          selectedColor: KarvaanDesign.borderColor,
+          selectedColor: KarvaanDesign.primarySurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(

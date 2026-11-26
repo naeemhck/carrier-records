@@ -6,28 +6,47 @@ import 'owned_presentation.dart';
 import 'karvaan_typography.dart';
 
 /// Urdu runs never inherit Material's Latin line height, which compresses
-/// Urdu ink into adjacent labels, especially at 200%. Plan §2.2: headings
-/// render in Noto Nastaliq Urdu (keeping that font's naturally tall metrics),
-/// body and labels in Noto Naskh Arabic at the plan's 14/26 leading. The
-/// bundled Noto Sans Arabic remains the offline/test fallback.
-TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
+/// Urdu ink into adjacent labels, especially at 200%.
+///
+/// A [companion] run accompanies English in bilingual mode: it is sized
+/// from that English (never larger than it, within the typography bounds),
+/// regular weight and a quieter tint of the same color, so the pair reads
+/// as one label with its translation instead of two competing lines. A
+/// primary run (Urdu-only mode) keeps the requested size, weight and color.
+///
+/// The tint stays at [_companionTint] so the quietest text color in the
+/// app still clears 4.5:1 against the page background. Action captions
+/// pass [tinted] false: a button label keeps the button's own foreground.
+///
+/// No line height is forced: the script's natural ascent and descent are
+/// what keep its marks from being cut off at a panel edge.
+TextStyle _urduStyle(
+  BuildContext context,
+  TextStyle? requested, {
+  bool companion = false,
+  bool tinted = true,
+}) {
   final base = DefaultTextStyle.of(context).style.merge(requested);
-  final size = (base.fontSize ?? KarvaanTypography.body).clamp(
-    KarvaanTypography.urduMinimum,
-    double.infinity,
-  );
-  final display = size >= KarvaanTypography.title;
+  final latin = base.fontSize ?? KarvaanTypography.body;
+  final size = companion
+      ? (latin * KarvaanTypography.urduCompanionRatio).clamp(
+          KarvaanTypography.urduMinimum,
+          KarvaanTypography.urduCompanionMaximum,
+        )
+      : latin.clamp(KarvaanTypography.urduMinimum, double.infinity);
+  final color = base.color;
   return TextStyle(
     inherit: false,
-    fontFamily: display
-        ? KarvaanTypography.urduDisplayFamily
-        : KarvaanTypography.urduBodyFamily,
+    fontFamily: KarvaanTypography.urduBodyFamily,
     fontFamilyFallback: KarvaanTypography.urduFallback,
     fontSize: size,
-    height: display ? null : 26 / 14,
-    fontWeight: base.fontWeight ?? FontWeight.w400,
+    fontWeight: companion
+        ? FontWeight.w400
+        : base.fontWeight ?? FontWeight.w400,
     fontFeatures: KarvaanTypography.figureFeatures,
-    color: base.color,
+    color: companion && tinted && color != null
+        ? color.withValues(alpha: _companionTint)
+        : color,
     backgroundColor: base.backgroundColor,
     decoration: base.decoration,
     decorationColor: base.decorationColor,
@@ -36,15 +55,61 @@ TextStyle _urduStyle(BuildContext context, TextStyle? requested) {
   );
 }
 
+const _companionTint = 0.85;
+
 /// Public entry to the Urdu run styling (see [_urduStyle]); the language
 /// switch labels its Urdu segment with it.
-TextStyle karvaanUrduStyle(BuildContext context, TextStyle? requested) =>
-    _urduStyle(context, requested);
+TextStyle karvaanUrduStyle(
+  BuildContext context,
+  TextStyle? requested, {
+  bool companion = false,
+}) => _urduStyle(context, requested, companion: companion);
+
+/// The bilingual pair: English, then its Urdu companion on the same line.
+/// When both do not fit the available width the Urdu drops beneath the
+/// English, so a short label costs one line and only a long sentence costs
+/// two. [Wrap] keeps this intrinsic-safe for dialogs. The pair stacks
+/// instead where a side-by-side pair would only take width that is not
+/// there: inside a [DataTable] cell (unbounded, so it would widen every
+/// column) and on phone-width windows (buttons in a row would overflow).
+Widget _bilingualPair(
+  BuildContext context, {
+  required Bilingual text,
+  required Widget english,
+  required Widget urdu,
+  TextAlign? textAlign,
+  bool? stacked,
+}) {
+  stacked ??=
+      context.findAncestorWidgetOfExactType<DataTable>() != null ||
+      MediaQuery.sizeOf(context).width < 600;
+  return Semantics(
+    label: '${text.en}. ${text.ur}',
+    excludeSemantics: true,
+    child: stacked
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [english, urdu],
+          )
+        : Wrap(
+            spacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: switch (textAlign) {
+              TextAlign.center => WrapAlignment.center,
+              TextAlign.right || TextAlign.end => WrapAlignment.end,
+              _ => WrapAlignment.start,
+            },
+            children: [english, urdu],
+          ),
+  );
+}
 
 /// Intrinsic-safe wrapping in dialogs/tables; RTL only for the Urdu run.
 ///
 /// Renders per the app-wide [KarvaanLanguageMode]: English only, Urdu only,
-/// or the stacked pair (the default). Layout stays LTR in every mode.
+/// or English with its quieter Urdu companion (the default). Layout stays
+/// LTR in every mode.
 class BilingualText extends StatelessWidget {
   const BilingualText(
     this.text, {
@@ -55,8 +120,13 @@ class BilingualText extends StatelessWidget {
     this.maxLines,
     this.overflow,
     this.softWrap,
+    this.stacked,
   });
   final Bilingual text;
+
+  /// Forces the pair beside each other (false) or stacked (true). Null
+  /// chooses: beside each other, except inside a [DataTable].
+  final bool? stacked;
   final TextStyle? style, urStyle;
   final TextAlign? textAlign;
   final int? maxLines;
@@ -79,8 +149,8 @@ class BilingualText extends StatelessWidget {
       }
       final urdu = Text(
         text.ur,
-        style: _urduStyle(context, urStyle ?? style),
-        textAlign: textAlign ?? TextAlign.right,
+        style: _urduStyle(context, urStyle ?? style, companion: true),
+        textAlign: textAlign ?? TextAlign.left,
         textDirection: TextDirection.rtl,
         maxLines: maxLines,
         overflow: overflow ?? TextOverflow.clip,
@@ -102,14 +172,13 @@ class BilingualText extends StatelessWidget {
           ),
         );
       }
-      return Semantics(
-        label: '${text.en}. ${text.ur}',
-        excludeSemantics: true,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [english, urdu],
-        ),
+      return _bilingualPair(
+        context,
+        text: text,
+        english: english,
+        urdu: urdu,
+        textAlign: textAlign,
+        stacked: stacked,
       );
     },
   );
@@ -133,7 +202,11 @@ class BilingualInlineLine extends StatelessWidget {
   Widget build(BuildContext context) => LanguageModeBuilder(
     builder: (context, mode) {
       final latin = style ?? DefaultTextStyle.of(context).style;
-      final urdu = _urduStyle(context, latin);
+      final urdu = _urduStyle(
+        context,
+        latin,
+        companion: mode == KarvaanLanguageMode.bilingual,
+      );
       final valueText = switch (mode) {
         KarvaanLanguageMode.urdu when value.ur.isNotEmpty => value.ur,
         _ => value.en,
@@ -153,13 +226,15 @@ class BilingualInlineLine extends StatelessWidget {
                   TextSpan(text: label.ur, style: urdu)
                 else
                   TextSpan(text: label.en),
-                TextSpan(text: ': $valueText'),
+                TextSpan(text: '\u200E: $valueText'),
               ],
               KarvaanLanguageMode.bilingual => [
                 TextSpan(text: label.en),
                 const TextSpan(text: ' / '),
                 TextSpan(text: label.ur, style: urdu),
-                TextSpan(text: ': ${value.en}'),
+                // The mark keeps a date or amount that follows the Urdu
+                // label in its own left-to-right order.
+                TextSpan(text: '\u200E: ${value.en}'),
                 if (value.ur.isNotEmpty)
                   TextSpan(text: ' / ${value.ur}', style: urdu),
               ],
@@ -205,21 +280,15 @@ class BilingualCaption extends StatelessWidget {
           ),
         );
       }
-      return Semantics(
-        label: '${text.en}. ${text.ur}',
-        excludeSemantics: true,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            english,
-            Text(
-              text.ur,
-              style: _urduStyle(context, effective),
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.right,
-            ),
-          ],
+      return _bilingualPair(
+        context,
+        text: text,
+        english: english,
+        urdu: Text(
+          text.ur,
+          style: _urduStyle(context, effective, companion: true, tinted: false),
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.left,
         ),
       );
     },
@@ -263,6 +332,34 @@ class BilingualFloatingLabel extends StatelessWidget {
                 textDirection: TextDirection.rtl,
                 style: _urduStyle(context, null),
               )
+            : mode == KarvaanLanguageMode.bilingual && message.ur.isNotEmpty
+            // One line in the field's own label slot: the English label
+            // with its Urdu companion, instead of a second helper line
+            // under every field. The tooltip carries the full pair if a
+            // narrow field has to ellipsize it.
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      message.en,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      message.ur,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textDirection: TextDirection.rtl,
+                      style: _urduStyle(context, null, companion: true),
+                    ),
+                  ),
+                ],
+              )
             : Text(
                 message.en,
                 maxLines: 1,
@@ -274,8 +371,8 @@ class BilingualFloatingLabel extends StatelessWidget {
   );
 }
 
-/// Material's floating-label slot is single-line. Keep native English label
-/// behavior and place its complete Urdu companion in the wrapping helper slot.
+/// Material's floating-label slot is single-line: the label carries the
+/// English and its Urdu companion together on that line in bilingual mode.
 /// The primary label supplies both languages to assistive technology.
 InputDecoration bilingualDecoration(
   BuildContext context,
@@ -288,29 +385,9 @@ InputDecoration bilingualDecoration(
       ? ownedMessage(label.source)
       : null;
   if (message == null || message.ur.isEmpty) return source;
-  // The Urdu companion line rides in the helper slot only in bilingual
-  // mode; single-language modes keep the field to one line (density pass).
-  if (LanguageModeStore.instance.mode.value != KarvaanLanguageMode.bilingual) {
-    return source.copyWith(label: BilingualFloatingLabel(message));
-  }
-  return source.copyWith(
-    label: BilingualFloatingLabel(message),
-    helper: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ExcludeSemantics(
-          child: Text(
-            message.ur,
-            textDirection: TextDirection.rtl,
-            textAlign: TextAlign.right,
-            style: _urduStyle(context, Theme.of(context).textTheme.bodySmall),
-          ),
-        ),
-        ?source.helper,
-      ],
-    ),
-  );
+  // Every mode keeps the field to one label line (GUI refresh): the Urdu
+  // companion no longer rides in a helper row beneath each field.
+  return source.copyWith(label: BilingualFloatingLabel(message));
 }
 
 /// Put multiline actions below the title when narrow rather than consuming
@@ -430,7 +507,11 @@ class BilingualHeaderTitle extends StatelessWidget {
       if (text.ur.isEmpty || mode == KarvaanLanguageMode.english) {
         return english;
       }
-      final urduStyle = _urduStyle(context, base);
+      final urduStyle = _urduStyle(
+        context,
+        base,
+        companion: mode == KarvaanLanguageMode.bilingual,
+      );
       if (mode == KarvaanLanguageMode.urdu) {
         return Semantics(
           label: '${text.en}. ${text.ur}',
@@ -559,19 +640,41 @@ double bilingualToolbarHeight(
       double.infinity,
     );
   }
-  final urduHeight = measure(
-    title.ur,
-    _urduStyle(context, style),
-    TextDirection.rtl,
+  final urduStyle = _urduStyle(
+    context,
+    style,
+    companion: mode == KarvaanLanguageMode.bilingual,
   );
+  final urduHeight = measure(title.ur, urduStyle, TextDirection.rtl);
+  final minimum = 56 * MediaQuery.textScalerOf(context).scale(1);
   if (mode == KarvaanLanguageMode.urdu) {
-    return (urduHeight + 16).clamp(
-      56 * MediaQuery.textScalerOf(context).scale(1),
-      double.infinity,
-    );
+    return (urduHeight + 16).clamp(minimum, double.infinity);
   }
-  return (englishHeight + urduHeight + 16).clamp(
-    88 * MediaQuery.textScalerOf(context).scale(1),
-    double.infinity,
-  );
+  // The pair shares one line when it fits beside each other; otherwise the
+  // Urdu drops beneath the English and the toolbar grows to hold both.
+  double width(String text, TextStyle textStyle, TextDirection direction) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: textStyle),
+      textDirection: direction,
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final result = painter.width;
+    painter.dispose();
+    return result;
+  }
+
+  final sideBySide =
+      width(
+            title.en,
+            style.copyWith(fontWeight: FontWeight.w600),
+            TextDirection.ltr,
+          ) +
+          8 +
+          width(title.ur, urduStyle, TextDirection.rtl) <=
+      availableWidth;
+  return ((sideBySide
+              ? (englishHeight > urduHeight ? englishHeight : urduHeight)
+              : englishHeight + urduHeight) +
+          16)
+      .clamp(minimum, double.infinity);
 }

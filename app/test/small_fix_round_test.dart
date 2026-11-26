@@ -59,46 +59,61 @@ void main() {
     ),
   );
 
-  testWidgets(
-    'Q4: after scrolling to the end, Review centre tap opens Review',
-    (tester) async {
-      setView(tester, const Size(390, 844));
-      await tester.pumpWidget(editor());
-      await tester.pumpAndSettle();
-      final scrollable = find.descendant(
-        of: find.byKey(const ValueKey('trip-steps-scroll')),
-        matching: find.byType(Scrollable),
-      );
-      double offset() =>
-          tester.state<ScrollableState>(scrollable).position.pixels;
-      // Scroll the strip to its end with the chevron, as a user would.
-      var previous = -1.0;
-      for (var i = 0; i < 5 && offset() != previous; i++) {
-        previous = offset();
-        await tester.tap(find.byKey(const ValueKey('trip-steps-next')));
+  // The step row scrolls only when its steps do not fit. With the bundled
+  // faces it fits a 390px phone outright; a 280px pane still has to scroll.
+  for (final (width, scrolls) in [(390.0, false), (280.0, true)]) {
+    testWidgets(
+      'Q4: Review centre tap opens Review, chevron never in the way $width',
+      (tester) async {
+        setView(tester, Size(width, 844));
+        await tester.pumpWidget(editor());
         await tester.pumpAndSettle();
-      }
-      expect(offset(), greaterThan(0), reason: 'the strip really scrolled');
-      final review = tester.getRect(find.byKey(const ValueKey('trip-step-2')));
-      final chevron = tester.getRect(
-        find.byKey(const ValueKey('trip-steps-next')),
-      );
-      // The defect: the overlay covered the step's right portion even at
-      // full scroll (48px intersection before the fix), and with real
-      // fonts its centre too. After the fix they must not overlap at all.
-      expect(
-        review.intersect(chevron).isEmpty,
-        isTrue,
-        reason: 'Review $review must sit clear of the chevron $chevron',
-      );
-      expect(chevron.contains(review.center), isFalse);
-      // Interaction-level proof: tap the button at its centre.
-      await tester.tapAt(review.center);
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('trip-step-content-2')), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+        final scrollable = find.descendant(
+          of: find.byKey(const ValueKey('trip-steps-scroll')),
+          matching: find.byType(Scrollable),
+        );
+        final next = find.byKey(const ValueKey('trip-steps-next'));
+        double offset() =>
+            tester.state<ScrollableState>(scrollable).position.pixels;
+        if (scrolls) {
+          // Scroll the strip to its end with the chevron, as a user would.
+          var previous = -1.0;
+          for (var i = 0; i < 5 && offset() != previous; i++) {
+            previous = offset();
+            await tester.tap(next);
+            await tester.pumpAndSettle();
+          }
+          expect(offset(), greaterThan(0), reason: 'the strip really scrolled');
+          final review = tester.getRect(
+            find.byKey(const ValueKey('trip-step-2')),
+          );
+          final chevron = tester.getRect(next);
+          // The defect: the overlay covered the step's right portion even
+          // at full scroll (48px intersection before the fix), and with
+          // real fonts its centre too. After the fix they must not overlap.
+          expect(
+            review.intersect(chevron).isEmpty,
+            isTrue,
+            reason: 'Review $review must sit clear of the chevron $chevron',
+          );
+          expect(chevron.contains(review.center), isFalse);
+        } else {
+          // A row that already fits offers no chevron that does nothing.
+          expect(next, findsNothing);
+        }
+        // Interaction-level proof: tap the button at its centre.
+        await tester.tapAt(
+          tester.getRect(find.byKey(const ValueKey('trip-step-2'))).center,
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('trip-step-content-2')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('chips guard: last chip centre stays tappable at 390x844', (
     tester,
